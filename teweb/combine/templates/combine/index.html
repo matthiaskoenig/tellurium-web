@@ -5,7 +5,7 @@ The tellurium Web Tools provide a means for the execution of Combine archives.
 {% if archives %}
     <ul>
     {% for archive in archives %}
-        <li><a href="/combine/{{ archive.id }}/">{{ archive.name }}</a></li>
+        <li><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
@@ -15,3 +15,15 @@ The tellurium Web Tools provide a means for the execution of Combine archives.
 
 <h2>Upload Archive</h2>
 <b>Upload</b>
+
+<h2>Open Issues</h2>
+<a href="https://github.com/matthiaskoenig/tellurium-web" target="_blank">github</a>
+<ul>
+    <li>example archives</li>
+    <li>upload archive functionality</li>
+    <li>execute archives</li>
+    <li>provide upload to Combine Archive Tools of archives</li>
+    <li>provide execution with SED-ML webtools for comparison</li>
+    <li>github linking of pages</li>
+    <li>version information (full list of versions of all libraries)</li>
+</ul>
