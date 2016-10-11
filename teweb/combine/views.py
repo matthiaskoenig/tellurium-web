@@ -31,6 +31,11 @@ def archive(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
+
+    # read the archive
+
+
+
     return render(request, 'combine/archive.html', {'archive': archive})
 
 
@@ -55,6 +60,8 @@ def upload(request):
             new_archive.save()
             # TODO: display information of uploaded archive
             # new_archive.pk
+
+            # TODO: validate the archive
 
             return index(request, form)
 
