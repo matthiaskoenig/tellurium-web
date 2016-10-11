@@ -12,26 +12,33 @@
     <!--
     <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon">
     -->
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <!-- Custom css -->
-    <link rel="stylesheet" type="text/css" href="{% static 'combine/font-awesome-4.6.3/css/font-awesome.min.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'combine/css/teweb.css' %}" />
+    <link rel="stylesheet" href="{% static 'combine/bootstrap-3.3.7/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'combine/font-awesome-4.6.3/css/font-awesome.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'combine/css/teweb.css' %}"/>
 </head>
 
 
 <body>
-    <div id="sidebar">
-        {% block sidebar %}
+<div id="sidebar">
+    {% block sidebar %}
         <ul>
             <li><a href="{% url 'combine:index' %}">Home</a></li>
             <li><a href="{% url 'combine:about' %}">About</a></li>
         </ul>
-        {% endblock %}
-    </div>
-    <div id="content">
-        {% block content %}{% endblock %}
-    </div>
+    {% endblock %}
+</div>
+<div id="content">
+    {% block content %}{% endblock %}
+</div>
+<div id="footer">
+    <hr/>
+    <img src="{% static 'combine/images/logos/combine.png' %}" height="30">&nbsp;&nbsp;
+    <img src="{% static 'combine/images/logos/omex.png' %}" height="30">&nbsp;&nbsp;
+    <img src="{% static 'combine/images/logos/sbml.png' %}" height="30">&nbsp;&nbsp;
+    <img src="{% static 'combine/images/logos/sedml.png' %}" height="30">&nbsp;&nbsp;
+    <img src="{% static 'combine/images/logos/libroadrunner.png' %}" height="30">&nbsp;&nbsp;
+
+</div>
 </body>
 </html>
 

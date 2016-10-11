@@ -2,10 +2,8 @@
 {% load static %}
 
 {% block content %}
-<h1>tellurium Web Tools</h1>
-The tellurium Web Tools provides functionality for the execution of Combine archives.
-Either select one of the example archives below, or upload a CombineArchive you want
-to execute:
+<h1>Tellurium Web Tools</h1>
+
 
 <h2>CombineArchives</h2>
 {% if archives %}
@@ -20,10 +18,10 @@ to execute:
     </thead>
     {% for archive in archives %}
         <tr>
-            <td><i class="fa fa-archive fa-lg"></i></td>
+            <td><a href="{% url 'combine:archive' archive.id %}"><i class="fa fa-archive fa-lg icon-black"></i></a></td>
             <td><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></td>
             <td>{{ archive.created }}</td>
-            <td><i class="fa fa-caret-square-o-right fa-lg"></i></td>
+            <td><a href="{% url 'combine:archive' archive.id %}"><i class="fa fa-caret-square-o-right fa-lg icon-black"></i></a></td>
         </tr>
     {% endfor %}
 

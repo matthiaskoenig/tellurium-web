@@ -1,6 +1,15 @@
-{{ archive }}
+{% extends "combine/base_generic.html" %}
+{% load static %}
 
-<p>
-    <b>Run archive</b><br />
-    Executes the given archive using tellurium.
-</p>
+{% block content %}
+    <h1>Archive: {{ archive }}</h1>
+    <h2>Info</h2>
+    Information about the archive content, validation, ...
+
+    <h2>Execute</h2>
+    <p>
+        <b>Run archive</b> <i class="fa fa-caret-square-o-right fa-lg icon-black"></i><br/>
+        Execute the CombineArchive using tellurium.
+    </p>
+
+{% endblock %}
