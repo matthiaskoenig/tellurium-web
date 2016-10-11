@@ -1,6 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.template import loader
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, Http404
 
 from .models import Archive
 
@@ -12,11 +11,10 @@ def index(request):
     :return:
     """
     archives = Archive.objects.all()
-    template = loader.get_template('combine/index.html')
     context = {
         'archives': archives,
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, 'combine/index.html', context)
 
 
 def archive(request, archive_id):
@@ -26,4 +24,12 @@ def archive(request, archive_id):
     :param archive_id:
     :return:
     """
-    return HttpResponse("You're looking at archive %s." % archive_id)
+    archive = get_object_or_404(Archive, pk=archive_id)
+    return render(request, 'combine/archive.html', {'archive': archive})
+
+
+def about(request):
+    """ About page. """
+    return render(request, 'combine/about.html', {})
+
+
