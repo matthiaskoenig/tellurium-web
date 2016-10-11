@@ -1,18 +1,11 @@
-"""
-Helper functions to work with combine archives.
-"""
 from __future__ import print_function, division
-from .models import Archive
-
 import libcombine
-import libsbml
+import os
 
-
-
-
-def get_content(archive):
-    path = archive.file.path
+def get_content(path):
     print(path)
+    print('path exists:', os.path.exists(path))
+
     # libsbml.readSBMLFromFile(path)
     manifest = libcombine.readOMEXFromFile(str(path))
 
@@ -26,24 +19,17 @@ def get_content(archive):
 
     # make CaListOfContents iteratable
     contentsList = manifest.getListOfContents()
-
     print('Contents: ', contentsList.getNumContents())
     for k in xrange(contentsList.getNumContents()):
         cabase = contentsList.get(k)
         print(cabase)
 
     print(manifest)
-    print("Hello world")
-
 
 
 if __name__ == "__main__":
-    import django
-    django.setup()
-    archive = Archive.objects.get(pk=10)
-    print(archive)
+    """
+    Try to read the showcase archive.
+    """
+    archive = "CombineArchiveShowCase.omex"
     get_content(archive)
-
-
-
-

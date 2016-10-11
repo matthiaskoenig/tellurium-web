@@ -29,7 +29,7 @@
             </thead>
             {% for archive in archives %}
                 <tr>
-                    <td><a href="{% url 'combine:archive' archive.id %}"><i class="fa fa-archive fa-lg black"></i></a>
+                    <td><a href="{% url 'combine:archive' archive.id %}"><i class="fa fa-archive fa-lg black"></i><span class="math">{{archive.id}}</span></class></a>
                     </td>
                     <td><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></td>
                     <td>{{ archive.created }}</td>

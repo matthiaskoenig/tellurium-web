@@ -4,8 +4,8 @@ body {
     padding-bottom: 50px;
 }
 
-.ontology{
-    background-color: #5FBDCE;
+.pk{
+    background-color: rgba(125, 125, 125, 0.7);
     padding:2px;
     padding-right:4px;
     color: white;

@@ -1,26 +1,26 @@
 # tellurium-web
+Tellurium Web Tools. Online tools for running Combine Archives (*.omex) 
+with tellurium.
 
-## Technology overview
+## Technology
 
 ### docker 
 * development & deployment in container
+* reproducible environments
 
-python web framework & python backend code
-* Django
-* [Flask](http://flask.pocoo.org/)
-* Pyramid
-https://www.airpair.com/python/posts/django-flask-pyramid
+### django
+* python web framework & python backend code
 
-=> django
-
-database backend
-* simple file database (existing combine archives)
+### sqlite & (postgresql) 
+* database backend
+* simple file database (sqlite)
+* switch to postgres when necessary
 
 python plot framework (interactive)
 * plotly (https://plot.ly/python/)
 * https://plot.ly/python/line-charts/
 
-javascript frontend
+#javascript frontend
 * navigation
 
 

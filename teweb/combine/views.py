@@ -54,12 +54,13 @@ def upload(request):
         form = UploadArchiveForm(request.POST, request.FILES)
         if form.is_valid():
             print('Handling uploaded file')
-            # FIXME: get the filename
-            name = 'test_name'
+
+            name = request.FILES['file']
             new_archive = Archive(name=name, file=request.FILES['file'])
             new_archive.save()
-            # TODO: display information of uploaded archive
-            # new_archive.pk
+
+            # validate
+
 
             # TODO: validate the archive
 
