@@ -11,5 +11,5 @@ urlpatterns = [
     # ex: /combine/upload
     url(r'upload^$', views.upload, name='upload'),
     # ex: /combine/about
-    url(r'about^$', views.index, name='about'),
+    url(r'about^$', views.about, name='about'),
 ]
