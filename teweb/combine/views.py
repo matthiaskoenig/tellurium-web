@@ -47,7 +47,9 @@ def upload(request):
             print('Handling uploaded file')
             new_archive = Archive(name=form.name, file=request.FILES['file'])
             new_archive.save()
-            return HttpResponseRedirect(reverse('combine.views.index'))
+            # TODO: display information of uploaded archive
+            # new_archive.pk
+            return HttpResponseRedirect(reverse('combine:about'))
     else:
         form = UploadArchiveForm()
     return render(request, 'combine/upload.html', {'form': form})

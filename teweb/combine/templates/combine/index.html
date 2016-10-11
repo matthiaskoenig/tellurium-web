@@ -3,7 +3,7 @@ The tellurium Web Tools provides functionality for the execution of Combine arch
 Either select one of the example archives below, or upload a CombineArchive you want
 to execute:
 
-<h2>Example CombineArchives</h2>
+<h2>CombineArchives</h2>
 {% if archives %}
     <ul>
     {% for archive in archives %}
@@ -11,21 +11,11 @@ to execute:
     {% endfor %}
     </ul>
 {% else %}
-    <p>No archives are available.</p>
+    <p>No archives availavble. Upload archive below.</p>
 {% endif %}
 
 <h2>Upload CombineArchive</h2>
-<li><a href="{% url 'combine:upload_archive' %}">Upload</a></li>-->
+<a href="{% url 'combine:upload' %}">Upload Archive</a>
 
-<h2>Open Issues</h2>
-<a href="https://github.com/matthiaskoenig/tellurium-web" target="_blank">github</a>
-<ul>
-    <li>example archives</li>
-    <li>static files</li>
-    <li>upload archive functionality</li>
-    <li>execute archives</li>
-    <li>provide upload to Combine Archive Tools of archives</li>
-    <li>provide execution with SED-ML webtools for comparison</li>
-    <li>github linking of pages</li>
-    <li>version information (full list of versions of all libraries)</li>
-</ul>
+<h2>About</h2>
+<a href="{% url 'combine:about' %}">About</a>
