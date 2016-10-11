@@ -13,7 +13,7 @@ from django.utils import timezone
 class Archive(models.Model):
     """ Combine Archive class. """
     name = models.CharField(max_length=200)
-    file = models.FileField(upload_to='archives/%Y/%m/%d')
+    file = models.FileField(upload_to='archives/upload')
     created = models.DateTimeField('date published', editable=False)
 
     def __str__(self):

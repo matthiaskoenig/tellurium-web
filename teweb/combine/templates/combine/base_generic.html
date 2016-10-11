@@ -14,28 +14,52 @@
     <link rel="stylesheet" type="text/css" href="{% static 'combine/css/teweb.css' %}"/>
 </head>
 
-
 <body>
-<div id="sidebar">
-    {% block sidebar %}
-        <ul>
-            <li><a href="{% url 'combine:index' %}">Home</a></li>
-            <li><a href="{% url 'combine:about' %}">About</a></li>
-        </ul>
-    {% endblock %}
-</div>
-<div id="content">
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'combine:index' %}"><img src="{% static 'combine/images/logos/te.png' %}" height="30"></a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="{% url 'combine:index' %}">Tellurium Web Tools</a></li>
+                <li><a href="{% url 'combine:about' %}">About</a></li>
+                <li><a href="{% url 'admin:index' %}">Admin</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div id="content" class="container">
+<div class="starter-template">
     {% block content %}{% endblock %}
 </div>
-<div id="footer">
-    <hr/>
-    <a href="http://co.mbine.org/" alt="COMBINE" target="_blank"><img src="{% static 'combine/images/logos/combine.png' %}" height="30"></a>&nbsp;&nbsp;
-    <a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img src="{% static 'combine/images/logos/omex.png' %}" height="30"></a>&nbsp;&nbsp;
-    <a href="http://sbml.org" alt="SBML" target="_blank"><img src="{% static 'combine/images/logos/sbml.png' %}" height="30"></a>&nbsp;&nbsp;
-    <a href="http://sed-ml.org" alt="SED-ML" target="_blank"><img src="{% static 'combine/images/logos/sedml.png' %}" height="30"></a>&nbsp;&nbsp;
-   <a href="http://libroadrunner.org/" alt="libroadrunner" target="_blank"><img src="{% static 'combine/images/logos/libroadrunner.jpg' %}" height="30"></a>&nbsp;&nbsp;
-<a href="http://tellurium.analogmachine.org/" alt="Tellurium" target="_blank"><img src="{% static 'combine/images/logos/te.png' %}" height="30"></a>&nbsp;&nbsp;
 </div>
+
+<div id="footer" class="container">
+    <hr/>
+    <a href="http://co.mbine.org/" alt="COMBINE" target="_blank"><img
+            src="{% static 'combine/images/logos/combine.png' %}" height="25"></a>&nbsp;&nbsp;
+    <a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
+            src="{% static 'combine/images/logos/omex.png' %}" height="25"></a>&nbsp;&nbsp;
+    <a href="http://sbml.org" alt="SBML" target="_blank"><img src="{% static 'combine/images/logos/sbml.png' %}"
+                                                              height="25"></a>&nbsp;&nbsp;
+    <a href="http://sed-ml.org" alt="SED-ML" target="_blank"><img src="{% static 'combine/images/logos/sedml.png' %}"
+                                                                  height="25"></a>&nbsp;&nbsp;
+    <a href="http://libroadrunner.org/" alt="libroadrunner" target="_blank"><img
+            src="{% static 'combine/images/logos/libroadrunner.jpg' %}" height="25"></a>&nbsp;&nbsp;
+    <a href="http://tellurium.analogmachine.org/" alt="Tellurium" target="_blank"><img
+            src="{% static 'combine/images/logos/te.png' %}" height="25"></a>&nbsp;&nbsp;
+</div>
+
+<script src="{% static 'combine/bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
 </body>
 </html>
 

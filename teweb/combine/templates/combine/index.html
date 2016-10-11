@@ -2,46 +2,47 @@
 {% load static %}
 
 {% block content %}
-<h1>Tellurium Web Tools</h1>
+    <h2>Upload Archive</h2>
 
+    <form action="{% url 'combine:upload' %}" method="post"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>{{ form.non_field_errors }}</p>
+        <p>{{ form.file.label_tag }} {{ form.file.help_text }}</p>
+        <p>
+            {{ form.file.errors }}
+            {{ form.file }} <input type="submit" value="Upload"/>
+        </p>
+    </form>
 
-<h2>CombineArchives</h2>
-{% if archives %}
-    <table class="table table-striped table-condensed table-hover">
-    <thead>
-    <tr>
-        <th></th>
-        <th>Name</th>
-        <th>Created</th>
-        <th>Run</th>
-    </tr>
-    </thead>
-    {% for archive in archives %}
-        <tr>
-            <td><a href="{% url 'combine:archive' archive.id %}"><i class="fa fa-archive fa-lg icon-black"></i></a></td>
-            <td><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></td>
-            <td>{{ archive.created }}</td>
-            <td><a href="{% url 'combine:archive' archive.id %}"><i class="fa fa-caret-square-o-right fa-lg icon-black"></i></a></td>
-        </tr>
-    {% endfor %}
+    <h2>Archives</h2>
+    {% if archives %}
+        <table class="table table-striped table-condensed table-hover">
+            <thead>
+            <tr>
+                <th>Archive</th>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Run</th>
+                <th>Results</th>
+            </tr>
+            </thead>
+            {% for archive in archives %}
+                <tr>
+                    <td><a href="{% url 'combine:archive' archive.id %}"><i class="fa fa-archive fa-lg black"></i></a>
+                    </td>
+                    <td><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></td>
+                    <td>{{ archive.created }}</td>
+                    <td><a href="{% url 'combine:archive' archive.id %}"><i
+                            class="fa fa-play-circle fa-lg black"></i></a></td>
+                    <td><a href="{% url 'combine:archive' archive.id %}"><i
+                            class="fa fa-ban fa-lg grey"></i></a></td>
+                </tr>
+            {% endfor %}
 
-    </table>
-{% else %}
-    <p>No archives available. Upload archive below.</p>
-{% endif %}
-
-<h2>Upload CombineArchive</h2>
-
-<form action="{% url 'combine:upload' %}" method="post" enctype="multipart/form-data">
-{% csrf_token %}
-
-<p>{{ form.non_field_errors }}</p>
-<p>{{ form.file.label_tag }} {{ form.file.help_text }}</p>
-<p>
-    {{ form.file.errors }}
-    <i class="fa fa-upload fa-lg"></i> {{ form.file }}
-</p>
-<p><input type="submit" value="Upload" /></p>
-</form>
+        </table>
+    {% else %}
+        <p>No archives available. Upload archive below.</p>
+    {% endif %}
 
 {% endblock %}

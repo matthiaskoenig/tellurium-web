@@ -1,4 +1,9 @@
 
+body {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
 .ontology{
     background-color: #5FBDCE;
     padding:2px;
@@ -39,9 +44,13 @@
 .icon-invisible {
     visibility: hidden;
 }
-.icon-black {
+.black {
     color: black;
 }
+.grey {
+    color: grey;
+}
+
 
 /* References */
 .ref-item {
