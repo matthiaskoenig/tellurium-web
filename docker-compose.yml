@@ -3,16 +3,16 @@ version: '2'
 services:
 
   db:
-    image: postgres
+    image: postgres:9.6.0
     environment:
       POSTGRES_PASSWORD: password
     volumes:
       - ./dbdata:/var/lib/postgresql/data
 
   web:
+    image: django:1.10.2-python2
     # Docker hack to wait until Postgres is up, then run stuff.
     command: bash -c "while ! nc -w 1 -z db 5432; do sleep 0.1; done; ./manage.py migrate; while :; do ./manage.py runserver_plus 0.0.0.0:8000; sleep 1; done"
-    image: django
     build: .
     volumes:
       - .:/code

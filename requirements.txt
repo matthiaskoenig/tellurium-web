@@ -1,0 +1,2 @@
+# requirements for web app
+django==1.10.2

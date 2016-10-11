@@ -1,8 +1,8 @@
-#tellurium-web
+# tellurium-web
 
 ## Technology overview
 
-docker 
+### docker 
 * development & deployment in container
 
 python web framework & python backend code
@@ -10,6 +10,8 @@ python web framework & python backend code
 * [Flask](http://flask.pocoo.org/)
 * Pyramid
 https://www.airpair.com/python/posts/django-flask-pyramid
+
+=> django
 
 database backend
 * simple file database (existing combine archives)
