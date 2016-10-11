@@ -1,3 +1,8 @@
+
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'combine/font-awesome-4.6.3/css/font-awesome.min.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'combine/css/teweb.css' %}" />
+
 <h1>tellurium Web Tools</h1>
 The tellurium Web Tools provides functionality for the execution of Combine archives.
 Either select one of the example archives below, or upload a CombineArchive you want
@@ -5,14 +10,21 @@ to execute:
 
 <h2>CombineArchives</h2>
 {% if archives %}
-    <table>
+    <table class="table table-striped table-condensed table-hover">
     <thead>
-    <tr><th>Name</th><th>Created</th></tr>
+    <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Created</th>
+        <th>Run</th>
+    </tr>
     </thead>
     {% for archive in archives %}
         <tr>
+            <td><i class="fa fa-archive fa-lg"></i></td>
             <td><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></td>
             <td>{{ archive.created }}</td>
+            <td><i class="fa fa-caret-square-o-right fa-lg"></i></td>
         </tr>
     {% endfor %}
 
@@ -30,7 +42,7 @@ to execute:
 <p>{{ form.file.label_tag }} {{ form.file.help_text }}</p>
 <p>
     {{ form.file.errors }}
-    {{ form.file }}
+    <i class="fa fa-upload fa-lg"></i> {{ form.file }}
 </p>
 <p><input type="submit" value="Upload" /></p>
 </form>

@@ -4,6 +4,8 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
 from django.utils import timezone
 
+# TODO: executed file for download, i.e. archive after execution
+# TODO: validation
 
 @python_2_unicode_compatible
 class Archive(models.Model):
