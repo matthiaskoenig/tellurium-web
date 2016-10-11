@@ -1,8 +1,7 @@
-
+{% extends "combine/base_generic.html" %}
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'combine/font-awesome-4.6.3/css/font-awesome.min.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'combine/css/teweb.css' %}" />
 
+{% block content %}
 <h1>tellurium Web Tools</h1>
 The tellurium Web Tools provides functionality for the execution of Combine archives.
 Either select one of the example archives below, or upload a CombineArchive you want
@@ -47,6 +46,4 @@ to execute:
 <p><input type="submit" value="Upload" /></p>
 </form>
 
-
-<h2>About</h2>
-<a href="{% url 'combine:about' %}">About</a>
+{% endblock %}

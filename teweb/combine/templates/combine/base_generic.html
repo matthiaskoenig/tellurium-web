@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Tellurium Web Tools{% endblock %}</title>
+    <meta name="description" content="Tellurium Web Tools">
+    <meta name="author" content="Matthias Koenig">
+
+    <!--
+    <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon">
+    -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <!-- Custom css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'combine/font-awesome-4.6.3/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'combine/css/teweb.css' %}" />
+</head>
+
+
+<body>
+    <div id="sidebar">
+        {% block sidebar %}
+        <ul>
+            <li><a href="{% url 'combine:index' %}">Home</a></li>
+            <li><a href="{% url 'combine:about' %}">About</a></li>
+        </ul>
+        {% endblock %}
+    </div>
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+
+

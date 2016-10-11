@@ -1,8 +1,7 @@
+{% extends "combine/base_generic.html" %}
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'combine/font-awesome-4.6.3/css/font-awesome.min.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'combine/css/teweb.css' %}" />
 
-
+{% block content %}
 <h1>About tellurium Web Tools</h1>
 tellurium Web Tools provide a simple means for the execution of CombineArchives.
 
@@ -53,4 +52,5 @@ in <a href="http://sbml.org">SED-ML</a> are supported.
 <!--
 Please <a href="https://github.com/{{ site.github.repository_nwo }}/edit/{{ site.branch }}/{{ site.page.path }}">help improve this article</a>.
 -->
+{% endblock %}
 

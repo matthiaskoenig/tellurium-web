@@ -6,6 +6,8 @@ from django.utils import timezone
 
 # TODO: executed file for download, i.e. archive after execution
 # TODO: validation
+# MD5 Hash
+# Filesize {{ value|filesizeformat }}
 
 @python_2_unicode_compatible
 class Archive(models.Model):
