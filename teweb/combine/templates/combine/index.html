@@ -5,17 +5,36 @@ to execute:
 
 <h2>CombineArchives</h2>
 {% if archives %}
-    <ul>
+    <table>
+    <thead>
+    <tr><th>Name</th><th>Created</th></tr>
+    </thead>
     {% for archive in archives %}
-        <li><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></li>
+        <tr>
+            <td><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></td>
+            <td>{{ archive.created }}</td>
+        </tr>
     {% endfor %}
-    </ul>
+
+    </table>
 {% else %}
-    <p>No archives availavble. Upload archive below.</p>
+    <p>No archives available. Upload archive below.</p>
 {% endif %}
 
 <h2>Upload CombineArchive</h2>
-<a href="{% url 'combine:upload' %}">Upload Archive</a>
+
+<form action="{% url 'combine:upload' %}" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+
+<p>{{ form.non_field_errors }}</p>
+<p>{{ form.file.label_tag }} {{ form.file.help_text }}</p>
+<p>
+    {{ form.file.errors }}
+    {{ form.file }}
+</p>
+<p><input type="submit" value="Upload" /></p>
+</form>
+
 
 <h2>About</h2>
 <a href="{% url 'combine:about' %}">About</a>

@@ -1,20 +1,24 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.template import RequestContext
 
 from .models import Archive
 from.forms import UploadArchiveForm
 
 
-def index(request):
+def index(request, form=None):
     """ Overview of archives.
 
     :param request:
     :return:
     """
-    archives = Archive.objects.all()
+    archives = Archive.objects.all().order_by('-created')
+    if form is None:
+        form = UploadArchiveForm()
     context = {
         'archives': archives,
+        'form': form
     }
     return render(request, 'combine/index.html', context)
 
@@ -45,11 +49,21 @@ def upload(request):
         form = UploadArchiveForm(request.POST, request.FILES)
         if form.is_valid():
             print('Handling uploaded file')
-            new_archive = Archive(name=form.name, file=request.FILES['file'])
+            # FIXME: get the filename
+            name = 'test_name'
+            new_archive = Archive(name=name, file=request.FILES['file'])
             new_archive.save()
             # TODO: display information of uploaded archive
             # new_archive.pk
-            return HttpResponseRedirect(reverse('combine:about'))
+
+            return index(request, form)
+
+            # return HttpResponseRedirect(reverse('combine:index'))
+        else:
+            print('Form is invalid')
     else:
         form = UploadArchiveForm()
-    return render(request, 'combine/upload.html', {'form': form})
+
+    return index(request, form)
+
+
