@@ -1,0 +1,10 @@
+<h1>Combine Archives</h1>
+{% if archives %}
+    <ul>
+    {% for archive in archives %}
+        <li><a href="/combine/{{ archive.id }}/">{{ archive.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No archives are available.</p>
+{% endif %}
