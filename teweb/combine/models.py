@@ -8,7 +8,8 @@ from django.db import models
 class Archive(models.Model):
     """ Combine Archive class. """
     name = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField('date published', auto_created=True)
+    file = models.FileField(upload_to='archives/%Y/%m/%d')
 
     def __str__(self):
         return self.name

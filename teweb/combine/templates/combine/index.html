@@ -1,7 +1,9 @@
 <h1>tellurium Web Tools</h1>
-The tellurium Web Tools provide a means for the execution of Combine archives.
+The tellurium Web Tools provides functionality for the execution of Combine archives.
+Either select one of the example archives below, or upload a CombineArchive you want
+to execute:
 
-<h2>Combine Archives</h2>
+<h2>Example CombineArchives</h2>
 {% if archives %}
     <ul>
     {% for archive in archives %}
@@ -12,14 +14,14 @@ The tellurium Web Tools provide a means for the execution of Combine archives.
     <p>No archives are available.</p>
 {% endif %}
 
-
-<h2>Upload Archive</h2>
-<b>Upload</b>
+<h2>Upload CombineArchive</h2>
+<li><a href="{% url 'combine:upload' %}">Upload</a></li>
 
 <h2>Open Issues</h2>
 <a href="https://github.com/matthiaskoenig/tellurium-web" target="_blank">github</a>
 <ul>
     <li>example archives</li>
+    <li>static files</li>
     <li>upload archive functionality</li>
     <li>execute archives</li>
     <li>provide upload to Combine Archive Tools of archives</li>
