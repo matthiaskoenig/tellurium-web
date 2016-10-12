@@ -36,10 +36,32 @@ def execute(request, archive_id):
     """
 
     archive = get_object_or_404(Archive, pk=archive_id)
-    path = str(archive.file.path)
+    omexPath = str(archive.file.path)
 
     # execute the archive
     # TODO
+
+    import os.path
+    import tellurium as te
+    import tempfile
+
+
+    # TODO: better implementation of execution
+    omexDir = os.path.dirname(os.path.realpath(__file__))
+
+    workingDir = os.path.join(omexDir, "_te_CombineArchiveShowCase")
+    tmp_dir = tempfile.mkdtemp()
+
+
+
+    print("*" * 80)
+    print("EXECUTION")
+    print("*" * 80)
+    te.executeOMEX(omexPath, workingDir=tmp_dir)
+
+
+    import shutil
+    shutil.rmtree(tmp_dir)
 
     # provide the info to the view
     context = {
