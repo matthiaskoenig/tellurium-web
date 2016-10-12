@@ -1,43 +1,56 @@
-import sys
+"""
+Example using libcombine.
+"""
 
+from __future__ import print_function, division
+import sys
 from libcombine import *
 
 
 def printMetaDataFor(archive, location):
-    desc = archive.getMetadataForLocation(location);
+    """ Print metadata.
+
+    :param archive:
+    :param location:
+    :return:
+    """
+    desc = archive.getMetadataForLocation(location)
     if desc.isEmpty():
-        {
-        print("  no metadata for '{0}'".format(location));
-    return;
+        print("no metadata for '{0}'".format(location))
+    return
 
-    print("  metadata for '{0}':".format(location));
-    print("     Created : {0}".format(desc.getCreated().getDateAsString()));
+    print("metadata for '{0}':".format(location))
+    print("\tCreated : {0}".format(desc.getCreated().getDateAsString()))
     for i in range(desc.getNumModified()):
-        print("     Modified : {0}".format(desc.getModified(i).getDateAsString()));
+        print("\tModified : {0}".format(desc.getModified(i).getDateAsString()))
 
-    print("     # Creators: {0}".format(desc.getNumCreators()));
+    print("\tCreators: {0}".format(desc.getNumCreators()))
     for i in range(desc.getNumCreators()):
-        creator = desc.getCreator(i);
-        print("       {0} {1}".format(creator.getGivenName(), creator.getFamilyName()));
+        creator = desc.getCreator(i)
+        print("\t{0} {1}".format(creator.getGivenName(), creator.getFamilyName()))
 
 
 def printArchive(fileName):
-    archive = CombineArchive();
-    if !archive.initializeFromArchive(fileName):
-        {
-            System.out.println("Invalid Combine Archive");
-    return;
-    }
+    """ Print the content of the archive.
 
-    printMetaDataFor(archive, ".");
+    :param fileName:
+    :return:
+    """
+    archive = CombineArchive()
+    if not archive.initializeFromArchive(fileName):
+        print("Invalid Combine Archive")
+        return
 
-    print("Num Entries: {0}".format(archive.getNumEntries()));
+    printMetaDataFor(archive, ".")
+    print("Num Entries: {0}".format(archive.getNumEntries()))
 
     for i in range(archive.getNumEntries()):
-        entry = archive.getEntry(i);
+        print(i)
+        entry = archive.getEntry(i)
+        print('entry: <{}>'.format(i), entry)
 
-        print(" {0}: location: {1} format: {2}".format(i, entry.getLocation(), entry.getFormat()));
-        printMetaDataFor(archive, entry.getLocation());
+        print(" {0}: location: {1} format: {2}".format(i, entry.getLocation(), entry.getFormat()))
+        printMetaDataFor(archive, entry.getLocation())
 
         # the entry could now be extracted via
         # archive.extractEntry(entry.getLocation(), <filename or folder>)
@@ -45,12 +58,16 @@ def printArchive(fileName):
         # or used as string
         # content = archive.extractEntryToString(entry.getLocation());
 
+        archive.cleanUp()
 
-        archive.cleanUp();
-
+#####################################################################
 if __name__ == "__main__":
+    archive = "/home/mkoenig/git/tellurium-web/archives/CombineArchiveShowCase.omex"
+    print(archive)
+    printArchive(archive)
+
+    """
     if len(sys.argv) < 2:
         print ("usage printArchive archive-file")
-    sys.exit(1)
-
-    printArchive(sys.argv[1])
+        sys.exit(1)
+    """
