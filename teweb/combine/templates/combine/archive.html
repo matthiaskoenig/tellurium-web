@@ -2,14 +2,17 @@
 {% load static %}
 
 {% block content %}
-    <h1>Archive: {{ archive }}</h1>
-    <h2>Info</h2>
-    Information about the archive content, validation, ...
+<h1>Archive: {{ archive }}</h1>
+<p>
+    <a href="{% url 'combine:execute' archive.id %}"><i class="fa fa-caret-square-o-right fa-3x fa-lg"></i></a>
+    <b>Execute CombineArchive with tellurium</b>
+</p>
 
-    <h2>Execute</h2>
-    <p>
-        <b>Run archive</b> <i class="fa fa-caret-square-o-right fa-lg icon-black"></i><br/>
-        Execute the CombineArchive using tellurium.
-    </p>
+<h2>Entries</h2>
+<ul>
+    {% for entry in entries %}
+    <li><b><code>{{entry.getLocation }}</code></b> ({{entry.getFormat}})</li>
+    {% endfor %}
+</ul>
 
 {% endblock %}
