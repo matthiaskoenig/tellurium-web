@@ -35,3 +35,6 @@ python plot framework (interactive)
 ## Changelog
 *v0.1* [?]
 - initial release
+
+# Deploy the container
+https://www.stavros.io/posts/how-deploy-django-docker/

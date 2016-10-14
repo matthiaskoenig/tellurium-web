@@ -14,7 +14,6 @@ install:
 
 before_script:
     # test dependencies
-    - pip install -r requirements.txt
     - pip install mock
     - pip install requests
     - pip install coverage
