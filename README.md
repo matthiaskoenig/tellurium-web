@@ -1,5 +1,5 @@
 # tellurium Web Tools
-<img title="tellurium logo" src="./teweb/combine/static/combine/images/te.png" height="50" />
+<img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" height="50" />
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 
