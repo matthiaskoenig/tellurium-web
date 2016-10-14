@@ -8,8 +8,14 @@ branches:
 services:
     - docker
 
+install:
+    - docker build -t tellurium-web .
+    - docker run -d -p 127.0.0.1:80:80 --name tellurium-web tellurium-web
+
 script:
-    - make build
+    # Docker container is running with website
+    - docker ps | grep -q blog
+
     # TODO: test that the server runs
     # TODO: test queries on server
 
