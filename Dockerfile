@@ -1,12 +1,27 @@
 # docker build -t matthiaskoenig/teweb . && docker run -it -p 8000:8000 matthiaskoenig/teweb
 # http://localhost:8000
-FROM python:2.7
+FROM matthiaskoenig/linux-setup-combine:latest
 MAINTAINER Matthias Koenig <konigmatt@googlemail.com>
 
 WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 COPY . .
+
+# Install latest tellurium
+WORKDIR $HOME
+RUN git clone https://github.com/sys-bio/tellurium
+WORKDIR $HOME/tellurium
+
+# testing mkoenig branch
+RUN git checkout mkoenig
+# run tellurium tests
+# install latest tellurium
+RUN python setup.py install
+
+# Run tests
+WORKDIR /usr/src/app/teweb
+RUN python manage.py test
 
 EXPOSE 8000
 WORKDIR /usr/src/app/teweb

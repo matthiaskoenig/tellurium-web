@@ -1,33 +1,32 @@
 # tellurium-web
+<img title="tellurium logo" src="./docs/images/tellurium_logo.png" height="50" />
+[![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
+[![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
+
 Tellurium Web Tools. Online tools for running Combine Archives (*.omex) 
 with tellurium.
 
 ## Technology
 
-### docker 
+### Docker 
 * development & deployment in container
 * reproducible environments
 
-### django
+### Web framework 
+* django
 * python web framework & python backend code
 
-### sqlite & (postgresql) 
+### Datastorage layer
+sqlite & (postgresql)
 * database backend
 * simple file database (sqlite)
 * switch to postgres when necessary
 
+### Interactive plots
 python plot framework (interactive)
 * plotly (https://plot.ly/python/)
 * https://plot.ly/python/line-charts/
 
-#javascript frontend
-* navigation
-
-
-Django includes an ORM out of the box, while Pyramid and Flask leave 
-it to the developer to choose how (or if) they want their data stored. 
-The most popular ORM for non-Django web applications is SQLAlchemy by 
-far, but there are plenty of other options from DynamoDB and MongoDB 
-to simple local persistence like LevelDB or plain SQLite. Pyramid is 
-designed to use any persistence layer, even yet-to-be-invented ones.
-
+## Changelog
+*v0.1* [?]
+- initial release

@@ -1,6 +1,15 @@
-# test that the server runs
+language: generic
+sudo: required
 
-# test queries on server
+branches:
+    only:
+        - master
 
-# run unittests
+services:
+    - docker
+
+script:
+    - make build
+    # TODO: test that the server runs
+    # TODO: test queries on server
 
