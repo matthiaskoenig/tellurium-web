@@ -55,14 +55,15 @@ def execute(request, archive_id):
 
 
     print("*" * 80)
-    print("EXECUTION")
+    print("RUN OMEX")
     print("*" * 80)
-    te.executeOMEX(omexPath, workingDir=tmp_dir)
+    # te.executeOMEX(omexPath, workingDir=tmp_dir)
 
-
+    print("...")
     import shutil
     shutil.rmtree(tmp_dir)
 
+    print("*" * 80)
     # provide the info to the view
     context = {
         'archive': archive,
@@ -92,10 +93,6 @@ def archive(request, archive_id):
         print("Num Entries: {0}".format(co_archive.getNumEntries()))
         for i in range(co_archive.getNumEntries()):
             entries.append(co_archive.getEntry(i))
-
-    # entries = combine_tools.getEntries(path)
-    print(entries)
-    # combine_tools.get_content(archive)
 
     # provide the info to the view
     context = {
