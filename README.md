@@ -6,9 +6,9 @@
 Online tools for running Combine Archives (*.omex) with tellurium.
 
 
-<img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" width="300" />
+<img title="tellurium logo" src="./docs/images/screenshot.png" width="600" />
 
-Screenshot of the archive upload.
+Screenshot of the CombineArchive upload and list of Archives.
 
 ## Technology
 tellurium Web Tools is a web site providing functionality for the 
