@@ -14,7 +14,7 @@ install:
 
 script:
     # Docker container is running with website
-    - docker ps | grep -q blog
+    - docker ps | grep -q tellurium-web
 
     # TODO: test that the server runs
     # TODO: test queries on server
