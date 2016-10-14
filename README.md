@@ -5,8 +5,10 @@
 
 Online tools for running Combine Archives (*.omex) with tellurium.
 
-![screenshot](./docs/images/screenshot.png)
-Screenshot
+
+<img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" width="300" />
+
+Screenshot of the archive upload.
 
 ## Technology
 tellurium Web Tools is a web site providing functionality for the 
@@ -28,7 +30,7 @@ sqlite & postgresql
 
 ### Interactive plots
 python plot framework (interactive)
-* plotly (https://plot.ly/python/) like https://plot.ly/python/line-charts/
+* [plotly](https://plot.ly/python/) with examples https://plot.ly/python/line-charts/
 
 ## Changelog
 *v0.1* [?]
