@@ -5,6 +5,9 @@
 
 Online tools for running Combine Archives (*.omex) with tellurium.
 
+![screenshot](./docs/images/screenshot.png)
+Screenshot
+
 ## Technology
 tellurium Web Tools is a web site providing functionality for the 
 execution of combine archives.
