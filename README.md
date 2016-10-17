@@ -27,11 +27,20 @@ In the following section an overview over the used and planned technology is
 given.
 ### Docker 
 * development & deployment in container
-* reproducible environments
+* reproducible environments for testing
 
 ### Web framework 
 * django
 * python web framework & python backend code
+
+### Asynchronous task queue
+Celery is a powerful, production-ready asynchronous job queue, which allows 
+you to run time-consuming Python functions in the background. A Celery powered 
+application can respond to user requests quickly, while long-running tasks 
+are passed onto the queue.
+ 
+http://michal.karzynski.pl/blog/2014/05/18/setting-up-an-asynchronous-task-queue-for-django-using-celery-redis/
+
 
 ### Datastorage layer
 sqlite & postgresql
