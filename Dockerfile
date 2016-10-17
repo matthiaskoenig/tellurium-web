@@ -9,15 +9,13 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Install latest tellurium
-WORKDIR $HOME
-RUN git clone https://github.com/sys-bio/tellurium
-WORKDIR $HOME/tellurium
+# WORKDIR $HOME
+# RUN git clone https://github.com/sys-bio/tellurium
+# WORKDIR $HOME/tellurium
+# RUN git checkout mkoenig
+# RUN python setup.py install
 
-# testing mkoenig branch
-RUN git checkout mkoenig
-# run tellurium tests
-# install latest tellurium
-RUN python setup.py install
+RUN pip install git+https://github.com/sys-bio/tellurium.git@mkoenig
 
 # Run tests
 WORKDIR /usr/src/app/teweb

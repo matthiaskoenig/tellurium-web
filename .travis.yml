@@ -15,6 +15,7 @@ install:
 before_script:
     # test dependencies
     - sudo pip install -r requirements.txt
+    - suo pip install git+https://github.com/sys-bio/tellurium.git@mkoenig
     - sudo pip install mock
     - sudo pip install requests
     - sudo pip install coverage
