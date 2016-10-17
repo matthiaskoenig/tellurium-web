@@ -10,6 +10,14 @@ Online tools for running Combine Archives (*.omex) with tellurium.
 
 Screenshot of the CombineArchive upload and list of Archives.
 
+## License
+* Source Code: [LGPLv3](http://opensource.org/licenses/LGPL-3.0)
+* Documentation: [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
+
+## Changelog
+*v0.1* [?]
+- initial release
+
 ## Technology
 tellurium Web Tools is a web site providing functionality for the 
 execution of combine archives.
@@ -32,9 +40,3 @@ sqlite & postgresql
 python plot framework (interactive)
 * [plotly](https://plot.ly/python/) with examples https://plot.ly/python/line-charts/
 
-## Changelog
-*v0.1* [?]
-- initial release
-
-# Deploy the container
-https://www.stavros.io/posts/how-deploy-django-docker/
