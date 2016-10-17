@@ -73,7 +73,6 @@ def execute(request, archive_id):
     return render(request, 'combine/results.html', context)
 
 
-
 def archive(request, archive_id):
     """ Single archive view.
 
