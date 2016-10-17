@@ -3,8 +3,11 @@
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 
-Online tools for running Combine Archives (*.omex) with tellurium. Model descriptions in 
+Online tools for running [CombineArchives](http://co.mbine.org/documents/archive) (*.omex) with tellurium.   
+Model descriptions in 
 [SBML](http://sbml.org) and simulation descriptions in [SED-ML](http://sed-ml.org) are supported.
+
+As example archive the [Combine Showcase Archive](https://github.com/SemsProject/CombineArchiveShowCase) is provided.
 
 <img title="Screenshot Tellurium Web Tools" src="./docs/images/screenshot.png" width="600" />
 
