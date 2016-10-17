@@ -5,6 +5,9 @@ from django.template import RequestContext
 
 from .models import Archive
 from .forms import UploadArchiveForm
+
+# import libcombine
+from tellurium import tecombine
 import combine_tools
 
 
@@ -53,7 +56,6 @@ def execute(request, archive_id):
     tmp_dir = tempfile.mkdtemp()
 
 
-
     print("*" * 80)
     print("RUN OMEX")
     print("*" * 80)
@@ -71,6 +73,7 @@ def execute(request, archive_id):
     return render(request, 'combine/results.html', context)
 
 
+
 def archive(request, archive_id):
     """ Single archive view.
 
@@ -83,9 +86,11 @@ def archive(request, archive_id):
     # read the archive contents & metadata
     path = str(archive.file.path)
 
-    entries = []
+    omex = tecombine.OpenCombine(path)
+    print(omex.listContents())
 
-    import libcombine
+    """
+    entries = []
     co_archive = libcombine.CombineArchive()
     if not co_archive.initializeFromArchive(str(path)):
         print("Invalid Combine Archive")
@@ -93,15 +98,15 @@ def archive(request, archive_id):
         print("Num Entries: {0}".format(co_archive.getNumEntries()))
         for i in range(co_archive.getNumEntries()):
             entries.append(co_archive.getEntry(i))
+    """
+
 
     # provide the info to the view
     context = {
         'archive': archive,
-        'co_archive': co_archive,
-        'entries': entries,
+        # 'co_archive': co_archive,
+        # 'entries': entries,
     }
-    entry = entries[0]
-    print(entry.getLocation())
 
     return render(request, 'combine/archive.html', context)
 
@@ -127,18 +132,12 @@ def upload(request):
     if request.method == 'POST':
         form = UploadArchiveForm(request.POST, request.FILES)
         if form.is_valid():
-            print('Handling uploaded file')
-
             name = request.FILES['file']
             new_archive = Archive(name=name, file=request.FILES['file'])
+            new_archive.full_clean()
             new_archive.save()
 
-            # validate
-            # TODO: validate the archive with the libcombine functionality
-
             return index(request, form)
-
-            # return HttpResponseRedirect(reverse('combine:index'))
         else:
             print('Form is invalid')
     else:

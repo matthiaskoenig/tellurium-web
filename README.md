@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 
-Online tools for running [CombineArchives](http://co.mbine.org/documents/archive) (*.omex) with tellurium.   
+Online tools for running [CombineArchives](http://co.mbine.org/documents/archive) (*.omex) with [tellurium](http://tellurium.analogmachine.org/).   
 Model descriptions in 
 [SBML](http://sbml.org) and simulation descriptions in [SED-ML](http://sed-ml.org) are supported.
 
