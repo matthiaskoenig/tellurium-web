@@ -3,7 +3,6 @@
 
 {% block content %}
     <h2>Upload Archive</h2>
-
     <form action="{% url 'combine:upload' %}" method="post"
           enctype="multipart/form-data">
         {% csrf_token %}

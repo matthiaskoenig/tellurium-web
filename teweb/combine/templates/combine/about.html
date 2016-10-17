@@ -2,20 +2,31 @@
 {% load static %}
 
 {% block content %}
-<h1>About</h1>
-Tellurium Web Tools provide a simple means for the execution of CombineArchives.
+    <h1>About</h1>
 
-The tellurium Web Tools allow to execute CombineArchives with model definition in SBML and simulation definitions
-in SED-ML.
 
-For more information about the Simulation Experiment Markup Language see the SED-ML Website.
-For more information about the Systems Biology Markup Language see the SBML-Webseite
+        Tellurium Web Tools provide a simple means for the execution of CombineArchives.
+    </p>
+    <p>
+        The tellurium Web Tools allow to execute CombineArchives with model definition in SBML and simulation
+        definitions
+        in SED-ML.
+    </p>
+    <p>
+        For more information about the Simulation Experiment Markup Language see the SED-ML Website.
+        For more information about the Systems Biology Markup Language see the SBML-Webseite
+    </p>
 
-<h2>Features</h2>
-Currently, CombineArchives with model descriptions in <a href="http://sbml.org">SBML</a> and simulation descriptions
-in <a href="http://sbml.org">SED-ML</a> are supported.
-
- <h2>Support</h2>
+    <b>version</b>: <a href="https://github.com/matthiaskoenig/tellurium-web/commit/{{ commit }}" title="Source code on github" target="_blank">
+        <span class="fa fa-github fa-fw black"></span><code>{{ commit }}</code></a><br/>
+    <p>
+    <h2>Features</h2>
+    <p>
+        Currently, CombineArchives with model descriptions in <a href="http://sbml.org">SBML</a> and simulation
+        descriptions
+        in <a href="http://sbml.org">SED-ML</a> are supported.
+    </p>
+    <h2>Support</h2>
     <table class="table table-striped table-condensed table-hover">
         <!--
         <tr><td><a href="https://groups.google.com/forum/#!forum/cysbml-cyfluxviz"><span class="fa fa-users fa-2x fa-fw black"></span></a></td>
@@ -23,16 +34,25 @@ in <a href="http://sbml.org">SED-ML</a> are supported.
             <td><a href="https://groups.google.com/forum/#!forum/cysbml-cyfluxviz">https://groups.google.com/forum/#!forum/cysbml-cyfluxviz</a></td>
         </tr>
         -->
-        <tr><td><a href="https://github.com/matthiaskoenig/tellurium-web/issues"><span class="fa fa-fire fa-fw black"></span></a></td>
+        <tr>
+            <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues"><span
+                    class="fa fa-fire fa-fw black"></span></a></td>
             <td><b>Bug Tracker</b></td>
-            <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues">https://github.com/matthiaskoenig/tellurium-web/issues</a></td>
+            <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues">https://github.com/matthiaskoenig/tellurium-web/issues</a>
+            </td>
         </tr>
-        <tr><td><a href="https://github.com/matthiaskoenig/tellurium-web"><span class="fa fa-github fa-fw black"></span></a></td>
+        <tr>
+            <td><a href="https://github.com/matthiaskoenig/tellurium-web"><span class="fa fa-github fa-fw black"></span></a>
+            </td>
             <td><b>Source code</b></td>
-            <td><a href="https://github.com/matthiaskoenig/tellurium-web">https://github.com/matthiaskoenig/tellurium-web</a></td></tr>
-        <tr><td><a href="mailto:konigmatt@googlemail.com"><span class="fa fa-envelope fa-fw black"></span></a></td>
+            <td><a href="https://github.com/matthiaskoenig/tellurium-web">https://github.com/matthiaskoenig/tellurium-web</a>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="mailto:konigmatt@googlemail.com"><span class="fa fa-envelope fa-fw black"></span></a></td>
             <td><b>Email</b></td>
-            <td><a href="mailto:konigmatt@googlemail.com">konigmatt@googlemail.com</a></td></tr>
+            <td><a href="mailto:konigmatt@googlemail.com">konigmatt@googlemail.com</a></td>
+        </tr>
     </table>
 
     <h2>How to cite?</h2>
@@ -40,25 +60,22 @@ in <a href="http://sbml.org">SED-ML</a> are supported.
     <h2>Disclaimer</h2>
     Release early and release often.
 
-<h2>Open Issues</h2>
-<ul>
-    <li>commit information (from which commit is the site build)</li>
+    <h2>Open Issues</h2>
+    <ul>
+        <li>archive view & content</li>
+        <li>execute archives</li>
+        <li>docker deployment to server</li>
+        <li>example archives</li>
 
+        <li>display release (badge & zenodo)</li>
+        <li>provide upload to Combine Archive Tools of archives</li>
+        <li>provide execution with SED-ML webtools for comparison</li>
+        <li>version information (full list of versions of all libraries)</li>
+        <li>Add how to cite</li>
 
-    <li>archive view & content</li>
-    <li>execute archives</li>
-    <li>docker deployment to server</li>
-    <li>example archives</li>
+    </ul>
 
-    <li>display release (badge & zenodo)</li>
-    <li>provide upload to Combine Archive Tools of archives</li>
-    <li>provide execution with SED-ML webtools for comparison</li>
-    <li>version information (full list of versions of all libraries)</li>
-    <li>Add how to cite</li>
-
-</ul>
-
-<!--
+    <!--
 Please <a href="https://github.com/{{ site.github.repository_nwo }}/edit/{{ site.branch }}/{{ site.page.path }}">help improve this article</a>.
 -->
 

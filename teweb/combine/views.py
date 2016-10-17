@@ -108,7 +108,14 @@ def archive(request, archive_id):
 
 def about(request):
     """ About page. """
-    return render(request, 'combine/about.html', {})
+    import subprocess
+    commit = subprocess.check_output(["git", "describe", "--always"])
+    commit = commit.strip()
+    context = {
+        'commit': commit
+    }
+
+    return render(request, 'combine/about.html', context)
 
 
 def upload(request):
