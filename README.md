@@ -1,12 +1,12 @@
-# tellurium Web Tools
+# Tellurium Web Tools
 <img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" height="50" />
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 
-Online tools for running Combine Archives (*.omex) with tellurium.
+Online tools for running Combine Archives (*.omex) with tellurium. Model descriptions in 
+[SBML](http://sbml.org) and simulation descriptions in [SED-ML](http://sed-ml.org) are supported.
 
-
-<img title="tellurium logo" src="./docs/images/screenshot.png" width="600" />
+<img title="Screenshot Tellurium Web Tools" src="./docs/images/screenshot.png" width="600" />
 
 Screenshot of the CombineArchive upload and list of Archives.
 
@@ -19,9 +19,8 @@ Screenshot of the CombineArchive upload and list of Archives.
 - initial release
 
 ## Technology
-tellurium Web Tools is a web site providing functionality for the 
-execution of combine archives.
-
+In the following section an overview over the used and planned technology is 
+given.
 ### Docker 
 * development & deployment in container
 * reproducible environments
