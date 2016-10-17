@@ -12,11 +12,13 @@ class ContentTest(unittest.TestCase):
     def setUp(self):
         """ Create some starter data to be used in tests """
         self.domain = "http://127.0.0.1"
+        self.port = 8000
         self.search_string = "Tellurium Web Tools"
 
     def tearDown(self):
         """ Destroy starter data """
         self.domain = None
+        self.port = None
         self.search_string = "None"
 
     def request_recurse(self, url, requested=None):
@@ -31,7 +33,7 @@ class ContentTest(unittest.TestCase):
             return counts, requested
         else:
             requested.append(url)
-        url = self.domain + url
+        url = self.domain + ":" + str(self.port) + url
         results = requests.get(url, allow_redirects=True, verify=False)
         print(results.status_code, url)
         if (self.search_string in results.text) or (url.endswith('/admin/')):

@@ -1,4 +1,9 @@
-""" Additional test runner. """
+"""
+Test runner for functional and integration tests.
+
+To run the tests start a server via
+
+"""
 
 from __future__ import print_function, division
 import unittest
@@ -7,7 +12,7 @@ import sys
 
 def run_functional_tests():
     """ Execute Functional Tests """
-    tests = unittest.TestLoader().discover('tests/functional')
+    tests = unittest.TestLoader().discover('functional')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
     return result.wasSuccessful()
 

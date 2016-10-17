@@ -10,7 +10,7 @@ services:
 
 install:
     - docker build -t tellurium-web .
-    - docker run -d -p 127.0.0.1:80:80 --name tellurium-web tellurium-web
+    - docker run -d -p 127.0.0.1:8000:8000 --name tellurium-web tellurium-web
 
 before_script:
     # test dependencies
@@ -21,8 +21,8 @@ before_script:
 
 script:
     - docker ps | grep -q tellurium-web
-    - python tests.py
-    - coverage run tests.py
+    - python tests/tests.py
+    - coverage run tests/tests.py
 
 after_success:
     - coveralls

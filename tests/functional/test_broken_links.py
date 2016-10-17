@@ -14,11 +14,13 @@ class BrokenLinkTest(unittest.TestCase):
     def setUp(self):
         """ Define some unique data for validation. """
         self.domain = "http://127.0.0.1"
+        self.port = 8000
         self.acceptable_codes = [200, 302]
 
     def tearDown(self):
         """ Destroy unique data. """
         self.domain = None
+        self.port = None
         self.acceptable_codes = None
 
     def request_recurse(self, url=None, requested=None):
@@ -30,7 +32,7 @@ class BrokenLinkTest(unittest.TestCase):
             return code_counts, requested
         else:
             requested.append(url)
-        url = self.domain + url
+        url = self.domain + ':' + str(self.port) + url
         results = requests.get(url, allow_redirects=False, verify=False)
         print(results.status_code, url)
         if results.status_code in code_counts:
