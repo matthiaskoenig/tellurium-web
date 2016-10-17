@@ -14,10 +14,10 @@ install:
 
 before_script:
     # test dependencies
-    - pip install mock
-    - pip install requests
-    - pip install coverage
-    - pip install coveralls
+    - sudo pip -r install mock
+    - sudo pip -r install requests
+    - sudo pip -r install coverage
+    - sudo pip -r install coveralls
 
 script:
     - docker ps | grep -q tellurium-web
