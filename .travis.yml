@@ -22,8 +22,8 @@ before_script:
 script:
     - docker ps | grep -q tellurium-web
     - python tests/tests.py
-    - coverage run tests/tests.py
-
+    # - coverage run tests/tests.py
+    - coverage run python teweb/manage.py test combine
 after_success:
     - coveralls
 
