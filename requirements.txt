@@ -1,3 +1,4 @@
 # requirements for web app
 django==1.10.2
 django-debug-toolbar==1.6
+celery==3.1.18
