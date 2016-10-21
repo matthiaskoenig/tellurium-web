@@ -8,7 +8,6 @@ from .forms import UploadArchiveForm
 
 # import libcombine
 from tellurium import tecombine
-import combine_tools
 
 
 def index(request, form=None):
@@ -50,6 +49,7 @@ def execute(request, archive_id):
 
 
     # TODO: better implementation of execution
+    # Celery with redis
     omexDir = os.path.dirname(os.path.realpath(__file__))
 
     workingDir = os.path.join(omexDir, "_te_CombineArchiveShowCase")

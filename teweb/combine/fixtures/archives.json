@@ -1,0 +1,10 @@
+[
+  {
+    "model": "combine.archive",
+    "pk": 1,
+    "fields": {
+      "name": "Test",
+      "file": ""
+    }
+  }
+]

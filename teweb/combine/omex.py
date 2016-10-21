@@ -1,12 +1,16 @@
 """
-Helper functions to work with combine archives.
+Helper functions to work with combine archives
+and omex files.
 """
 from __future__ import print_function, division
-from .models import Archive
-
+import os
+from models import Archive
 import libcombine
-import libsbml
 
+
+# directory of omex archives
+ARCHIVE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                           "../../archives")
 
 def printMetaDataFor(co_archive, location):
     """ Print metadata.
@@ -92,9 +96,12 @@ def get_content(archive):
     printArchive(fileName=path)
 
 
+
 if __name__ == "__main__":
+
     import django
     django.setup()
+
     archive = Archive.objects.get(pk=10)
     print(archive)
     get_content(archive)

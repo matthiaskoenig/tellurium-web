@@ -29,11 +29,25 @@ Celery uses “brokers” to pass messages between a Django Project and the Cele
 http://docs.celeryproject.org/en/latest/getting-started/first-steps-with-celery.html#first-steps
 http://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
 
+```
 pip install celery
+```
+
+# RabbitMQ - Message broker
+
+# Redis - Key:value store
+Redis, developed in 2009, is a flexible, open-source, key value data store. 
+Following in the footsteps of other NoSQL databases, such as Cassandra, CouchDB, and MongoDB, 
+Redis allows the user to store vast amounts of data without the limits of a relational database. 
+Additionally, it has also been compared to memcache and can be used, 
+with its basic elements as a cache with persistence.
+
 
 Message broker
 * RabbitMQ
+```
 sudo apt-get install rabbitmq-server
+```
 * Redis
 
 * Database
