@@ -5,7 +5,7 @@ Creates the HTML views of the web-interface.
 """
 
 from django.shortcuts import render, get_object_or_404, render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 
@@ -13,6 +13,8 @@ from .models import Archive
 from .forms import UploadArchiveForm
 from .tasks import execute_omex
 
+from celery.result import AsyncResult
+import json
 
 # import libcombine
 from tellurium import tecombine
@@ -60,6 +62,9 @@ def archive(request, archive_id):
             entries.append(co_archive.getEntry(i))
     """
 
+    # run the archive as celery task (asynchronous)
+    result = execute_omex.delay(archive_id)
+    print("Task:", result)
 
     # provide the info to the view
     context = {
@@ -71,6 +76,22 @@ def archive(request, archive_id):
 
     return render(request, 'combine/archive.html', context)
 
+
+# Create your views here.
+def task_state(request):
+    data = 'Fail'
+    if request.is_ajax():
+        if 'task_id' in request.POST.keys() and request.POST['task_id']:
+            task_id = request.POST['task_id']
+            task = AsyncResult(task_id)
+            data = task.result or task.state
+        else:
+            data = 'No task_id in the request'
+    else:
+        data = 'This is not an ajax request'
+
+    json_data = json.dumps(data)
+    return HttpResponse(json_data, content_type='application/json')
 
 def execute(request, archive_id):
     """ Run the given archive.

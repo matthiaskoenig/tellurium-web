@@ -23,13 +23,13 @@ from __future__ import absolute_import, print_function
 from celery import shared_task, task
 import time
 
-import os.path
 import tellurium as te
 import tempfile
 from django.shortcuts import get_object_or_404
 from .models import Archive
 
-@task(name="execute_omex")
+
+@shared_task(name="execute_omex")
 def execute_omex(archive_id):
     import matplotlib
     matplotlib.pyplot.switch_backend("Agg")
