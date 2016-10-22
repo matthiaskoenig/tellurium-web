@@ -1,11 +1,34 @@
+"""
+Setup of archive database.
+Database is populated from set of OMEX archives.
+
+The canonical way to accomplish this is fixtures -
+the loaddata and dumpdata commands, but these seem to be more
+useful when you already have some data in the DB.
+
+http://eli.thegreenplace.net/2014/02/15/programmatically-populating-a-django-database
+"""
+
 from __future__ import print_function, division
 import os
 import sys
-sys.path.append("/home/mkoenig/git/tellurium-web/teweb")
+
+proj_path = "../../../teweb/"
+
+# This is so my local_settings.py gets loaded.
+os.chdir(proj_path)
+print(os.getcwd())
+proj_path = os.getcwd()
+
+# This is so Django knows where to find stuff.
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "teweb.settings")
+sys.path.append(proj_path)
 print(sys.path)
+
+
 import django
 django.setup()
-from combine.models import Archive
+from teweb.combine.models import Archive
 
 # necessary to flush
 # python manage.py flush
@@ -15,6 +38,7 @@ ARCHIVE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                            "../../../archives")
 
 from django.core.files import File
+
 
 def add_archives_to_database():
     """ Add archives to database.
@@ -38,14 +62,12 @@ def add_archives_to_database():
 
 if __name__ == "__main__":
 
-
     """
     archive = Archive.objects.get(pk=10)
     print(archive)
     get_content(archive)
     """
 
-    django.setup()
     print('-'*80)
     print('Creating archives')
     print('-' * 80)
