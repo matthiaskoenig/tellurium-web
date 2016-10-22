@@ -4,6 +4,9 @@ Database is populated from set of OMEX archives.
 
 necessary to empty database
 $ python manage.py flush
+Use the
+$ reinit_db.sh
+script which performs the complete reset of the database.
 
 The canonical way to accomplish this is fixtures -
 the loaddata and dumpdata commands, but these seem to be more
