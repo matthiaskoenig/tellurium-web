@@ -71,13 +71,24 @@ Executing <b><code>{{ archive }}</code></b>
     }
     var csrftoken = getCookie('csrftoken');
 
+    function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
 
    var poll_xhr;
    var willstop = 0;
   (function(){
     var poll = function(){
       var json_dump = "";
-      var task_id = "";
+      var task_id = "{{ task_id }}";
 
       console.log(task_id);
       poll_xhr = $.ajax({

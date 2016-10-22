@@ -76,7 +76,7 @@ def archive(request, archive_id):
     return render_to_response('combine/archive.html', context)
 
 # Create your views here.
-def check_state(request):
+def check_state(request, archive_id):
     """ A view to report the progress of the archive to the user """
     data = 'Fail'
 
