@@ -34,6 +34,9 @@ pip install celery
 ```
 
 # RabbitMQ - Message broker
+```
+sudo apt-get install rabbitmq-server
+```
 
 # Redis - Key:value store
 Redis, developed in 2009, is a flexible, open-source, key value data store. 
@@ -45,9 +48,7 @@ with its basic elements as a cache with persistence.
 
 Message broker
 * RabbitMQ
-```
-sudo apt-get install rabbitmq-server
-```
+
 * Redis
 
 * Database

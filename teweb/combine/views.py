@@ -1,3 +1,9 @@
+"""
+Tellurium SED-ML Tools Views
+
+Creates the HTML views of the web-interface.
+"""
+
 from django.shortcuts import render, get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -5,6 +11,8 @@ from django.template import RequestContext
 
 from .models import Archive
 from .forms import UploadArchiveForm
+from .tasks import execute_omex
+
 
 # import libcombine
 from tellurium import tecombine
@@ -36,37 +44,13 @@ def execute(request, archive_id):
     :return:
     :rtype:
     """
-
+    # get archive
     archive = get_object_or_404(Archive, pk=archive_id)
-    omexPath = str(archive.file.path)
 
-    # execute the archive
-    # TODO
+    # run the archive as celery task (asynchronous)
+    result = execute_omex.delay(archive_id)
+    print("Task:", result)
 
-    import os.path
-    import tellurium as te
-    import tempfile
-
-
-    # TODO: better implementation of execution
-    # Celery with redis
-    omexDir = os.path.dirname(os.path.realpath(__file__))
-
-    workingDir = os.path.join(omexDir, "_te_CombineArchiveShowCase")
-    tmp_dir = tempfile.mkdtemp()
-
-
-    print("*" * 80)
-    print("RUN OMEX")
-    print("*" * 80)
-    # te.executeOMEX(omexPath, workingDir=tmp_dir)
-
-    print("...")
-    import shutil
-    shutil.rmtree(tmp_dir)
-
-    print("*" * 80)
-    # provide the info to the view
     context = {
         'archive': archive,
     }

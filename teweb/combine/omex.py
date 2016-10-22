@@ -8,10 +8,6 @@ from models import Archive
 import libcombine
 
 
-# directory of omex archives
-ARCHIVE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                           "../../archives")
-
 def printMetaDataFor(co_archive, location):
     """ Print metadata.
 
