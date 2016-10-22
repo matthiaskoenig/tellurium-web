@@ -2,17 +2,20 @@
 {% load static %}
 
 {% block content %}
-<h1>Archive: {{ archive }}</h1>
-<p>
-    <a href="{% url 'combine:execute' archive.id %}"><i class="fa fa-caret-square-o-right fa-3x fa-lg"></i></a>
-    <b>Execute CombineArchive with tellurium</b>
-</p>
+<h1><a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
+            src="{% static 'combine/images/logos/omex.png' %}" height="40"></a> {{ archive }}</h1>
 
-<h2>Entries</h2>
 <ul>
     {% for entry in entries %}
-    <li><b><code>{{entry.getLocation }}</code></b> ({{entry.getFormat}})</li>
+    <li>{{ entry }}<b><code>{{entry.getLocation }}</code></b> ({{entry.getFormat}})</li>
     {% endfor %}
 </ul>
+
+<hr />
+<h2>Results</h2>
+<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+<span class="sr-only">Loading...</span>
+
+Executing <b><code>{{ archive }}</code></b>
 
 {% endblock %}

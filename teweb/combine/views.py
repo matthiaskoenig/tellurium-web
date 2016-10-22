@@ -34,6 +34,44 @@ def index(request, form=None):
     return render(request, 'combine/index.html', context)
 
 
+def archive(request, archive_id):
+    """ Single archive view.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    archive = get_object_or_404(Archive, pk=archive_id)
+
+    # read the archive contents & metadata
+    path = str(archive.file.path)
+
+    omex = tecombine.OpenCombine(path)
+    entries = omex.listContents()
+
+    """
+    entries = []
+    co_archive = libcombine.CombineArchive()
+    if not co_archive.initializeFromArchive(str(path)):
+        print("Invalid Combine Archive")
+    else:
+        print("Num Entries: {0}".format(co_archive.getNumEntries()))
+        for i in range(co_archive.getNumEntries()):
+            entries.append(co_archive.getEntry(i))
+    """
+
+
+    # provide the info to the view
+    context = {
+        'archive': archive,
+        'entries': entries,
+        # 'co_archive': co_archive,
+        # 'entries': entries,
+    }
+
+    return render(request, 'combine/archive.html', context)
+
+
 def execute(request, archive_id):
     """ Run the given archive.
 
@@ -57,41 +95,7 @@ def execute(request, archive_id):
     return render(request, 'combine/results.html', context)
 
 
-def archive(request, archive_id):
-    """ Single archive view.
 
-    :param request:
-    :param archive_id:
-    :return:
-    """
-    archive = get_object_or_404(Archive, pk=archive_id)
-
-    # read the archive contents & metadata
-    path = str(archive.file.path)
-
-    omex = tecombine.OpenCombine(path)
-    print(omex.listContents())
-
-    """
-    entries = []
-    co_archive = libcombine.CombineArchive()
-    if not co_archive.initializeFromArchive(str(path)):
-        print("Invalid Combine Archive")
-    else:
-        print("Num Entries: {0}".format(co_archive.getNumEntries()))
-        for i in range(co_archive.getNumEntries()):
-            entries.append(co_archive.getEntry(i))
-    """
-
-
-    # provide the info to the view
-    context = {
-        'archive': archive,
-        # 'co_archive': co_archive,
-        # 'entries': entries,
-    }
-
-    return render(request, 'combine/archive.html', context)
 
 
 def about(request):

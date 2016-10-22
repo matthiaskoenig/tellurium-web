@@ -26,38 +26,36 @@ import time
 import os.path
 import tellurium as te
 import tempfile
+from django.shortcuts import get_object_or_404
+from .models import Archive
 
 @task(name="execute_omex")
 def execute_omex(archive_id):
-    print("start executing omex")
-    time.sleep(1)
-    print("finished executing omex")
+    import matplotlib
+    matplotlib.pyplot.switch_backend("Agg")
+
+
+    print("*" * 20)
+    print("START OMEX")
+    print("*" * 20)
+
+    # time.sleep(3)
 
     archive = get_object_or_404(Archive, pk=archive_id)
     omexPath = str(archive.file.path)
 
     # execute the archive
-    # TODO
-
-
-    # TODO: better implementation of execution
-    # Celery with redis
-    omexDir = os.path.dirname(os.path.realpath(__file__))
-
-    workingDir = os.path.join(omexDir, "_te_CombineArchiveShowCase")
     tmp_dir = tempfile.mkdtemp()
+    te.executeOMEX(omexPath, workingDir=tmp_dir)
 
+    # store the results somewhere for the archive on the server
 
-    print("*" * 80)
-    print("RUN OMEX")
-    print("*" * 80)
-    # te.executeOMEX(omexPath, workingDir=tmp_dir)
-
-    print("...")
     import shutil
     shutil.rmtree(tmp_dir)
 
-    print("*" * 80)
+    print("*" * 20)
+    print("END OMEX")
+    print("*" * 20)
 
 
 @shared_task
