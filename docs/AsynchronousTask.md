@@ -33,6 +33,16 @@ http://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
 pip install celery
 ```
 
+https://github.com/PolicyStat/jquery-celery/blob/master/src/celery.js
+
+# jobtastic
+http://policystat.github.io/jobtastic/
+```
+pip install jobtastic
+```
+
+
+
 # RabbitMQ - Message broker
 ```
 sudo apt-get install rabbitmq-server

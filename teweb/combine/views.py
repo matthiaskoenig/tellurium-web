@@ -67,19 +67,22 @@ def archive(request, archive_id):
     print("Task:", result)
 
     # provide the info to the view
-    context = {
+    context = RequestContext(request, {
         'archive': archive,
         'entries': entries,
-        # 'co_archive': co_archive,
-        # 'entries': entries,
-    }
+        'task_id': result.task_id
+    })
 
-    return render(request, 'combine/archive.html', context)
-
+    return render_to_response('combine/archive.html', context)
 
 # Create your views here.
-def task_state(request):
+def check_state(request):
+    """ A view to report the progress of the archive to the user """
     data = 'Fail'
+
+    print("*************")
+    print("CHECK STATE")
+    print("*************")
     if request.is_ajax():
         if 'task_id' in request.POST.keys() and request.POST['task_id']:
             task_id = request.POST['task_id']
@@ -90,8 +93,12 @@ def task_state(request):
     else:
         data = 'This is not an ajax request'
 
+    print(data)
     json_data = json.dumps(data)
     return HttpResponse(json_data, content_type='application/json')
+
+#####################
+
 
 def execute(request, archive_id):
     """ Run the given archive.
