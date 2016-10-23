@@ -77,7 +77,23 @@ def archive(request, archive_id):
 
 # Create your views here.
 def check_state(request, archive_id):
-    """ A view to report the progress of the archive to the user """
+    """ A view to report the progress of the archive to the user.
+
+    TODO: do a repetetive query to the state of the process.
+    If finished forward to the results.
+
+    $.ajax({
+        url: '127.0.0.1:8000/hello',
+        type: 'get', // This is the default though, you don't actually need to always mention it
+        success: function(data) {
+            alert(data);
+        },
+        failure: function(data) {
+            alert('Got an error dude');
+        }
+    });
+
+     """
     data = 'Fail'
 
     print("*************")
