@@ -58,12 +58,12 @@ body {
 /* Progress bar */
   .progress {
    width:50%;
-   background:yellow;
+   background: rgba(200, 200, 200, 0.69);
   }
   .bar {
    height:15px;
    width:0%;
-   background:tomato;
+   background:green;
    text-align:right;
   }
 

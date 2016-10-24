@@ -7,40 +7,42 @@
 
 <ul>
     {% for entry in entries %}
-    <li>{{ entry }}<b><code>{{entry.getLocation }}</code></b> ({{entry.getFormat}})</li>
+    <li>
+        {{ entry }}
+        <!--<code>{{entry.getLocation }}</code></b> ({{entry.getFormat}})-->
+    </li>
     {% endfor %}
 </ul>
 
 <hr />
-<h2>Results</h2>
+    <!--
 <p>
 <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
 <span class="sr-only">Loading...</span>
 Executing <b><code>{{ archive }}</code></b>
 </p>
-
 <p>
 <input type="button" id="id_status_button" value="status"><b>Task:</b> {{ task_id }}<br />
-
 <span id="id_status">?</span> <br />
 <span id="id_progress">?</span> <br />
-
-
 </p>
+-->
 
    <div class="progress_container">
-
    <div class="current-task">
-    <b>{% if task_id %} Task ID: {{ task_id }} {% endif %}</b>
+    {% if task_id %}
+        <b>Task:</b> {{ task_id }}
+    {% endif %}
    </div>
 
-   <div class="status"></div>
+   <div class="status"><span id="id_status"></span></div>
    <div class="progress">
         <div class="bar"></div>
         </div>
   </div>
-
  </div>
+
+    <!--<h2>Results</h2>-->
 
 
 {% endblock %}
@@ -83,6 +85,8 @@ Executing <b><code>{{ archive }}</code></b>
         }
     });
 
+      var willstop = 0;
+
     function checkState(){
         console.log("check_state");
 
@@ -101,8 +105,8 @@ Executing <b><code>{{ archive }}</code></b>
               console.log(result)
               // $("#id_status").text = result.status;
               document.getElementById("id_status").textContent=state;
-              document.getElementById("id_progress").textContent=result.progress_percent;
-              
+              // document.getElementById("id_progress").textContent=result.progress_percent;
+
               if (state == "PROGRESS"){
                  jQuery('.bar').css({'width': result.progress_percent + '%'});
                  jQuery('.bar').html(result.progress_percent + '%');
@@ -115,53 +119,20 @@ Executing <b><code>{{ archive }}</code></b>
       });
     }
 
-
+    /*
   $("#id_status_button").click(function(){
     checkState()
   });
+  */
 
-
-  /*
-   var willstop = 0;
-  (function(){
-    var poll = function(){
-      var json_dump = "";
-      var task_id = "{{ task_id }}";
-
-      console.log(task_id);
-      poll_xhr = $.ajax({
-        url:'check_state',
-        type: 'POST',
-        data: {
-            task_id: task_id,
-            csrfmiddlewaretoken: csrftoken,
-        },
-        success: function(result) {
-                    if (result.process_percent == null || result.process_percent == undefined) {
-                        willstop = 1;
-                        document.getElementById("user-count").textContent="DONE";
-                        jQuery('.bar').css({'width': 100 + '%'});
-                        jQuery('.bar').html(100 + '%');
-                        document.getElementById('returnBtn').style.visibility = 'visible';
-
-                       } else {
-                         jQuery('.bar').css({'width': result.process_percent + '%'});
-                         jQuery('.bar').html(result.process_percent + '%');
-                         document.getElementById("user-count").textContent="PROCRESSING";
-                       };
-                    }
-      });
-    };
-
+    // repetitive ajax call for result
     var refreshIntervalId = setInterval(function() {
-      poll();
+      checkState();
       if(willstop == 1){
         clearInterval(refreshIntervalId);
       }
     },500);
 
-  })();
-*/
   </script>
 {% endblock %}
 
