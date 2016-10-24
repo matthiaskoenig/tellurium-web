@@ -64,7 +64,6 @@ def archive(request, archive_id):
     # run the archive as celery task (asynchronous)
     # result = execute_omex.delay(archive_id)
 
-
     result = ExecuteOMEX.delay_or_fail(
         archive_id=archive_id
     )
@@ -101,6 +100,7 @@ def check_state(request, archive_id):
         }
 
     return JsonResponse(data)
+
 
 def about(request):
     """ About page. """

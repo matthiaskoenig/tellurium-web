@@ -22,6 +22,7 @@ wait for the task to finish or get its return value
 from __future__ import absolute_import, print_function
 
 import time
+import zipfile
 import tempfile
 
 from django.shortcuts import get_object_or_404
@@ -74,6 +75,9 @@ class ExecuteOMEX(JobtasticTask):
         # execute the archive
         tmp_dir = tempfile.mkdtemp()
         te.executeOMEX(omexPath, workingDir=tmp_dir)
+
+
+
         self.update_progress(8, total_count)
 
         # store results of execution for rendering
@@ -88,6 +92,40 @@ class ExecuteOMEX(JobtasticTask):
 
         print("*** END OMEX ***")
         return results
+
+    def executeOMEX(self, omexPath):
+        """
+        # Archive
+        if zipfile.is_zipfile(omexPath):
+
+            # a directory is created in which the files are extracted
+            if workingDir is None:
+                extractDir = os.path.join(os.path.dirname(os.path.realpath(omexPath)), '_te_{}'.format(filename))
+            else:
+                extractDir = workingDir
+
+            # extract the archive to working directory
+            CombineArchive.extractArchive(omexPath, extractDir)
+            # get SEDML files from archive
+            sedmlFiles = CombineArchive.filePathsFromExtractedArchive(extractDir, filetype='sed-ml')
+
+            if len(sedmlFiles) == 0:
+                raise IOError("No SEDML files found in COMBINE archive: {}".format(omexPath))
+
+            for sedmlFile in sedmlFiles:
+                factory = SEDMLCodeFactory(sedmlFile, workingDir=os.path.dirname(sedmlFile))
+                factory.executePython()
+        else:
+            raise IOError("File is not an OMEX Combine Archive in zip format: {}".format(omexPath))
+        """
+        pass
+
+        # TODO: What is required for plotting?
+        # For every SED-ML file return a list of data generators
+        # Use the data generators to create the outputs
+
+        # Necessary to create files to store with combine archive.
+
 
 
 @shared_task
