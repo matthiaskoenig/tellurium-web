@@ -5,7 +5,7 @@ Creates the HTML views of the web-interface.
 """
 
 from django.shortcuts import render, get_object_or_404, render_to_response
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 
@@ -75,7 +75,7 @@ def archive(request, archive_id):
 
     return render_to_response('combine/archive.html', context)
 
-# Create your views here.
+
 def check_state(request, archive_id):
     """ A view to report the progress of the archive to the user.
 
@@ -94,8 +94,6 @@ def check_state(request, archive_id):
     });
 
      """
-    data = 'Fail'
-
     print("*************")
     print("CHECK STATE")
     print("*************")
@@ -103,17 +101,17 @@ def check_state(request, archive_id):
         if 'task_id' in request.POST.keys() and request.POST['task_id']:
             task_id = request.POST['task_id']
             task = AsyncResult(task_id)
-            data = task.result or task.state
+            status = task.result or task.state
         else:
-            data = 'No task_id in the request'
+            status = 'No task_id in the request'
     else:
-        data = 'This is not an ajax request'
+        status = 'This is not an ajax request'
 
-    print(data)
-    json_data = json.dumps(data)
-    return HttpResponse(json_data, content_type='application/json')
+    data = {
+        'status': status,
+    }
+    return JsonResponse(data)
 
-#####################
 
 
 def execute(request, archive_id):

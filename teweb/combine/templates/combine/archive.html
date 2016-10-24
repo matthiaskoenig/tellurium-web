@@ -20,7 +20,7 @@ Executing <b><code>{{ archive }}</code></b>
 </p>
 
 <p>
-<input type="button" id="buttonid" value="status">
+<input type="button" id="id_status_button" value="status"><span id="id_status">?</span> <br />
 <b>Task:</b> {{ task_id }}
 </p>
 
@@ -49,10 +49,58 @@ Executing <b><code>{{ archive }}</code></b>
 
 {% block javascript %}
   <script>
-  var button = document.getElementById("buttonid");
-  button.addEventListener("click", function() {
-      console.log("Hello world");
-      console.log("call");
+      // using jQuery
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+
+
+  $("#id_status_button").click(function(){
+      console.log("check_state");
+
+      // ajax call to check status
+      $.ajax({
+          url: 'check_state',
+          type: 'POST',
+          data: {
+            task_id: '{{ task_id }}',
+            csrfmiddlewaretoken: csrftoken,
+          },
+          success: function (result) {
+              console.log(result.status)
+              // $("#id_status").text = result.status;
+              console.log($("#id_status"))
+              document.getElementById("id_status").textContent=result.status;
+              console.log("Status written")
+          }
+      });
   });
 
   /*
