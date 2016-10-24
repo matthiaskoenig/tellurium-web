@@ -20,8 +20,12 @@ Executing <b><code>{{ archive }}</code></b>
 </p>
 
 <p>
-<input type="button" id="id_status_button" value="status"><span id="id_status">?</span> <br />
-<b>Task:</b> {{ task_id }}
+<input type="button" id="id_status_button" value="status"><b>Task:</b> {{ task_id }}<br />
+
+<span id="id_status">?</span> <br />
+<span id="id_progress">?</span> <br />
+
+
 </p>
 
    <!--
@@ -48,6 +52,11 @@ Executing <b><code>{{ archive }}</code></b>
 {% endblock %}
 
 {% block javascript %}
+    <!--
+    <script src="{% static 'combine/js/celery.js' %}"></script>
+    <script src="{% static 'combine/js/celery.progressbar.js' %}"></script>
+    -->
+
   <script>
       // using jQuery
     function getCookie(name) {
@@ -93,12 +102,12 @@ Executing <b><code>{{ archive }}</code></b>
             task_id: '{{ task_id }}',
             csrfmiddlewaretoken: csrftoken,
           },
-          success: function (result) {
-              console.log(result.status)
+          success: function (data) {
+              console.log(data.state)
+              console.log(data.result)
               // $("#id_status").text = result.status;
-              console.log($("#id_status"))
-              document.getElementById("id_status").textContent=result.status;
-              console.log("Status written")
+              document.getElementById("id_status").textContent=data.state;
+              document.getElementById("id_progress").textContent=data.result.progress_percent
           }
       });
   });

@@ -64,6 +64,12 @@ def archive(request, archive_id):
 
     # run the archive as celery task (asynchronous)
     result = execute_omex.delay(archive_id)
+
+    from tasks import ExecuteOMEX
+    result = ExecuteOMEX.delay_or_fail(
+        archive_id=archive_id
+    )
+
     print("Task:", result)
 
     # provide the info to the view
@@ -77,39 +83,25 @@ def archive(request, archive_id):
 
 
 def check_state(request, archive_id):
-    """ A view to report the progress of the archive to the user.
-
-    TODO: do a repetetive query to the state of the process.
-    If finished forward to the results.
-
-    $.ajax({
-        url: '127.0.0.1:8000/hello',
-        type: 'get', // This is the default though, you don't actually need to always mention it
-        success: function(data) {
-            alert(data);
-        },
-        failure: function(data) {
-            alert('Got an error dude');
-        }
-    });
-
-     """
-    print("*************")
-    print("CHECK STATE")
-    print("*************")
+    """ A view to report the progress of the archive to the user. """
     if request.is_ajax():
         if 'task_id' in request.POST.keys() and request.POST['task_id']:
             task_id = request.POST['task_id']
             task = AsyncResult(task_id)
-            status = task.result or task.state
+            data = {
+                'result': task.result,
+                'state': task.state,
+            }
         else:
-            status = 'No task_id in the request'
-    else:
-        status = 'This is not an ajax request'
+            data = {
+                'state': 'No task_id in the request'
+            }
 
-    data = {
-        'status': status,
-    }
+    else:
+        data = {
+            'state': 'This is not an ajax request'
+        }
+
     return JsonResponse(data)
 
 
