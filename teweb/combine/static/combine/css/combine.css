@@ -55,6 +55,17 @@ body {
     color: white;
 }
 
+/* Progress bar */
+  .progress {
+   width:50%;
+   background:yellow;
+  }
+  .bar {
+   height:15px;
+   width:0%;
+   background:tomato;
+   text-align:right;
+  }
 
 
 /* References */

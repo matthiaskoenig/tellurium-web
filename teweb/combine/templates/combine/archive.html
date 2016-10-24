@@ -20,69 +20,43 @@ Executing <b><code>{{ archive }}</code></b>
 </p>
 
 <p>
+<input type="button" id="buttonid" value="status">
 <b>Task:</b> {{ task_id }}
 </p>
 
-  <style>
-  .progress {
-   width:50%;
-   background:yellow;
-  }
-  .bar {
-   height:15px;
-   width:0%;
-   background:tomato;
-   text-align:right;
-  }
- </style>
-
+   <!--
    <div class="progress_container">
 
    <div class="current-task">
-    <h4>{% if task_id %} Task ID: {{ task_id }} {% endif %}</h4>
+    <b>{% if task_id %} Task ID: {{ task_id }} {% endif %}</b>
    </div>
 
+
+
    <div class="status"></div>
-   {% if task_id %}
+
    <div class="progress">
-    <div class="bar"></div>
-   </div>
-   {% endif %}
+
+        <div class="bar"></div>
+        </div>
   </div>
+   -->
 
  </div>
 
-<script type="text/javascript">
-    // using jQuery
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
+
+{% endblock %}
+
+{% block javascript %}
+  <script>
+  var button = document.getElementById("buttonid");
+  button.addEventListener("click", function() {
+      console.log("Hello world");
+      console.log("call");
+  });
+
+  /*
     var csrftoken = getCookie('csrftoken');
-
-    function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-
    var poll_xhr;
    var willstop = 0;
   (function(){
@@ -124,7 +98,8 @@ Executing <b><code>{{ archive }}</code></b>
 
 
   })();
-</script>
-
-
+  */
+  </script>
 {% endblock %}
+
+
