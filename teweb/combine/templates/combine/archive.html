@@ -28,23 +28,17 @@ Executing <b><code>{{ archive }}</code></b>
 
 </p>
 
-   <!--
    <div class="progress_container">
 
    <div class="current-task">
     <b>{% if task_id %} Task ID: {{ task_id }} {% endif %}</b>
    </div>
 
-
-
    <div class="status"></div>
-
    <div class="progress">
-
         <div class="bar"></div>
         </div>
   </div>
-   -->
 
  </div>
 
@@ -89,10 +83,8 @@ Executing <b><code>{{ archive }}</code></b>
         }
     });
 
-
-
-  $("#id_status_button").click(function(){
-      console.log("check_state");
+    function checkState(){
+        console.log("check_state");
 
       // ajax call to check status
       $.ajax({
@@ -103,18 +95,33 @@ Executing <b><code>{{ archive }}</code></b>
             csrfmiddlewaretoken: csrftoken,
           },
           success: function (data) {
-              console.log(data.state)
-              console.log(data.result)
+              state = data.state
+              result = data.result
+              console.log(state)
+              console.log(result)
               // $("#id_status").text = result.status;
-              document.getElementById("id_status").textContent=data.state;
-              document.getElementById("id_progress").textContent=data.result.progress_percent
+              document.getElementById("id_status").textContent=state;
+              document.getElementById("id_progress").textContent=result.progress_percent;
+              
+              if (state == "PROGRESS"){
+                 jQuery('.bar').css({'width': result.progress_percent + '%'});
+                 jQuery('.bar').html(result.progress_percent + '%');
+              } else if (state == "SUCCESS"){
+                willstop = 1;
+                jQuery('.bar').css({'width': 100 + '%'});
+                jQuery('.bar').html(100 + '%');
+              }
           }
       });
+    }
+
+
+  $("#id_status_button").click(function(){
+    checkState()
   });
 
+
   /*
-    var csrftoken = getCookie('csrftoken');
-   var poll_xhr;
    var willstop = 0;
   (function(){
     var poll = function(){
@@ -153,9 +160,8 @@ Executing <b><code>{{ archive }}</code></b>
       }
     },500);
 
-
   })();
-  */
+*/
   </script>
 {% endblock %}
 
