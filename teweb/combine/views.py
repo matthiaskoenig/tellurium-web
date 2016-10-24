@@ -8,13 +8,12 @@ from django.shortcuts import render, get_object_or_404, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
+from tasks import ExecuteOMEX
 
 from .models import Archive
 from .forms import UploadArchiveForm
-from .tasks import execute_omex
 
 from celery.result import AsyncResult
-import json
 
 # import libcombine
 from tellurium import tecombine
@@ -63,14 +62,13 @@ def archive(request, archive_id):
     """
 
     # run the archive as celery task (asynchronous)
-    result = execute_omex.delay(archive_id)
+    # result = execute_omex.delay(archive_id)
 
-    from tasks import ExecuteOMEX
+
     result = ExecuteOMEX.delay_or_fail(
         archive_id=archive_id
     )
-
-    print("Task:", result)
+    # print("Task:", result)
 
     # provide the info to the view
     context = RequestContext(request, {
@@ -103,34 +101,6 @@ def check_state(request, archive_id):
         }
 
     return JsonResponse(data)
-
-
-
-def execute(request, archive_id):
-    """ Run the given archive.
-
-    :param request:
-    :type request:
-    :param archive_id:
-    :type archive_id:
-    :return:
-    :rtype:
-    """
-    # get archive
-    archive = get_object_or_404(Archive, pk=archive_id)
-
-    # run the archive as celery task (asynchronous)
-    result = execute_omex.delay(archive_id)
-    print("Task:", result)
-
-    context = {
-        'archive': archive,
-    }
-    return render(request, 'combine/results.html', context)
-
-
-
-
 
 def about(request):
     """ About page. """
