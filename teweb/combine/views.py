@@ -69,6 +69,9 @@ def archive(request, archive_id):
     )
     # print("Task:", result)
 
+
+
+
     # provide the info to the view
     context = RequestContext(request, {
         'archive': archive,
@@ -88,6 +91,45 @@ def results(request, archive_id, task_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
+
+    task = AsyncResult(task_id)
+    data = {
+        'result': task.result,
+        'state': task.state,
+    }
+
+    # Now create the plots with the given results
+    # The outputs are needed from sedml document
+
+    path = str(archive.file.path)
+    omex = tecombine.OpenCombine(path)
+    entries = omex.listContents()
+
+    from tellurium.sedml.tesedml import SEDMLTools
+
+    outputs = []
+    for sedmlFile, dgs in task.result.iteritems():
+
+        print(sedmlFile)
+        sedmlStr = omex.getSEDML(sedmlFile)
+        doc = SEDMLTools.readSEDMLDocument(sedmlStr)
+
+        # process all the outputs and create the respective graphs
+        # TODO
+        # for doc.getOutputs()
+        # dgs
+
+        # FIXME: Only processes the first file, than breaks
+        break
+
+    #experiment1.xml
+    omexPath = str(archive.file.path)
+
+
+    # open the archive and read the sedml document
+
+
+    # results['dgs'] = dgs_json
 
 
     # provide the info to the view

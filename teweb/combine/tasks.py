@@ -21,13 +21,10 @@ wait for the task to finish or get its return value
 """
 from __future__ import absolute_import, print_function
 
-import time
-import zipfile
 import tempfile
 
-
-
 from django.shortcuts import get_object_or_404
+
 from celery import shared_task, task
 from jobtastic import JobtasticTask
 
@@ -63,84 +60,39 @@ class ExecuteOMEX(JobtasticTask):
 
         import matplotlib
         matplotlib.pyplot.switch_backend("Agg")
+        self.update_progress(1, total_count)
 
         # read archive
         archive = get_object_or_404(Archive, pk=archive_id)
         omexPath = str(archive.file.path)
         self.update_progress(2, total_count)
 
-        '''
-        for k in range(total_count):
-            self.update_progress(k, total_count)
-            time.sleep(2)
-        '''
-        # execute the archive
+        # execute archive
         tmp_dir = tempfile.mkdtemp()
-        dgs = te.executeOMEX(omexPath, workingDir=tmp_dir)
+        dgs_all = te.executeOMEX(omexPath, workingDir=tmp_dir)
 
-        print("*" * 80)
-        for sedmlFile, dgs in dgs.iteritems():
+        self.update_progress(6, total_count)
+
+        # JSON serializable results (np.array to list)
+        print("-" * 80)
+        dgs_json = {}
+        for f_tmp, dgs in dgs_all.iteritems():
+            print(f_tmp)
+            sedmlFile = f_tmp.replace(tmp_dir + "/", "")
             print(sedmlFile)
-            print(dgs)
-        print(dgs)
-
-        print("*" * 80)
-
-
-        # Create the outputs from the data
-
-
-
+            for key in dgs:
+                dgs[key] = dgs[key].tolist()
+                print(key, ':', dgs[key])
+            dgs_json[sedmlFile] = dgs
+        print("-" * 80)
         self.update_progress(8, total_count)
 
-        # store results of execution for rendering
-
-        # TODO: python code
-        # TODO: results
-        results['data'] = [1, 2, 3]
-        results['plot'] = 'Hello world'
 
         import shutil
         shutil.rmtree(tmp_dir)
 
+        # store results of execution for rendering
+        results['dgs'] = dgs_json
+
         print("*** END OMEX ***")
         return results
-
-    def executeOMEX(self, omexPath):
-        """
-        # Archive
-        if zipfile.is_zipfile(omexPath):
-
-            # a directory is created in which the files are extracted
-            if workingDir is None:
-                extractDir = os.path.join(os.path.dirname(os.path.realpath(omexPath)), '_te_{}'.format(filename))
-            else:
-                extractDir = workingDir
-
-            # extract the archive to working directory
-            CombineArchive.extractArchive(omexPath, extractDir)
-            # get SEDML files from archive
-            sedmlFiles = CombineArchive.filePathsFromExtractedArchive(extractDir, filetype='sed-ml')
-
-            if len(sedmlFiles) == 0:
-                raise IOError("No SEDML files found in COMBINE archive: {}".format(omexPath))
-
-            for sedmlFile in sedmlFiles:
-                factory = SEDMLCodeFactory(sedmlFile, workingDir=os.path.dirname(sedmlFile))
-                factory.executePython()
-        else:
-            raise IOError("File is not an OMEX Combine Archive in zip format: {}".format(omexPath))
-        """
-        pass
-
-        # TODO: What is required for plotting?
-        # For every SED-ML file return a list of data generators
-        # Use the data generators to create the outputs
-
-        # Necessary to create files to store with combine archive.
-
-
-
-@shared_task
-def add(x, y):
-    return x + y
