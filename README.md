@@ -44,4 +44,6 @@ sqlite & postgresql
 ### Interactive plots
 python plot framework (interactive)
 * [plotly](https://plot.ly/python/) with examples https://plot.ly/python/line-charts/
+* [bokeh] http://bokeh.pydata.org/en/latest/docs/gallery/legend.html
+* [plotly.js] https://github.com/plotly/plotly.js
 

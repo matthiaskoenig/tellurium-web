@@ -25,6 +25,8 @@ import time
 import zipfile
 import tempfile
 
+
+
 from django.shortcuts import get_object_or_404
 from celery import shared_task, task
 from jobtastic import JobtasticTask
@@ -74,7 +76,18 @@ class ExecuteOMEX(JobtasticTask):
         '''
         # execute the archive
         tmp_dir = tempfile.mkdtemp()
-        te.executeOMEX(omexPath, workingDir=tmp_dir)
+        dgs = te.executeOMEX(omexPath, workingDir=tmp_dir)
+
+        print("*" * 80)
+        for sedmlFile, dgs in dgs.iteritems():
+            print(sedmlFile)
+            print(dgs)
+        print(dgs)
+
+        print("*" * 80)
+
+
+        # Create the outputs from the data
 
 
 

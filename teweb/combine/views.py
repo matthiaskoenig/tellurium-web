@@ -18,6 +18,10 @@ from celery.result import AsyncResult
 # import libcombine
 from tellurium import tecombine
 
+from bokeh.plotting import figure
+from bokeh.resources import CDN
+from bokeh.embed import components
+
 
 def index(request, form=None):
     """ Overview of archives.
@@ -69,11 +73,21 @@ def archive(request, archive_id):
     )
     # print("Task:", result)
 
+    plot = figure(plot_width=600, plot_height=400,
+           title="Figure 1", toolbar_location="above")
+    plot.circle([1, 2, 3, 4, 5], [2, 5, 8, 2, 7], size=10)
+    plot.square([1, 2, 3, 4, 5], [1, 2, 3, 4, 5], size=5)
+
+    script, div = components(plot, CDN)
+
+
     # provide the info to the view
     context = RequestContext(request, {
         'archive': archive,
         'entries': entries,
-        'task_id': result.task_id
+        'task_id': result.task_id,
+        'script': script,
+        'div': div,
     })
 
     return render_to_response('combine/archive.html', context)
