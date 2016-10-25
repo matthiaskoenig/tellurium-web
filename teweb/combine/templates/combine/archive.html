@@ -15,18 +15,6 @@
 </ul>
 
 <hr />
-    <!--
-<p>
-<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
-<span class="sr-only">Loading...</span>
-Executing <b><code>{{ archive }}</code></b>
-</p>
-<p>
-<input type="button" id="id_status_button" value="status"><b>Task:</b> {{ task_id }}<br />
-<span id="id_status">?</span> <br />
-<span id="id_progress">?</span> <br />
-</p>
--->
 
    <div class="progress_container">
    <div class="current-task">
@@ -41,34 +29,11 @@ Executing <b><code>{{ archive }}</code></b>
         </div>
   </div>
  </div>
-
-    <h2>Outputs</h2>
-    <div id="tester" style="width:800px;height:500px;"></div>
-
 {% endblock %}
 
 {% block javascript %}
 
   <script>
-
-    // plotly plot
-    var trace1 = {
-      x: [1, 2, 3, 4],
-      y: [10, 15, 13, 17],
-      type: 'scatter'
-    };
-
-    var trace2 = {
-      x: [1, 2, 3, 4],
-      y: [16, 5, 11, 9],
-      type: 'scatter'
-    };
-
-    var data = [trace1, trace2];
-    Plotly.newPlot('tester', data);
-
-
-
       // using jQuery
     function getCookie(name) {
         var cookieValue = null;
@@ -129,16 +94,13 @@ Executing <b><code>{{ archive }}</code></b>
                 willstop = 1;
                 jQuery('.bar').css({'width': 100 + '%'});
                 jQuery('.bar').html(100 + '%');
+                  // go to results
+                  window.location.href = '{{ task_id }}';
+
               }
           }
       });
     }
-
-    /*
-  $("#id_status_button").click(function(){
-    checkState()
-  });
-  */
 
     // repetitive ajax call for result
     var refreshIntervalId = setInterval(function() {
