@@ -108,11 +108,18 @@ def results(request, archive_id, task_id):
     from tellurium.sedml.tesedml import SEDMLTools
 
     outputs = []
-    for sedmlFile, dgs in task.result.iteritems():
+
+    import libsedml
+    dgs_json = task.result["dgs"]
+    for sedmlFile, dgs in dgs_json.iteritems():
 
         print(sedmlFile)
         sedmlStr = omex.getSEDML(sedmlFile)
-        doc = SEDMLTools.readSEDMLDocument(sedmlStr)
+        doc = libsedml.readSedMLFromString(sedmlStr)
+
+        for output in doc.getListOfOutputs():
+            outputs.append(output)
+
 
         # process all the outputs and create the respective graphs
         # TODO
@@ -122,20 +129,13 @@ def results(request, archive_id, task_id):
         # FIXME: Only processes the first file, than breaks
         break
 
-    #experiment1.xml
-    omexPath = str(archive.file.path)
-
-
-    # open the archive and read the sedml document
-
-
-    # results['dgs'] = dgs_json
-
 
     # provide the info to the view
     context = RequestContext(request, {
         'archive': archive,
         'task_id': task_id,
+        'doc': doc,
+        'outputs': outputs,
     })
 
     return render_to_response('combine/results.html', context)

@@ -5,7 +5,15 @@
 <h1><a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
             src="{% static 'combine/images/logos/omex.png' %}" height="40"></a> {{ archive }}</h1>
     <h2>Outputs</h2>
+    SedDocument: {{ doc }}<br />
+
+    {% for output in outputs %}
+        <h3>Output</h3>
+        {{ output }}
+    {% endfor %}
+
     <div id="tester" style="width:800px;height:500px;"></div>
+
 
 {% endblock %}
 
