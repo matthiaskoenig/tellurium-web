@@ -15,28 +15,28 @@
 {% if plot2Ds %}
     <h2>Plot2Ds [{{ plot2Ds | length }}]</h2>
     {% for info in plot2Ds %}
-    <h3 id="{{ info.id }}">{{ info.id }} {{ info.name }}</h3>
-    <div id="{{ info.id }}_plotly" style="width:400px;height:300px;color=gray"></div>
+    <h3 id="{{ info.id }}"><code>{{ info.id }}</code> {{ info.name }}</h3>
+    <div id="{{ info.id }}_plotly" style="width:800px;height:500px;"></div>
     {% endfor %}
 {% endif %}
 
 {% if plot3Ds %}
     <h2>Plot3Ds</h2>
     {% for info in plot3Ds %}
-    <h3 id="{{ info.id }}">{{ info.id }} {{ info.name }}</h3>
-    <div id="{{ info.id }}_plotly" style="width:400px;height:400px;color=gray"></div>
+    <h3 id="{{ info.id }}"><code>{{ info.id }}</code> {{ info.name }}</h3>
+    <div id="{{ info.id }}_plotly" style="width:800px;height:500px;"></div>
     {% endfor %}
 {% endif %}
 
 {% if reports %}
     <h2>Reports</h2>
     {% for info in reports %}
-        <h3 id="{{ info.id }}">{{ info.id }} {{ info.name}}</h3>
-        {{ info.html | safe }}
+    <h3 id="{{ info.id }}"><code>{{ info.id }}</code> {{ info.name}}</h3>
+    {{ info.html | safe }}
     {% endfor %}
 {% endif %}
 
-<div id="tester" style="width:800px;height:500px;"></div>
+<!--<div id="tester" style="width:800px;height:500px;"></div>-->
 {% endblock %}
 
 

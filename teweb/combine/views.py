@@ -295,7 +295,8 @@ def create_plot2D(sed_doc, output, dgs_dict):
         '''
 
     # register traces
-    js += "var data = {};\n".format(curve_ids)
+    data_ids = ", ".join(curve_ids)
+    js += "var data = [{}];\n".format(data_ids)
 
     # register layout
     js += """
