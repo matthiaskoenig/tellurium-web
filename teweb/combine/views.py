@@ -237,7 +237,7 @@ def create_plot2D(sed_doc, output, dgs_dict):
     if output.isSetName():
         title = output.getName()
 
-    js = "console.log('{}')\n".format(output_id)
+    js = ""  # created javascript code
 
     oneXLabel = True
     allXLabel = None
@@ -268,9 +268,7 @@ def create_plot2D(sed_doc, output, dgs_dict):
         elif xLabel != allXLabel:
             oneXLabel = False
 
-        # get x,y data for curve
-
-        # create the traces
+        # create the traces from curve data
         x = dgs_dict[xId]
         y = dgs_dict[yId]
         x = [item for sublist in x for item in sublist]  # flatten
@@ -279,10 +277,11 @@ def create_plot2D(sed_doc, output, dgs_dict):
             var {} = {{
                 x: {},
                 y: {},
-                mode: 'lines+markers',
-                name: 'Scatter + Lines'
+                //mode: 'lines+markers',
+                mode: 'lines',
+                name: '{}'
             }};\n
-            """.format(curve_id, x, y)
+            """.format(curve_id, x, y, yLabel)
 
         # TODO: color, linewidth, markersize, alpha, label
 
@@ -301,7 +300,7 @@ def create_plot2D(sed_doc, output, dgs_dict):
     # register layout
     js += """
     var layout = {{
-        title: '{}',
+        // title: '{}',
         xaxis: {{
             title: '{}'
         }},
