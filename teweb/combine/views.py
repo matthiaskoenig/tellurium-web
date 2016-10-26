@@ -128,23 +128,28 @@ def results(request, archive_id, task_id):
 
             # check what kind of output
             typeCode = output.getTypeCode()
+            info = {}
+            info["id"] = output.getId()
+            info["name"] = output.getName()
+            info["typeCode"] = typeCode
 
             if typeCode == libsedml.SEDML_OUTPUT_REPORT:
-                info = {}
-                info["typeCode"]
-
                 df = create_report(doc, output, dgs_dict)
                 html = df.to_html()
                 html = html.replace('<table border="1" class="dataframe">', '<table class="table table-striped table-condensed table-hover">')
-                reports.append(html)
+                info["html"] = html
+                reports.append(info)
 
             elif typeCode == libsedml.SEDML_OUTPUT_PLOT2D:
                 plot2D = create_plot2D(doc, output, dgs_dict)
-                plot2Ds.append(plot2D)
+                info["html"] = plot2D
+                plot2Ds.append(info)
 
             elif typeCode == libsedml.SEDML_OUTPUT_PLOT3D:
                 plot3D = create_plot3D(doc, output, dgs_dict)
-                plot3Ds.append(plot3D)
+                info["html"] = plot3D
+                plot3Ds.append(info)
+
 
             else:
                 print("# Unsupported output type: {}".format(output.getElementName()))

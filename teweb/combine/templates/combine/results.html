@@ -4,23 +4,36 @@
 {% block content %}
 <h1><a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
             src="{% static 'combine/images/logos/omex.png' %}" height="40"></a> {{ archive }}</h1>
-    <h2>Outputs</h2>
-    SedDocument: {{ doc }}<br />
 
+    {% if outputs %}
+    <h2>Outputs</h2>
     {% for output in outputs %}
         {{ output }} <br />
     {% endfor %}
 
-    <h2>Plot2Ds</h2>
-    {%
-    <div id="tester" style="width:800px;height:500px;"></div>
+    {% if plot2Ds %}
+        <h2>Plot2Ds [{{ plot2Ds | length }}]</h2>
+        {% for info in plot2Ds %}
+            <h3 id="{{ info.id }}">{{ info.id }} {{ info.name }}</h3>
+            <div id="{{ info.id }}_plotly" style="width:400px;height:300px;color=gray"></div>
+        {% endfor %}
+    {% endif %}
 
-    <h2>Reports</h2>
-    <!-- TODO: print the id -->
+    {% if plot3Ds %}
+        <h2>Plot3Ds</h2>
+        {% for info in plot3Ds %}
+            <h3 id="{{ info.id }}">{{ info.id }} {{ info.name }}</h3>
+            <div id="{{ info.id }}_plotly" style="width:400px;height:400px;color=gray"></div>
+        {% endfor %}
+    {% endif %}
 
-    {% for df in reports %}
-    {{ df | safe }}
-    {% endfor %}
+    {% if reports %}
+        <h2>Reports</h2>
+        {% for info in reports %}
+            <h3 id="{{ info.id }}">{{ info.id }} {{ info.name}}</h3>
+            {{ info.html | safe }}
+        {% endfor %}
+    {% endif %}
 
     <h2>Test</h2>
     <div id="tester" style="width:800px;height:500px;"></div>
