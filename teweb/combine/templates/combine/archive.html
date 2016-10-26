@@ -85,7 +85,6 @@
               console.log(result)
               // $("#id_status").text = result.status;
               document.getElementById("id_status").textContent=state;
-              // document.getElementById("id_progress").textContent=result.progress_percent;
 
               if (state == "PROGRESS"){
                  jQuery('.bar').css({'width': result.progress_percent + '%'});
@@ -94,10 +93,15 @@
                 willstop = 1;
                 jQuery('.bar').css({'width': 100 + '%'});
                 jQuery('.bar').html(100 + '%');
-                  // go to results
-                  window.location.href = '{{ task_id }}';
+              }else{
+                  console.log(state)
               }
+          },
+          error: function(xhr, textStatus, errorThrown){
+              // Problem of parsererror if finishes too fast
+            console.log('ajax request failed: ' + textStatus);
           }
+
       });
     }
 
@@ -105,9 +109,12 @@
     var refreshIntervalId = setInterval(function() {
       checkState();
       if(willstop == 1){
-        clearInterval(refreshIntervalId);
+          clearInterval(refreshIntervalId);
+          // go to results
+          window.location.href = '{{ task_id }}';
       }
     },500);
+
 
   // TODO: abort criteria if task is PENDING forever
 

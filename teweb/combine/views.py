@@ -153,7 +153,6 @@ def results(request, archive_id, task_id):
             else:
                 print("# Unsupported output type: {}".format(output.getElementName()))
 
-
         # process all the outputs and create the respective graphs
         # TODO
         # for doc.getOutputs()
@@ -224,7 +223,16 @@ def create_plot2D(sed_doc, output, dgs_dict):
     """
 
     # General settings
-    colors = [u'r', u'b', u'g', u'm', u'c', u'y', u'k'],
+    colors = [
+          'rgba(1.0, 0, 0, 1)',  # r
+          'rgba(0, 0, 1.0, 1)',  # b
+          'rgba(0, 0.5, 0, 1)',  # g
+          'rgba(0.75, 0, 0.75, 1)',  # m
+          'rgba(0, 0.75, 0.75, 1)',  # c
+          'rgba(0.75, 0.75, 0, 1)',  # y
+          'rgba(0, 0, 0, 1)',  # k
+          ]
+
     facecolor = 'w',
     edgecolor = 'k',
     linewidth = 1.5,
@@ -241,10 +249,10 @@ def create_plot2D(sed_doc, output, dgs_dict):
 
     oneXLabel = True
     allXLabel = None
-    curve_ids = []
+    trace_ids = []
     for kc, curve in enumerate(output.getListOfCurves()):
+        color = colors[kc % len(colors)]
         curve_id = curve.getId()
-        curve_ids.append(curve_id)
         logX = curve.getLogX()
         logY = curve.getLogY()
         xId = curve.getXDataReference()
@@ -271,17 +279,34 @@ def create_plot2D(sed_doc, output, dgs_dict):
         # create the traces from curve data
         x = dgs_dict[xId]
         y = dgs_dict[yId]
-        x = [item for sublist in x for item in sublist]  # flatten
-        y = [item for sublist in y for item in sublist]  # flatten
-        js += """
-            var {} = {{
-                x: {},
-                y: {},
-                //mode: 'lines+markers',
-                mode: 'lines',
-                name: '{}'
-            }};\n
-            """.format(curve_id, x, y, yLabel)
+        # TODO: create all the repeats from the data
+        Nrepeats = len(x[0])
+        for k in range(Nrepeats):
+            trace_id = "{}_{}".format(curve_id, k)
+            trace_ids.append(trace_id)
+
+            x_tr = [sublist[k] for sublist in x]  # flatten
+            y_tr = [sublist[k] for sublist in y]  # flatten
+
+            # one data point ('lines+markers')
+            if len(x_tr) == 1:
+                mode = "markers"
+            else:
+                mode = "lines"
+
+            name = "{}[{}]".format(yLabel, k)
+            js += """
+                var {} = {{
+                    x: {},
+                    y: {},
+                    mode: '{}',
+                    name: '{}',
+                    marker: {{
+                        color: '{}'
+                    }}
+                }};\n
+                """.format(trace_id, x_tr, y_tr, mode,
+                           name, color)
 
         # TODO: color, linewidth, markersize, alpha, label
 
@@ -294,10 +319,11 @@ def create_plot2D(sed_doc, output, dgs_dict):
         '''
 
     # register traces
-    data_ids = ", ".join(curve_ids)
+    data_ids = ", ".join(trace_ids)
     js += "var data = [{}];\n".format(data_ids)
 
     # register layout
+    # TODO: check the oneXLable
     js += """
     var layout = {{
         // title: '{}',
@@ -321,6 +347,7 @@ def create_plot3D(sed_doc, output, dgs_dict):
     :param output:
     :return:
     """
+    # TODO: analoque to the plot2D
     return None
 
 

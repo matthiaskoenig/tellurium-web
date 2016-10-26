@@ -30,6 +30,7 @@ from jobtastic import JobtasticTask
 
 from .models import Archive
 import tellurium as te
+import time
 
 
 # --------------------------------------------------
@@ -69,9 +70,11 @@ class ExecuteOMEX(JobtasticTask):
 
         # execute archive
         tmp_dir = tempfile.mkdtemp()
+
+        # TODO: execute without making images for speedup
         dgs_all = te.executeOMEX(omexPath, workingDir=tmp_dir)
 
-        print("dgs_all:", dgs_all)
+        # print("dgs_all:", dgs_all)
 
         self.update_progress(6, total_count)
 
@@ -88,6 +91,7 @@ class ExecuteOMEX(JobtasticTask):
             dgs_json[sedmlFile] = dgs
         print("-" * 80)
         self.update_progress(8, total_count)
+
 
 
         import shutil
