@@ -202,7 +202,7 @@ def create_report(sed_doc, output, dgs_dict):
 
         # write data
         data = dgs_dict[dgId]
-        data = [item for sublist in data for item in sublist] # flatten list
+        data = [item for sublist in data for item in sublist]  # flatten list
         columns.append(data)
 
     # print('header:', headers)
@@ -223,54 +223,93 @@ def create_plot2D(sed_doc, output, dgs_dict):
     :return: javascript code
     """
 
+    # General settings
+    colors = [u'r', u'b', u'g', u'm', u'c', u'y', u'k'],
+    facecolor = 'w',
+    edgecolor = 'k',
+    linewidth = 1.5,
+    markersize = 3.0,
 
     output_id = output.getId()
     output_name = output.getName()
 
-    js = "console.log('{}')".format(output_id)
+    title = output.getId()
+    if output.isSetName():
+        title = output.getName()
 
-    # create the traces
-    '''
-    var trace1 = {
-        x: [1, 2, 3, 4],
-        y: [10, 15, 13, 17],
-        mode: 'markers',
-        name: 'Scatter'
-    };
+    js = "console.log('{}')\n".format(output_id)
 
-    var trace2 = {
-        x: [2, 3, 4, 5],
-        y: [16, 5, 11, 9],
-        mode: 'lines',
-        name: 'Lines'
-    };
+    oneXLabel = True
+    allXLabel = None
+    curve_ids = []
+    for kc, curve in enumerate(output.getListOfCurves()):
+        curve_id = curve.getId()
+        curve_ids.append(curve_id)
+        logX = curve.getLogX()
+        logY = curve.getLogY()
+        xId = curve.getXDataReference()
+        yId = curve.getYDataReference()
+        dgx = sed_doc.getDataGenerator(xId)
+        dgy = sed_doc.getDataGenerator(yId)
+        # color = settings.colors[kc % len(settings.colors)]
 
-    var trace3 = {
-        x: [1, 2, 3, 4],
-        y: [12, 9, 15, 12],
-        mode: 'lines+markers',
-        name: 'Scatter + Lines'
-    };
-    '''
+        yLabel = yId
+        if curve.isSetName():
+            yLabel = curve.getName()
+        elif dgy.isSetName():
+            yLabel = dgy.getName()
+        xLabel = xId
+        if dgx.isSetName():
+            xLabel = dgx.getName()
+
+        # do all curves have the same xLabel
+        if kc == 0:
+            allXLabel = xLabel
+        elif xLabel != allXLabel:
+            oneXLabel = False
+
+        # get x,y data for curve
+
+        # create the traces
+        x = dgs_dict[xId]
+        y = dgs_dict[yId]
+        x = [item for sublist in x for item in sublist]  # flatten
+        y = [item for sublist in y for item in sublist]  # flatten
+        js += """
+            var {} = {{
+                x: {},
+                y: {},
+                mode: 'lines+markers',
+                name: 'Scatter + Lines'
+            }};\n
+            """.format(curve_id, x, y)
+
+        # TODO: color, linewidth, markersize, alpha, label
+
+        # TODO: handle the log
+        '''
+        if logX is True:
+            lines.append("plt.xscale('log')")
+        if logY is True:
+            lines.append("plt.yscale('log')")
+        '''
 
     # register traces
-    '''
-    var data = [trace1, trace2, trace3];
-    '''
+    js += "var data = {};\n".format(curve_ids)
 
     # register layout
-    '''
-    var layout = {
-        title: 'Adding Names to Line and Scatter Plot',
-        xaxis: {
-            title: 'x-axis title'
-        },
-        yaxis: {
-            title: 'y-axis title'
-        }
-    };
-    Plotly.newPlot('tester', data, layout);
-    '''
+    js += """
+    var layout = {{
+        title: '{}',
+        xaxis: {{
+            title: '{}'
+        }},
+        yaxis: {{
+            title: '{}'
+        }}
+    }};
+    Plotly.newPlot('{}_plotly', data, layout);
+    """.format(title, xLabel, yLabel, output_id)
 
     return js
 
