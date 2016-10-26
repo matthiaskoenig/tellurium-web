@@ -1,6 +1,9 @@
 """
 Models.
 """
+# TODO: implement tags for the archives
+# TODO: implement user/example field
+# TODO: md5 value on save
 
 from __future__ import unicode_literals
 from django.utils.encoding import python_2_unicode_compatible
@@ -18,12 +21,15 @@ from django.core.validators import ValidationError
 # import libcombine
 from tellurium import tecombine
 
-
-
+# ===============================================================================
+# Utility functions for models
+# ===============================================================================
 def validate_omex(fieldFile):
-    """ Validator for the omex file
+    """ Validator for the omex file.
+    Necessary to run basic file checks on upload.
+    Otherwise the archives will create problems on execution.
 
-    :param file:
+    :param fieldFile:
     :return:
     """
 
@@ -41,6 +47,7 @@ def validate_omex(fieldFile):
     # omex = tecombine.OpenCombine(path)
     # omex.listContents()
 
+    # FIXME: currently not completely implemented.
 
     """
     # libcombine
@@ -56,12 +63,42 @@ def validate_omex(fieldFile):
     """
 
 
+def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
+    """ Calculate the md5_hash for a file.
+
+        Calculating a hash for a file is always useful when you need to check if two files
+        are identical, or to make sure that the contents of a file were not changed, and to
+        check the integrity of a file when it is transmitted over a network.
+        he most used algorithms to hash a file are MD5 and SHA-1. They are used because they
+        are fast and they provide a good way to identify different files.
+        [http://www.pythoncentral.io/hashing-files-with-python/]
+    """
+    import hashlib
+
+    hasher = None
+    if hash_type == 'MD5':
+        hasher = hashlib.md5()
+    elif hash_type == 'SHA1':
+        hasher == hashlib.sha1()
+    with open(filepath, 'rb') as f:
+        buf = f.read(blocksize)
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = f.read(blocksize)
+    return hasher.hexdigest()
+
+
+# ===============================================================================
+# Archive
+# ===============================================================================
+
 @python_2_unicode_compatible
 class Archive(models.Model):
     """ Combine Archive class. """
     name = models.CharField(max_length=200)
     file = models.FileField(upload_to='archives/upload', validators=[validate_omex])
     created = models.DateTimeField('date published', editable=False)
+    md5 = models.CharField(max_length=36)
 
     def __str__(self):
         return self.name
@@ -70,5 +107,19 @@ class Archive(models.Model):
         """ On save, update timestamps. """
         if not self.id:
             self.created = timezone.now()
+
+        if not self.md5:
+            # the file is uploaded at this point
+            file_path = str(self.file.path)
+            self.md5 = hash_for_file(file_path, hash_type='MD5')
+
+            # check via hash if the archive is already existing
+            # not really necessary, we allow for duplicate archives
+
         return super(Archive, self).save(*args, **kwargs)
+
+
+# ===============================================================================
+# Tag
+# ===============================================================================
 
