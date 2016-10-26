@@ -142,14 +142,13 @@ def results(request, archive_id, task_id):
 
             elif typeCode == libsedml.SEDML_OUTPUT_PLOT2D:
                 plot2D = create_plot2D(doc, output, dgs_dict)
-                info["html"] = plot2D
+                info["js"] = plot2D
                 plot2Ds.append(info)
 
             elif typeCode == libsedml.SEDML_OUTPUT_PLOT3D:
                 plot3D = create_plot3D(doc, output, dgs_dict)
-                info["html"] = plot3D
+                info["js"] = plot3D
                 plot3Ds.append(info)
-
 
             else:
                 print("# Unsupported output type: {}".format(output.getElementName()))
@@ -217,13 +216,63 @@ def create_report(sed_doc, output, dgs_dict):
 
 
 def create_plot2D(sed_doc, output, dgs_dict):
-    """
+    """ Creates the necessary javascript for plotly.
 
     :param sed_document:
     :param output:
-    :return:
+    :return: javascript code
     """
-    return None
+
+
+    output_id = output.getId()
+    output_name = output.getName()
+
+    js = "console.log('{}')".format(output_id)
+
+    # create the traces
+    '''
+    var trace1 = {
+        x: [1, 2, 3, 4],
+        y: [10, 15, 13, 17],
+        mode: 'markers',
+        name: 'Scatter'
+    };
+
+    var trace2 = {
+        x: [2, 3, 4, 5],
+        y: [16, 5, 11, 9],
+        mode: 'lines',
+        name: 'Lines'
+    };
+
+    var trace3 = {
+        x: [1, 2, 3, 4],
+        y: [12, 9, 15, 12],
+        mode: 'lines+markers',
+        name: 'Scatter + Lines'
+    };
+    '''
+
+    # register traces
+    '''
+    var data = [trace1, trace2, trace3];
+    '''
+
+    # register layout
+    '''
+    var layout = {
+        title: 'Adding Names to Line and Scatter Plot',
+        xaxis: {
+            title: 'x-axis title'
+        },
+        yaxis: {
+            title: 'y-axis title'
+        }
+    };
+    Plotly.newPlot('tester', data, layout);
+    '''
+
+    return js
 
 
 def create_plot3D(sed_doc, output, dgs_dict):

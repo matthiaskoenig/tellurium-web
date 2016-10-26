@@ -45,13 +45,13 @@
 
 {% if plot2Ds %}
     {% for info in plot2Ds %}
-        {{ info.js }}">
+        <script>{{ info.js | safe }}</script>
     {% endfor %}
 {% endif %}
 
 {% if plot3Ds %}
     {% for info in plot3Ds %}
-        <script>{{ info.js }}</script>
+        <script>{{ info.js | safe }}</script>
     {% endfor %}
 {% endif %}
 
