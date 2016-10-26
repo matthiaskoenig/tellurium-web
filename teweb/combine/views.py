@@ -111,14 +111,43 @@ def results(request, archive_id, task_id):
 
     import libsedml
     dgs_json = task.result["dgs"]
-    for sedmlFile, dgs in dgs_json.iteritems():
+    for sedmlFile, dgs_dict in dgs_json.iteritems():
 
         print(sedmlFile)
         sedmlStr = omex.getSEDML(sedmlFile)
         doc = libsedml.readSedMLFromString(sedmlStr)
 
+        # Stores all the html & js information for the outputs
+        # necessary to handle the JS separately
+        reports = []
+        plot2Ds = []
+        plot3Ds = []
+
         for output in doc.getListOfOutputs():
             outputs.append(output)
+
+            # check what kind of output
+            typeCode = output.getTypeCode()
+
+            if typeCode == libsedml.SEDML_OUTPUT_REPORT:
+                info = {}
+                info["typeCode"]
+
+                df = create_report(doc, output, dgs_dict)
+                html = df.to_html()
+                html = html.replace('<table border="1" class="dataframe">', '<table class="table table-striped table-condensed table-hover">')
+                reports.append(html)
+
+            elif typeCode == libsedml.SEDML_OUTPUT_PLOT2D:
+                plot2D = create_plot2D(doc, output, dgs_dict)
+                plot2Ds.append(plot2D)
+
+            elif typeCode == libsedml.SEDML_OUTPUT_PLOT3D:
+                plot3D = create_plot3D(doc, output, dgs_dict)
+                plot3Ds.append(plot3D)
+
+            else:
+                print("# Unsupported output type: {}".format(output.getElementName()))
 
 
         # process all the outputs and create the respective graphs
@@ -136,10 +165,70 @@ def results(request, archive_id, task_id):
         'task_id': task_id,
         'doc': doc,
         'outputs': outputs,
+        'reports': reports,
+        'plot2Ds': plot2Ds,
+        'plot3Ds': plot3Ds,
     })
 
     return render_to_response('combine/results.html', context)
 
+
+def create_report(sed_doc, output, dgs_dict):
+    """ Create the report from output
+
+    :param output:
+    :param sed_doc:
+    :return:
+    """
+    output_id = output.getId()
+    from libsedml import SedOutput
+    import pandas
+    import numpy as np
+
+
+    headers = []
+    dgIds = []
+    columns = []
+    for dataSet in output.getListOfDataSets():
+        # these are the columns
+        headers.append(dataSet.getLabel())
+        # data generator (the id is the id of the data in python)
+        dgId = dataSet.getDataReference()
+        dgIds.append(dgId)
+
+        # write data
+        data = dgs_dict[dgId]
+        data = [item for sublist in data for item in sublist] # flatten list
+        columns.append(data)
+
+    # print('header:', headers)
+    # print('columns:')
+    df = pandas.DataFrame(np.column_stack(columns), columns=headers)
+    print(df.head(5))
+
+    # csv = df.to_csv()
+
+    return df
+
+
+def create_plot2D(sed_doc, output, dgs_dict):
+    """
+
+    :param sed_document:
+    :param output:
+    :return:
+    """
+    return None
+
+
+def create_plot3D(sed_doc, output, dgs_dict):
+    """
+
+    :param sed_doc:
+    :param output:
+    :return:
+    """
+    return None
 
 
 def check_state(request, archive_id):
@@ -165,11 +254,24 @@ def check_state(request, archive_id):
     return JsonResponse(data)
 
 
+def get_commit():
+    """ Get the current commit of the repository.
+    Only works in the context of a git repository.
+    Careful it returns the value of the current folder.
+    Returns None if the commit cannot be resolved.
+    :return:
+    """
+    import subprocess
+    try:
+        commit = subprocess.check_output(["git", "describe", "--always"])
+        commit = commit.strip()
+        return commit
+    except Exception:
+        return None
+
 def about(request):
     """ About page. """
-    import subprocess
-    commit = subprocess.check_output(["git", "describe", "--always"])
-    commit = commit.strip()
+    commit = get_commit()
     context = {
         'commit': commit
     }

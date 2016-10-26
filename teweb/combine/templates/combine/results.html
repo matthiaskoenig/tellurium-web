@@ -8,10 +8,21 @@
     SedDocument: {{ doc }}<br />
 
     {% for output in outputs %}
-        <h3>Output</h3>
-        {{ output }}
+        {{ output }} <br />
     {% endfor %}
 
+    <h2>Plot2Ds</h2>
+    {%
+    <div id="tester" style="width:800px;height:500px;"></div>
+
+    <h2>Reports</h2>
+    <!-- TODO: print the id -->
+
+    {% for df in reports %}
+    {{ df | safe }}
+    {% endfor %}
+
+    <h2>Test</h2>
     <div id="tester" style="width:800px;height:500px;"></div>
 
 

@@ -71,6 +71,8 @@ class ExecuteOMEX(JobtasticTask):
         tmp_dir = tempfile.mkdtemp()
         dgs_all = te.executeOMEX(omexPath, workingDir=tmp_dir)
 
+        print("dgs_all:", dgs_all)
+
         self.update_progress(6, total_count)
 
         # JSON serializable results (np.array to list)
