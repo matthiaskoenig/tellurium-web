@@ -98,6 +98,7 @@ class Archive(models.Model):
     name = models.CharField(max_length=200)
     file = models.FileField(upload_to='archives/upload', validators=[validate_omex])
     created = models.DateTimeField('date published', editable=False)
+    # FIXME: make nullable
     md5 = models.CharField(max_length=36)
 
     def __str__(self):
