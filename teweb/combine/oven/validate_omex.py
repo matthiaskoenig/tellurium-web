@@ -4,6 +4,8 @@ terminate called after throwing an instance of 'std::runtime_error'
   what():  Error loading zip file!
 Aborted (core dumped)
 
+This is now fixed in the latest version.
+
 """
 import libcombine
 from tellurium import tecombine
