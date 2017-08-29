@@ -1,5 +1,12 @@
-# docker build -t matthiaskoenig/teweb . && docker run -it -p 8000:8000 matthiaskoenig/teweb
-# http://localhost:8000
+##############################################################################
+# Dockerfile
+##############################################################################
+# Dockerfile for running the webapp in a container.
+# The container can be build and run via:
+#
+#       docker build -t matthiaskoenig/teweb . && docker run -it -p 8000:8000 matthiaskoenig/teweb
+#
+##############################################################################
 FROM matthiaskoenig/linux-setup-combine:latest
 MAINTAINER Matthias Koenig <konigmatt@googlemail.com>
 
