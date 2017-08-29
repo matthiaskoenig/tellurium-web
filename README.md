@@ -47,3 +47,10 @@ python plot framework (interactive)
 * [bokeh] http://bokeh.pydata.org/en/latest/docs/gallery/legend.html
 * [plotly.js] https://github.com/plotly/plotly.js
 
+# Installation
+```
+mkvirtualenv tellurium-web
+(tellurium-web) pip install -r requirements.txt
+```
+
+In addition tellurium must be installed in the environment.
