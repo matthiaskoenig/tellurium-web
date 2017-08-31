@@ -5,7 +5,7 @@ Models.
 # TODO: implement user/example field
 # TODO: md5 value on save
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 from django.utils.encoding import python_2_unicode_compatible
 
 from django.db import models
@@ -19,7 +19,7 @@ from django.utils import timezone
 
 from django.core.validators import ValidationError
 # import libcombine
-from tellurium import tecombine
+# from tellurium import tecombine
 
 # ===============================================================================
 # Utility functions for models

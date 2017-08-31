@@ -20,7 +20,6 @@ wait for the task to finish or get its return value
 
 """
 from __future__ import absolute_import, print_function
-
 import tempfile
 
 from django.shortcuts import get_object_or_404
@@ -28,9 +27,10 @@ from django.shortcuts import get_object_or_404
 from celery import shared_task, task
 from jobtastic import JobtasticTask
 
+
 from .models import Archive
-import tellurium as te
-import time
+# import tellurium as te
+
 
 
 # --------------------------------------------------

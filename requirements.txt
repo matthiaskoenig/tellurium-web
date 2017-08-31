@@ -1,9 +1,10 @@
 # requirements for web app
-django>=1.11.3
-django-debug-toolbar>=1.8
 celery>=4.1.0
-redis>=2.10.5
-jobtastic>=0.3.1
-# bokeh==0.12.3
+redis>=2.10.6
+jobtastic>=1.0.0a2
 
+django>=1.11.4
+django-debug-toolbar>=1.8
+
+# bokeh==0.12.3
 # tellurium

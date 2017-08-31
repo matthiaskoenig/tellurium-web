@@ -1,5 +1,6 @@
 # Tellurium Web Tools
 <img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" height="50" />
+
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 [![Coverage Status](https://coveralls.io/repos/github/matthiaskoenig/tellurium-web/badge.svg?branch=master)](https://coveralls.io/github/matthiaskoenig/tellurium-web?branch=master)
@@ -18,28 +19,40 @@ Screenshot of the CombineArchive upload and list of Archives.
 * Source Code: [LGPLv3](http://opensource.org/licenses/LGPL-3.0)
 * Documentation: [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
 
+## Installation
+```
+mkvirtualenv tellurium-web
+(tellurium-web) pip install -r requirements.txt
+```
+
+In addition tellurium must be installed in the environment. This can be done
+by cloning the `tellurium repository` and installing the latest version via
+```
+
+```
+
+The test server can be run via
+```
+cd teweb
+python manage.py runserver
+```
+
 ## Changelog
 *v0.1* [?]
 - initial release
 
 ## Technology
-In the following section an overview over the used and planned technology is 
-given.
-### Docker 
-* development & deployment in container
-* reproducible environments for testing
+The following technology is used in `tellurium-web`
 
 ### Web framework 
 * django
-* python web framework & python backend code
 
+### Database layer
+* sqlite (develop) & postgres (deploy)
 
-
-### Datastorage layer
-sqlite & postgresql
-* database backend
-* simple file database (sqlite)
-* switch to postgres when necessary
+### Task queue
+* celery, jobtastic
+* rabbitmq
 
 ### Interactive plots
 python plot framework (interactive)
@@ -47,10 +60,6 @@ python plot framework (interactive)
 * [bokeh] http://bokeh.pydata.org/en/latest/docs/gallery/legend.html
 * [plotly.js] https://github.com/plotly/plotly.js
 
-# Installation
-```
-mkvirtualenv tellurium-web
-(tellurium-web) pip install -r requirements.txt
-```
-
-In addition tellurium must be installed in the environment.
+### Docker 
+* development & deployment in container
+* reproducible environments for testing

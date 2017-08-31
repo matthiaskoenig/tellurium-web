@@ -4,19 +4,21 @@ Tellurium SED-ML Tools Views
 Creates the HTML views of the web-interface.
 """
 
+from __future__ import print_function, absolute_import
 from django.shortcuts import render, get_object_or_404, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from tasks import ExecuteOMEX
-
-from .models import Archive
-from .forms import UploadArchiveForm
 
 from celery.result import AsyncResult
 
+from .tasks import ExecuteOMEX
+from .models import Archive
+from .forms import UploadArchiveForm
+
+
 # import libcombine
-from tellurium import tecombine
+# from tellurium import tecombine
 
 
 def index(request, form=None):
