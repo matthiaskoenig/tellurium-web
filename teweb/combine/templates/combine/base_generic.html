@@ -1,16 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Tellurium Web Tools{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Tellurium Web Tools">
     <meta name="author" content="Matthias Koenig">
     <link rel="shortcut icon" href="{{ static('combine/images/favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ static('combine/bootstrap-3.3.7/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ static('combine/font-awesome-4.6.3/css/font-awesome.min.css') }}"/>
+    <title>Tellurium Web</title>
+
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ static('combine/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('combine/js/datatables.min.css') }}"/>
+    <link rel="stylesheet" type="text/css" href="{{ static('combine/font-awesome-4.7.0/css/font-awesome.min.css') }}"/>
     <link rel="stylesheet" type="text/css" href="{{ static('combine/css/combine.css') }}"/>
+
+    <!-- HEAD -->
+    {% block head %}{% endblock %}
 </head>
 
 <body>
@@ -76,9 +82,10 @@
 <!-- /#wrapper -->
 
 
-<script src="{{ static('combine/js/jquery-3.1.1.min.js') }}"></script>
-<script src="{{ static('combine/bootstrap-3.3.7/js/bootstrap.min.js') }}"></script>
-<script src="{{ static('combine/js/combine.js') }}"></script>
+<script src="{{ static('combine/js/jquery-3.2.1.min.js') }}"></script>
+<script src="{{ static('combine/js/tether-1.4.0.min.js') }}"></script>
+<script src="{{ static('combine/js/bootstrap-3.3.7.min.js') }}"></script>
+<script src="{{ static('combine/js/datatables-1.10.15.min.js') }}"></script>
 {% block javascript %}{% endblock %}
 
 </body>
