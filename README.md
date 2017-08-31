@@ -1,5 +1,4 @@
-# Tellurium Web Tools
-<img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" height="50" />
+<h1><img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" height="50" />Tellurium Web Tools</h1>
 
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
@@ -43,7 +42,6 @@ Database can be filled via
 ```
 ./scripts/fill_db.sh
 ```
- 
 
 ## Changelog
 *v0.1* [?]
@@ -60,14 +58,15 @@ The following technology is used in `tellurium-web`
 * [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
 
 ### Task queue
-* celery, jobtastic
-* rabbitmq
+* [celery](http://www.celeryproject.org/) Distributed task queue
+* [jobtastic](https://github.com/PolicyStat/jobtastic)
+* [rabbitmq](https://www.rabbitmq.com/) Message broker
 
 ### Interactive plots
 python plot framework (interactive)
 * [plotly](https://plot.ly/python/) with examples https://plot.ly/python/line-charts/
-* [bokeh] http://bokeh.pydata.org/en/latest/docs/gallery/legend.html
-* [plotly.js] https://github.com/plotly/plotly.js
+* [bokeh](https://bokeh.pydata.org/en/latest/) 
+* [plotly.js](https://github.com/plotly/plotly.js) 
 
 ### Docker 
 * development & deployment in container
