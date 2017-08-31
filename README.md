@@ -1,4 +1,4 @@
-<h1><img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" height="50" />Tellurium Web Tools</h1>
+<h1><img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" height="40" />&nbsp;&nbsp;Tellurium Web Tools</h1>
 
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
@@ -48,8 +48,8 @@ Database can be filled via
 - initial release
 
 
-## Technology
-The following technology is used in `tellurium-web`
+# Technology
+This section gives an overview over the employed technology in `tellurium-web`
 
 ### Web framework 
 * [django](https://www.djangoproject.com/)
