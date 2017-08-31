@@ -17,11 +17,13 @@ from .models import Archive
 from .forms import UploadArchiveForm
 
 
-# import libcombine
-# from tellurium import tecombine
+try:
+    import libcombine
+except ImportError:
+    import tecombine as libcombine
 
 
-def index(request, form=None):
+def index_view(request, form=None):
     """ Overview of archives.
 
     :param request:
@@ -49,30 +51,17 @@ def archive(request, archive_id):
     # read the archive contents & metadata
     path = str(archive.file.path)
 
-    omex = tecombine.OpenCombine(path)
-    entries = omex.listContents()
+    omex = libcombine.readOMEXFromFile(path)
+    print(omex)
 
-    """
-    entries = []
-    co_archive = libcombine.CombineArchive()
-    if not co_archive.initializeFromArchive(str(path)):
-        print("Invalid Combine Archive")
-    else:
-        print("Num Entries: {0}".format(co_archive.getNumEntries()))
-        for i in range(co_archive.getNumEntries()):
-            entries.append(co_archive.getEntry(i))
-    """
+    entries = omex.listContents()
 
     # run the archive as celery task (asynchronous)
     # result = execute_omex.delay(archive_id)
-
     result = ExecuteOMEX.delay_or_fail(
         archive_id=archive_id
     )
     # print("Task:", result)
-
-
-
 
     # provide the info to the view
     context = RequestContext(request, {
@@ -104,7 +93,7 @@ def results(request, archive_id, task_id):
     # The outputs are needed from sedml document
 
     path = str(archive.file.path)
-    omex = tecombine.OpenCombine(path)
+    omex = libcombine.OpenCombine(path)
     entries = omex.listContents()
 
     from tellurium.sedml.tesedml import SEDMLTools

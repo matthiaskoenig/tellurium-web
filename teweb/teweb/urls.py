@@ -21,6 +21,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^combine/', include('combine.urls')),
