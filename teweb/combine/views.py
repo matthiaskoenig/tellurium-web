@@ -5,7 +5,7 @@ Creates the HTML views of the web-interface.
 """
 
 from __future__ import print_function, absolute_import
-from django.shortcuts import render, get_object_or_404, render_to_response
+from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
