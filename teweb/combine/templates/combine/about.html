@@ -1,7 +1,8 @@
 {% extends "combine/base_generic.html" %}
-{% load static %}
 
 {% block content %}
+<div class="row">
+    <div class="col-lg-12">
     <h1>About</h1>
         Tellurium Web Tools provide a simple means for the execution of CombineArchives.
     </p>
@@ -66,29 +67,8 @@
     To be able to improve this service we store archives which result in errors and problems for debugging.
     The stored archives are only used for error analysis and are deleted as soon as the error is fixed.
     </p>
-
-    <h2>Next steps</h2>
-    <ul>
-        <li>archive view & content</li>
-        <li>validation of archive content</li>
-
-        <li>execute archives</li>
-
-        <li>docker deployment to server</li>
-        <li>example archives</li>
-
-        <li>display release (badge & zenodo)</li>
-        <li>provide upload to Combine Archive Tools of archives</li>
-        <li>provide execution with SED-ML webtools for comparison</li>
-        <li>version information (full list of versions of all libraries)</li>
-        <li>Add how to cite</li>
-
-    </ul>
-
-    <!--
-Please <a href="https://github.com/{{ site.github.repository_nwo }}/edit/{{ site.branch }}/{{ site.page.path }}">help improve this article</a>.
--->
-
+    </div>
+</div>
 
 {% endblock %}
 

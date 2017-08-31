@@ -57,6 +57,15 @@ ROOT_URLCONF = 'teweb.urls'
 
 TEMPLATES = [
     {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'DIRS': [os.path.join(BASE_DIR, 'combine/templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'environment': 'teweb.jinja2.environment',
+        },
+    },
+
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
         'APP_DIRS': True,

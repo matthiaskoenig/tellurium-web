@@ -1,13 +1,14 @@
 {% extends "combine/base_generic.html" %}
-{% load static %}
 
 {% block content %}
-    <h2>Upload Archive</h2>
-    <form action="{% url 'combine:upload' %}" method="post"
+<div class="row">
+    <div class="col-lg-12">
+    <h2>Upload Combine Archive</h2>
+    <form action="{{ url('combine:upload') }}" method="post"
           enctype="multipart/form-data">
-        {% csrf_token %}
-        <p>{{ form.non_field_errors }}</p>
-        <p>{{ form.file.label_tag }} {{ form.file.help_text }}</p>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <p>{{ form.non_field_errors() }}</p>
+        <p>{{ form.file.label_tag() }} {{ form.file.help_text }}</p>
         <p>
             {{ form.file.errors }}
             {{ form.file }} <input type="submit" value="Upload"/>
@@ -28,13 +29,13 @@
             </thead>
             {% for archive in archives %}
                 <tr>
-                    <td><a href="{% url 'combine:archive' archive.id %}"><i class="fa fa-archive fa-lg black"></i><span class="math">{{archive.id}}</span></class></a>
+                    <td><a href="{{ url('combine:archive', args=[archive.id]) }}"><i class="fa fa-archive fa-lg black"></i><span class="math">{{archive.id}}</span></class></a>
                     </td>
-                    <td><a href="{% url 'combine:archive' archive.id %}">{{ archive.name }}</a></td>
+                    <td><a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a></td>
                     <td>{{ archive.created }}</td>
-                    <td><a href="{% url 'combine:archive' archive.id %}"><i
+                    <td><a href="{{ url('combine:archive', args=[archive.id]) }}"><i
                             class="fa fa-play-circle fa-lg black"></i></a></td>
-                    <td><a href="{% url 'combine:archive' archive.id %}"><i
+                    <td><a href="{{ url('combine:archive', args=[archive.id]) }}"><i
                             class="fa fa-ban fa-lg grey"></i></a></td>
                 </tr>
             {% endfor %}
@@ -43,5 +44,6 @@
     {% else %}
         <p>No archives available. Upload archive below.</p>
     {% endif %}
-
+    </div>
+</div>
 {% endblock %}

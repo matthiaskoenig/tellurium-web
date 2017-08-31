@@ -43,11 +43,12 @@ Database can be filled via
 ```
 ./scripts/fill_db.sh
 ```
-
+ 
 
 ## Changelog
 *v0.1* [?]
 - initial release
+
 
 ## Technology
 The following technology is used in `tellurium-web`

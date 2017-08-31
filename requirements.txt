@@ -6,6 +6,7 @@ jobtastic>=1.0.0a2
 django>=1.11.4
 django-debug-toolbar>=1.8
 
+jinja2
 matplotlib
 # bokeh==0.12.3
 # tellurium
