@@ -1,4 +1,4 @@
-<h1><img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te.png" height="40" />&nbsp;&nbsp;Tellurium Web Tools</h1>
+<h1><img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te-web.png" height="40" />&nbsp;&nbsp;Tellurium Web Tools</h1>
 
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
@@ -8,11 +8,12 @@ Online tools for running [CombineArchives](http://co.mbine.org/documents/archive
 Model descriptions in 
 [SBML](http://sbml.org) and simulation descriptions in [SED-ML](http://sed-ml.org) are supported.
 
-As example archive the [Combine Showcase Archive](https://github.com/SemsProject/CombineArchiveShowCase) is provided.
 
-<img title="Screenshot Tellurium Web Tools" src="./docs/images/screenshot.png" width="600" />
 
-Screenshot of the CombineArchive upload and list of Archives.
+<img title="Screenshot Tellurium Web Tools" src="./docs/images/screenshot-0.1.png" width="600" />
+
+Screenshot of the CombineArchive upload and list of Archives. 
+Among others the [Combine Showcase Archive](https://github.com/SemsProject/CombineArchiveShowCase) is included.
 
 ## License
 * Source Code: [LGPLv3](http://opensource.org/licenses/LGPL-3.0)
@@ -31,7 +32,7 @@ mkvirtualenv tellurium-web
 In addition tellurium must be installed in the environment. This can be done
 by cloning the `tellurium repository` and installing the latest version via
 ```
-
+TODO:
 ```
 
 The test server can be run via
