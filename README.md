@@ -39,6 +39,11 @@ python manage.py makemigrations combine
 python manage.py migrate
 python manage.py runserver
 ```
+Database can be filled via
+```
+./scripts/fill_db.sh
+```
+
 
 ## Changelog
 *v0.1* [?]

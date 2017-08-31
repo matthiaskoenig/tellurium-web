@@ -13,13 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+
 from django.conf import settings
+from django.conf.urls.static import static
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import RedirectView
 
 urlpatterns = [
-    url(r'^combine/', include('combine.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^combine/', include('combine.urls')),
+    url(r'^$', RedirectView.as_view(pattern_name='index', permanent=False)),
 ]
 
 if settings.DEBUG:
@@ -27,3 +31,4 @@ if settings.DEBUG:
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

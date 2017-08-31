@@ -6,10 +6,12 @@ Models.
 # TODO: md5 value on save
 
 from __future__ import absolute_import, print_function, unicode_literals
-from django.utils.encoding import python_2_unicode_compatible
+
+import hashlib
 
 from django.db import models
 from django.utils import timezone
+
 
 # TODO: executed file for download, i.e. archive after execution
 # TODO: validation
@@ -73,8 +75,6 @@ def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
         are fast and they provide a good way to identify different files.
         [http://www.pythoncentral.io/hashing-files-with-python/]
     """
-    import hashlib
-
     hasher = None
     if hash_type == 'MD5':
         hasher = hashlib.md5()
@@ -92,13 +92,11 @@ def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
 # Archive
 # ===============================================================================
 
-@python_2_unicode_compatible
 class Archive(models.Model):
     """ Combine Archive class. """
     name = models.CharField(max_length=200)
-    file = models.FileField(upload_to='archives/upload', validators=[validate_omex])
+    file = models.FileField(upload_to='archives', validators=[validate_omex])
     created = models.DateTimeField('date published', editable=False)
-    # FIXME: make nullable
     md5 = models.CharField(max_length=36)
 
     def __str__(self):
@@ -118,6 +116,7 @@ class Archive(models.Model):
             # not really necessary, we allow for duplicate archives
 
         return super(Archive, self).save(*args, **kwargs)
+
 
 
 # ===============================================================================

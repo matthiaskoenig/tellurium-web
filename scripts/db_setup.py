@@ -15,7 +15,7 @@ useful when you already have some data in the DB.
 http://eli.thegreenplace.net/2014/02/15/programmatically-populating-a-django-database
 """
 
-from __future__ import print_function, division
+from __future__ import print_function, absolute_import
 import os
 import sys
 
@@ -35,7 +35,7 @@ sys.path.append(PROJECT_DIR)
 import django
 django.setup()
 
-from combine.models import Archive
+from combine.models import Archive, hash_for_file
 from django.core.files import File
 
 
@@ -54,9 +54,10 @@ def add_archives_to_database():
     for f in sorted(files):
         print(f)
         name = os.path.basename(f)
-        django_file = File(open(f), 'rb')
+        django_file = File(open(f, 'rb'))
         new_archive = Archive(name=name)
         new_archive.file.save(name, django_file, save=False)
+        new_archive.md5 = hash_for_file(f, hash_type='MD5')
         new_archive.full_clean()
         new_archive.save()
 
