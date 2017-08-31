@@ -19,6 +19,10 @@ Screenshot of the CombineArchive upload and list of Archives.
 * Documentation: [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
 
 ## Installation
+### Requirements
+`tellurium-web` requires `python 3.5` or `python 3.6`.
+
+### Setup
 ```
 mkvirtualenv tellurium-web
 (tellurium-web) pip install -r requirements.txt
