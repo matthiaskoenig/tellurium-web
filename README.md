@@ -34,6 +34,9 @@ by cloning the `tellurium repository` and installing the latest version via
 The test server can be run via
 ```
 cd teweb
+python manage.py makemigrations
+python manage.py makemigrations combine
+python manage.py migrate
 python manage.py runserver
 ```
 
@@ -45,10 +48,10 @@ python manage.py runserver
 The following technology is used in `tellurium-web`
 
 ### Web framework 
-* django
+* [django](https://www.djangoproject.com/)
 
 ### Database layer
-* sqlite (develop) & postgres (deploy)
+* [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
 
 ### Task queue
 * celery, jobtastic

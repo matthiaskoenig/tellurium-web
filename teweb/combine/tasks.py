@@ -25,7 +25,7 @@ import tempfile
 from django.shortcuts import get_object_or_404
 
 from celery import shared_task, task
-from jobtastic import JobtasticTask
+# from jobtastic import JobtasticTask
 
 
 from .models import Archive
@@ -36,7 +36,10 @@ from .models import Archive
 # --------------------------------------------------
 # Celery Tasks
 # --------------------------------------------------
-class ExecuteOMEX(JobtasticTask):
+
+# FIXME: get the real celery task running
+# class ExecuteOMEX1(JobtasticTask):
+class ExecuteOMEX():
     """
     Execution of CombineArchives via celery workers.
     """
@@ -91,7 +94,6 @@ class ExecuteOMEX(JobtasticTask):
             dgs_json[sedmlFile] = dgs
         print("-" * 80)
         self.update_progress(8, total_count)
-
 
 
         import shutil
