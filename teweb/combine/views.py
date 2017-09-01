@@ -8,6 +8,7 @@ from __future__ import print_function, absolute_import
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import RequestContext
+from six import iteritems
 
 from celery.result import AsyncResult
 from .tasks import add, execute_omex
@@ -16,7 +17,8 @@ from .models import Archive, hash_for_file
 from .forms import UploadArchiveForm
 from .git import get_commit
 
-
+import libsedml
+import tellurium
 try:
     import libcombine
 except ImportError:
@@ -111,7 +113,7 @@ def upload(request):
             new_archive.md5 = 'None'
             new_archive.full_clean()
             new_archive.save()
-            return archive(request, new_archive.id)
+            return archive_view(request, new_archive.id)
         else:
             print('Form is invalid')
     else:
@@ -186,34 +188,28 @@ def results(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
+
     # no task for the archive, so no results
     if not archive.task_id:
         return archive_view(request, archive_id)
 
-    task = AsyncResult(archive.task_id)
-    data = {
-        'result': task.result,
-        'state': task.state,
-    }
-
-    # Now create the plots with the given results
+    # Create the plots with the given results
     # The outputs are needed from sedml document
+    task = AsyncResult(archive.task_id)
 
     path = str(archive.file.path)
-    omex = libcombine.OpenCombine(path)
-    entries = omex.listContents()
+    omex = tellurium.tecombine.OpenCombine(path)
 
-    from tellurium.sedml.tesedml import SEDMLTools
 
     outputs = []
 
-    import libsedml
+
     dgs_json = task.result["dgs"]
-    for sedmlFile, dgs_dict in dgs_json.iteritems():
+    for sedmlFile, dgs_dict in iteritems(dgs_json):
 
         print(sedmlFile)
         sedmlStr = omex.getSEDML(sedmlFile)
-        doc = libsedml.readSedMLFromString(sedmlStr)
+        doc = libsedml.readSedMLFromString(str(sedmlStr))
 
         # Stores all the html & js information for the outputs
         # necessary to handle the JS separately
@@ -261,17 +257,17 @@ def results(request, archive_id):
 
 
     # provide the info to the view
-    context = RequestContext(request, {
+    context = {
         'archive': archive,
-        'task_id': task_id,
+        'task_id': archive.task_id,
         'doc': doc,
         'outputs': outputs,
         'reports': reports,
         'plot2Ds': plot2Ds,
         'plot3Ds': plot3Ds,
-    })
+    }
 
-    return render_to_response('combine/results.html', context)
+    return render(request, 'combine/results.html', context)
 
 
 ######################
