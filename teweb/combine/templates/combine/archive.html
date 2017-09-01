@@ -8,7 +8,7 @@
             <div class="panel-heading">
                 <h2 class="panel-title">
                     <a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
-                src="{{ static('combine/images/logos/omex.png') }}" height="40"></a> {{ archive }}
+                            src="{{ static('combine/images/logos/omex.png') }}" height="40"></a> {{ archive }}
                 </h2>
                 {{ omex }}
             </div>
@@ -33,6 +33,8 @@
                     </tr>
                     {% endfor %}
                 </table>
+                <span class="btn btn-default"><a href="{{ url('combine:archive_task', args=[archive.id]) }}" title="Run Combine Archive"><i
+                            class="fa fa-play-circle fa-4x green"></i></a></span>
                 {% else %}
                 <p>No entries in archive.</p>
                 {% endif %}
@@ -40,9 +42,8 @@
         </div>
 
     </div>
+</div>
 
-</div>
-</div>
 {% endblock %}
 
 {% block javascript %}{% endblock %}

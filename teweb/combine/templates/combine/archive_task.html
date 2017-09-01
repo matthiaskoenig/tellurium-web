@@ -6,15 +6,6 @@
         <h1><a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
                 src="{{ static('combine/images/logos/omex.png') }}" height="40"></a> {{ archive }}</h1>
 
-        <ul>
-            {% for entry in entries %}
-            <li>
-                {{ entry }}
-                <!--<code>{{entry.getLocation }}</code></b> ({{entry.getFormat}})-->
-            </li>
-            {% endfor %}
-        </ul>
-
         <hr/>
 
         <div class="progress_container">

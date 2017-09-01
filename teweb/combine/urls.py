@@ -8,6 +8,9 @@ urlpatterns = [
     url(r'^$', views.archives, name='index'),
     # ex: /combine/5/
     url(r'^(?P<archive_id>[0-9]+)/$', views.archive, name='archive'),
+    # ex: /combine/5/task
+    url(r'^(?P<archive_id>[0-9]+)/task$', views.archive_task, name='archive_task'),
+
     # ex: /combine/upload
     url(r'^upload$', views.upload, name='upload'),
     # /combine/5/check_state

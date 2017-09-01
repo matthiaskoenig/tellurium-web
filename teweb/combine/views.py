@@ -7,7 +7,6 @@ Creates the HTML views of the web-interface.
 from __future__ import print_function, absolute_import
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.core.urlresolvers import reverse
 from django.template import RequestContext
 
 from celery.result import AsyncResult
@@ -32,7 +31,6 @@ def about(request):
     context = {
         'commit': get_commit()
     }
-
     return render(request, 'combine/about.html', context)
 
 
@@ -134,12 +132,12 @@ def archive_task(request, archive_id):
     """
     archive = get_object_or_404(Archive, pk=archive_id)
 
-
     # run the archive as celery task (asynchronous)
     result = ExecuteOMEX.delay_or_fail(
         archive_id=archive_id
     )
     context = RequestContext(request, {
+        'archive': archive,
         'task_id': result.task_id,
     })
 

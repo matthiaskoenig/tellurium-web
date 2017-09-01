@@ -29,8 +29,8 @@
                                 class="badge">{{archive.id}}</span></a>
                         </td>
                         <td><b><a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a></b></td>
-                        <td><a href="{{ url('combine:archive', args=[archive.id]) }}"><i
-                                class="fa fa-play-circle fa-lg green"></i></a></td>
+                        <td><span class="btn btn-default"><a href="{{ url('combine:archive_task', args=[archive.id]) }}"><i
+                                class="fa fa-play-circle fa-lg green"></i></a></span></td>
                         <td><a href="{{ url('combine:archive', args=[archive.id]) }}"><i
                                 class="fa fa-ban fa-lg grey"></i></a></td>
                         <td class="hidden-xs">{{ archive.created }}</td>
@@ -80,7 +80,9 @@
 {% block javascript %}
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function () {
-        $('#archives').DataTable();
+        $('#archives').DataTable({
+           "order": [[ 4, "desc" ]]
+        });
     });
 </script>
 {% endblock %}
