@@ -33,8 +33,16 @@
                     </tr>
                     {% endfor %}
                 </table>
+
                 <span class="btn btn-default"><a href="{{ url('combine:archive_task', args=[archive.id]) }}" title="Run Combine Archive"><i
                             class="fa fa-play-circle fa-4x green"></i></a></span>
+
+                {% if archive.task_id %}
+                <!-- Possible values: PENDING/STARTED/RETRY/FAILURE/SUCCESS -->
+                <b>task_id:</b> {{ archive.task_id }}<br/>
+                <b>status</b>:</b> {{ archive.status }}<br/>
+                {% endif %}
+
                 {% else %}
                 <p>No entries in archive.</p>
                 {% endif %}

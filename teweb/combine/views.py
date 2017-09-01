@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import RequestContext
 
 from celery.result import AsyncResult
-from .tasks import ExecuteOMEX, add
+from .tasks import add, execute_omex
 
 from .models import Archive, hash_for_file
 from .forms import UploadArchiveForm
@@ -53,7 +53,7 @@ def archives(request, form=None):
     return render(request, 'combine/archives.html', context)
 
 
-def archive(request, archive_id):
+def archive_view(request, archive_id):
     """ Single archive view.
     Displays the content of the archive.
 
@@ -130,20 +130,27 @@ def archive_task(request, archive_id):
     :param archive_id:
     :return:
     """
+    create_task = False
+
     archive = get_object_or_404(Archive, pk=archive_id)
+    if archive.task_id:
+        # existing task
+        result = AsyncResult(archive.task_id)
+        if result.status == "FAILURE":
+            create_task = True
+    else:
+        create_task = True
 
-    # run the archive as celery task (asynchronous)
-    result = ExecuteOMEX.delay_or_fail(
-        archive_id=archive_id
-    )
-    # add.delay(4, 4)
+    if create_task:
+        # add.delay(4, 4)
+        print('* creating new task')
+        result = execute_omex.delay(archive_id=archive_id)
+        archive.task_id = result.task_id
+        archive.save()
 
-    context = {
-        'archive': archive,
-        # 'task_id': 1,
-        'task_id': result.task_id,
-    }
-    return render(request, 'combine/archive_task.html', context)
+    return archive_view(request, archive_id)
+
+
 
 
 def check_state(request, archive_id):

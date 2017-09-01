@@ -1,12 +1,13 @@
-# celery>=4.1.0 # not supported in jobtastic
-celery==3.1.25
+celery>=4.1.0 # not supported in jobtastic
+# celery==3.1.25
+# jobtastic>=1.0.0a2
+
 redis>=2.10.6
 
 django>=1.11.4
 django-debug-toolbar>=1.8
-# django-celery-results>=1.0.1
-# django-celery-beat
-jobtastic>=1.0.0a2
+django-celery-results>=1.0.1
+django-celery-beat
 
 jinja2>=2.9.6
 matplotlib>=2.0.2

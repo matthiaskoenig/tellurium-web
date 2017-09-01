@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'django_celery_results',
+    'django_celery_results',
     # 'debug_toolbar'
 ]
 
@@ -138,9 +138,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CELERY STUFF
 BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-# CELERY_RESULT_BACKEND = 'django-db'
-
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'django-db'
 
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'

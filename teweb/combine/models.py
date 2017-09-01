@@ -1,9 +1,6 @@
 """
 Models.
 """
-# TODO: implement tags for the archives
-# TODO: implement user/example field
-# TODO: md5 value on save
 
 from __future__ import absolute_import, print_function, unicode_literals
 
@@ -11,17 +8,10 @@ import hashlib
 
 from django.db import models
 from django.utils import timezone
-
-
-# TODO: executed file for download, i.e. archive after execution
-# TODO: validation
-# TODO: MD5 Hash
-# TODO: Filesize {{ value|filesizeformat }}
-# TODO: add tags for description
-
 from django.core.validators import ValidationError
-# import libcombine
-# from tellurium import tecombine
+
+from celery.result import AsyncResult
+
 
 # ===============================================================================
 # Utility functions for models
@@ -98,6 +88,7 @@ class Archive(models.Model):
     file = models.FileField(upload_to='archives', validators=[validate_omex])
     created = models.DateTimeField('date published', editable=False)
     md5 = models.CharField(max_length=36)
+    task_id = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.name
@@ -117,9 +108,15 @@ class Archive(models.Model):
 
         return super(Archive, self).save(*args, **kwargs)
 
-
+    @property
+    def status(self):
+        if self.task_id:
+            result = AsyncResult(self.task_id)
+            return result.status
+        else:
+            return None
 
 # ===============================================================================
 # Tag
 # ===============================================================================
-
+# TODO: implement

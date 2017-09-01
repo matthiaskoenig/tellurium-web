@@ -7,114 +7,11 @@
                 src="{{ static('combine/images/logos/omex.png') }}" height="40"></a> {{ archive }}</h1>
 
         <hr/>
+        <b>task_id:</b> {{ task_id }}<br/>
+        <b>status</b>:</b> {{ status }}<br/>
 
-        <div class="progress_container">
-            <div class="current-task">
-                {% if task_id %}
-                <b>Task:</b> {{ task_id }}
-                {% endif %}
-            </div>
-
-            <div class="status"><span id="id_status"></span></div>
-            <div class="progress">
-                <div class="bar"></div>
-            </div>
-        </div>
     </div>
-
 </div>
-</div>
-{% endblock %}
-
-
-{% block javascript %}
-
-<script>
-    // using jQuery
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    var csrftoken = getCookie('csrftoken');
-
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-
-    var willstop = 0;
-
-    function checkState() {
-        console.log("check_state");
-
-        // ajax call to check status
-        $.ajax({
-            url: 'check_state',
-            type: 'POST',
-            data: {
-                task_id: '{{ task_id }}',
-                csrfmiddlewaretoken: csrftoken,
-            },
-            success: function (data) {
-                state = data.state
-                result = data.result
-                console.log(state)
-                console.log(result)
-                // $("#id_status").text = result.status;
-                document.getElementById("id_status").textContent = state;
-
-                if (state == "PROGRESS") {
-                    jQuery('.bar').css({'width': result.progress_percent + '%'});
-                    jQuery('.bar').html(result.progress_percent + '%');
-                } else if (state == "SUCCESS") {
-                    willstop = 1;
-                    jQuery('.bar').css({'width': 100 + '%'});
-                    jQuery('.bar').html(100 + '%');
-                }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                // Problem of parsererror if finishes too fast
-                console.log('ajax request failed: ' + textStatus);
-            }
-
-        });
-    }
-
-    // repetitive ajax call for result
-    var refreshIntervalId = setInterval(function () {
-        checkState();
-        if (willstop == 1) {
-            clearInterval(refreshIntervalId);
-            // go to results
-            window.location.href = '{{ task_id }}';
-        }
-    }, 500);
-
-
-    // TODO: abort criteria if task is PENDING forever
-
-
-</script>
 {% endblock %}
 
 

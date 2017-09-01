@@ -27,19 +27,66 @@ import tellurium as te
 
 from django.shortcuts import get_object_or_404
 from .models import Archive
-
-
 from celery import shared_task, task
-from jobtastic import JobtasticTask
+
+
+# --------------------------------------------------
+# Celery Tasks
+# --------------------------------------------------
 
 @task(name="adding numbers")
 def add(x, y):
     return x + y
 
 
-# --------------------------------------------------
-# Celery Tasks
-# --------------------------------------------------
+@task(name="execute omex")
+def execute_omex(archive_id, debug=True):
+    """
+    Execute omex.
+    """
+    # TODO: error handling for cleanup
+    matplotlib.pyplot.switch_backend("Agg")
+
+    print("*** START RUNNING OMEX ***")
+    results = {}
+
+    # read archive
+    archive = get_object_or_404(Archive, pk=archive_id)
+    omex_path = str(archive.file.path)
+
+    # execute archive
+    # FIXME: execute without making images for speedup
+    tmp_dir = tempfile.mkdtemp()
+    dgs_all = te.executeOMEX(omex_path, workingDir=tmp_dir)
+    if debug:
+        print("dgs_all:", dgs_all)
+
+    # JSON serializable results (np.array to list)
+    print("-" * 80)
+    dgs_json = {}
+    for f_tmp, dgs in dgs_all.iteritems():
+        print(f_tmp)
+        sedmlFile = f_tmp.replace(tmp_dir + "/", "")
+        print(sedmlFile)
+        for key in dgs:
+            dgs[key] = dgs[key].tolist()
+            print(key, ':', dgs[key])
+        dgs_json[sedmlFile] = dgs
+    print("-" * 80)
+
+    # cleanup
+    shutil.rmtree(tmp_dir)
+
+    # store results of execution for rendering
+    results['dgs'] = dgs_json
+
+    print("*** FINISHED RUNNING OMEX ***")
+    return results
+
+'''
+from jobtastic import JobtasticTask
+
+
 class ExecuteOMEX(JobtasticTask):
     """
     Execution of CombineArchives via celery workers.
@@ -105,3 +152,4 @@ class ExecuteOMEX(JobtasticTask):
 
         print("*** FINISHED RUNNING OMEX ***")
         return results
+'''
