@@ -177,7 +177,7 @@ def check_state(request, archive_id):
     return JsonResponse(data)
 
 
-def results(request, archive_id, task_id):
+def results(request, archive_id):
     """ View is called when results are ready.
 
     :param request:
@@ -186,8 +186,11 @@ def results(request, archive_id, task_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
+    # no task for the archive, so no results
+    if not archive.task_id:
+        return archive_view(request, archive_id)
 
-    task = AsyncResult(task_id)
+    task = AsyncResult(archive.task_id)
     data = {
         'result': task.result,
         'state': task.state,

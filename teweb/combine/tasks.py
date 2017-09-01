@@ -23,7 +23,8 @@ from __future__ import absolute_import, unicode_literals, print_function
 import tempfile
 import shutil
 import matplotlib
-import tellurium as te
+import tellurium
+from six import iteritems
 
 from django.shortcuts import get_object_or_404
 from .models import Archive
@@ -57,14 +58,14 @@ def execute_omex(archive_id, debug=True):
     # execute archive
     # FIXME: execute without making images for speedup
     tmp_dir = tempfile.mkdtemp()
-    dgs_all = te.executeOMEX(omex_path, workingDir=tmp_dir)
+    dgs_all = tellurium.sedml.tesedml.executeOMEX(omex_path, workingDir=tmp_dir)
     if debug:
         print("dgs_all:", dgs_all)
 
     # JSON serializable results (np.array to list)
     print("-" * 80)
     dgs_json = {}
-    for f_tmp, dgs in dgs_all.iteritems():
+    for f_tmp, dgs in iteritems(dgs_all):
         print(f_tmp)
         sedmlFile = f_tmp.replace(tmp_dir + "/", "")
         print(sedmlFile)

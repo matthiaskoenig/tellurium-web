@@ -41,6 +41,13 @@
                 <!-- Possible values: PENDING/STARTED/RETRY/FAILURE/SUCCESS -->
                 <b>task_id:</b> {{ archive.task_id }}<br/>
                 <b>status</b>:</b> {{ archive.status }}<br/>
+
+                    {% if archive.status == "SUCCESS" %}
+                 <span class="btn btn-default">
+                <a href="{{ url('combine:results', args=[archive.id]) }}" title="Results"> <i class="fa fa-line-chart fa-4x"></i> RESULTS</a>
+                     </a></span>
+                    {% endif %}
+
                 {% endif %}
 
                 {% else %}
