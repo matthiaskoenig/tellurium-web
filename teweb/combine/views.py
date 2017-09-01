@@ -13,8 +13,9 @@ from django.template import RequestContext
 from celery.result import AsyncResult
 
 from .tasks import ExecuteOMEX
-from .models import Archive
+from .models import Archive, hash_for_file
 from .forms import UploadArchiveForm
+from .git import get_commit
 
 
 try:
@@ -23,7 +24,22 @@ except ImportError:
     import tecombine as libcombine
 
 
-def index_view(request, form=None):
+######################
+# ABOUT
+######################
+def about(request):
+    """ About page. """
+    context = {
+        'commit': get_commit()
+    }
+
+    return render(request, 'combine/about.html', context)
+
+
+######################
+# ARCHIVES
+######################
+def archives(request, form=None):
     """ Overview of archives.
 
     :param request:
@@ -36,11 +52,81 @@ def index_view(request, form=None):
         'archives': archives,
         'form': form
     }
-    return render(request, 'combine/index.html', context)
+    return render(request, 'combine/archives.html', context)
 
 
 def archive(request, archive_id):
     """ Single archive view.
+    Displays the content of the archive.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    archive = get_object_or_404(Archive, pk=archive_id)
+    path = str(archive.file.path)
+
+    # read combine archive contents & metadata
+    omex = libcombine.CombineArchive()
+    if omex.initializeFromArchive(path) is None:
+        print("Invalid Combine Archive")
+        return None
+
+    entries = []
+    for i in range(omex.getNumEntries()):
+        entry = omex.getEntry(i)
+        # entry.getLocation(), entry.getFormat()
+        # printMetaDataFor(archive, entry.getLocation());
+        entries.append(entry)
+
+        # the entry could now be extracted via
+        # archive.extractEntry(entry.getLocation(), <filename or folder>)
+
+        # or used as string
+        # content = archive.extractEntryToString(entry.getLocation());
+
+    # omex.cleanUp()
+
+    # view context
+    context = {
+        'archive': archive,
+        'omex': omex,
+        'entries': entries,
+    }
+
+    return render(request, 'combine/archive.html', context)
+
+
+def upload(request):
+    """ Upload file view.
+
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        form = UploadArchiveForm(request.POST, request.FILES)
+        if form.is_valid():
+            name = request.FILES['file']
+            new_archive = Archive(name=name, file=request.FILES['file'])
+            # FIXME: hash
+            # new_archive.md5 = hash_for_file(name, hash_type='MD5')
+            new_archive.md5 = 'None'
+            new_archive.full_clean()
+            new_archive.save()
+            return archive(request, new_archive.id)
+        else:
+            print('Form is invalid')
+    else:
+        form = UploadArchiveForm()
+
+    return archives(request, form)
+
+
+######################
+# ARCHIVE EXECUTION
+######################
+def archive_task(request, archive_id):
+    """ Execute the given archive and show the task.
 
     :param request:
     :param archive_id:
@@ -48,29 +134,39 @@ def archive(request, archive_id):
     """
     archive = get_object_or_404(Archive, pk=archive_id)
 
-    # read the archive contents & metadata
-    path = str(archive.file.path)
-
-    omex = libcombine.readOMEXFromFile(path)
-    print(omex)
-
-    entries = omex.listContents()
 
     # run the archive as celery task (asynchronous)
-    # result = execute_omex.delay(archive_id)
     result = ExecuteOMEX.delay_or_fail(
         archive_id=archive_id
     )
-    # print("Task:", result)
-
-    # provide the info to the view
     context = RequestContext(request, {
-        'archive': archive,
-        'entries': entries,
         'task_id': result.task_id,
     })
 
-    return render_to_response('combine/archive.html', context)
+    return render_to_response('combine/archive_task.html', context)
+
+
+def check_state(request, archive_id):
+    """ A view to report the progress of the archive to the user. """
+    if request.is_ajax():
+        if 'task_id' in request.POST.keys() and request.POST['task_id']:
+            task_id = request.POST['task_id']
+            task = AsyncResult(task_id)
+            data = {
+                'result': task.result,
+                'state': task.state,
+            }
+        else:
+            data = {
+                'state': 'No task_id in the request'
+            }
+
+    else:
+        data = {
+            'state': 'This is not an ajax request'
+        }
+
+    return JsonResponse(data)
 
 
 def results(request, archive_id, task_id):
@@ -167,6 +263,9 @@ def results(request, archive_id, task_id):
     return render_to_response('combine/results.html', context)
 
 
+######################
+# OUTPUTS
+######################
 def create_report(sed_doc, output, dgs_dict):
     """ Create the report from output
 
@@ -339,77 +438,5 @@ def create_plot3D(sed_doc, output, dgs_dict):
     :return:
     """
     # TODO: analoque to the plot2D
+
     return None
-
-
-def check_state(request, archive_id):
-    """ A view to report the progress of the archive to the user. """
-    if request.is_ajax():
-        if 'task_id' in request.POST.keys() and request.POST['task_id']:
-            task_id = request.POST['task_id']
-            task = AsyncResult(task_id)
-            data = {
-                'result': task.result,
-                'state': task.state,
-            }
-        else:
-            data = {
-                'state': 'No task_id in the request'
-            }
-
-    else:
-        data = {
-            'state': 'This is not an ajax request'
-        }
-
-    return JsonResponse(data)
-
-
-def get_commit():
-    """ Get the current commit of the repository.
-    Only works in the context of a git repository.
-    Careful it returns the value of the current folder.
-    Returns None if the commit cannot be resolved.
-    :return:
-    """
-    import subprocess
-    try:
-        commit = subprocess.check_output(["git", "describe", "--always"])
-        commit = commit.strip()
-        return commit
-    except Exception:
-        return None
-
-def about(request):
-    """ About page. """
-    commit = get_commit()
-    context = {
-        'commit': commit
-    }
-
-    return render(request, 'combine/about.html', context)
-
-
-def upload(request):
-    """ Upload file view.
-
-    :param request:
-    :return:
-    """
-    if request.method == 'POST':
-        form = UploadArchiveForm(request.POST, request.FILES)
-        if form.is_valid():
-            name = request.FILES['file']
-            new_archive = Archive(name=name, file=request.FILES['file'])
-            new_archive.full_clean()
-            new_archive.save()
-
-            return index(request, form)
-        else:
-            print('Form is invalid')
-    else:
-        form = UploadArchiveForm()
-
-    return index(request, form)
-
-

@@ -109,8 +109,8 @@ class Archive(models.Model):
 
         if not self.md5:
             # the file is uploaded at this point
-            file_path = str(self.file.path)
-            self.md5 = hash_for_file(file_path, hash_type='MD5')
+            # file_path = str(self.file.path)
+            self.md5 = hash_for_file(self.file, hash_type='MD5')
 
             # check via hash if the archive is already existing
             # not really necessary, we allow for duplicate archives
