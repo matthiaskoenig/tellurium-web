@@ -14,6 +14,12 @@
     <link rel="stylesheet" type="text/css" href="{{ static('combine/font-awesome-4.7.0/css/font-awesome.min.css') }}"/>
     <link rel="stylesheet" type="text/css" href="{{ static('combine/css/combine.css') }}"/>
 
+    <!-- scripts -->
+    <script src="{{ static('combine/js/jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ static('combine/js/tether-1.4.0.min.js') }}"></script>
+    <script src="{{ static('combine/js/bootstrap-3.3.7.min.js') }}"></script>
+    <script src="{{ static('combine/js/datatables-1.10.15.min.js') }}"></script>
+    <script src="{{ static('combine/js/plotly-1.30.0.min.js') }}"></script>
     <!-- HEAD -->
     {% block head %}{% endblock %}
 </head>
@@ -72,25 +78,13 @@
     <div id="page-wrapper">
         <div class="container-fluid">
             {% block content %}{% endblock %}
-
-            <!--
-            <div class="row">
-                <div class="col-lg-12">
-                    <hr/>
-                    <p>&copy; 2017 tellurium-web
-                </div>
-            </div>
-            -->
         </div>
     </div>
 </div>
 
 
-    <script src="{{ static('combine/js/jquery-3.2.1.min.js') }}"></script>
-    <script src="{{ static('combine/js/tether-1.4.0.min.js') }}"></script>
-    <script src="{{ static('combine/js/bootstrap-3.3.7.min.js') }}"></script>
-    <script src="{{ static('combine/js/datatables-1.10.15.min.js') }}"></script>
-    {% block javascript %}{% endblock %}
+
+{% block javascript %}{% endblock %}
 
 </body>
 </html>
