@@ -17,13 +17,13 @@ from .models import Archive, hash_for_file
 from .forms import UploadArchiveForm
 from .git import get_commit
 
-import libsedml
+
 import tellurium
 try:
     import libcombine
 except ImportError:
     import tecombine as libcombine
-
+import libsedml
 
 ######################
 # ABOUT
@@ -207,9 +207,14 @@ def results(request, archive_id):
     dgs_json = task.result["dgs"]
     for sedmlFile, dgs_dict in iteritems(dgs_json):
 
-        print(sedmlFile)
-        sedmlStr = omex.getSEDML(sedmlFile)
+        # python 3
+        sedmlStr = omex.getSEDML(sedmlFile).decode('UTF-8')
         doc = libsedml.readSedMLFromString(str(sedmlStr))
+
+        # check that valid
+        sedml_str = libsedml.writeSedMLToString(doc)
+
+
 
         # Stores all the html & js information for the outputs
         # necessary to handle the JS separately

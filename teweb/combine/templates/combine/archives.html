@@ -21,6 +21,7 @@
                         <th>Results</th>
                         <th class="hidden-xs">Created</th>
                         <th class="hidden-xs">MD5</th>
+                        <th>Download</th>
                     </tr>
                     </thead>
                     {% for archive in archives %}
@@ -35,6 +36,7 @@
                                 class="fa fa-ban fa-lg grey"></i></a></td>
                         <td class="hidden-xs">{{ archive.created }}</td>
                         <td class="hidden-xs">{{ archive.md5 }}</td>
+                        <td><a href="{{ archive.file.url }}" title="Download archive"><i class="fa fa-download fa-lg black"></i></a></td>
                     </tr>
                     {% endfor %}
 
