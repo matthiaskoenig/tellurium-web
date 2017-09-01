@@ -19,27 +19,28 @@ wait for the task to finish or get its return value
 (or if the task failed, the exception and traceback).
 
 """
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, unicode_literals, print_function
 import tempfile
+import shutil
+import matplotlib
+import tellurium as te
 
 from django.shortcuts import get_object_or_404
+from .models import Archive
+
 
 from celery import shared_task, task
-# from jobtastic import JobtasticTask
+from jobtastic import JobtasticTask
 
-
-from .models import Archive
-# import tellurium as te
-
+@task(name="adding numbers")
+def add(x, y):
+    return x + y
 
 
 # --------------------------------------------------
 # Celery Tasks
 # --------------------------------------------------
-
-# FIXME: get the real celery task running
-# class ExecuteOMEX1(JobtasticTask):
-class ExecuteOMEX():
+class ExecuteOMEX(JobtasticTask):
     """
     Execution of CombineArchives via celery workers.
     """
@@ -58,11 +59,11 @@ class ExecuteOMEX():
         """
         Execute omex.
         """
-        print("*** START OMEX ***")
+        print("*** START RUNNING OMEX ***")
         total_count = 10
         results = {}
 
-        import matplotlib
+
         matplotlib.pyplot.switch_backend("Agg")
         self.update_progress(1, total_count)
 
@@ -75,32 +76,32 @@ class ExecuteOMEX():
         tmp_dir = tempfile.mkdtemp()
 
         # TODO: execute without making images for speedup
-        dgs_all = te.executeOMEX(omexPath, workingDir=tmp_dir)
+        try:
+            dgs_all = te.executeOMEX(omexPath, workingDir=tmp_dir)
 
-        # print("dgs_all:", dgs_all)
+            # print("dgs_all:", dgs_all)
 
-        self.update_progress(6, total_count)
+            self.update_progress(6, total_count)
 
-        # JSON serializable results (np.array to list)
-        print("-" * 80)
-        dgs_json = {}
-        for f_tmp, dgs in dgs_all.iteritems():
-            print(f_tmp)
-            sedmlFile = f_tmp.replace(tmp_dir + "/", "")
-            print(sedmlFile)
-            for key in dgs:
-                dgs[key] = dgs[key].tolist()
-                print(key, ':', dgs[key])
-            dgs_json[sedmlFile] = dgs
-        print("-" * 80)
-        self.update_progress(8, total_count)
+            # JSON serializable results (np.array to list)
+            print("-" * 80)
+            dgs_json = {}
+            for f_tmp, dgs in dgs_all.iteritems():
+                print(f_tmp)
+                sedmlFile = f_tmp.replace(tmp_dir + "/", "")
+                print(sedmlFile)
+                for key in dgs:
+                    dgs[key] = dgs[key].tolist()
+                    print(key, ':', dgs[key])
+                dgs_json[sedmlFile] = dgs
+            print("-" * 80)
+            self.update_progress(8, total_count)
 
-
-        import shutil
-        shutil.rmtree(tmp_dir)
+        finally:
+            shutil.rmtree(tmp_dir)
 
         # store results of execution for rendering
         results['dgs'] = dgs_json
 
-        print("*** END OMEX ***")
+        print("*** FINISHED RUNNING OMEX ***")
         return results

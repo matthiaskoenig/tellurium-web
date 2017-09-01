@@ -10,8 +10,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import RequestContext
 
 from celery.result import AsyncResult
+from .tasks import ExecuteOMEX, add
 
-from .tasks import ExecuteOMEX
 from .models import Archive, hash_for_file
 from .forms import UploadArchiveForm
 from .git import get_commit
@@ -136,12 +136,14 @@ def archive_task(request, archive_id):
     result = ExecuteOMEX.delay_or_fail(
         archive_id=archive_id
     )
-    context = RequestContext(request, {
-        'archive': archive,
-        'task_id': result.task_id,
-    })
+    # add.delay(4, 4)
 
-    return render_to_response('combine/archive_task.html', context)
+    context = {
+        'archive': archive,
+        # 'task_id': 1,
+        'task_id': result.task_id,
+    }
+    return render(request, 'combine/archive_task.html', context)
 
 
 def check_state(request, archive_id):
@@ -151,9 +153,10 @@ def check_state(request, archive_id):
             task_id = request.POST['task_id']
             task = AsyncResult(task_id)
             data = {
-                'result': task.result,
                 'state': task.state,
             }
+            if task.state == "SUCCESS":
+                data['result'] = task.result
         else:
             data = {
                 'state': 'No task_id in the request'

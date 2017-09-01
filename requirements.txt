@@ -1,10 +1,15 @@
-celery>=4.1.0
+# celery>=4.1.0 # not supported in jobtastic
+celery==3.1.25
 redis>=2.10.6
-jobtastic>=1.0.0a2
+
 django>=1.11.4
 django-debug-toolbar>=1.8
-jinja2>=
-matplotlib>=
+# django-celery-results>=1.0.1
+# django-celery-beat
+jobtastic>=1.0.0a2
+
+jinja2>=2.9.6
+matplotlib>=2.0.2
 
 # tellurium>=2.0.0
 -e git+https://github.com/sys-bio/tellurium.git@2.0-sedml-L1V3#egg=tellurium

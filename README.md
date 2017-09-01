@@ -20,8 +20,11 @@ Among others the [Combine Showcase Archive](https://github.com/SemsProject/Combi
 * Documentation: [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
 
 ## Installation
-### Requirements
-`tellurium-web` requires `python 3.5` or `python 3.6`.
+`tellurium-web` requires 
+- `python 3.5` or `python 3.6`.
+- `redis` installation as message broker (for installation script see `linux-setup`) or `rabbitmq-server`
+- `postgres`
+
 
 ### Setup
 ```
@@ -29,25 +32,27 @@ mkvirtualenv tellurium-web
 (tellurium-web) pip install -r requirements.txt
 ```
 
-In addition tellurium must be installed in the environment. This can be done
-by cloning the `tellurium repository` and installing the latest version via
-```
-TODO:
-```
-
 The test server can be run via
 ```
-cd teweb
-python manage.py makemigrations
-python manage.py makemigrations combine
-python manage.py migrate
-python manage.py runserver
-python manage.py createsuperuser
+(tellurium-web) cd teweb
+(tellurium-web) python manage.py makemigrations
+(tellurium-web) python manage.py makemigrations combine
+
+(tellurium-web) python manage.py migrate
+(tellurium-web) python manage.py runserver
+(tellurium-web) python manage.py createsuperuser
 ```
 Database can be filled via
 ```
-./scripts/fill_db.sh
+(tellurium-web) ./scripts/fill_db.sh
 ```
+
+# Celery
+Start a test worker 
+```
+(tellurium-web) celery -A teweb worker -l info
+```
+
 
 ## Changelog
 *v0.1* [?]
@@ -64,9 +69,13 @@ This section gives an overview over the employed technology in `tellurium-web`
 * [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
 
 ### Task queue
+The execution of the CombineArchives and the simulations are performed
+in a task queue. Task queues are used as a mechanism to distribute work across threads or machines.
 * [celery](http://www.celeryproject.org/) Distributed task queue
+* [redis](https://redis.io/) Redis is an open source (BSD licensed), 
+in-memory data structure store, used as a database, cache and message broker.
 * [jobtastic](https://github.com/PolicyStat/jobtastic)
-* [rabbitmq](https://www.rabbitmq.com/) Message broker
+
 
 ### Interactive plots
 python plot framework (interactive)
