@@ -36,9 +36,10 @@ class ContentTest(unittest.TestCase):
         url = self.domain + ":" + str(self.port) + url
         results = requests.get(url, allow_redirects=True, verify=False)
         print(results.status_code, url)
-        if (self.search_string in results.text) or (url.endswith('/admin/')):
+        if (self.search_string in results.text) or (url.endswith('/admin/') or (url.endswith('omex'))):
             counts['pass'] += 1
         else:
+            print('FAIL:', url)
             counts['fail'] += 1
         urls = re.findall(
             'href="/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
