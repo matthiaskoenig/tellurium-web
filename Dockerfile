@@ -7,7 +7,7 @@
 #       docker build -t matthiaskoenig/teweb . && docker run -it -p 8000:8000 matthiaskoenig/teweb
 #
 ##############################################################################
-FROM matthiaskoenig/linux-setup-combine:latest
+FROM python:latest
 MAINTAINER Matthias Koenig <konigmatt@googlemail.com>
 
 WORKDIR /usr/src/app
