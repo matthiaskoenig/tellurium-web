@@ -18,6 +18,7 @@
                         <th>Archive</th>
                         <th>Name</th>
                         <th>Run</th>
+                        <th>Task</th>
                         <th>Results</th>
                         <th class="hidden-xs">Created</th>
                         <th class="hidden-xs">MD5</th>
@@ -25,6 +26,7 @@
                     </tr>
                     </thead>
                     {% for archive in archives %}
+
                     <tr>
                         <td><a href="{{ url('combine:archive', args=[archive.id]) }}"><span
                                 class="badge">{{archive.id}}</span></a>
@@ -32,8 +34,29 @@
                         <td><b><a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a></b></td>
                         <td><span class="btn btn-default"><a href="{{ url('combine:archive_task', args=[archive.id]) }}"><i
                                 class="fa fa-play-circle fa-lg green"></i></a></span></td>
-                        <td><a href="{{ url('combine:archive', args=[archive.id]) }}"><i
-                                class="fa fa-ban fa-lg grey"></i></a></td>
+
+                        <td>{% if archive.task_id %}
+                                {%  with task = tasks[loop.index0] %}
+                                    {{ task }}<br />
+                                    {{ task.status }}
+                                {%  endwith %}
+                            {% else %}
+                                <i class="fa fa-ban fa-fw fa-lg grey"></i>
+                            {%  endif %}
+                        </td>
+                        <td>{% if archive.task_id %}
+                                {%  with task = tasks[loop.index0] %}
+                                    {% if task.status == "SUCCESS" %}
+                                        <i class="fa fa-line-chart fa-fw fa-lg"></i>
+                                    {% else %}
+                                        <i class="fa fa-ban fa-fw fa-lg grey"></i>
+                                    {%  endif %}
+                                {%  endwith %}
+                            {% else %}
+                                <i class="fa fa-ban fa-fw fa-lg grey"></i>
+                            {%  endif %}
+
+                        </td>
                         <td class="hidden-xs">{{ archive.created }}</td>
                         <td class="hidden-xs">{{ archive.md5 }}</td>
                         <td><a href="{{ archive.file.url }}" title="Download archive"><i class="fa fa-download fa-lg black"></i></a></td>

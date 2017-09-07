@@ -46,10 +46,18 @@ def archives(request, form=None):
     :return:
     """
     archives = Archive.objects.all().order_by('-created')
+    tasks = []
+    for archive in archives:
+        task = None
+        if archive.task_id:
+            task = AsyncResult(archive.task_id)
+        tasks.append(task)
+
     if form is None:
         form = UploadArchiveForm()
     context = {
         'archives': archives,
+        'tasks': tasks,
         'form': form
     }
     return render(request, 'combine/archives.html', context)
@@ -97,6 +105,34 @@ def archive_view(request, archive_id):
     return render(request, 'combine/archive.html', context)
 
 
+def archive_task(request, archive_id):
+    """ Execute the given archive and show the task.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    create_task = False
+
+    archive = get_object_or_404(Archive, pk=archive_id)
+    if archive.task_id:
+        # existing task
+        result = AsyncResult(archive.task_id)
+        if result.status == "FAILURE":
+            create_task = True
+    else:
+        create_task = True
+
+    if create_task:
+        # add.delay(4, 4)
+        print('* creating new task')
+        result = execute_omex.delay(archive_id=archive_id)
+        archive.task_id = result.task_id
+        archive.save()
+
+    return archive_view(request, archive_id)
+
+
 def upload(request):
     """ Upload file view.
 
@@ -125,32 +161,7 @@ def upload(request):
 ######################
 # ARCHIVE EXECUTION
 ######################
-def archive_task(request, archive_id):
-    """ Execute the given archive and show the task.
 
-    :param request:
-    :param archive_id:
-    :return:
-    """
-    create_task = False
-
-    archive = get_object_or_404(Archive, pk=archive_id)
-    if archive.task_id:
-        # existing task
-        result = AsyncResult(archive.task_id)
-        if result.status == "FAILURE":
-            create_task = True
-    else:
-        create_task = True
-
-    if create_task:
-        # add.delay(4, 4)
-        print('* creating new task')
-        result = execute_omex.delay(archive_id=archive_id)
-        archive.task_id = result.task_id
-        archive.save()
-
-    return archive_view(request, archive_id)
 
 
 
