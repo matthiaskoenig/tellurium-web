@@ -48,3 +48,12 @@ class ArchiveMethodTests(TestCase):
         file_dict = {'file': SimpleUploadedFile(upload_file.name, upload_file.read())}
         form = UploadArchiveForm(post_dict, file_dict)
         self.assertTrue(form.is_valid())
+
+
+    # OMEX Tests
+    def test_omex(self):
+        # TODO: implement & upload archive & fill database tests for the test database
+        pass
+        # archive = Archive.objects.get(pk=1)
+        # print(archive)
+        # get_content(archive)

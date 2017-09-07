@@ -1,19 +1,17 @@
 """
 Models.
 """
-
-from __future__ import absolute_import, print_function, unicode_literals
-
 import hashlib
 
 from django.db import models
 from django.utils import timezone
 from django.core.validators import ValidationError
+
 try:
     import libcombine
 except ImportError:
     import tecombine as libcombine
-import libsedml
+from .omex import metadata_for_location
 
 from celery.result import AsyncResult
 
@@ -137,6 +135,7 @@ class Archive(models.Model):
 
         entries = []
         for i in range(omex.getNumEntries()):
+
             entry = omex.getEntry(i)
             # entry.getLocation(), entry.getFormat()
             # TODO: IMPLEMENT ME
@@ -144,8 +143,16 @@ class Archive(models.Model):
 
             # ! hardcopy the required information so archive can be closed again.
             info = {}
-            info['location'] = entry.getLocation()
+            location = entry.getLocation()
+            info['location'] = location
             info['format'] = entry.getFormat()
+            master = entry.getMaster()
+            info['master'] = master
+            metadata = metadata_for_location(omex, entry.getLocation())
+            info['metadata'] = metadata
+            print(location)
+            print('master:', master)
+            print(metadata)
 
 
             entries.append(info)
