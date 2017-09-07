@@ -47,7 +47,9 @@
                         <td>{% if archive.task_id %}
                                 {%  with task = tasks[loop.index0] %}
                                     {% if task.status == "SUCCESS" %}
+                                        <a href="{{ url('combine:results', args=[archive.id])}}">
                                         <i class="fa fa-line-chart fa-fw fa-lg"></i>
+                                        </a>
                                     {% else %}
                                         <i class="fa fa-ban fa-fw fa-lg grey"></i>
                                     {%  endif %}

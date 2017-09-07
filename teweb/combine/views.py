@@ -95,11 +95,16 @@ def archive_view(request, archive_id):
 
     # omex.cleanUp()
 
+    if archive.task_id:
+        # existing task
+        task = AsyncResult(archive.task_id)
+
     # view context
     context = {
         'archive': archive,
         'omex': omex,
         'entries': entries,
+        'task': task,
     }
 
     return render(request, 'combine/archive.html', context)
@@ -161,9 +166,6 @@ def upload(request):
 ######################
 # ARCHIVE EXECUTION
 ######################
-
-
-
 
 
 def check_state(request, archive_id):
