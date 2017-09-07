@@ -50,6 +50,7 @@
 {% endblock %}
 
 {% block javascript %}
+    {%  include "combine/archive_content_js.html" %}
 
     {% if plot2Ds %}
         {% for info in plot2Ds %}

@@ -1,0 +1,71 @@
+{% extends "combine/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        {% with tr=taskresult %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title"><i class="fa fa-play"></i> TaskResult</h2>
+            </div>
+
+            <div class="panel-body">
+
+                <table id="taskresults" class="table table-striped table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>task_id</th>
+                        <th>status</th>
+                        <th>content_type</th>
+                        <th>content_encoding</th>
+                        <th>date_done</th>
+                        <th>hidden</th>
+                        <th>meta</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                    <td>{{ tr.id }}</td>
+                    <td>{{ tr.task_id }}</td>
+                    <td>{{ tr.status }}</td>
+                    <td>{{ tr.content_type }}</td>
+                    <td>{{ tr.content_encoding }}</td>
+                    <td>{{ tr.date_done }}</td>
+                    <td>{{ tr.hidden }}</td>
+                    <td>{{ tr.meta }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+            {%  if tr.traceback %}
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title"><i class="fa fa-play"></i> Traceback</h2>
+            </div>
+            <div class="panel-body">
+                <code class="prettyprint">{{ tr.traceback|safe }}</code>s
+            </div>
+            </div>
+            {% endif %}
+
+            {%  if tr.result %}
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title"><i class="fa fa-play"></i> Result</h2>
+            </div>
+            <div class="panel-body">
+                <code class="prettyprint">{{ tr.result|safe }}</code>
+            </div>
+            </div>
+            {% endif %}
+
+        {%  endwith %}
+
+    </div>
+</div>
+
+
+{%  endblock %}
+
+{% block javascript %}<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>{% endblock %}

@@ -8,6 +8,7 @@ from __future__ import print_function, absolute_import
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import RequestContext
+from django_celery_results.models import TaskResult
 from six import iteritems
 
 from celery.result import AsyncResult
@@ -119,6 +120,13 @@ def archive_task(request, archive_id):
     return archive_view(request, archive_id)
 
 
+def upload_view(request, form):
+    context = {
+        'form': form,
+    }
+    return render(request, 'combine/archive_upload.html', context)
+
+
 def upload(request):
     """ Upload file view.
 
@@ -141,7 +149,7 @@ def upload(request):
     else:
         form = UploadArchiveForm()
 
-    return archives(request, form)
+    return upload_view(request, form)
 
 
 ######################
@@ -171,6 +179,35 @@ def check_state(request, archive_id):
         }
 
     return JsonResponse(data)
+
+
+def taskresults(request):
+    """ View the task results.
+
+    :param request:
+    :return:
+    """
+    taskresults = TaskResult.objects.all()
+    context = {
+        'taskresults': taskresults,
+    }
+    return render(request, 'combine/taskresults.html', context)
+
+
+def taskresult(request, taskresult_id):
+    """ Single taskresult view.
+
+    :param request:
+    :param taskresult_id:
+    :return:
+    """
+    taskresult = get_object_or_404(TaskResult, pk=taskresult_id)
+
+    context = {
+        'taskresult': taskresult,
+    }
+
+    return render(request, 'combine/taskresult.html', context)
 
 
 def results(request, archive_id):
