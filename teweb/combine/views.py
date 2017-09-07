@@ -72,31 +72,11 @@ def archive_view(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
-    path = str(archive.file.path)
+    omex, entries = archive.get_entries()
 
-    # read combine archive contents & metadata
-    omex = libcombine.CombineArchive()
-    if omex.initializeFromArchive(path) is None:
-        print("Invalid Combine Archive")
-        return None
-
-    entries = []
-    for i in range(omex.getNumEntries()):
-        entry = omex.getEntry(i)
-        # entry.getLocation(), entry.getFormat()
-        # printMetaDataFor(archive, entry.getLocation());
-        entries.append(entry)
-
-        # the entry could now be extracted via
-        # archive.extractEntry(entry.getLocation(), <filename or folder>)
-
-        # or used as string
-        # content = archive.extractEntryToString(entry.getLocation());
-
-    # omex.cleanUp()
-
+    # already task id assigned
+    task = None
     if archive.task_id:
-        # existing task
         task = AsyncResult(archive.task_id)
 
     # view context
@@ -110,6 +90,7 @@ def archive_view(request, archive_id):
     return render(request, 'combine/archive.html', context)
 
 
+# TODO: refactor for easy start of task
 def archive_task(request, archive_id):
     """ Execute the given archive and show the task.
 
@@ -201,6 +182,7 @@ def results(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
+    omex, entries = archive.get_entries()
 
     # no task for the archive, so no results
     if not archive.task_id:
@@ -277,7 +259,9 @@ def results(request, archive_id):
     # provide the info to the view
     context = {
         'archive': archive,
-        'task_id': archive.task_id,
+        'entries': entries,
+        'omex': omex,
+
         'doc': doc,
         'outputs': outputs,
         'reports': reports,

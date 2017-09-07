@@ -1,12 +1,7 @@
 {% extends "combine/base.html" %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-lg-12">
-            <h1><a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
-                    src="{{ static('combine/images/logos/omex.png') }}" height="40"></a> {{ archive }}</h1>
-        </div>
-    </div>
+    {%  include "combine/archive_content.html" %}
 
     {% if plot2Ds %}
         {% for info in plot2Ds %}

@@ -9,6 +9,11 @@ import hashlib
 from django.db import models
 from django.utils import timezone
 from django.core.validators import ValidationError
+try:
+    import libcombine
+except ImportError:
+    import tecombine as libcombine
+import libsedml
 
 from celery.result import AsyncResult
 
@@ -115,6 +120,46 @@ class Archive(models.Model):
             return result.status
         else:
             return None
+
+    def get_entries(self):
+        """ Get entries and omex object from given archive.
+
+        :param archive:
+        :return:
+        """
+        path = str(self.file.path)
+
+        # read combine archive contents & metadata
+        omex = libcombine.CombineArchive()
+        if omex.initializeFromArchive(path) is None:
+            print("Invalid Combine Archive")
+            return None
+
+        entries = []
+        for i in range(omex.getNumEntries()):
+            entry = omex.getEntry(i)
+            # entry.getLocation(), entry.getFormat()
+            # TODO: IMPLEMENT ME
+            # printMetaDataFor(archive, entry.getLocation());
+
+            # ! hardcopy the required information so archive can be closed again.
+            info = {}
+            info['location'] = entry.getLocation()
+            info['format'] = entry.getFormat()
+
+
+            entries.append(info)
+
+
+            # the entry could now be extracted via
+            # archive.extractEntry(entry.getLocation(), <filename or folder>)
+
+            # or used as string
+            # content = archive.extractEntryToString(entry.getLocation());
+
+        omex.cleanUp()
+
+        return omex, entries
 
 # ===============================================================================
 # Tag
