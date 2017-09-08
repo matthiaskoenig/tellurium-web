@@ -10,27 +10,20 @@ branches:
     - master
     - develop
 
-# addons:
-#   apt:
-#     sources:
-#     - ubuntu-toolchain-r-test
-#     packages:
-#     - gcc-4.8
-#     - g++-4.8
-
 
 before_install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get update -q
-  - sudo apt-get install gcc-4.8 -y
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
 
 install:
-    - pip install -r requirements.txt
-    # testing dependencies
-    - pip install mock
-    - pip install requests
-    - pip install coverage
-    - pip install coveralls
+  - sudo apt-get install -qq g++-5
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
+  - pip install -r requirements.txt
+  # testing dependencies
+  - pip install mock
+  - pip install requests
+  - pip install coverage
+  - pip install coveralls
 
 script:
     # functional test with running database server
