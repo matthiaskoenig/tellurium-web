@@ -24,6 +24,8 @@ import tempfile
 import shutil
 import matplotlib
 import tellurium
+import libcombine
+
 from six import iteritems
 
 from django.shortcuts import get_object_or_404

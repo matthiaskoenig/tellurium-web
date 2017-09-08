@@ -2,12 +2,21 @@
 Helper functions to work with combine archives
 and omex files.
 """
-import os
-try:
-    import libcombine
-except ImportError:
-    import tecombine as libcombine
+import libcombine
+import importlib
+importlib.reload(libcombine)
 
+
+def short_format(format):
+    """ Returns short format string for given full format string.
+
+    :param format:
+    :return:
+    """
+    tokens = format.split("/")
+    short = tokens[-1].split('.')[0]
+    short = short.replace('+xml', '')
+    return short
 
 def metadata_for_location(co_archive, location):
     """ Returns the metadata for given location.
@@ -16,23 +25,33 @@ def metadata_for_location(co_archive, location):
         :param location:
         :return:
         """
-    info = ""
-    desc = co_archive.getMetadataForLocation(location)
+
+    desc = co_archive.getMetadataForLocation(location)  # type: libcombine.OmexDescription
     if desc.isEmpty():
-        info += "no metadata for '{0}'".format(location)
-        return info
+        return None
 
-    info += "metadata for '{0}':\n".format(location)
-    info += "\tCreated : {0}\n".format(desc.getCreated().getDateAsString())
+    info = dict()  # type: dict
+    info['about'] = desc.getAbout()
+    info['description'] = desc.getDescription()
+    info['created'] = desc.getCreated().getDateAsString()
+    info['creators'] = []
+    info['modified'] = []
+
     for i in range(desc.getNumModified()):
-        info += "\tModified : {0}\n".format(desc.getModified(i).getDateAsString())
+        modified = desc.getModified(i).getDateAsString()
+        info['modified'].append(modified)
 
-    info += "\tCreators: {0}".format(desc.getNumCreators())
     for i in range(desc.getNumCreators()):
-        creator = desc.getCreator(i)
-        info += "\t\t{0} {1}".format(creator.getGivenName(), creator.getFamilyName())
+        vcard = desc.getCreator(i)  # type: libcombine.VCard
+        info['creators'].append(
+            {
+                'givenName': vcard.getGivenName(),
+                'familyName': vcard.getFamilyName(),
+                'email': vcard.getEmail(),
+                'organisation': vcard.getOrganization()
+             }
+        )
     return info
-
 
 
 def print_metadata(co_archive, location):
@@ -67,7 +86,7 @@ def print_archive(fileName):
         print('entry: <{}>'.format(i), entry)
 
         print(" {0}: location: {1} format: {2}".format(i, entry.getLocation(), entry.getFormat()))
-        printMetaDataFor(archive, entry.getLocation())
+        print_metadata(archive, entry.getLocation())
 
         # the entry could now be extracted via
         # archive.extractEntry(entry.getLocation(), <filename or folder>)

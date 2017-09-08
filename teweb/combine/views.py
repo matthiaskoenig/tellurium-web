@@ -18,13 +18,17 @@ from .models import Archive, hash_for_file
 from .forms import UploadArchiveForm
 from .git import get_commit
 
+import pandas
+import numpy as np
 
 import tellurium
-try:
-    import libcombine
-except ImportError:
-    import tecombine as libcombine
 import libsedml
+from libsedml import SedOutput
+import libcombine
+import importlib
+importlib.reload(libcombine)
+
+
 
 ######################
 # ABOUT
@@ -320,9 +324,7 @@ def create_report(sed_doc, output, dgs_dict):
     :return:
     """
     output_id = output.getId()
-    from libsedml import SedOutput
-    import pandas
-    import numpy as np
+
 
 
     headers = []
@@ -416,7 +418,6 @@ def create_plot2D(sed_doc, output, dgs_dict):
         x = dgs_dict[xId]
         y = dgs_dict[yId]
         # TODO: create all the repeats from the data
-        import numpy as np
         Nrepeats = len(x[0])
         for k in range(Nrepeats):
             trace_id = "{}_{}".format(curve_id, k)

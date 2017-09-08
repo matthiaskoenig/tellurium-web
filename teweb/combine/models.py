@@ -7,11 +7,9 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import ValidationError
 
-try:
-    import libcombine
-except ImportError:
-    import tecombine as libcombine
-from .omex import metadata_for_location
+
+import libcombine
+from .omex import metadata_for_location, short_format
 
 from celery.result import AsyncResult
 
@@ -129,6 +127,7 @@ class Archive(models.Model):
 
         # read combine archive contents & metadata
         omex = libcombine.CombineArchive()
+        print(path)
         if omex.initializeFromArchive(path) is None:
             print("Invalid Combine Archive")
             return None
@@ -137,24 +136,24 @@ class Archive(models.Model):
         for i in range(omex.getNumEntries()):
 
             entry = omex.getEntry(i)
-            # entry.getLocation(), entry.getFormat()
-            # TODO: IMPLEMENT ME
-            # printMetaDataFor(archive, entry.getLocation());
 
             # ! hardcopy the required information so archive can be closed again.
             info = {}
             location = entry.getLocation()
             info['location'] = location
-            info['format'] = entry.getFormat()
+
+            format = entry.getFormat()
+            info['format'] = format
+            info['short_format'] = short_format(format)
+
+
             master = entry.getMaster()
             info['master'] = master
-            metadata = metadata_for_location(omex, entry.getLocation())
+
+            # printMetaDataFor(omex, location=location)
+            metadata = metadata_for_location(omex, location=location)
+
             info['metadata'] = metadata
-            print(location)
-            print('master:', master)
-            print(metadata)
-
-
             entries.append(info)
 
 

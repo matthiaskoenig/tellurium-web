@@ -14,8 +14,9 @@
                             <tr>
                                 <th></th>
                                 <th></th>
-                                <th>location</th>
                                 <th>format</th>
+                                <th>location</th>
+                                <th>description</th>
                                 <th>metadata</th>
                             </tr>
                             </thead>
@@ -26,11 +27,28 @@
                                         <i class="fa fa-star fa-fw" title="master"></i>
                                         {% endif %}
                                     </td>
+                                    <td>
+                                        {% if entry.short_format in ['cellml', 'sed-ml', 'sbml', 'sbgn', 'omex-manifest'] %}
+                                        <img height=30 title="{{ entry.format }}" src="{{ static('combine/images/mediatype/')}}{{ entry.short_format }}.png">
+                                        {% else %}
+                                        <code title="{{ entry.format }}">{{ entry.short_format }}</code>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ entry.location }}</td>
-                                    <td><code>{{ entry.format }}</code></td>
+
                                     <td>
                                         {% if entry.metadata %}
-                                        {{ entry.metadata}}
+                                            {%  with md = entry.metadata %}
+                                                {{ md.description }}
+                                            {%  endwith %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if entry.metadata %}
+                                            {%  with md = entry.metadata %}
+                                                {{ md.description }}
+                                            <code>{{ md }}</code>
+                                            {%  endwith %}
                                         {% endif %}
                                     </td>
                                 </tr>

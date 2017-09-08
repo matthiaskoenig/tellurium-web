@@ -9,7 +9,7 @@ from .forms import UploadArchiveForm
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OMEX_SHOWCASE_PATH = os.path.join(BASE_DIR, '../../archives/CombineArchiveShowCase.omex')
+OMEX_SHOWCASE_PATH = os.path.join(BASE_DIR, '../../archives/old_CombineArchiveShowCase.omex')
 
 BASE_URL = '/combine/'
 

@@ -1,7 +1,9 @@
+"""
+Forms.
+"""
 
-from __future__ import print_function, absolute_import
+
 from django import forms
-# import libcombine
 from django.core.validators import ValidationError
 
 
