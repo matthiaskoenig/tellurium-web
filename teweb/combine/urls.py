@@ -14,6 +14,8 @@ urlpatterns = [
     # ex: /combine/upload
     url(r'^upload$', views.upload, name='upload'),
 
+    # ex: /combine/upload
+    url(r'^runall$', views.runall, name='runall'),
     #
     url(r'^taskresults$', views.taskresults, name='taskresults'),
     url(r'^taskresults/(?P<taskresult_id>[0-9]+)/$', views.taskresult, name='taskresult'),

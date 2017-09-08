@@ -41,6 +41,22 @@ def about(request):
     return render(request, 'combine/about.html', context)
 
 
+def runall(request):
+    """ Runs all archives.
+
+    :param request:
+    :return:
+    """
+    all_archives = Archive.objects.all().order_by('-created')
+    for archive in all_archives:
+        # add.delay(4, 4)
+        print('* creating new task')
+        result = execute_omex.delay(archive_id=archive.id)
+        archive.task_id = result.task_id
+        archive.save()
+    return archives(request)
+
+
 ######################
 # ARCHIVES
 ######################
