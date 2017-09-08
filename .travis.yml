@@ -1,23 +1,24 @@
+# travis only runs on ubuntu 14.04
+dist: trusty
+sudo: required
 language: python
 # cache: pip
 python:
   - "3.5"
   - "3.6"
-sudo: required
 
 branches:
   only:
     - master
     - develop
 
-
-before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
+# before_install:
+#   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+#   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -qq g++-5
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
+#  - sudo apt-get install -qq g++-5
+#  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
   - pip install -r requirements.txt
   # testing dependencies
   - pip install mock
