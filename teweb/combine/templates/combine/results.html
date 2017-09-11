@@ -1,17 +1,17 @@
 {% extends "combine/base.html" %}
 
 {% block content %}
-    {% include "combine/task_content.html" %}
-    {% include "combine/archive_content.html" %}
 
+    <h2>
+    <a href="{{ url('combine:archive', args=[archive.id]) }}"><i class="fa fa-archive fa-fw"></i> {{ archive }}</a>
+    </h2>
     {% if plot2Ds %}
         {% for info in plot2Ds %}
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h2 class="panel-title" id="{{ info.id }}">{{ info.id }} <code>{{ info.name }}</code></h2>
+                    <h2 class="panel-title" id="{{ info.id }}"><i class="fa fa-line-chart fa-fw"></i> {{ info.id }}</h2>
                 </div>
-
                 <div class="panel-body">
                     <div id="{{ info.id }}_plotly" style="width:700px;height:500px;"></div>
                 </div>
@@ -24,7 +24,7 @@
         {% for info in plot3Ds %}
             <div class="panel panel-default">
             <div class="panel-heading">
-                <h2 class="panel-title" id="{{ info.id }}">{{ info.id }} <code>{{ info.name }}</code></h2>
+                <h2 class="panel-title" id="{{ info.id }}"><i class="fa fa-line-chart fa-fw"></i> {{ info.id }}</h2>
             </div>
 
             <div class="panel-body">
@@ -38,7 +38,7 @@
         {% for info in reports %}
             <div class="panel panel-default">
             <div class="panel-heading">
-                <h2 class="panel-title" id="{{ info.id }}">{{ info.id }} <code>{{ info.name }}</code></h2>
+                <h2 class="panel-title" id="{{ info.id }}"><i class="fa fa-table fa-fw"></i> {{ info.id }}</h2>
             </div>
 
             <div class="panel-body">

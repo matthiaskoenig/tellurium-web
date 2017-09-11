@@ -32,7 +32,7 @@
                                 class="badge">{{archive.id}}</span></a>
                         </td>
                         <td><b><a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a></b></td>
-                        <td><span class="btn btn-default"><a href="{{ url('combine:archive_task', args=[archive.id]) }}"><i
+                        <td><span class="btn btn-default"><a href="{{ url('combine:run_archive', args=[archive.id]) }}"><i
                                 class="fa fa-play-circle fa-lg green"></i></a></span></td>
 
                         <td>{% if archive.task_id %}

@@ -1,4 +1,5 @@
-    <div class="row">
+
+<div class="row">
         <div class="col-lg-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -7,23 +8,49 @@
                     </h2>
                 </div>
                 <div class="panel-body">
+                    <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
+
+                     {% if task %}
+                         {% if task.status == 'SUCCESS' %}
+                             <span class="btn btn-default">
+                             <i class="fa fa-play-circle fa-lg" title="RERUN"></i> RERUN
+                         {% elif task.status == 'FAILURE' %}
+                             <span class="btn btn-danger">
+                             <i class="fa fa-refresh" title="RETRY"></i> RETRY
+                         {% else %}
+                             <span class="btn btn-info">
+                             <i class="fa fa-cog fa-spin fa-fw" title="WAITING"></i> WAITING
+                         {% endif %}
+                     {% else %}
+                         <span class="btn btn-success">
+                         <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN
+                     {% endif %}
+                    </span>
+                    </a><br />
+
 
                     <b>task_id:</b> {{ archive.task_id }}<br/>
-                    <b>status</b>:
+
+
                     {% if task %}
-                        </b> {{ task.status }}<br/>
-                         {% if task.status == 'SUCCESS' %}
-                             <b>results</b>:
-                             <a href="{{ url('combine:results', args=[archive.id]) }}"><i
-                                class="fa fa-line-chart fa-fw fa-lg"></i></a><br />
-                         {% endif %}
+                         <b>status</b>: {{ task.status }}<br/>
+
+                           {% if task_result %}
+                        <b>TaskResult</b>: <a href="{{ url('combine:taskresult', args=[task_result.pk]) }}">{{ task_result.id }}</a><br/>
+                          {% endif %}
+
+                        {% if task.status == 'SUCCESS' %}
+
+                             <a href="{{ url('combine:results', args=[archive.id]) }}" title="RESULTS">
+                                 <span class="btn btn-success">
+                                 <i class="fa fa-line-chart fa-fw"></i> RESULTS
+                             </a><br />
+                        {%  endif %}
+
                     {% endif %}
 
-                    {% if task_result %}
-                    <b>TaskResult</b>: <a href="{{ url('combine:taskresult', args=[task_result.pk]) }}">{{ task_result.id }}</a>
-                        {% else %}
-                        No TaskResult for Task.
-                    {%  endif %}
+
+
                 </div>
             </div>
         </div>

@@ -9,7 +9,7 @@ urlpatterns = [
     # ex: /combine/5/
     url(r'^(?P<archive_id>[0-9]+)/$', views.archive_view, name='archive'),
     # ex: /combine/5/task
-    url(r'^(?P<archive_id>[0-9]+)/task$', views.archive_task, name='archive_task'),
+    url(r'^(?P<archive_id>[0-9]+)/run$', views.run_archive, name='run_archive'),
 
     # ex: /combine/upload
     url(r'^upload$', views.upload, name='upload'),

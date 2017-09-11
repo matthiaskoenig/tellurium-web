@@ -217,9 +217,8 @@ def results(request, archive_id):
     return render(request, 'combine/results.html', context)
 
 
-# TODO: refactor for easy start of task
-def archive_task(request, archive_id):
-    """ Execute the given archive and show the task.
+def run_archive(request, archive_id):
+    """ Executes the given archive.
 
     :param request:
     :param archive_id:
@@ -229,11 +228,13 @@ def archive_task(request, archive_id):
 
     archive = get_object_or_404(Archive, pk=archive_id)
     if archive.task_id:
-        # existing task
         result = AsyncResult(archive.task_id)
-        if result.status == "FAILURE":
+        # Create new task and run again.
+        if result.status in ["FAILURE", "SUCCESS"]:
             create_task = True
+
     else:
+        # no execution yet
         create_task = True
 
     if create_task:
@@ -243,7 +244,9 @@ def archive_task(request, archive_id):
         archive.task_id = result.task_id
         archive.save()
 
-    return archive_view(request, archive_id)
+    return redirect('combine:archive', archive_id)
+
+
 
 
 def upload_view(request, form):
