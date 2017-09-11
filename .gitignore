@@ -4,6 +4,6 @@
 teweb/static/
 teweb/combine/migrations/
 teweb/combine/__pycache__/
-teweb/db.sqlite3
+teweb/combine.sqlite3
 teweb/media/
 teweb/teweb/__pycache__/
