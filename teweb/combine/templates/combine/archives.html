@@ -15,14 +15,14 @@
                         <table id="archives" class="table table-striped table-condensed table-hover">
                             <thead>
                             <tr>
-                                <th>Archive</th>
-                                <th>Download</th>
-                                <th>Name</th>
-                                <th>Action</th>
-                                <th>Status</th>
-                                <th>Results</th>
-                                <th class="hidden hidden-xs">Created</th>
-                                <th class="hidden hidden-xs">MD5</th>
+                                <th>archive</th>
+                                <th>download</th>
+                                <th>name</th>
+                                <th>action</th>
+                                <th>status</th>
+                                <th>results</th>
+                                <th class="hidden hidden-xs">created</th>
+                                <th class="hidden hidden-xs">md5</th>
                             </tr>
                             </thead>
                             {% for archive in archives %}
@@ -35,29 +35,35 @@
                                         <i class="fa fa-download fa-lg black"></i></a></td>
                                     <td><a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a>
                                     </td>
+
+                                    <!-- action -->
                                     <td>{% if archive.task_id %}
                                         {% with task = tasks[loop.index0] %}
                                             <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
-                                                {% if task %}
-                                                    {% if task.status == 'SUCCESS' %}
-                                                        <span class="btn btn-default btn-xs">
-                                                        <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN
-                                                    {% elif task.status == 'FAILURE' %}
-                                                        <span class="btn btn-danger btn-xs">
-                                                        <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY
-                                                    {% else %}
-                                                        <span class="btn btn-info btn-xs">
-                                                        <i class="fa fa-cog fa-spin fa-fw" title="WAITING"></i> WAITING
-                                                    {% endif %}
+                                            {% if task %}
+                                                {% if task.status == 'SUCCESS' %}
+                                                    <span class="btn btn-default btn-xs">
+                                                    <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN
+                                                {% elif task.status == 'FAILURE' %}
+                                                    <span class="btn btn-danger btn-xs">
+                                                    <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY
                                                 {% else %}
-                                                    <span class="btn btn-success btn-xs">
-                                                    <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN
+                                                    <span class="btn btn-info btn-xs">
+                                                    <i class="fa fa-cog fa-spin fa-fw" title="WAITING"></i> WAITING
                                                 {% endif %}
-                                                </span>
+                                            {% endif %}
+                                            </span>
                                             </a>
                                         {% endwith %}
                                     {% endif %}
+
+                                        {% if not archive.task_id %}
+                                            <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
+                                            <span class="btn btn-success btn-xs">
+                                            <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN</span></a>
+                                        {% endif %}
                                     </td>
+                                    <!-- status -->
                                     <td>{% if archive.task_id %}
                                         {% with task = tasks[loop.index0] %}
                                             {% if task.status == "SUCCESS" %}
@@ -72,13 +78,13 @@
                                             {% endif %}
                                         {% endwith %}
                                     {% else %}
-                                        <i class="fa fa-ban fa-fw grey"></i>
+                                        <i class="fa fa-ban fa-fw fa-lg grey"></i>
                                     {% endif %}
                                     </td>
+                                    <!-- results -->
                                     <td>{% if archive.task_id %}
                                         {% with task = tasks[loop.index0] %}
                                             {% if task.status == "SUCCESS" %}
-
                                                 <a href="{{ url('combine:results', args=[archive.id])}}">
                                                     <i class="fa fa-line-chart fa-fw fa-lg"></i>
                                                 </a>

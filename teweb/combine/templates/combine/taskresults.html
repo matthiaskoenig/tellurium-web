@@ -30,7 +30,19 @@
                     <td><a href="{{ url('combine:taskresult', args=[tr.id]) }}"><span
                                 class="badge">{{ tr.id }}</span></a></td>
                     <td>{{ tr.task_id }}</td>
-                    <td>{{ tr.status }}</td>
+                    <td>
+                        {% with status = tr.status %}
+                        {% if status == "SUCCESS" %}
+                            <span class="label label-success"><i
+                                    class="fa fa-check-square fa-fw"></i> {{ status }}</span>
+                        {% elif status == "FAILURE" %}
+                            <span class="label label-danger"><i
+                                    class="fa fa-minus-square fa-fw"></i> {{ status }}</span>
+                        {% else %}
+                            <span class="label label-info">{{ status }}</span>
+                        {% endif %}
+                        {% endwith %}
+                    </td>
                     <td>{{ tr.content_type }}</td>
                     <td>{{ tr.content_encoding }}</td>
                     <td>{{ tr.date_done }}</td>

@@ -34,7 +34,19 @@
                         {% endif %}
                     </td>
                     <td>{{ tr.task_id }}</td>
-                    <td>{{ tr.status }}</td>
+                    <td>
+                        {% with status = tr.status %}
+                        {% if status == "SUCCESS" %}
+                            <span class="label label-success"><i
+                                    class="fa fa-check-square fa-fw"></i> {{ status }}</span>
+                        {% elif status == "FAILURE" %}
+                            <span class="label label-danger"><i
+                                    class="fa fa-minus-square fa-fw"></i> {{ status }}</span>
+                        {% else %}
+                            <span class="label label-info">{{ status }}</span>
+                        {% endif %}
+                        {% endwith %}
+                    </td>
                     <td>{{ tr.content_type }}</td>
                     <td>{{ tr.content_encoding }}</td>
                     <td>{{ tr.date_done }}</td>
@@ -51,7 +63,9 @@
                 <h2 class="panel-title"><i class="fa fa-play"></i> Traceback</h2>
             </div>
             <div class="panel-body">
-                <code class="prettyprint">{{ tr.traceback|safe }}</code>s
+                <pre>
+                <code class="prettyprint">{{ tr.traceback|safe }}</code>
+                </pre>
             </div>
             </div>
             {% endif %}
@@ -62,7 +76,9 @@
                 <h2 class="panel-title"><i class="fa fa-play"></i> Result</h2>
             </div>
             <div class="panel-body">
+                <pre>
                 <code>{{ tr.result|safe }}</code>
+                </pre>
             </div>
             </div>
             {% endif %}

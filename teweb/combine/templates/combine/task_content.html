@@ -31,8 +31,9 @@
                      {% endif %}
                     <br />
 
-
+                    {% if archive.task_id %}
                     <b>task_id:</b> {{ archive.task_id }}<br/>
+                    {% endif %}
                     {% if task %}
                          <b>status</b>: {{ task.status }}<br/>
 
