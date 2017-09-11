@@ -13,10 +13,10 @@
                      {% if task %}
                          {% if task.status == 'SUCCESS' %}
                              <span class="btn btn-default">
-                             <i class="fa fa-play-circle fa-lg" title="RERUN"></i> RERUN
+                             <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN
                          {% elif task.status == 'FAILURE' %}
                              <span class="btn btn-danger">
-                             <i class="fa fa-refresh" title="RETRY"></i> RETRY
+                             <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY
                          {% else %}
                              <span class="btn btn-info">
                              <i class="fa fa-cog fa-spin fa-fw" title="WAITING"></i> WAITING
@@ -44,12 +44,11 @@
                              <a href="{{ url('combine:results', args=[archive.id]) }}" title="RESULTS">
                                  <span class="btn btn-success">
                                  <i class="fa fa-line-chart fa-fw"></i> RESULTS
-                             </a><br />
+                                 </span>
+                             </a>
                         {%  endif %}
 
                     {% endif %}
-
-
 
                 </div>
             </div>

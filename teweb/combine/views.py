@@ -9,6 +9,8 @@ from django.shortcuts import render, get_object_or_404, render_to_response, redi
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import RequestContext
 from django_celery_results.models import TaskResult
+from django.contrib.auth.decorators import login_required
+
 from six import iteritems
 
 from celery.result import AsyncResult
@@ -40,7 +42,7 @@ def about(request):
     }
     return render(request, 'combine/about.html', context)
 
-
+@login_required
 def runall(request):
     """ Runs all archives.
 
@@ -54,7 +56,7 @@ def runall(request):
         result = execute_omex.delay(archive_id=archive.id)
         archive.task_id = result.task_id
         archive.save()
-    return archives(request)
+    return redirect('combine:index')
 
 
 ######################
@@ -284,6 +286,7 @@ def upload(request):
 ######################
 # TASK RESULTS
 ######################
+@login_required
 def taskresults(request):
     """ View the task results.
 

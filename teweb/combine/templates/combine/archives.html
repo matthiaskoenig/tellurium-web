@@ -16,13 +16,13 @@
                     <thead>
                     <tr>
                         <th>Archive</th>
+                        <th>Download</th>
                         <th>Name</th>
-                        <th>Run</th>
-                        <th>Task</th>
+                        <th>Action</th>
+                        <th>Status</th>
                         <th>Results</th>
                         <th class="hidden-xs">Created</th>
                         <th class="hidden-xs">MD5</th>
-                        <th>Download</th>
                     </tr>
                     </thead>
                     {% for archive in archives %}
@@ -31,14 +31,44 @@
                         <td><a href="{{ url('combine:archive', args=[archive.id]) }}"><span
                                 class="badge">{{archive.id}}</span></a>
                         </td>
+                    <td><a href="{{ archive.file.url }}" title="Download archive"><i class="fa fa-download fa-lg black"></i></a></td>
                         <td><b><a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a></b></td>
-                        <td><span class="btn btn-default"><a href="{{ url('combine:run_archive', args=[archive.id]) }}"><i
-                                class="fa fa-play-circle fa-lg green"></i></a></span></td>
+                        <td>{% if archive.task_id %}
+                                {%  with task = tasks[loop.index0] %}
+
+                            <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
+                            {% if task %}
+                                 {% if task.status == 'SUCCESS' %}
+                                     <span class="btn btn-default">
+                                     <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN
+                                 {% elif task.status == 'FAILURE' %}
+                                     <span class="btn btn-danger">
+                                     <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY
+                                 {% else %}
+                                     <span class="btn btn-info">
+                                     <i class="fa fa-cog fa-spin fa-fw" title="WAITING"></i> WAITING
+                                 {% endif %}
+                             {% else %}
+                                 <span class="btn btn-success">
+                                 <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN
+                             {% endif %}
+                            </a>
+
+
+                                {% endwith %}
+                            {% endif %}
+
+                        </td>
 
                         <td>{% if archive.task_id %}
                                 {%  with task = tasks[loop.index0] %}
-                                    {{ task }}<br />
-                                    {{ task.status }}
+                                    {% if task.status == "SUCCESS" %}
+                                    <span class="btn btn-success" title="{{ task }}">{{ task.status }}</span>
+                                    {% elif task.status == "FAILURE" %}
+                                    <span class="btn btn-danger" title="{{ task }}">{{ task.status }}</span>
+                                    {% else %}
+                                    <span class="btn btn-info" title="{{ task }}">{{ task.status }}</span>
+                                    {%  endif %}
                                 {%  endwith %}
                             {% else %}
                                 <i class="fa fa-ban fa-fw fa-lg grey"></i>
@@ -47,6 +77,7 @@
                         <td>{% if archive.task_id %}
                                 {%  with task = tasks[loop.index0] %}
                                     {% if task.status == "SUCCESS" %}
+
                                         <a href="{{ url('combine:results', args=[archive.id])}}">
                                         <i class="fa fa-line-chart fa-fw fa-lg"></i>
                                         </a>
@@ -61,7 +92,7 @@
                         </td>
                         <td class="hidden-xs">{{ archive.created }}</td>
                         <td class="hidden-xs">{{ archive.md5 }}</td>
-                        <td><a href="{{ archive.file.url }}" title="Download archive"><i class="fa fa-download fa-lg black"></i></a></td>
+
                     </tr>
                     {% endfor %}
 
