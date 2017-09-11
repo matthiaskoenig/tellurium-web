@@ -13,20 +13,29 @@
                      {% if task %}
                          {% if task.status == 'SUCCESS' %}
                              <span class="btn btn-default">
-                             <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN
+                             <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN</span></a>
                          {% elif task.status == 'FAILURE' %}
                              <span class="btn btn-danger">
-                             <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY
+                             <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY</span></a>
                          {% else %}
                              <span class="btn btn-info">
-                             <i class="fa fa-cog fa-spin fa-fw" title="WAITING"></i> WAITING
+                             <i class="fa fa-cog fa-spin fa-fw" title="WAITING"></i> WAITING</span></a>
+                             <a href="{{ url('combine:archive', args=[archive.id]) }}">
+                             <span class="btn btn-default">
+                                 <i class="fa fa-refresh fa-fw" title="CHECK STATUS"></i> CHECK STATUS</span></a>
+
                          {% endif %}
                      {% else %}
                          <span class="btn btn-success">
-                         <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN
+                         <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN</span></a>
                      {% endif %}
-                    </span>
-                    </a><br />
+
+
+
+
+
+
+                    <br />
 
 
                     <b>task_id:</b> {{ archive.task_id }}<br/>
