@@ -167,6 +167,37 @@ class Archive(models.Model):
 
         return omex, entries
 
+    def extract_entry(self, index, filename):
+        path = str(self.file.path)
+
+        # read combine archive contents & metadata
+        omex = libcombine.CombineArchive()
+        print(path)
+        if omex.initializeFromArchive(path) is None:
+            print("Invalid Combine Archive")
+            return None
+        entry = omex.getEntry(index)
+        omex.extractEntry(entry.getLocation(), filename)
+
+        omex.cleanUp()
+
+
+
+    def get_entry_content(self, index):
+        path = str(self.file.path)
+
+        # read combine archive contents & metadata
+        omex = libcombine.CombineArchive()
+        print(path)
+        if omex.initializeFromArchive(path) is None:
+            print("Invalid Combine Archive")
+            return None
+        entry = omex.getEntry(index)
+        content = omex.extractEntryToString(entry.getLocation())
+
+        omex.cleanUp()
+        return content
+
 # ===============================================================================
 # Tag
 # ===============================================================================

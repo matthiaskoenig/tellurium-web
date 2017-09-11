@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import RequestContext
 from django_celery_results.models import TaskResult
 from django.contrib.auth.decorators import login_required
+from django.core.files.temp import NamedTemporaryFile
 
 from six import iteritems
 
@@ -86,8 +87,6 @@ def archives(request, form=None):
     return render(request, 'combine/archives.html', context)
 
 
-# FIXME: unify the results and archive view
-
 def archive_view(request, archive_id):
     """ Single archive view.
     Displays the content of the archive.
@@ -119,6 +118,43 @@ def archive_view(request, archive_id):
     }
 
     return render(request, 'combine/archive.html', context)
+
+
+def archive_entry(request, archive_id, entry_index):
+    """ Display an entry in the archive.
+
+
+    :param request:
+    :param archive_id:
+    :param entry_id:
+    :return:
+    """
+    try:
+        entry_index = int(entry_index)
+        archive = get_object_or_404(Archive, pk=archive_id)
+        content = archive.get_entry_content(entry_index)
+    except (UnicodeDecodeError, TypeError):
+        content = None
+
+    print('*' * 80)
+    print('CONTENT: archive_id <{}>, entry_index <{}>'.format(archive_id, entry_index))
+    print('*' * 80)
+    print(content)
+    print('*' * 80)
+
+    context = {
+
+    }
+
+    from django.http import FileResponse
+    with NamedTemporaryFile(mode='w+b') as f:
+
+        archive.extract_entry(entry_index, f.name)
+        response = FileResponse(open(f.name, 'rb'))
+
+    return response
+    # return redirect('combine:archive', archive_id)
+
 
 
 

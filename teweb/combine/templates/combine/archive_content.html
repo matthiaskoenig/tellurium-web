@@ -34,7 +34,9 @@
                                         <code title="{{ entry.format }}">{{ entry.short_format }}</code>
                                         {% endif %}
                                     </td>
-                                    <td>{{ entry.location }}</td>
+                                    <td>
+                                        <a href="{{ url('combine:archive_entry', args=[archive.id, loop.index0]) }}" target="_blank">{{ entry.location }}</a>
+                                    </td>
 
                                     <td>
                                         {% if entry.metadata %}
