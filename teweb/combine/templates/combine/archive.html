@@ -1,32 +1,7 @@
 {% extends "combine/base.html" %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h2 class="panel-title">
-                        Task
-                    </h2>
-                </div>
-                <div class="panel-body">
-
-                    <b>task_id:</b> {{ archive.task_id }}<br/>
-                    <b>status</b>:
-                    {% if task %}
-                        </b> {{ task.status }}<br/>
-                         {% if task.status == 'SUCCESS' %}
-                             <b>results</b>:
-                             <a href="{{ url('combine:results', args=[archive.id]) }}"><i
-                                class="fa fa-line-chart fa-fw fa-lg"></i></a>
-                         {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-
+    {% include "combine/task_content.html" %}
     {% include "combine/archive_content.html" %}
 
 {% endblock %}

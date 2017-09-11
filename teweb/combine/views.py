@@ -84,6 +84,8 @@ def archives(request, form=None):
     return render(request, 'combine/archives.html', context)
 
 
+# FIXME: unify the results and archive view
+
 def archive_view(request, archive_id):
     """ Single archive view.
     Displays the content of the archive.
@@ -97,8 +99,13 @@ def archive_view(request, archive_id):
 
     # already task id assigned
     task = None
+    task_result = None
     if archive.task_id:
         task = AsyncResult(archive.task_id)
+        task_result = TaskResult.objects.filter(task_id=archive.task_id)
+        if task_result and len(task_result)>0:
+            print(task_result)
+            task_result = task_result[0]
 
     # view context
     context = {
@@ -106,9 +113,108 @@ def archive_view(request, archive_id):
         'omex': omex,
         'entries': entries,
         'task': task,
+        'task_result': task_result,
     }
 
     return render(request, 'combine/archive.html', context)
+
+
+def results(request, archive_id):
+    """ View is called when results are ready.
+
+    :param request:
+    :param archive_id:
+    :param task_id:
+    :return:
+    """
+    archive = get_object_or_404(Archive, pk=archive_id)
+    omex, entries = archive.get_entries()
+
+    # no task for the archive, so no results
+    if not archive.task_id:
+        return archive_view(request, archive_id)
+
+    # Create the plots with the given results
+    # The outputs are needed from sedml document
+    task = AsyncResult(archive.task_id)
+    task_result = TaskResult.objects.filter(task_id=archive.task_id)
+
+    path = str(archive.file.path)
+    omex = tellurium.tecombine.OpenCombine(path)
+
+
+    outputs = []
+
+    dgs_json = task.result["dgs"]
+    for sedmlFile, dgs_dict in iteritems(dgs_json):
+
+        # python 3
+        sedmlStr = omex.getSEDML(sedmlFile).decode('UTF-8')
+        doc = libsedml.readSedMLFromString(str(sedmlStr))
+
+        # check that valid
+        sedml_str = libsedml.writeSedMLToString(doc)
+
+        # Stores all the html & js information for the outputs
+        # necessary to handle the JS separately
+        reports = []
+        plot2Ds = []
+        plot3Ds = []
+
+        for output in doc.getListOfOutputs():
+            outputs.append(output)
+
+            # check what kind of output
+            typeCode = output.getTypeCode()
+            info = {}
+            info["id"] = output.getId()
+            info["name"] = output.getName()
+            info["typeCode"] = typeCode
+
+            if typeCode == libsedml.SEDML_OUTPUT_REPORT:
+                df = create_report(doc, output, dgs_dict)
+                html = df.to_html()
+                html = html.replace('<table border="1" class="dataframe">', '<table class="table table-striped table-condensed table-hover">')
+                info["html"] = html
+                reports.append(info)
+
+            elif typeCode == libsedml.SEDML_OUTPUT_PLOT2D:
+                plot2D = create_plot2D(doc, output, dgs_dict)
+                info["js"] = plot2D
+                plot2Ds.append(info)
+
+            elif typeCode == libsedml.SEDML_OUTPUT_PLOT3D:
+                plot3D = create_plot3D(doc, output, dgs_dict)
+                info["js"] = plot3D
+                plot3Ds.append(info)
+
+            else:
+                print("# Unsupported output type: {}".format(output.getElementName()))
+
+        # process all the outputs and create the respective graphs
+        # TODO
+        # for doc.getOutputs()
+        # dgs
+
+        # FIXME: Only processes the first file, than breaks
+        break
+
+    # provide the info to the view
+    context = {
+        'archive': archive,
+        'entries': entries,
+        'omex': omex,
+        'task': task,
+        'task_result': task_result,
+
+        'doc': doc,
+        'outputs': outputs,
+        'reports': reports,
+        'plot2Ds': plot2Ds,
+        'plot3Ds': plot3Ds,
+    }
+
+    return render(request, 'combine/results.html', context)
 
 
 # TODO: refactor for easy start of task
@@ -173,9 +279,42 @@ def upload(request):
 
 
 ######################
+# TASK RESULTS
+######################
+def taskresults(request):
+    """ View the task results.
+
+    :param request:
+    :return:
+    """
+    taskresults = TaskResult.objects.all()
+    context = {
+        'taskresults': taskresults,
+    }
+    return render(request, 'combine/taskresults.html', context)
+
+
+def taskresult(request, taskresult_id):
+    """ Single taskresult view.
+
+    :param request:
+    :param taskresult_id:
+    :return:
+    """
+    taskresult = get_object_or_404(TaskResult, pk=taskresult_id)
+    archives = Archive.objects.filter(task_id=taskresult.task_id)
+
+    context = {
+        'taskresult': taskresult,
+        'archives': archives,
+    }
+
+    return render(request, 'combine/taskresult.html', context)
+
+
+######################
 # ARCHIVE EXECUTION
 ######################
-
 
 def check_state(request, archive_id):
     """ A view to report the progress of the archive to the user. """
@@ -201,132 +340,7 @@ def check_state(request, archive_id):
     return JsonResponse(data)
 
 
-def taskresults(request):
-    """ View the task results.
 
-    :param request:
-    :return:
-    """
-    taskresults = TaskResult.objects.all()
-    context = {
-        'taskresults': taskresults,
-    }
-    return render(request, 'combine/taskresults.html', context)
-
-
-def taskresult(request, taskresult_id):
-    """ Single taskresult view.
-
-    :param request:
-    :param taskresult_id:
-    :return:
-    """
-    taskresult = get_object_or_404(TaskResult, pk=taskresult_id)
-
-    context = {
-        'taskresult': taskresult,
-    }
-
-    return render(request, 'combine/taskresult.html', context)
-
-
-def results(request, archive_id):
-    """ View is called when results are ready.
-
-    :param request:
-    :param archive_id:
-    :param task_id:
-    :return:
-    """
-    archive = get_object_or_404(Archive, pk=archive_id)
-    omex, entries = archive.get_entries()
-
-    # no task for the archive, so no results
-    if not archive.task_id:
-        return archive_view(request, archive_id)
-
-    # Create the plots with the given results
-    # The outputs are needed from sedml document
-    task = AsyncResult(archive.task_id)
-
-    path = str(archive.file.path)
-    omex = tellurium.tecombine.OpenCombine(path)
-
-
-    outputs = []
-
-
-    dgs_json = task.result["dgs"]
-    for sedmlFile, dgs_dict in iteritems(dgs_json):
-
-        # python 3
-        sedmlStr = omex.getSEDML(sedmlFile).decode('UTF-8')
-        doc = libsedml.readSedMLFromString(str(sedmlStr))
-
-        # check that valid
-        sedml_str = libsedml.writeSedMLToString(doc)
-
-
-
-        # Stores all the html & js information for the outputs
-        # necessary to handle the JS separately
-        reports = []
-        plot2Ds = []
-        plot3Ds = []
-
-        for output in doc.getListOfOutputs():
-            outputs.append(output)
-
-            # check what kind of output
-            typeCode = output.getTypeCode()
-            info = {}
-            info["id"] = output.getId()
-            info["name"] = output.getName()
-            info["typeCode"] = typeCode
-
-            if typeCode == libsedml.SEDML_OUTPUT_REPORT:
-                df = create_report(doc, output, dgs_dict)
-                html = df.to_html()
-                html = html.replace('<table border="1" class="dataframe">', '<table class="table table-striped table-condensed table-hover">')
-                info["html"] = html
-                reports.append(info)
-
-            elif typeCode == libsedml.SEDML_OUTPUT_PLOT2D:
-                plot2D = create_plot2D(doc, output, dgs_dict)
-                info["js"] = plot2D
-                plot2Ds.append(info)
-
-            elif typeCode == libsedml.SEDML_OUTPUT_PLOT3D:
-                plot3D = create_plot3D(doc, output, dgs_dict)
-                info["js"] = plot3D
-                plot3Ds.append(info)
-
-            else:
-                print("# Unsupported output type: {}".format(output.getElementName()))
-
-        # process all the outputs and create the respective graphs
-        # TODO
-        # for doc.getOutputs()
-        # dgs
-
-        # FIXME: Only processes the first file, than breaks
-        break
-
-
-    # provide the info to the view
-    context = {
-        'archive': archive,
-        'entries': entries,
-        'omex': omex,
-
-        'doc': doc,
-        'outputs': outputs,
-        'reports': reports,
-        'plot2Ds': plot2Ds,
-        'plot3Ds': plot3Ds,
-    }
-
-    return render(request, 'combine/results.html', context)
 
 
 ######################
