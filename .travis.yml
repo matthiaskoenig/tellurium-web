@@ -1,8 +1,11 @@
 # travis only runs on ubuntu 14.04
-group: deprecated-2017Q3
 sudo: required
+group: deprecated-2017Q3
+dist: trusty
+os: linux
+
 language: python
-cache: pip
+# cache: pip
 python:
   - "3.5"
   - "3.6"
