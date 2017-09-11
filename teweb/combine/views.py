@@ -341,8 +341,6 @@ def check_state(request, archive_id):
 
 
 
-
-
 ######################
 # OUTPUTS
 ######################
@@ -354,8 +352,6 @@ def create_report(sed_doc, output, dgs_dict):
     :return:
     """
     output_id = output.getId()
-
-
 
     headers = []
     dgIds = []
