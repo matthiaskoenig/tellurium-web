@@ -121,6 +121,28 @@ def archive_view(request, archive_id):
     return render(request, 'combine/archive.html', context)
 
 
+
+def check_state(request, archive_id):
+    """ A view to report the progress of the archive to the user. """
+    if request.is_ajax():
+        if 'task_id' in request.POST.keys() and request.POST['task_id']:
+            task_id = request.POST['task_id']
+            task = AsyncResult(task_id)
+            data = {
+                'status': task.status
+            }
+        else:
+            data = {
+                'status': 'No task_id in the request'
+            }
+    else:
+        data = {
+            'status': 'This is not an ajax request'
+        }
+
+    return JsonResponse(data)
+
+
 def results(request, archive_id):
     """ View is called when results are ready.
 
@@ -130,21 +152,24 @@ def results(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
-    omex, entries = archive.get_entries()
 
     # no task for the archive, so no results
     if not archive.task_id:
-        return archive_view(request, archive_id)
+        return redirect('combine:archive', archive_id)
+
+    task = AsyncResult(archive.task_id)
+    if task.status != "SUCCESS":
+        print("Task was not successful:", archive.task_id)
+        return redirect('combine:archive', archive_id)
+
+    task_result = TaskResult.objects.filter(task_id=archive.task_id)
+    path = str(archive.file.path)
+    omex, entries = archive.get_entries()
+
+    omex = tellurium.tecombine.OpenCombine(path)
 
     # Create the plots with the given results
     # The outputs are needed from sedml document
-    task = AsyncResult(archive.task_id)
-    task_result = TaskResult.objects.filter(task_id=archive.task_id)
-
-    path = str(archive.file.path)
-    omex = tellurium.tecombine.OpenCombine(path)
-
-
     outputs = []
 
     dgs_json = task.result["dgs"]
@@ -318,32 +343,6 @@ def taskresult(request, taskresult_id):
     return render(request, 'combine/taskresult.html', context)
 
 
-######################
-# ARCHIVE EXECUTION
-######################
-
-def check_state(request, archive_id):
-    """ A view to report the progress of the archive to the user. """
-    if request.is_ajax():
-        if 'task_id' in request.POST.keys() and request.POST['task_id']:
-            task_id = request.POST['task_id']
-            task = AsyncResult(task_id)
-            data = {
-                'state': task.state,
-            }
-            if task.state == "SUCCESS":
-                data['result'] = task.result
-        else:
-            data = {
-                'state': 'No task_id in the request'
-            }
-
-    else:
-        data = {
-            'state': 'This is not an ajax request'
-        }
-
-    return JsonResponse(data)
 
 
 
