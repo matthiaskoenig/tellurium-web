@@ -2,7 +2,7 @@
 *.pyc
 *~
 teweb/static/
-teweb/combine/migrations/
+# teweb/combine/migrations/
 teweb/combine/__pycache__/
 teweb/combine.sqlite3
 teweb/media/
