@@ -176,6 +176,7 @@ class Archive(models.Model):
         if omex.initializeFromArchive(path) is None:
             print("Invalid Combine Archive")
             return None
+
         entry = omex.getEntry(index)
         omex.extractEntry(entry.getLocation(), filename)
 
