@@ -25,7 +25,6 @@
                         <th></th>
                         <th>format</th>
                         <th>location</th>
-                        <th>description</th>
                         <th>metadata</th>
                     </tr>
                     </thead>
@@ -51,24 +50,43 @@
 
                             <td>
                                 {% if entry.metadata %}
-                                    {% with md = entry.metadata %}
-                                        {{ md.description }}
+                                {% with md = entry.metadata %}
+
+                                 <span data-toggle="popover"
+                                       data-html="true"
+                                       class="btn-xs btn-default"
+                                       title="{% for creator in md.creators %}
+                                                <b>{{ creator.givenName }} {{ creator.familyName }}</b>
+                                                {% if creator.organisation %}
+                                                ({{ creator.organisation }})
+                                                {%  endif %}<br/>
+                                               {% endfor %}"
+                                       data-content="{% if md.created %}
+                                                        <b>created</b><br />
+                                                        <code>{{ md.created }}</code><br />
+                                                     {%  endif %}
+                                                     {%  if md.modified %}
+                                                     <b>modified</b><br />
+                                                     {%  endif %}
+                                                        {% for mod in md.modified %}
+                                                            <code>{{ mod }}</code><br/>
+                                                        {% endfor %}"> <i class="fa fa-plus-square-o fa-fw" title="metadata"></i></span>
                                     {% endwith %}
                                 {% endif %}
-                            </td>
-                            <td>
+
                                 {% if entry.metadata %}
                                     {% with md = entry.metadata %}
                                         {{ md.description }}
-                                        <code>{{ md }}</code>
                                     {% endwith %}
                                 {% endif %}
                             </td>
+
                         </tr>
                     {% endfor %}
                 </table>
             {% else %}
-                <p>No entries in archive metadata. This does not mean that there are no entries in the zip file,
+                <p>No entries in archive metadata.<br />
+                    This does not mean that there are no entries in the zip file,
                     only that none of them are listed in the manifest.</p>
             {% endif %}
         </div>

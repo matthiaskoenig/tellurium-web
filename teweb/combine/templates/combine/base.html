@@ -18,7 +18,7 @@
     <script src="{{ static('combine/js/jquery-3.2.1.min.js') }}"></script>
     <script src="{{ static('combine/js/tether-1.4.0.min.js') }}"></script>
     <script src="{{ static('combine/js/bootstrap-3.3.7.min.js') }}"></script>
-    <script src="{{ static('combine/js/datatables-1.10.15.min.js') }}"></script>
+    <script src="{{ static('combine/js/datatables-1.10.16.min.js') }}"></script>
 
     {% block head %}{% endblock %}
 </head>
@@ -41,7 +41,7 @@
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="{{ url('combine:index') }}" title="Tellurium Web"><b>Tellurium Web</b></a></li>
+                <li><a href="{{ url('combine:index') }}" title="Tellurium Web"><b>Tellurium Web</b></a></li>
                 <li class="active"><a href="{{ url('combine:index') }}" title="Combine Archives"><i class="fa fa-archive fa-fw"></i> Archives</a></li>
                 <li class="active"><a href="{{ url('combine:upload') }}" title="Upload Combine Archive"><i class="fa fa-upload fa-fw"></i> Upload</a></li>
                 {% if request.user.is_authenticated %}
