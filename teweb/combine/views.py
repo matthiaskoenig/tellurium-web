@@ -113,11 +113,24 @@ def archive_view(request, archive_id):
             print(task_result)
             task_result = task_result[0]
 
+    # json tree data
+    import json
+    tree_data = [
+        {"id": "ajson1", "parent": "#", "text": "Simple root node", "state": {"opened": True, "selected": True}},
+        {"id": "ajson2", "parent": "#", "text": "Root node 2", "state": {"opened": True}},
+        {"id": "ajson3", "parent": "ajson2", "text": "Child 1"},
+        {"id": "ajson4", "parent": "ajson2", "text": "Child 2", "icon": "fa fa-play"}
+    ]
+    tree_data_json = json.dumps(tree_data)
+
+
+
     # view context
     context = {
         'archive': archive,
         'omex': omex,
         'entries': entries,
+        'tree_data_json': tree_data_json,
         'task': task,
         'task_result': task_result,
     }
