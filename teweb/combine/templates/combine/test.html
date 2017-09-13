@@ -1,17 +1,56 @@
-<html>
-<body>
-<h1>Testing</h1>
-Test page.
-<div class="container">
-  <h3>Popover Example</h3>
-  <a href="#" data-toggle="popover" title="Popover Header" data-content="Some content inside the popover">Toggle popover</a>
-</div>
 
-<script>
-$(document).ready(function(){
-    $('[data-toggle="popover"]').popover();
-});
-</script>
-</body>
+{% extends "combine/base.html" %}
 
-</html>
+{% block head %}
+    <link rel="stylesheet" href="{{ static('combine/js/jstree-3.3.4/themes/default/style.min.css') }}" />
+    <script src="{{ static('combine/js/jstree-3.3.4.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+
+    <!-- in this example the tree is populated from inline HTML -->
+    <h3>Inline</h3>
+    <div id="jstree">
+    <ul>
+      <li>Root node 1
+        <ul>
+          <li>Child node 1</li>
+          <li>Child node 2</li>
+        </ul>
+      </li>
+      <li>Root node 2</li>
+    </ul>
+    </div>
+
+    <!-- JSON approach -->
+    <h3>JSON</h3>
+    <div id="json_tree"></div>
+
+
+
+{% endblock %}
+
+{% block javascript %}
+    <script>
+    $(function () {
+        $('#json_tree').jstree({ 'core' : {
+            'data' :
+            [
+               { "id" : "ajson1", "parent" : "#", "text" : "Simple root node", state : { "opened" : true, "selected" : true} },
+               { "id" : "ajson2", "parent" : "#", "text" : "Root node 2", "state" : { "opened" : true } },
+               { "id" : "ajson3", "parent" : "ajson2", "text" : "Child 1" },
+               { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2", "icon" : "fa fa-play" }
+            ]
+        } });
+    });</script>
+
+  <script>
+  $(function () {
+    // create an instance when the DOM is ready
+    $('#jstree').jstree();
+
+  });
+  </script>
+
+{% endblock %}

@@ -23,6 +23,8 @@ urlpatterns = [
     # ex: /combine/about
     url(r'^about$', views.about, name='about'),
 
+    url(r'^test$', views.test_view, name='test_view'),
+
     # ajax check
     # /combine/5/check_state
     # url(r'^(?P<archive_id>[0-9]+)/check_state$', views.check_state, name='check_state'),

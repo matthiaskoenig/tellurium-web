@@ -85,10 +85,24 @@
                     {% endfor %}
                 </table>
             {% else %}
-                <p>No entries in archive metadata.<br />
-                    This does not mean that there are no entries in the zip file,
-                    only that none of them are listed in the manifest.</p>
+                <p>No entries in archive metadata.</p>
             {% endif %}
+
+            <h3>JSON</h3>
+            <div id="json_tree"></div>
+            <script>
+            $(function () {
+                $('#json_tree').jstree({ 'core' : {
+                    'data' :
+                    [
+                       { "id" : "ajson1", "parent" : "#", "text" : "Simple root node", state : { "opened" : true, "selected" : true} },
+                       { "id" : "ajson2", "parent" : "#", "text" : "Root node 2", "state" : { "opened" : true } },
+                       { "id" : "ajson3", "parent" : "ajson2", "text" : "Child 1" },
+                       { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2", "icon" : "fa fa-play" }
+                    ]
+                } });
+            });</script>
+
         </div>
     </div>
 </div>
