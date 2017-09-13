@@ -1,4 +1,4 @@
-"""teweb URL Configuration
+"""URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.10/topics/http/urls/
@@ -23,9 +23,10 @@ from django.views.generic import RedirectView
 
 
 urlpatterns = [
+
     url(r'^admin/', admin.site.urls),
     url(r'^combine/', include('combine.urls')),
-    url(r'^$', RedirectView.as_view(pattern_name='index', permanent=False)),
+    url(r'^$', RedirectView.as_view(pattern_name='combine:index', permanent=False)),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),
 ]

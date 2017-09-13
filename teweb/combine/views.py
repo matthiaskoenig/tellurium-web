@@ -32,6 +32,11 @@ import importlib
 importlib.reload(libcombine)
 
 
+def test_view(request):
+    """ Test page. """
+    context = {}
+    return render(request, 'combine/test.html', context)
+
 
 ######################
 # ABOUT
