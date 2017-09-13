@@ -489,7 +489,7 @@ def create_plot2D(sed_doc, output, dgs_dict):
         # create the traces from curve data
         x = dgs_dict[xId]
         y = dgs_dict[yId]
-        # TODO: create all the repeats from the data
+
         Nrepeats = len(x[0])
         for k in range(Nrepeats):
             trace_id = "{}_{}".format(curve_id, k)
@@ -497,12 +497,10 @@ def create_plot2D(sed_doc, output, dgs_dict):
 
             x_tr = [sublist[k] for sublist in x]  # flatten
             y_tr = [sublist[k] for sublist in y]  # flatten
-            print(y_tr[-1], type(y_tr[-1]))
 
-            # FIXME: nan fix, this is simulation issue
+            # This should never happen, but fixes NaN issues
             x_tr = [x if not np.isnan(x) else 0 for x in x_tr]
             y_tr = [y if not np.isnan(y) else 0 for y in y_tr]
-
 
             # one data point ('lines+markers')
             if len(x_tr) == 1:
@@ -511,7 +509,6 @@ def create_plot2D(sed_doc, output, dgs_dict):
                 mode = "lines"
 
             name = "{}[{}]".format(yLabel, k)
-
 
             js += """
     var {} = {{
