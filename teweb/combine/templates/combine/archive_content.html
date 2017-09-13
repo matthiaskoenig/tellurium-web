@@ -1,66 +1,76 @@
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h2 class="panel-title"> <a href="{{ url('combine:archive', args=[archive.id]) }}"><i class="fa fa-archive fa-fw"></i> {{ archive }}</a>
-                    (<a href="{{ archive.file.url }}" title="Download archive"><i class="fa fa-download fa-fw"></i></a>)
-                    </h2>
-                </div>
+<div class="col-lg-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
 
-                <div class="panel-body">
-                    {% if entries %}
-                        <table id="entries" class="table table-striped table-condensed table-hover">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th></th>
-                                <th>format</th>
-                                <th>location</th>
-                                <th>description</th>
-                                <th>metadata</th>
-                            </tr>
-                            </thead>
-                            {% for entry in entries %}
-                                <tr>
-                                    <td><span class="badge">{{ loop.index }}</span></td>
-                                    <td>{% if entry.master %}
-                                        <i class="fa fa-star fa-fw" title="master"></i>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if entry.short_format in ['cellml', 'sed-ml', 'sbml', 'sbgn', 'omex-manifest'] %}
-                                        <img height=30 title="{{ entry.format }}" src="{{ static('combine/images/mediatype/')}}{{ entry.short_format }}.png">
-                                        {% else %}
-                                        <code title="{{ entry.format }}">{{ entry.short_format }}</code>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{{ url('combine:archive_entry', args=[archive.id, loop.index0]) }}" target="_blank">{{ entry.location }}</a>
-                                    </td>
+            <h2 class="panel-title">
+                <a class="btn-xs btn-default" href="{{ url('combine:archive_previous', args=[archive.id]) }}"
+                   title="Previous archive"><i class="fa fa-arrow-circle-o-left fa-fw"></i></a>
+                <a class="btn-xs btn-default" href="{{ url('combine:archive_next', args=[archive.id]) }}"
+                   title="Next archive"><i class="fa fa-arrow-circle-o-right fa-fw"></i></a>
 
-                                    <td>
-                                        {% if entry.metadata %}
-                                            {%  with md = entry.metadata %}
-                                                {{ md.description }}
-                                            {%  endwith %}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if entry.metadata %}
-                                            {%  with md = entry.metadata %}
-                                                {{ md.description }}
-                                            <code>{{ md }}</code>
-                                            {%  endwith %}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% else %}
-                        <p>No entries in archive metadata. This does not mean that there are no entries in the zip file,
-                        only that none of them are listed in the manifest.</p>
-                    {% endif %}
-                </div>
-            </div>
-          </div>
+                <i class="fa fa-archive fa-fw"></i>
+                <a href="{{ url('combine:archive', args=[archive.id]) }}">
+                    <span class="label label-primary"><span class="badge">{{ archive.id }}</span> {{ archive }}</span></a>
+                (<a href="{{ archive.file.url }}" title="Download archive"><i class="fa fa-download fa-fw"></i></a>)
+            </h2>
+
+        </div>
+
+        <div class="panel-body">
+            {% if entries %}
+                <table id="entries" class="table table-striped table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>format</th>
+                        <th>location</th>
+                        <th>description</th>
+                        <th>metadata</th>
+                    </tr>
+                    </thead>
+                    {% for entry in entries %}
+                        <tr>
+                            <td><span class="badge">{{ loop.index }}</span></td>
+                            <td>{% if entry.master %}
+                                <i class="fa fa-star fa-fw" title="master"></i>
+                            {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.short_format in ['cellml', 'sed-ml', 'sbml', 'sbgn', 'omex-manifest'] %}
+                                    <img height=20 title="{{ entry.format }}"
+                                         src="{{ static('combine/images/mediatype/')}}{{ entry.short_format }}.png">
+                                {% else %}
+                                    <code title="{{ entry.format }}">{{ entry.short_format }}</code>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url('combine:archive_entry', args=[archive.id, loop.index0]) }}"
+                                   target="_blank">{{ entry.location }}</a>
+                            </td>
+
+                            <td>
+                                {% if entry.metadata %}
+                                    {% with md = entry.metadata %}
+                                        {{ md.description }}
+                                    {% endwith %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.metadata %}
+                                    {% with md = entry.metadata %}
+                                        {{ md.description }}
+                                        <code>{{ md }}</code>
+                                    {% endwith %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>No entries in archive metadata. This does not mean that there are no entries in the zip file,
+                    only that none of them are listed in the manifest.</p>
+            {% endif %}
+        </div>
     </div>
+</div>

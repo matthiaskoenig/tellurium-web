@@ -1,17 +1,17 @@
 {% extends "combine/base.html" %}
 
 {% block head %}
-<script src="{{ static('combine/js/plotly-1.30.0.min.js') }}"></script>
+    <script src="{{ static('combine/js/plotly-1.30.0.min.js') }}"></script>
 {% endblock %}
 
 {% block content %}
+<div class="row">
+    {% include "combine/archive_content.html" %}
 
-    <h2>
-    <a href="{{ url('combine:archive', args=[archive.id]) }}"><i class="fa fa-archive fa-fw"></i> {{ archive }}</a>
-    </h2>
+
     {% if plot2Ds %}
         {% for info in plot2Ds %}
-
+            <div class="col-lg-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h2 class="panel-title" id="{{ info.id }}"><i class="fa fa-line-chart fa-fw"></i> {{ info.id }}</h2>
@@ -20,19 +20,22 @@
                     <div id="{{ info.id }}_plotly" style="width:700px;height:500px;"></div>
                 </div>
             </div>
+            </div>
 
         {% endfor %}
     {% endif %}
 
     {% if plot3Ds %}
         {% for info in plot3Ds %}
+            <div class="col-lg-6">
             <div class="panel panel-default">
-            <div class="panel-heading">
-                <h2 class="panel-title" id="{{ info.id }}"><i class="fa fa-line-chart fa-fw"></i> {{ info.id }}</h2>
-            </div>
+                <div class="panel-heading">
+                    <h2 class="panel-title" id="{{ info.id }}"><i class="fa fa-line-chart fa-fw"></i> {{ info.id }}</h2>
+                </div>
 
-            <div class="panel-body">
-                <div id="{{ info.id }}_plotly" style="width:700px;height:500px;"></div>
+                <div class="panel-body">
+                    <div id="{{ info.id }}_plotly" style="width:700px;height:500px;"></div>
+                </div>
             </div>
             </div>
         {% endfor %}
@@ -40,22 +43,24 @@
 
     {% if reports %}
         {% for info in reports %}
+            <div class="col-lg-6">
             <div class="panel panel-default">
-            <div class="panel-heading">
-                <h2 class="panel-title" id="{{ info.id }}"><i class="fa fa-table fa-fw"></i> {{ info.id }}</h2>
-            </div>
+                <div class="panel-heading">
+                    <h2 class="panel-title" id="{{ info.id }}"><i class="fa fa-table fa-fw"></i> {{ info.id }}</h2>
+                </div>
 
-            <div class="panel-body">
-                {{ info.html | safe }}
+                <div class="panel-body">
+                    {{ info.html | safe }}
+                </div>
             </div>
             </div>
         {% endfor %}
     {% endif %}
-
+</div>
 {% endblock %}
 
 {% block javascript %}
-    {%  include "combine/archive_content_js.html" %}
+    {% include "combine/archive_content_js.html" %}
 
     {% if plot2Ds %}
         {% for info in plot2Ds %}
@@ -72,5 +77,4 @@
             </script>
         {% endfor %}
     {% endif %}
-
 {% endblock %}

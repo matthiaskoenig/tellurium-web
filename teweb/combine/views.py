@@ -125,6 +125,51 @@ def archive_view(request, archive_id):
     return render(request, 'combine/archive.html', context)
 
 
+def archive_next(request, archive_id):
+    """ Returns single archive view of next archive.
+    Displays the content of the archive.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    next_archive = Archive.objects.filter(pk__gt=archive_id).order_by('pk')[0:1]
+    if len(next_archive) == 1:
+        pk = next_archive[0].pk
+    else:
+        pk = archive_id
+
+    full_url = request.build_absolute_uri('?')
+    print(full_url)
+    print('request:',  request)
+    referer = request.META.get('HTTP_REFERER')
+    if referer.endswith('results'):
+        return redirect('combine:results', pk)
+    else:
+        return redirect('combine:archive', pk)
+
+
+def archive_previous(request, archive_id):
+    """ Returns single archive view of previous archive.
+    Displays the content of the archive.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    prev_archive = Archive.objects.filter(pk__lt=archive_id).order_by('-pk')[0:1]
+    if len(prev_archive) == 1:
+        pk = prev_archive[0].pk
+    else:
+        pk = archive_id
+
+    referer = request.META.get('HTTP_REFERER')
+    if referer.endswith('results'):
+        return redirect('combine:results', pk)
+    else:
+        return redirect('combine:archive', pk)
+
+
 def archive_entry(request, archive_id, entry_index):
     """ Display an entry in the archive.
 
@@ -382,9 +427,6 @@ def taskresult(request, taskresult_id):
     }
 
     return render(request, 'combine/taskresult.html', context)
-
-
-
 
 
 ######################

@@ -7,6 +7,8 @@ urlpatterns = [
 
     url(r'^$', views.archives, name='index'),
     url(r'^(?P<archive_id>[0-9]+)/$', views.archive_view, name='archive'),
+    url(r'^(?P<archive_id>[0-9]+)/previous$', views.archive_previous, name='archive_previous'),
+    url(r'^(?P<archive_id>[0-9]+)/next$', views.archive_next, name='archive_next'),
     url(r'^(?P<archive_id>[0-9]+)/results$', views.results, name='results'),
     url(r'^(?P<archive_id>[0-9]+)/run$', views.run_archive, name='run_archive'),
 

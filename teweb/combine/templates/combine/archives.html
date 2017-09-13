@@ -3,8 +3,8 @@
 {% block content %}
     <!-- COMBINE archives -->
     <div class="row">
-        <div class="col-lg-12">
 
+        <div class="col-lg-9">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h2 class="panel-title"><i class="fa fa-archive"></i> Combine Archives</h2>
@@ -33,7 +33,11 @@
                                     </td>
                                     <td><a href="{{ archive.file.url }}" title="Download archive">
                                         <i class="fa fa-download fa-lg black"></i></a></td>
-                                    <td><a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a>
+                                    <td>
+
+                                            <a href="{{ url('combine:archive', args=[archive.id]) }}">
+                                                <span class="label label-primary">{{ archive.name }}
+                                        </span></a>
                                     </td>
 
                                     <!-- action -->
@@ -111,9 +115,12 @@
             </div>
 
         </div>
-    </div>
 
     {% include "combine/upload.html" %}
+
+    </div>
+
+
 
 {% endblock %}
 
