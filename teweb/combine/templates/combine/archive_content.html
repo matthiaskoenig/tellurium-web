@@ -25,7 +25,7 @@
                         <th></th>
                         <th>format</th>
                         <th>location</th>
-                        <th>metadata</th>
+                        <th class="hidden-xs">metadata</th>
                     </tr>
                     </thead>
                     {% for entry in entries %}
@@ -48,7 +48,7 @@
                                    target="_blank">{{ entry.location }}</a>
                             </td>
 
-                            <td>
+                            <td class="hidden-xs">
                                 {% if entry.metadata %}
                                 {% with md = entry.metadata %}
 
