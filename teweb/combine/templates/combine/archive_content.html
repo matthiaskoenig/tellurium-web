@@ -92,11 +92,12 @@
                 <p>No entries in archive metadata.</p>
             {% endif %}
 
-            <h3>Files</h3>
+            <span class="label label-default" title="ZIP Content">{{ archive.name }}</span>
             <div id="json_tree"></div>
             <script>
                 $(function () {
                     $('#json_tree').jstree({ 'core' : {
+                        'multiple': false,
                         'data' : JSON.parse('{{ tree_data_json|safe }}')
                     } });
                 });

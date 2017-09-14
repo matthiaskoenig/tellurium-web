@@ -4,7 +4,8 @@ Models definitions.
 import logging
 
 import hashlib
-
+import json
+import zipfile
 from django.db import models
 from django.utils import timezone
 
@@ -85,29 +86,54 @@ class Archive(models.Model):
         else:
             return None
 
-    def zip_entries(self, as_json=True):
+    def zip_entries(self):
         """ Returns the entries of the combine archive zip file.
 
         These are all files in the zip files. Not all of these
         have to be managed in the entries of the Combine Archive.
 
-        :param as_json: zip_entries are returned as json
-        :return: entries of the zip file
-        """
-
-        if as_json:
-            # TODO: convert to json
-            pass
-
-        import json
+        The JSON data is in the following format (jstree)
         tree_data = [
             {"id": "ajson1", "parent": "#", "text": "Simple root node", "state": {"opened": True, "selected": True}},
             {"id": "ajson2", "parent": "#", "text": "Root node 2", "state": {"opened": True}},
             {"id": "ajson3", "parent": "ajson2", "text": "Child 1"},
             {"id": "ajson4", "parent": "ajson2", "text": "Child 2", "icon": "fa fa-play"}
         ]
-        tree_data_json = json.dumps(tree_data)
-        return tree_data_json
+
+        :return: entries of the zip file
+        """
+        is_dir = lambda zipinfo: zipinfo.filename.endswith('/')
+        def find_parent(name):
+            if name.endswith('/'):
+                name = name[:-1]
+            tokens = name.split("/")
+            if len(tokens) == 1:
+                return '#'
+            return '/'.join(tokens[:-1]) + '/'
+
+        path = str(self.file.path)
+        tree_data = []
+        with zipfile.ZipFile(path) as zip:
+            # zip.printdir()
+            for zip_info in zip.infolist():
+                print(zip_info)
+                # zip_info.filename
+                # zip_info.date_time
+                # zip_info.file_size
+
+                node = {}
+                node['id'] = zip_info.filename
+                node['parent'] = find_parent(zip_info.filename)
+                node['text'] = zip_info.filename
+                if is_dir(zip_info):
+                    icon = "fa fa-folder fa-fw"
+                else:
+                    icon = "fa fa-file-o fa-fw"
+                node['icon'] = icon
+                node['state'] = {'opened': True}
+                tree_data.append(node)
+
+        return json.dumps(tree_data)
 
     def entries(self):
         """ Get entries and omex object from given archive.
