@@ -3,10 +3,10 @@
         <div class="panel-heading">
 
             <h2 class="panel-title">
-                <a class="btn-xs btn-default" href="{{ url('combine:archive_previous', args=[archive.id]) }}"
-                   title="Previous archive"><i class="fa fa-arrow-circle-o-left fa-fw"></i></a>
-                <a class="btn-xs btn-default" href="{{ url('combine:archive_next', args=[archive.id]) }}"
-                   title="Next archive"><i class="fa fa-arrow-circle-o-right fa-fw"></i></a>
+                <a href="{{ url('combine:archive_previous', args=[archive.id]) }}"
+                   title="Previous archive"><span class="btn-xs btn-primary"><i class="fa fa-arrow-circle-o-left fa-fw"></i></span></a>
+                <a href="{{ url('combine:archive_next', args=[archive.id]) }}"
+                   title="Next archive"><span class="btn-xs btn-primary"><i class="fa fa-arrow-circle-o-right fa-fw"></i></span></a>
 
                 <i class="fa fa-archive fa-fw"></i>
                 <a href="{{ url('combine:archive', args=[archive.id]) }}">

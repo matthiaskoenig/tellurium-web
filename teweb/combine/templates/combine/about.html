@@ -1,70 +1,165 @@
 {% extends "combine/base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-12">
-        <h1><img style="height:50px" src="{{ static('combine/images/logos/te-web.png') }}"> About Tellurium Web</h1>
-        Tellurium Web provides an online solution for the execution of CombineArchives.
-        </p>
+    <div class="row">
 
-        <h2>Features</h2>
-        The current version is <a href="https://github.com/matthiaskoenig/tellurium-web/commit/{{ commit }}"
-                                  title="Source code on github" target="_blank">
-        <span class="fa fa-github fa-fw black"></span><code>{{ commit }}</code></a><br/>
-        <p>
-        <ul>
-            <li>model descriptions in <a href="http://sbml.org">SBML</a></li>
-            <li>simulation descriptions in <a href="http://sbml.org">SED-ML</a></li>
-        </ul>
-        </p>
+    <div class="col-lg-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1 class="panel-title"><i class="fa fa-info fa-fw"></i>About Tellurium Web</h1>
+            </div>
 
-        <h2>Support</h2>
-        For more information refer to the github repository
+            <div class="panel-body">
+                <p>
+                    Tellurium Web provides an online service for the execution of CombineArchives.
 
-        <table class="table table-striped table-condensed table-hover">
-            <tr>
-                <td><a href="https://github.com/matthiaskoenig/tellurium-web"><span
-                        class="fa fa-github fa-fw black"></span></a></td>
-                <td><b>Repository</b></td>
-                <td><a href="https://github.com/matthiaskoenig/tellurium-web">https://github.com/matthiaskoenig/tellurium-web</a>
-                </td>
-            </tr>
-            <tr>
-                <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues"><span
-                        class="fa fa-fire fa-fw black"></span></a></td>
-                <td><b>Bug Tracker</b></td>
-                <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues">https://github.com/matthiaskoenig/tellurium-web/issues</a>
-                </td>
-            </tr>
-            <tr>
-                <td><a href="mailto:konigmatt@googlemail.com"><span class="fa fa-envelope fa-fw black"></span></a></td>
-                <td><b>Email</b></td>
-                <td><a href="mailto:konigmatt@googlemail.com">konigmatt@googlemail.com</a></td>
-            </tr>
-        </table>
+                    The current version is <a href="https://github.com/matthiaskoenig/tellurium-web/commit/{{ commit }}"
+                                              title="Source code on github" target="_blank">
+                    <span class="fa fa-github fa-fw black"></span><code>{{ commit }}</code></a> and supports:
+                <ul>
+                    <li>model descriptions in <a href="http://sbml.org">SBML</a></li>
+                    <li>simulation descriptions in <a href="http://sbml.org">SED-ML</a></li>
+                </ul>
+                For additional information refer to the github repository
+                <a href="https://github.com/matthiaskoenig/tellurium-web" target="new">https://github.com/matthiaskoenig/tellurium-web</a>
+                </p>
 
-        <h2>Acknowledgement</h2>
-        Tellurium Web is build on existing technology and standard, e.g., </p>
-        <p>
-            <a href="http://co.mbine.org/" alt="COMBINE" target="_blank"><img
-                    src="{{ static('combine/images/logos/combine.png') }}" height="25"></a>&nbsp;&nbsp;
-            <a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
-                    src="{{ static('combine/images/logos/omex.png') }}" height="25"></a>&nbsp;&nbsp;
-            <a href="http://sbml.org" alt="SBML" target="_blank"><img
-                    src="{{ static('combine/images/logos/sbml.png') }}"
-                    height="25"></a>&nbsp;&nbsp;
-            <a href="http://sed-ml.org" alt="SED-ML" target="_blank"><img
-                    src="{{ static('combine/images/logos/sedml.png') }}"
-                    height="25"></a>&nbsp;&nbsp;
-            <a href="http://libroadrunner.org/" alt="libroadrunner" target="_blank"><img
-                    src="{{ static('combine/images/logos/libroadrunner.jpg') }}" height="25"></a>&nbsp;&nbsp;
-            <a href="http://tellurium.analogmachine.org/" alt="Tellurium" target="_blank"><img
-                    src="{{ static('combine/images/logos/te.png') }}" height="25"></a>&nbsp;&nbsp;
-            <a href="http://antimony.sourceforge.net//" alt="Antimony" target="_blank"><img
-                    src="{{ static('combine/images/logos/antimony.png') }}" height="25"></a>&nbsp;&nbsp;
-        </p>
+                <h2>Support</h2>
+                <p>
+                Support is available via the following channels
+
+                <table class="table table-striped table-condensed table-hover">
+                    <tr>
+                        <td><a href="https://github.com/matthiaskoenig/tellurium-web"><span
+                                class="fa fa-github fa-fw black"></span></a></td>
+                        <td><b>Repository</b></td>
+                        <td><a href="https://github.com/matthiaskoenig/tellurium-web">https://github.com/matthiaskoenig/tellurium-web</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues"><span
+                                class="fa fa-fire fa-fw black"></span></a></td>
+                        <td><b>Bug Tracker</b></td>
+                        <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues">https://github.com/matthiaskoenig/tellurium-web/issues</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a href="mailto:konigmatt@googlemail.com"><span
+                                class="fa fa-envelope fa-fw black"></span></a></td>
+                        <td><b>Email</b></td>
+                        <td><a href="mailto:konigmatt@googlemail.com">konigmatt@googlemail.com</a></td>
+                    </tr>
+                </table>
+                </p>
+
+                <h2>Acknowledgement</h2>
+                <p> Tellurium Web is build on existing technology and standards, e.g.,</p>
+                <p>
+                    <a href="http://co.mbine.org/" alt="COMBINE" target="_blank"><img
+                            src="{{ static('combine/images/logos/combine.png') }}" height="25"></a>&nbsp;&nbsp;
+                    <a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
+                            src="{{ static('combine/images/logos/omex.png') }}" height="25"></a>&nbsp;&nbsp;
+                    <a href="http://sbml.org" alt="SBML" target="_blank"><img
+                            src="{{ static('combine/images/logos/sbml.png') }}"
+                            height="25"></a>&nbsp;&nbsp;
+                    <a href="http://sed-ml.org" alt="SED-ML" target="_blank"><img
+                            src="{{ static('combine/images/logos/sedml.png') }}"
+                            height="25"></a>&nbsp;&nbsp;
+                    <a href="http://libroadrunner.org/" alt="libroadrunner" target="_blank"><img
+                            src="{{ static('combine/images/logos/libroadrunner.jpg') }}" height="25"></a>&nbsp;&nbsp;
+                    <a href="http://tellurium.analogmachine.org/" alt="Tellurium" target="_blank"><img
+                            src="{{ static('combine/images/logos/te.png') }}" height="25"></a>&nbsp;&nbsp;
+                    <a href="http://antimony.sourceforge.net//" alt="Antimony" target="_blank"><img
+                            src="{{ static('combine/images/logos/antimony.png') }}" height="25"></a>&nbsp;&nbsp;
+                </p>
+            </div>
+        </div>
     </div>
-</div>
+    <div class="col-lg-6">
+
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <h1 class="panel-title">Privacy notice and terms of service</h1>
+            </div>
+
+            <div class="panel-body">
+                <h3>Terms of service and disclaimers</h3>
+                <p>
+                    By using any part of this service, you agree to the terms of service and disclaimer stated in this
+                    section.
+                </p>
+                <h4>No warranty and no liability</h4>
+                <p>
+                    All content on Tellurium Web is provided in the hope that it will be useful, but WITHOUT ANY
+                    WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+                    Neither the
+                    Humboldt University,
+                    nor collaborating institutions, nor the German Government, nor any of their employees, make any
+                    warranty,
+                    express or implied, including the warranties of merchantability and fitness for a particular
+                    purpose, or
+                    assumes
+                    any legal liability or responsibility for the accuracy, completeness, or usefulness of any
+                    information,
+                    results, apparatus, product, or process disclosed, or represents that its use would not infringe
+                    privately
+                    owned rights. The content is on an "as is" basis, and the Humboldt University and any other
+                    organizations that have
+                    participated in the Tellurium Web project have no obligations to provide maintenance, support,
+                    updates,
+                    enhancements or modifications. In no event shall the Humboldt University or any other organizations
+                    be
+                    liable to
+                    any party for direct, indirect, special, incidental or consequential damages, including lost
+                    profits,
+                    arising
+                    out of the use of this software and its documentation, even if the Humboldt University or other
+                    organizations
+                    have been advised of the possibility of such damage.
+                </p>
+                <p>
+                    No one associated with the Tellurium Web project, its hosting institutions, or anyone else, will be
+                    held
+                    liable
+                    for any breaches of privacy involving this service.
+                </p>
+                <p>
+                    No one associated with the Tellurium Web project, its hosting institutions, or anyone else in any
+                    way
+                    whatsoever
+                    shall be held responsible for the appearance of any inaccurate, libelous, or objectionable content,
+                    or for your use of the information contained in or linked from these web pages.
+                </p>
+
+                <h3>Privacy notice</h3>
+                <h4>Does this service store your SBML model or file?</h4>
+                <p>
+                    This service is implemented as a server-side facility, meaning that the computations are physically
+                    performed
+                    on our computers, which are housed at the Humboldt University. As a consequence, your Combine
+                    Archive file
+                    must be transmitted to, and stored temporarily on, our servers in order to process it.
+
+                    In the event that this service itself exhibits an error, the Tellurium Web Team may need to inspect
+                    the
+                    material
+                    you submitted (i.e., the Combine Archive file) to ascertain the cause of the error.
+
+                    Your Combine Archive file will never be passed willingly to any third party, and it will be deleted
+                    after
+                    a period of time. Your Combine Archive file will only be used for the purposes of validating it,
+                    for gathering general statistics about the uses of this service and Combine Archives and SED-ML in
+                    general,
+                    and for debugging the service itself (and then, only if necessary).
+
+                    By submitting content to this service, you grant the Tellurium Web Team the right to use and store
+                    your
+                    file temporarily for these purposes.</p>
+            </div>
+        </div>
+
+    </div>
 
 {% endblock %}
 

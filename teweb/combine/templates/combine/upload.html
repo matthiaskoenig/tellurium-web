@@ -7,6 +7,7 @@
             </div>
 
             <div class="panel-body">
+                <div class="form-group">
                 <form action="{{ url('combine:upload') }}" method="post"
                       enctype="multipart/form-data">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -14,9 +15,11 @@
                     <p>{{ form.file.label_tag() }} {{ form.file.help_text }}</p>
                     <p>
                         {{ form.file.errors }}
-                        {{ form.file }} <input class="btn btn-primary" type="submit" value="Upload"/>
+                        {{ form.file }}
+                        <input class="btn btn-primary" type="submit" value="Upload"/>
                     </p>
                 </form>
+                </div>
             </div>
         </div>
 
