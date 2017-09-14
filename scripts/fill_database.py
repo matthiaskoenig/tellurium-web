@@ -1,6 +1,5 @@
 """
-Setup of archive database.
-Database is populated from set of OMEX archives.
+Initial setup of combine archive database.
 
 necessary to empty database
 $ python manage.py flush
@@ -16,6 +15,7 @@ http://eli.thegreenplace.net/2014/02/15/programmatically-populating-a-django-dat
 """
 import os
 import sys
+import warnings
 
 FILE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 # project directory
@@ -52,15 +52,21 @@ def add_archives_to_database():
                 omex_files.append(path)
 
     for f in sorted(omex_files):
+        print('-' * 80)
         print(f)
-        name = os.path.basename(f)
-        django_file = File(open(f, 'rb'))
-        new_archive = Archive(name=name)
-        new_archive.file.save(name, django_file, save=False)
-        new_archive.md5 = hash_for_file(f, hash_type='MD5')
-        new_archive.full_clean()
-        new_archive.save()
-
+        md5 = hash_for_file(f, hash_type='MD5')
+        existing_archive = Archive.objects.filter(md5=md5)
+        # archive exists already based on the MD5 checksum
+        if len(existing_archive)>0:
+            print("Archive already exists, not recreated: {}".format(f))
+        else:
+            name = os.path.basename(f)
+            django_file = File(open(f, 'rb'))
+            new_archive = Archive(name=name)
+            new_archive.file.save(name, django_file, save=False)
+            new_archive.md5 = hash_for_file(f, hash_type='MD5')
+            new_archive.full_clean()
+            new_archive.save()
 
 if __name__ == "__main__":
 

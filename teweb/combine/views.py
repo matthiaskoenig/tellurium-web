@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.temp import NamedTemporaryFile
 from django.urls import reverse
 from django.http import FileResponse
+import logging
 
 from six import iteritems
 
@@ -35,6 +36,8 @@ import libcombine
 import importlib
 importlib.reload(libcombine)
 
+
+logger = logging.getLogger(__name__)
 
 def test_view(request):
     """ Test page. """
@@ -182,14 +185,12 @@ def upload(request):
         if form.is_valid():
             name = request.FILES['file']
             new_archive = Archive(name=name, file=request.FILES['file'])
-            # FIXME: hash
-            # new_archive.md5 = hash_for_file(name, hash_type='MD5')
             new_archive.md5 = 'None'
-            new_archive.full_clean()
+            # new_archive.full_clean()
             new_archive.save()
             return archive_view(request, new_archive.id)
         else:
-            print('Form is invalid')
+            logging.warning('Form is invalid')
     else:
         form = UploadArchiveForm()
 

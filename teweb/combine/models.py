@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Utility functions for models
 # ===============================================================================
 
-def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
+def hash_for_file(file, hash_type='MD5', blocksize=65536):
     """ Calculate the md5_hash for a file.
 
         Calculating a hash for a file is always useful when you need to check if two files
@@ -35,7 +35,8 @@ def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
         hasher = hashlib.md5()
     elif hash_type == 'SHA1':
         hasher == hashlib.sha1()
-    with open(filepath, 'rb') as f:
+
+    with open(file, 'rb') as f:
         buf = f.read(blocksize)
         while len(buf) > 0:
             hasher.update(buf)
@@ -55,7 +56,7 @@ class Archive(models.Model):
     name = models.CharField(max_length=200)
     file = models.FileField(upload_to='archives', validators=[validators.validate_omex])
     created = models.DateTimeField('date published', editable=False)
-    md5 = models.CharField(max_length=36)
+    md5 = models.CharField(max_length=36, blank=True)
     task_id = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
@@ -69,10 +70,12 @@ class Archive(models.Model):
         if not self.md5:
             self.md5 = hash_for_file(self.file, hash_type='MD5')
 
-            # FIXME: check via hash if the archive is already existing
-            # currently duplicate files allowed duplicate archives
-
         return super(Archive, self).save(*args, **kwargs)
+
+    @property
+    def md5_short(self):
+        return self.md5[0:8]
+
 
     @property
     def status(self):

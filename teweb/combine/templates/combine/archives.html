@@ -18,11 +18,11 @@
                                 <th>archive</th>
                                 <th>download</th>
                                 <th>name</th>
+                                <th class="hidden-xs">md5</th>
                                 <th>action</th>
                                 <th>status</th>
                                 <th>results</th>
                                 <th class="hidden hidden-xs">created</th>
-                                <th class="hidden hidden-xs">md5</th>
                             </tr>
                             </thead>
                             {% for archive in archives %}
@@ -34,12 +34,11 @@
                                     <td><a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
                                         <i class="fa fa-download fa-lg black"></i></a></td>
                                     <td>
-
                                             <a href="{{ url('combine:archive', args=[archive.id]) }}">
                                                 <span class="label label-primary">{{ archive.name }}
                                         </span></a>
                                     </td>
-
+                                    <td class="hidden-xs">{{ archive.md5_short }}</td>
                                     <!-- action -->
                                     <td>{% if archive.task_id %}
                                         {% with task = tasks[loop.index0] %}
@@ -103,7 +102,7 @@
                                     </td>
 
                                     <td class="hidden hidden-xs">{{ archive.created }}</td>
-                                    <td class="hidden hidden-xs">{{ archive.md5 }}</td>
+
                                 </tr>
                             {% endfor %}
 
