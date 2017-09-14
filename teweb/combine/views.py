@@ -12,6 +12,7 @@ from django_celery_results.models import TaskResult
 from django.contrib.auth.decorators import login_required
 from django.core.files.temp import NamedTemporaryFile
 from django.urls import reverse
+from django.http import FileResponse
 
 from six import iteritems
 
@@ -24,6 +25,7 @@ from .git import get_commit
 
 import pandas
 import numpy as np
+import magic
 
 import tellurium
 import libsedml
@@ -145,33 +147,20 @@ def download_archive(request, archive_id):
 def archive_entry(request, archive_id, entry_index):
     """ Display an entry in the archive.
 
-
     :param request:
     :param archive_id:
     :param entry_id:
     :return:
     """
-    try:
-        entry_index = int(entry_index)
-        archive = get_object_or_404(Archive, pk=archive_id)
-        content = archive.get_entry_content(entry_index)
-    except (UnicodeDecodeError, TypeError):
-        content = None
+    entry_index = int(entry_index)
+    archive = get_object_or_404(Archive, pk=archive_id)
 
-    print('*' * 80)
-    print('CONTENT: archive_id <{}>, entry_index <{}>'.format(archive_id, entry_index))
-    print('*' * 80)
-    print(content)
-    print('*' * 80)
-
-
-    # FIXME: do with correct content type
-
-    from django.http import FileResponse
     with NamedTemporaryFile(mode='w+b') as f:
-
         archive.extract_entry(entry_index, f.name)
-        response = FileResponse(open(f.name, 'rb'))
+
+        # get content_type with magic
+        content_type = magic.from_file(f.name)
+        response = FileResponse(open(f.name, 'rb'), content_type=content_type)
 
     return response
 
