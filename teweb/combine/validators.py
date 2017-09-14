@@ -6,6 +6,8 @@ from django.template.defaultfilters import filesizeformat
 from django.utils.deconstruct import deconstructible
 from django.core.exceptions import ValidationError
 
+import libcombine
+
 
 def validate_omex(data):
     """ Validate that file is a combine archive.
@@ -17,8 +19,13 @@ def validate_omex(data):
                                   content_types=('application/zip',))
     validate_file(data)
 
-    # in addition check that the omex can be read with libcombine
-    # TODO: implement
+    # check that the omex can be read with libcombine
+    # FIXME: not checked if archive can be read, this is done on access
+    # path = ?
+    # omex = libcombine.CombineArchive()
+    # if omex.initializeFromArchive(path) is None:
+    #    raise ValidationError("Combine archive is not valid. Reading with libcombine failed.")
+    # omex.cleanUp()
 
 
 @deconstructible

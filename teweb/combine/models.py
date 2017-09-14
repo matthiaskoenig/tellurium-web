@@ -1,6 +1,8 @@
 """
 Models definitions.
 """
+import logging
+
 import hashlib
 
 from django.db import models
@@ -9,6 +11,8 @@ from django.utils import timezone
 import libcombine
 from celery.result import AsyncResult
 from . import comex, validators
+
+logger = logging.getLogger(__name__)
 
 
 # ===============================================================================
@@ -62,12 +66,10 @@ class Archive(models.Model):
             self.created = timezone.now()
 
         if not self.md5:
-            # the file is uploaded at this point
-            # file_path = str(self.file.path)
             self.md5 = hash_for_file(self.file, hash_type='MD5')
 
-            # check via hash if the archive is already existing
-            # not really necessary, we allow for duplicate archives
+            # FIXME: check via hash if the archive is already existing
+            # currently duplicate files allowed duplicate archives
 
         return super(Archive, self).save(*args, **kwargs)
 
@@ -93,9 +95,8 @@ class Archive(models.Model):
 
         # read combine archive contents & metadata
         omex = libcombine.CombineArchive()
-        print(path)
         if omex.initializeFromArchive(path) is None:
-            print("Invalid Combine Archive")
+            logger.error("Invalid Combine Archive: {}", self)
             return None
 
         entries = []
@@ -129,9 +130,8 @@ class Archive(models.Model):
 
         # read combine archive contents & metadata
         omex = libcombine.CombineArchive()
-        print(path)
         if omex.initializeFromArchive(path) is None:
-            print("Invalid Combine Archive")
+            logger.error("Invalid Combine Archive: {}", self)
             return None
 
         entry = omex.getEntry(index)

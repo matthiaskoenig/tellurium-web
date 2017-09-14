@@ -11,7 +11,7 @@
                 <i class="fa fa-archive fa-fw"></i>
                 <a href="{{ url('combine:archive', args=[archive.id]) }}">
                     <span class="label label-primary"><span class="badge">{{ archive.id }}</span> {{ archive }}</span></a>
-                (<a href="{{ archive.file.url }}" title="Download archive"><i class="fa fa-download fa-fw"></i></a>)
+                (<a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive"><i class="fa fa-download fa-fw"></i></a>)
             </h2>
 
         </div>

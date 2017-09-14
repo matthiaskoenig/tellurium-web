@@ -31,7 +31,7 @@
                                     <td><a href="{{ url('combine:archive', args=[archive.id]) }}">
                                         <span class="badge">{{ archive.id }}</span></a>
                                     </td>
-                                    <td><a href="{{ archive.file.url }}" title="Download archive">
+                                    <td><a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
                                         <i class="fa fa-download fa-lg black"></i></a></td>
                                     <td>
 

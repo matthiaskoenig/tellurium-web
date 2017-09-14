@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django_celery_results.models import TaskResult
 from django.contrib.auth.decorators import login_required
 from django.core.files.temp import NamedTemporaryFile
+from django.urls import reverse
 
 from six import iteritems
 
@@ -47,23 +48,6 @@ def about(request):
         'commit': get_commit()
     }
     return render(request, 'combine/about.html', context)
-
-@login_required
-def runall(request):
-    """ Runs all archives.
-
-    :param request:
-    :return:
-    """
-    all_archives = Archive.objects.all().order_by('-created')
-    for archive in all_archives:
-        # add.delay(4, 4)
-        print('* creating new task')
-        result = execute_omex.delay(archive_id=archive.id)
-        archive.task_id = result.task_id
-        archive.save()
-    return redirect('combine:index')
-
 
 ######################
 # ARCHIVES
@@ -138,6 +122,92 @@ def archive_view(request, archive_id):
     return render(request, 'combine/archive.html', context)
 
 
+def download_archive(request, archive_id):
+    """ Download archive.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    archive = get_object_or_404(Archive, pk=archive_id)
+    filename = archive.file.name.split('/')[-1]
+
+    response = HttpResponse(archive.file, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+
+    # no redirecting, but breaks on archives
+    # url = reverse('combine:archive', args=(archive_id,))
+    # response['Refresh'] = "0;url={}".format(url)
+
+    return response
+
+
+def archive_entry(request, archive_id, entry_index):
+    """ Display an entry in the archive.
+
+
+    :param request:
+    :param archive_id:
+    :param entry_id:
+    :return:
+    """
+    try:
+        entry_index = int(entry_index)
+        archive = get_object_or_404(Archive, pk=archive_id)
+        content = archive.get_entry_content(entry_index)
+    except (UnicodeDecodeError, TypeError):
+        content = None
+
+    print('*' * 80)
+    print('CONTENT: archive_id <{}>, entry_index <{}>'.format(archive_id, entry_index))
+    print('*' * 80)
+    print(content)
+    print('*' * 80)
+
+
+    # FIXME: do with correct content type
+
+    from django.http import FileResponse
+    with NamedTemporaryFile(mode='w+b') as f:
+
+        archive.extract_entry(entry_index, f.name)
+        response = FileResponse(open(f.name, 'rb'))
+
+    return response
+
+
+def upload_view(request, form):
+    context = {
+        'form': form,
+    }
+    return render(request, 'combine/archive_upload.html', context)
+
+
+def upload(request):
+    """ Upload file view.
+
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        form = UploadArchiveForm(request.POST, request.FILES)
+        if form.is_valid():
+            name = request.FILES['file']
+            new_archive = Archive(name=name, file=request.FILES['file'])
+            # FIXME: hash
+            # new_archive.md5 = hash_for_file(name, hash_type='MD5')
+            new_archive.md5 = 'None'
+            new_archive.full_clean()
+            new_archive.save()
+            return archive_view(request, new_archive.id)
+        else:
+            print('Form is invalid')
+    else:
+        form = UploadArchiveForm()
+
+    return upload_view(request, form)
+
+
 def archive_next(request, archive_id):
     """ Returns single archive view of next archive.
     Displays the content of the archive.
@@ -183,63 +253,86 @@ def archive_previous(request, archive_id):
         return redirect('combine:archive', pk)
 
 
-def archive_entry(request, archive_id, entry_index):
-    """ Display an entry in the archive.
+######################
+# TASK RESULTS
+######################
+@login_required
+def taskresults(request):
+    """ View the task results.
 
+    :param request:
+    :return:
+    """
+    taskresults = TaskResult.objects.all()
+    context = {
+        'taskresults': taskresults,
+    }
+    return render(request, 'combine/taskresults.html', context)
+
+
+def taskresult(request, taskresult_id):
+    """ Single taskresult view.
+
+    :param request:
+    :param taskresult_id:
+    :return:
+    """
+    taskresult = get_object_or_404(TaskResult, pk=taskresult_id)
+    archives = Archive.objects.filter(task_id=taskresult.task_id)
+
+    context = {
+        'taskresult': taskresult,
+        'archives': archives,
+    }
+
+    return render(request, 'combine/taskresult.html', context)
+
+
+############################################
+# EXECUTE COMBINE ARCHIVES
+############################################
+@login_required
+def runall(request):
+    """ Executes all archives.
+
+    :param request:
+    :return:
+    """
+    all_archives = Archive.objects.all().order_by('-created')
+    for archive in all_archives:
+        result = execute_omex.delay(archive_id=archive.id)
+        archive.task_id = result.task_id
+        archive.save()
+    return redirect('combine:index')
+
+
+def run_archive(request, archive_id):
+    """ Executes the given archive.
 
     :param request:
     :param archive_id:
-    :param entry_id:
     :return:
     """
-    try:
-        entry_index = int(entry_index)
-        archive = get_object_or_404(Archive, pk=archive_id)
-        content = archive.get_entry_content(entry_index)
-    except (UnicodeDecodeError, TypeError):
-        content = None
+    create_task = False
 
-    print('*' * 80)
-    print('CONTENT: archive_id <{}>, entry_index <{}>'.format(archive_id, entry_index))
-    print('*' * 80)
-    print(content)
-    print('*' * 80)
+    archive = get_object_or_404(Archive, pk=archive_id)
+    if archive.task_id:
+        result = AsyncResult(archive.task_id)
+        # Create new task and run again.
+        if result.status in ["FAILURE", "SUCCESS"]:
+            create_task = True
 
-    context = {
-
-    }
-
-    from django.http import FileResponse
-    with NamedTemporaryFile(mode='w+b') as f:
-
-        archive.extract_entry(entry_index, f.name)
-        response = FileResponse(open(f.name, 'rb'))
-
-    return response
-    # return redirect('combine:archive', archive_id)
-
-
-
-
-def check_state(request, archive_id):
-    """ A view to report the progress of the archive to the user. """
-    if request.is_ajax():
-        if 'task_id' in request.POST.keys() and request.POST['task_id']:
-            task_id = request.POST['task_id']
-            task = AsyncResult(task_id)
-            data = {
-                'status': task.status
-            }
-        else:
-            data = {
-                'status': 'No task_id in the request'
-            }
     else:
-        data = {
-            'status': 'This is not an ajax request'
-        }
+        # no execution yet
+        create_task = True
 
-    return JsonResponse(data)
+    if create_task:
+        # add.delay(4, 4)
+        result = execute_omex.delay(archive_id=archive_id)
+        archive.task_id = result.task_id
+        archive.save()
+
+    return redirect('combine:archive', archive_id)
 
 
 def results(request, archive_id):
@@ -343,108 +436,6 @@ def results(request, archive_id):
     return render(request, 'combine/results.html', context)
 
 
-def run_archive(request, archive_id):
-    """ Executes the given archive.
-
-    :param request:
-    :param archive_id:
-    :return:
-    """
-    create_task = False
-
-    archive = get_object_or_404(Archive, pk=archive_id)
-    if archive.task_id:
-        result = AsyncResult(archive.task_id)
-        # Create new task and run again.
-        if result.status in ["FAILURE", "SUCCESS"]:
-            create_task = True
-
-    else:
-        # no execution yet
-        create_task = True
-
-    if create_task:
-        # add.delay(4, 4)
-        print('* creating new task')
-        result = execute_omex.delay(archive_id=archive_id)
-        archive.task_id = result.task_id
-        archive.save()
-
-    return redirect('combine:archive', archive_id)
-
-
-
-
-def upload_view(request, form):
-    context = {
-        'form': form,
-    }
-    return render(request, 'combine/archive_upload.html', context)
-
-
-def upload(request):
-    """ Upload file view.
-
-    :param request:
-    :return:
-    """
-    if request.method == 'POST':
-        form = UploadArchiveForm(request.POST, request.FILES)
-        if form.is_valid():
-            name = request.FILES['file']
-            new_archive = Archive(name=name, file=request.FILES['file'])
-            # FIXME: hash
-            # new_archive.md5 = hash_for_file(name, hash_type='MD5')
-            new_archive.md5 = 'None'
-            new_archive.full_clean()
-            new_archive.save()
-            return archive_view(request, new_archive.id)
-        else:
-            print('Form is invalid')
-    else:
-        form = UploadArchiveForm()
-
-    return upload_view(request, form)
-
-
-######################
-# TASK RESULTS
-######################
-@login_required
-def taskresults(request):
-    """ View the task results.
-
-    :param request:
-    :return:
-    """
-    taskresults = TaskResult.objects.all()
-    context = {
-        'taskresults': taskresults,
-    }
-    return render(request, 'combine/taskresults.html', context)
-
-
-def taskresult(request, taskresult_id):
-    """ Single taskresult view.
-
-    :param request:
-    :param taskresult_id:
-    :return:
-    """
-    taskresult = get_object_or_404(TaskResult, pk=taskresult_id)
-    archives = Archive.objects.filter(task_id=taskresult.task_id)
-
-    context = {
-        'taskresult': taskresult,
-        'archives': archives,
-    }
-
-    return render(request, 'combine/taskresult.html', context)
-
-
-######################
-# OUTPUTS
-######################
 def create_report(sed_doc, output, dgs_dict):
     """ Create the report from output
 
@@ -622,3 +613,24 @@ def create_plot3D(sed_doc, output, dgs_dict):
     # TODO: analoque to the plot2D
 
     return None
+
+
+def check_state(request, archive_id):
+    """ A view to report the progress of the archive to the user. """
+    if request.is_ajax():
+        if 'task_id' in request.POST.keys() and request.POST['task_id']:
+            task_id = request.POST['task_id']
+            task = AsyncResult(task_id)
+            data = {
+                'status': task.status
+            }
+        else:
+            data = {
+                'status': 'No task_id in the request'
+            }
+    else:
+        data = {
+            'status': 'This is not an ajax request'
+        }
+
+    return JsonResponse(data)
