@@ -22,6 +22,7 @@ from .tasks import add, execute_omex
 from .models import Archive, hash_for_file
 from .forms import UploadArchiveForm
 from .git import get_commit
+from . import comex
 
 import pandas
 import numpy as np
@@ -87,41 +88,39 @@ def archive_view(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
-    omex, entries = archive.get_entries()
+    context = archive_context(archive)
+    return render(request, 'combine/archive.html', context)
 
-    # already task id assigned
+
+def archive_context(archive):
+    """ Context required to render archive_content"""
+    # omex entries
+    entries = archive.entries()
+
+    # zip entries: json tree data
+    zip_entries = archive.zip_entries()
+    print("*" * 80)
+    print(zip_entries)
+    print("*" * 80)
+
+    # task and taskresult
     task = None
     task_result = None
     if archive.task_id:
         task = AsyncResult(archive.task_id)
         task_result = TaskResult.objects.filter(task_id=archive.task_id)
-        if task_result and len(task_result)>0:
+        if task_result and len(task_result) > 0:
             print(task_result)
             task_result = task_result[0]
 
-    # json tree data
-    import json
-    tree_data = [
-        {"id": "ajson1", "parent": "#", "text": "Simple root node", "state": {"opened": True, "selected": True}},
-        {"id": "ajson2", "parent": "#", "text": "Root node 2", "state": {"opened": True}},
-        {"id": "ajson3", "parent": "ajson2", "text": "Child 1"},
-        {"id": "ajson4", "parent": "ajson2", "text": "Child 2", "icon": "fa fa-play"}
-    ]
-    tree_data_json = json.dumps(tree_data)
-
-
-
-    # view context
     context = {
         'archive': archive,
-        'omex': omex,
         'entries': entries,
-        'tree_data_json': tree_data_json,
+        'tree_data_json': zip_entries,
         'task': task,
         'task_result': task_result,
     }
-
-    return render(request, 'combine/archive.html', context)
+    return context
 
 
 def download_archive(request, archive_id):
@@ -333,38 +332,27 @@ def results(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
-
-    # no task for the archive, so no results
     if not archive.task_id:
         return redirect('combine:archive', archive_id)
 
-    task = AsyncResult(archive.task_id)
+    # archive context
+    context = archive_context(archive)
+    task = context['task']
     if task.status != "SUCCESS":
-        print("Task was not successful:", archive.task_id)
         return redirect('combine:archive', archive_id)
 
-    task_result = TaskResult.objects.filter(task_id=archive.task_id)
+    # output context
     path = str(archive.file.path)
-    omex, entries = archive.get_entries()
-
     omex = tellurium.tecombine.OpenCombine(path)
-
-    # Create the plots with the given results
-    # The outputs are needed from sedml document
     outputs = []
 
     dgs_json = task.result["dgs"]
     for sedmlFile, dgs_dict in iteritems(dgs_json):
 
-        # python 3
-        sedmlStr = omex.getSEDML(sedmlFile).decode('UTF-8')
-        doc = libsedml.readSedMLFromString(str(sedmlStr))
+        sedml_str = omex.getSEDML(sedmlFile).decode('UTF-8')
+        doc = libsedml.readSedMLFromString(str(sedml_str))
 
-        # check that valid
-        sedml_str = libsedml.writeSedMLToString(doc)
-
-        # Stores all the html & js information for the outputs
-        # necessary to handle the JS separately
+        # Store html and JSON to render results
         reports = []
         plot2Ds = []
         plot3Ds = []
@@ -399,28 +387,17 @@ def results(request, archive_id):
             else:
                 print("# Unsupported output type: {}".format(output.getElementName()))
 
-        # process all the outputs and create the respective graphs
-        # TODO
-        # for doc.getOutputs()
-        # dgs
-
         # FIXME: Only processes the first file, than breaks
         break
 
-    # provide the info to the view
-    context = {
-        'archive': archive,
-        'entries': entries,
-        'omex': omex,
-        'task': task,
-        'task_result': task_result,
-
+    # add results context
+    context.update({
         'doc': doc,
         'outputs': outputs,
         'reports': reports,
         'plot2Ds': plot2Ds,
         'plot3Ds': plot3Ds,
-    }
+    })
 
     return render(request, 'combine/results.html', context)
 

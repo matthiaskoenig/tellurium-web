@@ -85,11 +85,35 @@ class Archive(models.Model):
         else:
             return None
 
-    def get_entries(self):
+    def zip_entries(self, as_json=True):
+        """ Returns the entries of the combine archive zip file.
+
+        These are all files in the zip files. Not all of these
+        have to be managed in the entries of the Combine Archive.
+
+        :param as_json: zip_entries are returned as json
+        :return: entries of the zip file
+        """
+
+        if as_json:
+            # TODO: convert to json
+            pass
+
+        import json
+        tree_data = [
+            {"id": "ajson1", "parent": "#", "text": "Simple root node", "state": {"opened": True, "selected": True}},
+            {"id": "ajson2", "parent": "#", "text": "Root node 2", "state": {"opened": True}},
+            {"id": "ajson3", "parent": "ajson2", "text": "Child 1"},
+            {"id": "ajson4", "parent": "ajson2", "text": "Child 2", "icon": "fa fa-play"}
+        ]
+        tree_data_json = json.dumps(tree_data)
+        return tree_data_json
+
+    def entries(self):
         """ Get entries and omex object from given archive.
 
         :param archive:
-        :return:
+        :return: entries in the combine archive (managed via manifest)
         """
         path = str(self.file.path)
 
@@ -101,29 +125,21 @@ class Archive(models.Model):
 
         entries = []
         for i in range(omex.getNumEntries()):
-
             entry = omex.getEntry(i)
-
-            # ! hardcopy the required information so archive can be closed again.
-            info = {}
             location = entry.getLocation()
-            info['location'] = location
-
             format = entry.getFormat()
+
+            info = {}
+            info['location'] = location
             info['format'] = format
             info['short_format'] = comex.short_format(format)
+            info['master'] = entry.getMaster()
+            info['metadata'] = comex.metadata_for_location(omex, location=location)
 
-            master = entry.getMaster()
-            info['master'] = master
-
-            metadata = comex.metadata_for_location(omex, location=location)
-
-            info['metadata'] = metadata
             entries.append(info)
 
         omex.cleanUp()
-
-        return omex, entries
+        return entries
 
     def extract_entry(self, index, filename):
         path = str(self.file.path)

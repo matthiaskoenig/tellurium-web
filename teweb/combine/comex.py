@@ -1,5 +1,5 @@
 """
-Helper functions to work with combine archives
+Helper functions to work with combine archives and zip files.
 and omex files.
 """
 
@@ -104,3 +104,4 @@ def get_content(archive):
     path = archive.file.path
     print(path)
     print_archive(fileName=path)
+
