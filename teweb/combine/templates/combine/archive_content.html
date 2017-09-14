@@ -44,8 +44,12 @@
                                 {% endif %}
                             </td>
                             <td>
+                                {% if entry.location == './manifest.xml' %}
+                                    {{ entry.location }}
+                                {% else %}
                                 <a href="{{ url('combine:archive_entry', args=[archive.id, loop.index0]) }}"
                                    target="_blank">{{ entry.location }}</a>
+                                {% endif %}
                             </td>
 
                             <td class="hidden-xs">
