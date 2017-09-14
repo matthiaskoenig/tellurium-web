@@ -2,7 +2,9 @@
 Helper functions to work with combine archives
 and omex files.
 """
+
 import libcombine
+# FIXME: this is a bugfix for https://github.com/sbmlteam/libCombine/issues/15
 import importlib
 importlib.reload(libcombine)
 
@@ -17,6 +19,7 @@ def short_format(format):
     short = tokens[-1].split('.')[0]
     short = short.replace('+xml', '')
     return short
+
 
 def metadata_for_location(co_archive, location):
     """ Returns the metadata for given location.

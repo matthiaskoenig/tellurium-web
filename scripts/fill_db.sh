@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
+# TODO: implement full script
+
 
 # delete old database files & uploads
 
 # clean setup
-#   python manage.py makemigrations
-#   python manage.py migrate
+python manage.py makemigrations
+python manage.py makemigrations combine
+python manage.py migrate
 #   python manage.py createsuperuser
 
 # clean everything

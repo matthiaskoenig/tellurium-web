@@ -1,60 +1,19 @@
 """
-Models.
+Models definitions.
 """
 import hashlib
 
 from django.db import models
 from django.utils import timezone
-from django.core.validators import ValidationError
-
 
 import libcombine
-from .omex import metadata_for_location, short_format
-
 from celery.result import AsyncResult
+from . import comex, validators
 
 
 # ===============================================================================
 # Utility functions for models
 # ===============================================================================
-def validate_omex(fieldFile):
-    """ Validator for the omex file.
-    Necessary to run basic file checks on upload.
-    Otherwise the archives will create problems on execution.
-
-    :param fieldFile:
-    :return:
-    """
-
-    print('*'*80)
-    print(fieldFile)
-    print(type(fieldFile))
-    print('*' * 80)
-
-    # check that it is a jar file
-    path = fieldFile.path
-    print(path)
-    file = fieldFile.path
-    print(file)
-
-    # omex = tecombine.OpenCombine(path)
-    # omex.listContents()
-
-    # FIXME: currently not completely implemented.
-
-    """
-    # libcombine
-    # Try to read the archive
-    omex = libcombine.CombineArchive()
-    if not omex.initializeFromArchive(path):
-        print("Invalid Combine Archive")
-        raise ValidationError(
-            _('Invalid archive: %(file)s'),
-            code='invalid',
-            params={'file': 'file'},
-        )
-    """
-
 
 def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
     """ Calculate the md5_hash for a file.
@@ -80,13 +39,16 @@ def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
 
 
 # ===============================================================================
-# Archive
+# Models
 # ===============================================================================
 
 class Archive(models.Model):
-    """ Combine Archive class. """
+    """ Combine Archive class.
+
+    Stores the combine archives.
+    """
     name = models.CharField(max_length=200)
-    file = models.FileField(upload_to='archives', validators=[validate_omex])
+    file = models.FileField(upload_to='archives', validators=[validators.validate_omex])
     created = models.DateTimeField('date published', editable=False)
     md5 = models.CharField(max_length=36)
     task_id = models.CharField(max_length=100, blank=True)
@@ -111,6 +73,10 @@ class Archive(models.Model):
 
     @property
     def status(self):
+        """ Returns the task status of the task.
+
+        :return:
+        """
         if self.task_id:
             result = AsyncResult(self.task_id)
             return result.status
@@ -144,24 +110,15 @@ class Archive(models.Model):
 
             format = entry.getFormat()
             info['format'] = format
-            info['short_format'] = short_format(format)
-
+            info['short_format'] = comex.short_format(format)
 
             master = entry.getMaster()
             info['master'] = master
 
-            # printMetaDataFor(omex, location=location)
-            metadata = metadata_for_location(omex, location=location)
+            metadata = comex.metadata_for_location(omex, location=location)
 
             info['metadata'] = metadata
             entries.append(info)
-
-
-            # the entry could now be extracted via
-            # archive.extractEntry(entry.getLocation(), <filename or folder>)
-
-            # or used as string
-            # content = archive.extractEntryToString(entry.getLocation());
 
         omex.cleanUp()
 
@@ -182,14 +139,11 @@ class Archive(models.Model):
 
         omex.cleanUp()
 
-
-
     def get_entry_content(self, index):
         path = str(self.file.path)
 
         # read combine archive contents & metadata
         omex = libcombine.CombineArchive()
-        print(path)
         if omex.initializeFromArchive(path) is None:
             print("Invalid Combine Archive")
             return None
