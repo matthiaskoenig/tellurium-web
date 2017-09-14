@@ -5,86 +5,244 @@ Creates the HTML views of the web-interface.
 """
 
 from __future__ import print_function, absolute_import
-from django.shortcuts import render, get_object_or_404, render_to_response
+from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.core.urlresolvers import reverse
 from django.template import RequestContext
+from django_celery_results.models import TaskResult
+from django.contrib.auth.decorators import login_required
+from django.core.files.temp import NamedTemporaryFile
+
+from six import iteritems
 
 from celery.result import AsyncResult
+from .tasks import add, execute_omex
 
-from .tasks import ExecuteOMEX
-from .models import Archive
+from .models import Archive, hash_for_file
 from .forms import UploadArchiveForm
+from .git import get_commit
+
+import pandas
+import numpy as np
+
+import tellurium
+import libsedml
+from libsedml import SedOutput
+import libcombine
+import importlib
+importlib.reload(libcombine)
 
 
-# import libcombine
-# from tellurium import tecombine
+def test_view(request):
+    """ Test page. """
+    context = {}
+    return render(request, 'combine/test.html', context)
 
 
-def index(request, form=None):
+######################
+# ABOUT
+######################
+def about(request):
+    """ About page. """
+    context = {
+        'commit': get_commit()
+    }
+    return render(request, 'combine/about.html', context)
+
+@login_required
+def runall(request):
+    """ Runs all archives.
+
+    :param request:
+    :return:
+    """
+    all_archives = Archive.objects.all().order_by('-created')
+    for archive in all_archives:
+        # add.delay(4, 4)
+        print('* creating new task')
+        result = execute_omex.delay(archive_id=archive.id)
+        archive.task_id = result.task_id
+        archive.save()
+    return redirect('combine:index')
+
+
+######################
+# ARCHIVES
+######################
+def archives(request, form=None):
     """ Overview of archives.
 
     :param request:
     :return:
     """
     archives = Archive.objects.all().order_by('-created')
+    tasks = []
+    for archive in archives:
+        task = None
+        if archive.task_id:
+            task = AsyncResult(archive.task_id)
+        tasks.append(task)
+
     if form is None:
         form = UploadArchiveForm()
     context = {
         'archives': archives,
+        'tasks': tasks,
         'form': form
     }
-    return render(request, 'combine/index.html', context)
+    return render(request, 'combine/archives.html', context)
 
 
-def archive(request, archive_id):
+def archive_view(request, archive_id):
     """ Single archive view.
+    Displays the content of the archive.
 
     :param request:
     :param archive_id:
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
+    omex, entries = archive.get_entries()
 
-    # read the archive contents & metadata
-    path = str(archive.file.path)
+    # already task id assigned
+    task = None
+    task_result = None
+    if archive.task_id:
+        task = AsyncResult(archive.task_id)
+        task_result = TaskResult.objects.filter(task_id=archive.task_id)
+        if task_result and len(task_result)>0:
+            print(task_result)
+            task_result = task_result[0]
 
-    omex = tecombine.OpenCombine(path)
-    entries = omex.listContents()
-
-    """
-    entries = []
-    co_archive = libcombine.CombineArchive()
-    if not co_archive.initializeFromArchive(str(path)):
-        print("Invalid Combine Archive")
-    else:
-        print("Num Entries: {0}".format(co_archive.getNumEntries()))
-        for i in range(co_archive.getNumEntries()):
-            entries.append(co_archive.getEntry(i))
-    """
-
-    # run the archive as celery task (asynchronous)
-    # result = execute_omex.delay(archive_id)
-
-    result = ExecuteOMEX.delay_or_fail(
-        archive_id=archive_id
-    )
-    # print("Task:", result)
+    # json tree data
+    import json
+    tree_data = [
+        {"id": "ajson1", "parent": "#", "text": "Simple root node", "state": {"opened": True, "selected": True}},
+        {"id": "ajson2", "parent": "#", "text": "Root node 2", "state": {"opened": True}},
+        {"id": "ajson3", "parent": "ajson2", "text": "Child 1"},
+        {"id": "ajson4", "parent": "ajson2", "text": "Child 2", "icon": "fa fa-play"}
+    ]
+    tree_data_json = json.dumps(tree_data)
 
 
 
-
-    # provide the info to the view
-    context = RequestContext(request, {
+    # view context
+    context = {
         'archive': archive,
+        'omex': omex,
         'entries': entries,
-        'task_id': result.task_id,
-    })
+        'tree_data_json': tree_data_json,
+        'task': task,
+        'task_result': task_result,
+    }
 
-    return render_to_response('combine/archive.html', context)
+    return render(request, 'combine/archive.html', context)
 
 
-def results(request, archive_id, task_id):
+def archive_next(request, archive_id):
+    """ Returns single archive view of next archive.
+    Displays the content of the archive.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    next_archive = Archive.objects.filter(pk__gt=archive_id).order_by('pk')[0:1]
+    if len(next_archive) == 1:
+        pk = next_archive[0].pk
+    else:
+        pk = archive_id
+
+    full_url = request.build_absolute_uri('?')
+    print(full_url)
+    print('request:',  request)
+    referer = request.META.get('HTTP_REFERER')
+    if referer.endswith('results'):
+        return redirect('combine:results', pk)
+    else:
+        return redirect('combine:archive', pk)
+
+
+def archive_previous(request, archive_id):
+    """ Returns single archive view of previous archive.
+    Displays the content of the archive.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    prev_archive = Archive.objects.filter(pk__lt=archive_id).order_by('-pk')[0:1]
+    if len(prev_archive) == 1:
+        pk = prev_archive[0].pk
+    else:
+        pk = archive_id
+
+    referer = request.META.get('HTTP_REFERER')
+    if referer.endswith('results'):
+        return redirect('combine:results', pk)
+    else:
+        return redirect('combine:archive', pk)
+
+
+def archive_entry(request, archive_id, entry_index):
+    """ Display an entry in the archive.
+
+
+    :param request:
+    :param archive_id:
+    :param entry_id:
+    :return:
+    """
+    try:
+        entry_index = int(entry_index)
+        archive = get_object_or_404(Archive, pk=archive_id)
+        content = archive.get_entry_content(entry_index)
+    except (UnicodeDecodeError, TypeError):
+        content = None
+
+    print('*' * 80)
+    print('CONTENT: archive_id <{}>, entry_index <{}>'.format(archive_id, entry_index))
+    print('*' * 80)
+    print(content)
+    print('*' * 80)
+
+    context = {
+
+    }
+
+    from django.http import FileResponse
+    with NamedTemporaryFile(mode='w+b') as f:
+
+        archive.extract_entry(entry_index, f.name)
+        response = FileResponse(open(f.name, 'rb'))
+
+    return response
+    # return redirect('combine:archive', archive_id)
+
+
+
+
+def check_state(request, archive_id):
+    """ A view to report the progress of the archive to the user. """
+    if request.is_ajax():
+        if 'task_id' in request.POST.keys() and request.POST['task_id']:
+            task_id = request.POST['task_id']
+            task = AsyncResult(task_id)
+            data = {
+                'status': task.status
+            }
+        else:
+            data = {
+                'status': 'No task_id in the request'
+            }
+    else:
+        data = {
+            'status': 'This is not an ajax request'
+        }
+
+    return JsonResponse(data)
+
+
+def results(request, archive_id):
     """ View is called when results are ready.
 
     :param request:
@@ -94,30 +252,34 @@ def results(request, archive_id, task_id):
     """
     archive = get_object_or_404(Archive, pk=archive_id)
 
-    task = AsyncResult(task_id)
-    data = {
-        'result': task.result,
-        'state': task.state,
-    }
+    # no task for the archive, so no results
+    if not archive.task_id:
+        return redirect('combine:archive', archive_id)
 
-    # Now create the plots with the given results
-    # The outputs are needed from sedml document
+    task = AsyncResult(archive.task_id)
+    if task.status != "SUCCESS":
+        print("Task was not successful:", archive.task_id)
+        return redirect('combine:archive', archive_id)
 
+    task_result = TaskResult.objects.filter(task_id=archive.task_id)
     path = str(archive.file.path)
-    omex = tecombine.OpenCombine(path)
-    entries = omex.listContents()
+    omex, entries = archive.get_entries()
 
-    from tellurium.sedml.tesedml import SEDMLTools
+    omex = tellurium.tecombine.OpenCombine(path)
 
+    # Create the plots with the given results
+    # The outputs are needed from sedml document
     outputs = []
 
-    import libsedml
     dgs_json = task.result["dgs"]
-    for sedmlFile, dgs_dict in dgs_json.iteritems():
+    for sedmlFile, dgs_dict in iteritems(dgs_json):
 
-        print(sedmlFile)
-        sedmlStr = omex.getSEDML(sedmlFile)
-        doc = libsedml.readSedMLFromString(sedmlStr)
+        # python 3
+        sedmlStr = omex.getSEDML(sedmlFile).decode('UTF-8')
+        doc = libsedml.readSedMLFromString(str(sedmlStr))
+
+        # check that valid
+        sedml_str = libsedml.writeSedMLToString(doc)
 
         # Stores all the html & js information for the outputs
         # necessary to handle the JS separately
@@ -163,21 +325,126 @@ def results(request, archive_id, task_id):
         # FIXME: Only processes the first file, than breaks
         break
 
-
     # provide the info to the view
-    context = RequestContext(request, {
+    context = {
         'archive': archive,
-        'task_id': task_id,
+        'entries': entries,
+        'omex': omex,
+        'task': task,
+        'task_result': task_result,
+
         'doc': doc,
         'outputs': outputs,
         'reports': reports,
         'plot2Ds': plot2Ds,
         'plot3Ds': plot3Ds,
-    })
+    }
 
-    return render_to_response('combine/results.html', context)
+    return render(request, 'combine/results.html', context)
 
 
+def run_archive(request, archive_id):
+    """ Executes the given archive.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    create_task = False
+
+    archive = get_object_or_404(Archive, pk=archive_id)
+    if archive.task_id:
+        result = AsyncResult(archive.task_id)
+        # Create new task and run again.
+        if result.status in ["FAILURE", "SUCCESS"]:
+            create_task = True
+
+    else:
+        # no execution yet
+        create_task = True
+
+    if create_task:
+        # add.delay(4, 4)
+        print('* creating new task')
+        result = execute_omex.delay(archive_id=archive_id)
+        archive.task_id = result.task_id
+        archive.save()
+
+    return redirect('combine:archive', archive_id)
+
+
+
+
+def upload_view(request, form):
+    context = {
+        'form': form,
+    }
+    return render(request, 'combine/archive_upload.html', context)
+
+
+def upload(request):
+    """ Upload file view.
+
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        form = UploadArchiveForm(request.POST, request.FILES)
+        if form.is_valid():
+            name = request.FILES['file']
+            new_archive = Archive(name=name, file=request.FILES['file'])
+            # FIXME: hash
+            # new_archive.md5 = hash_for_file(name, hash_type='MD5')
+            new_archive.md5 = 'None'
+            new_archive.full_clean()
+            new_archive.save()
+            return archive_view(request, new_archive.id)
+        else:
+            print('Form is invalid')
+    else:
+        form = UploadArchiveForm()
+
+    return upload_view(request, form)
+
+
+######################
+# TASK RESULTS
+######################
+@login_required
+def taskresults(request):
+    """ View the task results.
+
+    :param request:
+    :return:
+    """
+    taskresults = TaskResult.objects.all()
+    context = {
+        'taskresults': taskresults,
+    }
+    return render(request, 'combine/taskresults.html', context)
+
+
+def taskresult(request, taskresult_id):
+    """ Single taskresult view.
+
+    :param request:
+    :param taskresult_id:
+    :return:
+    """
+    taskresult = get_object_or_404(TaskResult, pk=taskresult_id)
+    archives = Archive.objects.filter(task_id=taskresult.task_id)
+
+    context = {
+        'taskresult': taskresult,
+        'archives': archives,
+    }
+
+    return render(request, 'combine/taskresult.html', context)
+
+
+######################
+# OUTPUTS
+######################
 def create_report(sed_doc, output, dgs_dict):
     """ Create the report from output
 
@@ -186,10 +453,6 @@ def create_report(sed_doc, output, dgs_dict):
     :return:
     """
     output_id = output.getId()
-    from libsedml import SedOutput
-    import pandas
-    import numpy as np
-
 
     headers = []
     dgIds = []
@@ -281,7 +544,7 @@ def create_plot2D(sed_doc, output, dgs_dict):
         # create the traces from curve data
         x = dgs_dict[xId]
         y = dgs_dict[yId]
-        # TODO: create all the repeats from the data
+
         Nrepeats = len(x[0])
         for k in range(Nrepeats):
             trace_id = "{}_{}".format(curve_id, k)
@@ -290,6 +553,10 @@ def create_plot2D(sed_doc, output, dgs_dict):
             x_tr = [sublist[k] for sublist in x]  # flatten
             y_tr = [sublist[k] for sublist in y]  # flatten
 
+            # This should never happen, but fixes NaN issues
+            x_tr = [x if not np.isnan(x) else 0 for x in x_tr]
+            y_tr = [y if not np.isnan(y) else 0 for y in y_tr]
+
             # one data point ('lines+markers')
             if len(x_tr) == 1:
                 mode = "markers"
@@ -297,16 +564,17 @@ def create_plot2D(sed_doc, output, dgs_dict):
                 mode = "lines"
 
             name = "{}[{}]".format(yLabel, k)
+
             js += """
-                var {} = {{
-                    x: {},
-                    y: {},
-                    mode: '{}',
-                    name: '{}',
-                    marker: {{
-                        color: '{}'
-                    }}
-                }};\n
+    var {} = {{
+        x: {},
+        y: {},
+        mode: '{}',
+        name: '{}',
+        marker: {{
+            color: '{}'
+        }}
+    }};
                 """.format(trace_id, x_tr, y_tr, mode,
                            name, color)
 
@@ -322,7 +590,9 @@ def create_plot2D(sed_doc, output, dgs_dict):
 
     # register traces
     data_ids = ", ".join(trace_ids)
-    js += "var data = [{}];\n".format(data_ids)
+    js += """
+    var data = [{}];
+    """.format(data_ids)
 
     # register layout
     # TODO: check the oneXLable
@@ -350,77 +620,5 @@ def create_plot3D(sed_doc, output, dgs_dict):
     :return:
     """
     # TODO: analoque to the plot2D
+
     return None
-
-
-def check_state(request, archive_id):
-    """ A view to report the progress of the archive to the user. """
-    if request.is_ajax():
-        if 'task_id' in request.POST.keys() and request.POST['task_id']:
-            task_id = request.POST['task_id']
-            task = AsyncResult(task_id)
-            data = {
-                'result': task.result,
-                'state': task.state,
-            }
-        else:
-            data = {
-                'state': 'No task_id in the request'
-            }
-
-    else:
-        data = {
-            'state': 'This is not an ajax request'
-        }
-
-    return JsonResponse(data)
-
-
-def get_commit():
-    """ Get the current commit of the repository.
-    Only works in the context of a git repository.
-    Careful it returns the value of the current folder.
-    Returns None if the commit cannot be resolved.
-    :return:
-    """
-    import subprocess
-    try:
-        commit = subprocess.check_output(["git", "describe", "--always"])
-        commit = commit.strip()
-        return commit
-    except Exception:
-        return None
-
-def about(request):
-    """ About page. """
-    commit = get_commit()
-    context = {
-        'commit': commit
-    }
-
-    return render(request, 'combine/about.html', context)
-
-
-def upload(request):
-    """ Upload file view.
-
-    :param request:
-    :return:
-    """
-    if request.method == 'POST':
-        form = UploadArchiveForm(request.POST, request.FILES)
-        if form.is_valid():
-            name = request.FILES['file']
-            new_archive = Archive(name=name, file=request.FILES['file'])
-            new_archive.full_clean()
-            new_archive.save()
-
-            return index(request, form)
-        else:
-            print('Form is invalid')
-    else:
-        form = UploadArchiveForm()
-
-    return index(request, form)
-
-

@@ -14,8 +14,6 @@ useful when you already have some data in the DB.
 
 http://eli.thegreenplace.net/2014/02/15/programmatically-populating-a-django-database
 """
-
-from __future__ import print_function, absolute_import
 import os
 import sys
 
@@ -45,13 +43,15 @@ def add_archives_to_database():
     :return:
     """
     # list files
-    files = []
-    for f in os.listdir(ARCHIVE_DIR):
-        path = os.path.join(ARCHIVE_DIR, f)
-        if os.path.isfile(path) and path.endswith('.omex'):
-            files.append(path)
+    omex_files = []
 
-    for f in sorted(files):
+    for subdir, dirs, files in os.walk(ARCHIVE_DIR):
+        for file in files:
+            path = os.path.join(subdir, file)
+            if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
+                omex_files.append(path)
+
+    for f in sorted(omex_files):
         print(f)
         name = os.path.basename(f)
         django_file = File(open(f, 'rb'))

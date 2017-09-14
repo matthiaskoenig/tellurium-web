@@ -1,0 +1,13 @@
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+        var table = $('#entries').DataTable({
+            "pageLength": 10,
+            "drawCallback": function() {
+                $('[data-toggle="popover"]').popover();
+            }
+        });
+
+
+    });
+</script>
+

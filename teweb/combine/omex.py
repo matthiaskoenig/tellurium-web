@@ -2,36 +2,70 @@
 Helper functions to work with combine archives
 and omex files.
 """
-from __future__ import print_function, division
-import os
-from models import Archive
 import libcombine
+import importlib
+importlib.reload(libcombine)
 
 
-def printMetaDataFor(co_archive, location):
+def short_format(format):
+    """ Returns short format string for given full format string.
+
+    :param format:
+    :return:
+    """
+    tokens = format.split("/")
+    short = tokens[-1].split('.')[0]
+    short = short.replace('+xml', '')
+    return short
+
+def metadata_for_location(co_archive, location):
+    """ Returns the metadata for given location.
+
+        :param co_archive:
+        :param location:
+        :return:
+        """
+
+    desc = co_archive.getMetadataForLocation(location)  # type: libcombine.OmexDescription
+    if desc.isEmpty():
+        return None
+
+    info = dict()  # type: dict
+    info['about'] = desc.getAbout()
+    info['description'] = desc.getDescription()
+    info['created'] = desc.getCreated().getDateAsString()
+    info['creators'] = []
+    info['modified'] = []
+
+    for i in range(desc.getNumModified()):
+        modified = desc.getModified(i).getDateAsString()
+        info['modified'].append(modified)
+
+    for i in range(desc.getNumCreators()):
+        vcard = desc.getCreator(i)  # type: libcombine.VCard
+        info['creators'].append(
+            {
+                'givenName': vcard.getGivenName(),
+                'familyName': vcard.getFamilyName(),
+                'email': vcard.getEmail(),
+                'organisation': vcard.getOrganization()
+             }
+        )
+    return info
+
+
+def print_metadata(co_archive, location):
     """ Print metadata.
 
     :param co_archive:
     :param location:
     :return:
     """
-    desc = co_archive.getMetadataForLocation(location)
-    if desc.isEmpty():
-        print("no metadata for '{0}'".format(location))
-        return
-
-    print("metadata for '{0}':".format(location))
-    print("\tCreated : {0}".format(desc.getCreated().getDateAsString()))
-    for i in range(desc.getNumModified()):
-        print("\tModified : {0}".format(desc.getModified(i).getDateAsString()))
-
-    print("\tCreators: {0}".format(desc.getNumCreators()))
-    for i in range(desc.getNumCreators()):
-        creator = desc.getCreator(i)
-        print("\t\t{0} {1}".format(creator.getGivenName(), creator.getFamilyName()))
+    info = metadata_for_location(co_archive=co_archive, location=location)
+    print(info)
 
 
-def printArchive(fileName):
+def print_archive(fileName):
     """ Print the content of the archive.
 
     :param fileName:
@@ -52,7 +86,7 @@ def printArchive(fileName):
         print('entry: <{}>'.format(i), entry)
 
         print(" {0}: location: {1} format: {2}".format(i, entry.getLocation(), entry.getFormat()))
-        printMetaDataFor(archive, entry.getLocation())
+        print_metadata(archive, entry.getLocation())
 
         # the entry could now be extracted via
         # archive.extractEntry(entry.getLocation(), <filename or folder>)
@@ -63,45 +97,7 @@ def printArchive(fileName):
     archive.cleanUp()
 
 
-def getEntries(fileName):
-    """ Get entries from archive.
-
-    :param fileName:
-    :type fileName:
-    :return:
-    :rtype:
-    """
-    entries = []
-
-    archive = libcombine.CombineArchive()
-    if not archive.initializeFromArchive(str(fileName)):
-        print("Invalid Combine Archive")
-        return entries
-
-    printMetaDataFor(archive, ".")
-    print("Num Entries: {0}".format(archive.getNumEntries()))
-
-    for i in range(archive.getNumEntries()):
-        entries.append(archive.getEntry(i))
-    return entries
-
-
 def get_content(archive):
     path = archive.file.path
     print(path)
-    printArchive(fileName=path)
-
-
-
-if __name__ == "__main__":
-
-    import django
-    django.setup()
-
-    archive = Archive.objects.get(pk=10)
-    print(archive)
-    get_content(archive)
-
-
-
-
+    print_archive(fileName=path)

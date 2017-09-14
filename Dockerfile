@@ -4,27 +4,16 @@
 # Dockerfile for running the webapp in a container.
 # The container can be build and run via:
 #
-#       docker build -t matthiaskoenig/teweb . && docker run -it -p 8000:8000 matthiaskoenig/teweb
+#       docker build -t matthiaskoenig/teweb . && docker run -it -p 1234:8000 matthiaskoenig/teweb
 #
 ##############################################################################
-FROM matthiaskoenig/linux-setup-combine:latest
+FROM python:3.5
 MAINTAINER Matthias Koenig <konigmatt@googlemail.com>
 
 WORKDIR /usr/src/app
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
 COPY . .
+RUN pip install -r requirements.txt
 
-# Install latest tellurium
-# WORKDIR $HOME
-# RUN git clone https://github.com/sys-bio/tellurium
-# WORKDIR $HOME/tellurium
-# RUN git checkout mkoenig
-# RUN python setup.py install
-
-RUN pip install git+https://github.com/sys-bio/tellurium.git@mkoenig
-
-# Run tests
 WORKDIR /usr/src/app/teweb
 RUN python manage.py test
 

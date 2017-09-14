@@ -4,17 +4,28 @@ from . import views
 
 app_name = 'combine'
 urlpatterns = [
-    # ex: /combine/
-    url(r'^$', views.index, name='index'),
-    # ex: /combine/5/
-    url(r'^(?P<archive_id>[0-9]+)/$', views.archive, name='archive'),
-    # ex: /combine/upload
+
+    url(r'^$', views.archives, name='index'),
+    url(r'^(?P<archive_id>[0-9]+)/$', views.archive_view, name='archive'),
+    url(r'^(?P<archive_id>[0-9]+)/previous$', views.archive_previous, name='archive_previous'),
+    url(r'^(?P<archive_id>[0-9]+)/next$', views.archive_next, name='archive_next'),
+    url(r'^(?P<archive_id>[0-9]+)/results$', views.results, name='results'),
+    url(r'^(?P<archive_id>[0-9]+)/run$', views.run_archive, name='run_archive'),
+
+    url(r'^(?P<archive_id>[0-9]+)/(?P<entry_index>[0-9]+)$', views.archive_entry, name='archive_entry'),
+
     url(r'^upload$', views.upload, name='upload'),
-    # /combine/5/check_state
-    url(r'^(?P<archive_id>[0-9]+)/check_state$', views.check_state, name='check_state'),
-    # /combine/5/aeeae648-25ec-49f2-a7ef-4285ad960276
-    url(r'^(?P<archive_id>[0-9]+)/(?P<task_id>.+)$', views.results, name='results'),
+    url(r'^runall$', views.runall, name='runall'),
+
+    url(r'^taskresults$', views.taskresults, name='taskresults'),
+    url(r'^taskresults/(?P<taskresult_id>[0-9]+)/$', views.taskresult, name='taskresult'),
 
     # ex: /combine/about
     url(r'^about$', views.about, name='about'),
+
+    url(r'^test$', views.test_view, name='test_view'),
+
+    # ajax check
+    # /combine/5/check_state
+    # url(r'^(?P<archive_id>[0-9]+)/check_state$', views.check_state, name='check_state'),
 ]

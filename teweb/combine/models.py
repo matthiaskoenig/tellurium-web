@@ -1,27 +1,18 @@
 """
 Models.
 """
-# TODO: implement tags for the archives
-# TODO: implement user/example field
-# TODO: md5 value on save
-
-from __future__ import absolute_import, print_function, unicode_literals
-
 import hashlib
 
 from django.db import models
 from django.utils import timezone
-
-
-# TODO: executed file for download, i.e. archive after execution
-# TODO: validation
-# TODO: MD5 Hash
-# TODO: Filesize {{ value|filesizeformat }}
-# TODO: add tags for description
-
 from django.core.validators import ValidationError
-# import libcombine
-# from tellurium import tecombine
+
+
+import libcombine
+from .omex import metadata_for_location, short_format
+
+from celery.result import AsyncResult
+
 
 # ===============================================================================
 # Utility functions for models
@@ -98,6 +89,7 @@ class Archive(models.Model):
     file = models.FileField(upload_to='archives', validators=[validate_omex])
     created = models.DateTimeField('date published', editable=False)
     md5 = models.CharField(max_length=36)
+    task_id = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.name
@@ -109,17 +101,105 @@ class Archive(models.Model):
 
         if not self.md5:
             # the file is uploaded at this point
-            file_path = str(self.file.path)
-            self.md5 = hash_for_file(file_path, hash_type='MD5')
+            # file_path = str(self.file.path)
+            self.md5 = hash_for_file(self.file, hash_type='MD5')
 
             # check via hash if the archive is already existing
             # not really necessary, we allow for duplicate archives
 
         return super(Archive, self).save(*args, **kwargs)
 
+    @property
+    def status(self):
+        if self.task_id:
+            result = AsyncResult(self.task_id)
+            return result.status
+        else:
+            return None
 
+    def get_entries(self):
+        """ Get entries and omex object from given archive.
+
+        :param archive:
+        :return:
+        """
+        path = str(self.file.path)
+
+        # read combine archive contents & metadata
+        omex = libcombine.CombineArchive()
+        print(path)
+        if omex.initializeFromArchive(path) is None:
+            print("Invalid Combine Archive")
+            return None
+
+        entries = []
+        for i in range(omex.getNumEntries()):
+
+            entry = omex.getEntry(i)
+
+            # ! hardcopy the required information so archive can be closed again.
+            info = {}
+            location = entry.getLocation()
+            info['location'] = location
+
+            format = entry.getFormat()
+            info['format'] = format
+            info['short_format'] = short_format(format)
+
+
+            master = entry.getMaster()
+            info['master'] = master
+
+            # printMetaDataFor(omex, location=location)
+            metadata = metadata_for_location(omex, location=location)
+
+            info['metadata'] = metadata
+            entries.append(info)
+
+
+            # the entry could now be extracted via
+            # archive.extractEntry(entry.getLocation(), <filename or folder>)
+
+            # or used as string
+            # content = archive.extractEntryToString(entry.getLocation());
+
+        omex.cleanUp()
+
+        return omex, entries
+
+    def extract_entry(self, index, filename):
+        path = str(self.file.path)
+
+        # read combine archive contents & metadata
+        omex = libcombine.CombineArchive()
+        print(path)
+        if omex.initializeFromArchive(path) is None:
+            print("Invalid Combine Archive")
+            return None
+
+        entry = omex.getEntry(index)
+        omex.extractEntry(entry.getLocation(), filename)
+
+        omex.cleanUp()
+
+
+
+    def get_entry_content(self, index):
+        path = str(self.file.path)
+
+        # read combine archive contents & metadata
+        omex = libcombine.CombineArchive()
+        print(path)
+        if omex.initializeFromArchive(path) is None:
+            print("Invalid Combine Archive")
+            return None
+        entry = omex.getEntry(index)
+        content = omex.extractEntryToString(entry.getLocation())
+
+        omex.cleanUp()
+        return content
 
 # ===============================================================================
 # Tag
 # ===============================================================================
-
+# TODO: implement

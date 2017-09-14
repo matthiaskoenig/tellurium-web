@@ -1,72 +1,68 @@
-{% extends "combine/base_generic.html" %}
+{% extends "combine/base.html" %}
 
 {% block content %}
 <div class="row">
     <div class="col-lg-12">
-    <h1>About</h1>
-        Tellurium Web Tools provide a simple means for the execution of CombineArchives.
-    </p>
-    <p>
-        The tellurium Web Tools allow to execute CombineArchives with model definition in SBML and simulation
-        definitions
-        in SED-ML.
-    </p>
-    <p>
-        For more information about the Simulation Experiment Markup Language see the SED-ML Website.
-        For more information about the Systems Biology Markup Language see the SBML-Webseite
-    </p>
+        <h1><img style="height:50px" src="{{ static('combine/images/logos/te-web.png') }}"> About Tellurium Web</h1>
+        Tellurium Web provides an online solution for the execution of CombineArchives.
+        </p>
 
-    <b>version</b>: <a href="https://github.com/matthiaskoenig/tellurium-web/commit/{{ commit }}" title="Source code on github" target="_blank">
+        <h2>Features</h2>
+        The current version is <a href="https://github.com/matthiaskoenig/tellurium-web/commit/{{ commit }}"
+                                  title="Source code on github" target="_blank">
         <span class="fa fa-github fa-fw black"></span><code>{{ commit }}</code></a><br/>
-    <p>
-    <h2>Features</h2>
-    <p>
-        Currently, CombineArchives with model descriptions in <a href="http://sbml.org">SBML</a> and simulation
-        descriptions
-        in <a href="http://sbml.org">SED-ML</a> are supported.
-    </p>
-    <h2>Support</h2>
-    <table class="table table-striped table-condensed table-hover">
-        <!--
-        <tr><td><a href="https://groups.google.com/forum/#!forum/cysbml-cyfluxviz"><span class="fa fa-users fa-2x fa-fw black"></span></a></td>
-            <td><b>Forum</b></td>
-            <td><a href="https://groups.google.com/forum/#!forum/cysbml-cyfluxviz">https://groups.google.com/forum/#!forum/cysbml-cyfluxviz</a></td>
-        </tr>
-        -->
-        <tr>
-            <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues"><span
-                    class="fa fa-fire fa-fw black"></span></a></td>
-            <td><b>Bug Tracker</b></td>
-            <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues">https://github.com/matthiaskoenig/tellurium-web/issues</a>
-            </td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/matthiaskoenig/tellurium-web"><span class="fa fa-github fa-fw black"></span></a>
-            </td>
-            <td><b>Source code</b></td>
-            <td><a href="https://github.com/matthiaskoenig/tellurium-web">https://github.com/matthiaskoenig/tellurium-web</a>
-            </td>
-        </tr>
-        <tr>
-            <td><a href="mailto:konigmatt@googlemail.com"><span class="fa fa-envelope fa-fw black"></span></a></td>
-            <td><b>Email</b></td>
-            <td><a href="mailto:konigmatt@googlemail.com">konigmatt@googlemail.com</a></td>
-        </tr>
-    </table>
+        <p>
+        <ul>
+            <li>model descriptions in <a href="http://sbml.org">SBML</a></li>
+            <li>simulation descriptions in <a href="http://sbml.org">SED-ML</a></li>
+        </ul>
+        </p>
 
-    <h2>Disclaimer</h2>
-    <p>
-    This is an early alpha release version (<a href="https://github.com/matthiaskoenig/tellurium-web/commit/{{ commit }}" title="Source code on github" target="_blank"><span class="fa fa-github fa-fw black"></span><code>{{ commit }}</code></a>).<br />
-    We follow the philosophy of "release early and release often".
-    </p>
-    <p>
-    <a href="https://travis-ci.org/matthiaskoenig/tellurium-web"><img src="https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=master"></img></a>
-    </p>
+        <h2>Support</h2>
+        For more information refer to the github repository
 
-    <p>
-    To be able to improve this service we store archives which result in errors and problems for debugging.
-    The stored archives are only used for error analysis and are deleted as soon as the error is fixed.
-    </p>
+        <table class="table table-striped table-condensed table-hover">
+            <tr>
+                <td><a href="https://github.com/matthiaskoenig/tellurium-web"><span
+                        class="fa fa-github fa-fw black"></span></a></td>
+                <td><b>Repository</b></td>
+                <td><a href="https://github.com/matthiaskoenig/tellurium-web">https://github.com/matthiaskoenig/tellurium-web</a>
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues"><span
+                        class="fa fa-fire fa-fw black"></span></a></td>
+                <td><b>Bug Tracker</b></td>
+                <td><a href="https://github.com/matthiaskoenig/tellurium-web/issues">https://github.com/matthiaskoenig/tellurium-web/issues</a>
+                </td>
+            </tr>
+            <tr>
+                <td><a href="mailto:konigmatt@googlemail.com"><span class="fa fa-envelope fa-fw black"></span></a></td>
+                <td><b>Email</b></td>
+                <td><a href="mailto:konigmatt@googlemail.com">konigmatt@googlemail.com</a></td>
+            </tr>
+        </table>
+
+        <h2>Acknowledgement</h2>
+        Tellurium Web is build on existing technology and standard, e.g., </p>
+        <p>
+            <a href="http://co.mbine.org/" alt="COMBINE" target="_blank"><img
+                    src="{{ static('combine/images/logos/combine.png') }}" height="25"></a>&nbsp;&nbsp;
+            <a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img
+                    src="{{ static('combine/images/logos/omex.png') }}" height="25"></a>&nbsp;&nbsp;
+            <a href="http://sbml.org" alt="SBML" target="_blank"><img
+                    src="{{ static('combine/images/logos/sbml.png') }}"
+                    height="25"></a>&nbsp;&nbsp;
+            <a href="http://sed-ml.org" alt="SED-ML" target="_blank"><img
+                    src="{{ static('combine/images/logos/sedml.png') }}"
+                    height="25"></a>&nbsp;&nbsp;
+            <a href="http://libroadrunner.org/" alt="libroadrunner" target="_blank"><img
+                    src="{{ static('combine/images/logos/libroadrunner.jpg') }}" height="25"></a>&nbsp;&nbsp;
+            <a href="http://tellurium.analogmachine.org/" alt="Tellurium" target="_blank"><img
+                    src="{{ static('combine/images/logos/te.png') }}" height="25"></a>&nbsp;&nbsp;
+            <a href="http://antimony.sourceforge.net//" alt="Antimony" target="_blank"><img
+                    src="{{ static('combine/images/logos/antimony.png') }}" height="25"></a>&nbsp;&nbsp;
+        </p>
     </div>
 </div>
 

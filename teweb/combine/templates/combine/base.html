@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Tellurium Web Tools">
+    <meta name="author" content="Matthias Koenig">
+    <link rel="shortcut icon" href="{{ static('combine/images/favicon.ico') }}" type="image/x-icon">
+    <title>Tellurium Web</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ static('combine/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('combine/js/datatables.min.css') }}"/>
+    <link rel="stylesheet" type="text/css" href="{{ static('combine/font-awesome-4.7.0/css/font-awesome.min.css') }}"/>
+    <link rel="stylesheet" type="text/css" href="{{ static('combine/css/combine.css') }}"/>
+
+    <!-- scripts -->
+    <script src="{{ static('combine/js/jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ static('combine/js/tether-1.4.0.min.js') }}"></script>
+    <script src="{{ static('combine/js/bootstrap-3.3.7.min.js') }}"></script>
+    <script src="{{ static('combine/js/datatables-1.10.16.min.js') }}"></script>
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+<nav class="navbar navbar-default navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url('combine:index') }}"><img style="height:25px"
+                                                                             src="{{ static('combine/images/logos/te-web.png') }}" title="Tellurium Web"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="{{ url('combine:index') }}" title="Tellurium Web"><b>Tellurium Web</b></a></li>
+                <li><a href="{{ url('combine:index') }}" title="Overview Combine Archives"><i class="fa fa-archive fa-fw"></i> Archives</a></li>
+                <li><a href="{{ url('combine:upload') }}" title="Upload Combine Archive"><i class="fa fa-upload fa-fw"></i> Upload</a></li>
+                {% if request.user.is_authenticated %}
+                    <li><a href="{{ url('combine:taskresults') }}" title="Overview TaskResults"><i class="fa fa-server fa-fw"></i> TaskResults</a></li>
+                    <li><a href="{{ url('combine:runall') }}" title="Run All Combine Archives"><i class="fa fa-play-circle fa-fw"></i> Run All</a></li>
+                {% endif %}
+                <li><a href="{{ url('combine:about') }}" title="About Tellurium Web"><i class="fa fa-info fa-fw"></i> About</a></li>
+            </ul>
+
+
+             <ul class="nav navbar-nav navbar-right">
+                {% if request.user.is_authenticated %}
+                    <li class="dropdown">
+                        <a data-toggle="dropdown" role="button" aria-expanded="false"><i
+                                class="fa fa-user fa-fw"></i> {{ request.user.get_username() }} <span
+                                class="caret" title="User Information"></span> </a>
+                        <ul class="dropdown-menu" role="menu">
+
+                            <li><a href="{{ url('logout') }}?next={{ request.path }}"> <i class="fa fa-sign-out fa-fw"> </i> Logout</a></li>
+                        </ul>
+                    </li>
+                   <li><a href="{{ url('admin:index') }}" title="Admin Interface" target="_blank"><i class="fa fa-cog fa-fw"></i> Admin</a></li>
+                {% else %}
+                    <li><a href="{{ url('login') }}?next={{ request.path }}"><i
+                            class="fa fa-sign-in fa-fw"></i> Login</a></li>
+                {% endif %}
+
+                 <li><a href="https://github.com/matthiaskoenig/tellurium-web" title="Source code on github" target="_blank">
+                     <i class="fa fa-github fa-fw"></i> Github Repository</a></li>
+
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+
+<div id="wrapper">
+    <div id="page-wrapper">
+        <div class="container-fluid">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+
+
+{% block javascript %}{% endblock %}
+
+</body>
+</html>
+
+

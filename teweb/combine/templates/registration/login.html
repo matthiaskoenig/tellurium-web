@@ -1,0 +1,20 @@
+{% extends "combine/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+  <h1><i class="fa fa-sign-in fa-fw"></i> Login</h1>
+    <div class="form-group row">
+        <form method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {# {% csrf_token %} #}
+
+         {{ form.as_p()}}
+          <button name="submit_button" type="submit">Login</button>
+        </form>
+    </div>
+    </div>
+</div>
+{% endblock %}
