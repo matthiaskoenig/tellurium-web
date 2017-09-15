@@ -3,15 +3,17 @@
         <div class="panel-heading">
 
             <h2 class="panel-title">
+                <i class="fa fa-archive fa-fw"></i>
+                <a href="{{ url('combine:archive', args=[archive.id]) }}">
+                    <span class="label label-primary">{{ archive }}</span></a>
+                <a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive"><i class="fa fa-download fa-fw"></i></a>
+
+                <span class="pull-right">
                 <a href="{{ url('combine:archive_previous', args=[archive.id]) }}"
                    title="Previous archive"><span class="btn-xs btn-primary"><i class="fa fa-arrow-circle-o-left fa-fw"></i></span></a>
                 <a href="{{ url('combine:archive_next', args=[archive.id]) }}"
                    title="Next archive"><span class="btn-xs btn-primary"><i class="fa fa-arrow-circle-o-right fa-fw"></i></span></a>
-
-                <i class="fa fa-archive fa-fw"></i>
-                <a href="{{ url('combine:archive', args=[archive.id]) }}">
-                    <span class="label label-primary"><span class="badge">{{ archive.id }}</span> {{ archive }}</span></a>
-                (<a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive"><i class="fa fa-download fa-fw"></i></a>)
+                </span>
             </h2>
 
         </div>
@@ -92,7 +94,7 @@
                 <p>No entries in archive metadata.</p>
             {% endif %}
 
-            <span class="label label-default" title="ZIP Content">{{ archive.name }}</span>
+            <span class="label label-primary" title="ZIP Content">zip content</span>
             <div id="json_tree"></div>
             <script>
                 $(function () {

@@ -26,10 +26,10 @@
                     </tr>
                     </thead>
                     <tr>
-                    <td>{{ tr.id }}</td>
+                        <td><span class="badge">{{ tr.id }}</span></td>
                     <td>{% if archives %}
                         {%  for archive in archives %}
-                            <a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a>
+                            <a href="{{ url('combine:archive', args=[archive.id]) }}"><span class="label label-primary">{{ archive.name }}</span></a>
                         {% endfor %}
                         {% endif %}
                     </td>
