@@ -39,7 +39,7 @@
                             {% endif %}
                             </td>
                             <td>
-                                {% if entry.base_format in ['cellml', 'sed-ml', 'sbml', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'] %}
+                                {% if entry.base_format in ['cellml', 'sed-ml', 'sbml', 'numl', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'] %}
                                     <img height=20 title="{{ entry.format }}"
                                          src="{{ static('combine/images/mediatype/')}}{{ entry.base_format }}.png">
                                 {% endif %}
