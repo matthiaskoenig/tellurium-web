@@ -169,12 +169,12 @@ class Archive(models.Model):
             logger.error("Invalid Combine Archive: {}", self)
             return None
 
+        # add entries
         entries = []
         for i in range(omex.getNumEntries()):
             entry = omex.getEntry(i)
             location = entry.getLocation()
             format = entry.getFormat()
-
             info = {}
             info['location'] = location
             info['format'] = format
@@ -184,6 +184,18 @@ class Archive(models.Model):
             info['metadata'] = comex.metadata_for_location(omex, location=location)
 
             entries.append(info)
+
+        # add root information
+        format = 'http://identifiers.org/combine.specifications/omex'
+        info = {
+            'location': '.',
+            'format': format,
+            'short_format': comex.short_format(format),
+            'base_format': comex.base_format(format),
+            'metadata': comex.metadata_for_location(omex, '.'),
+            'master': None
+        }
+        entries.append(info)
 
         omex.cleanUp()
         return entries
