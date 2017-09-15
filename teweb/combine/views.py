@@ -3,35 +3,29 @@ Tellurium SED-ML Tools Views
 
 Creates the HTML views of the web-interface.
 """
-
-from __future__ import print_function, absolute_import
-from django.shortcuts import render, get_object_or_404, render_to_response, redirect
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.template import RequestContext
-from django_celery_results.models import TaskResult
-from django.contrib.auth.decorators import login_required
-from django.core.files.temp import NamedTemporaryFile
-from django.urls import reverse
-from django.http import FileResponse
 import logging
-
+# FIXME: replace iteritems with py3 construct
 from six import iteritems
-
-from celery.result import AsyncResult
-from .tasks import add, execute_omex
-
-from .models import Archive, hash_for_file
-from .forms import UploadArchiveForm
-from .git import get_commit
-from . import comex
 
 import pandas
 import numpy as np
 import magic
 
+from django.shortcuts import render, get_object_or_404, render_to_response, redirect
+from django.http import HttpResponse, FileResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.core.files.temp import NamedTemporaryFile
+
+from django_celery_results.models import TaskResult
+from celery.result import AsyncResult
+from .tasks import execute_omex
+
+from .models import Archive
+from .forms import UploadArchiveForm
+from .git import get_commit
+
 import tellurium
 import libsedml
-from libsedml import SedOutput
 import libcombine
 import importlib
 importlib.reload(libcombine)
@@ -39,21 +33,24 @@ importlib.reload(libcombine)
 
 logger = logging.getLogger(__name__)
 
+
+######################
+# ABOUT
+######################
+@login_required
 def test_view(request):
     """ Test page. """
     context = {}
     return render(request, 'combine/test.html', context)
 
 
-######################
-# ABOUT
-######################
 def about(request):
     """ About page. """
     context = {
         'commit': get_commit()
     }
     return render(request, 'combine/about.html', context)
+
 
 ######################
 # ARCHIVES
@@ -62,6 +59,7 @@ def archives(request, form=None):
     """ Overview of archives.
 
     :param request:
+    :param form:
     :return:
     """
     archives = Archive.objects.all().order_by('-created')
@@ -113,7 +111,6 @@ def archive_context(archive):
         task = AsyncResult(archive.task_id)
         task_result = TaskResult.objects.filter(task_id=archive.task_id)
         if task_result and len(task_result) > 0:
-            print(task_result)
             task_result = task_result[0]
 
     context = {
@@ -205,20 +202,7 @@ def archive_next(request, archive_id):
     :param archive_id:
     :return:
     """
-    next_archive = Archive.objects.filter(pk__gt=archive_id).order_by('pk')[0:1]
-    if len(next_archive) == 1:
-        pk = next_archive[0].pk
-    else:
-        pk = archive_id
-
-    full_url = request.build_absolute_uri('?')
-    print(full_url)
-    print('request:',  request)
-    referer = request.META.get('HTTP_REFERER')
-    if referer.endswith('results'):
-        return redirect('combine:results', pk)
-    else:
-        return redirect('combine:archive', pk)
+    return archive_adjacent(request, archive_id, order='pk')
 
 
 def archive_previous(request, archive_id):
@@ -229,9 +213,23 @@ def archive_previous(request, archive_id):
     :param archive_id:
     :return:
     """
-    prev_archive = Archive.objects.filter(pk__lt=archive_id).order_by('-pk')[0:1]
-    if len(prev_archive) == 1:
-        pk = prev_archive[0].pk
+    return archive_adjacent(request, archive_id, order='-pk')
+
+
+def archive_adjacent(request, archive_id, order):
+    """ Returns adjacent archive view.
+
+    :param request:
+    :param archive_id:
+    :param order: order parameter to decide adjacent
+    :return:
+    """
+    if order.startswith("-"):
+        adj_archive = Archive.objects.filter(pk__lt=archive_id).order_by(order)[0:1]
+    else:
+        adj_archive = Archive.objects.filter(pk__gt=archive_id).order_by(order)[0:1]
+    if len(adj_archive) == 1:
+        pk = adj_archive[0].pk
     else:
         pk = archive_id
 
@@ -386,7 +384,7 @@ def results(request, archive_id):
                 plot3Ds.append(info)
 
             else:
-                print("# Unsupported output type: {}".format(output.getElementName()))
+                logging.warning("# Unsupported output type: {}".format(output.getElementName()))
 
         # FIXME: Only processes the first file, than breaks
         break
@@ -404,20 +402,20 @@ def results(request, archive_id):
 
 
 def create_report(sed_doc, output, dgs_dict):
-    """ Create the report from output
+    """ Create the report from output.
+
+    Creates a pandas DataFrame.
 
     :param output:
     :param sed_doc:
     :return:
     """
-    output_id = output.getId()
-
-    headers = []
     dgIds = []
+    headers = []
     columns = []
     for dataSet in output.getListOfDataSets():
-        # these are the columns
         headers.append(dataSet.getLabel())
+
         # data generator (the id is the id of the data in python)
         dgId = dataSet.getDataReference()
         dgIds.append(dgId)
@@ -427,13 +425,7 @@ def create_report(sed_doc, output, dgs_dict):
         data = [item for sublist in data for item in sublist]  # flatten list
         columns.append(data)
 
-    # print('header:', headers)
-    # print('columns:')
     df = pandas.DataFrame(np.column_stack(columns), columns=headers)
-    print(df.head(5))
-
-    # csv = df.to_csv()
-
     return df
 
 

@@ -105,36 +105,53 @@ class Archive(models.Model):
 
         :return: entries of the zip file
         """
-        is_dir = lambda zipinfo: zipinfo.filename.endswith('/')
-        def find_parent(name):
-            if name.endswith('/'):
-                name = name[:-1]
-            tokens = name.split("/")
+        is_dir = lambda filename: filename.endswith('/')
+
+        def find_parent(filename):
+            if filename.endswith('/'):
+                filename = filename[:-1]
+            tokens = filename.split("/")
             if len(tokens) == 1:
                 return '#'
             return '/'.join(tokens[:-1]) + '/'
 
+        def node_from_filename(filename):
+            node = {}
+            node['id'] = filename
+            node['parent'] = find_parent(filename)
+            node['text'] = filename
+            if filename.endswith('/'):
+                icon = "fa fa-folder fa-fw"
+            else:
+                icon = "fa fa-file-o fa-fw"
+            node['icon'] = icon
+            node['state'] = {'opened': True}
+            return node
+
         path = str(self.file.path)
-        tree_data = []
+        nodes = {}
         with zipfile.ZipFile(path) as zip:
             # zip.printdir()
             for zip_info in zip.infolist():
-                print(zip_info)
+                # print(zip_info)
                 # zip_info.filename
                 # zip_info.date_time
                 # zip_info.file_size
+                node = node_from_filename(zip_info.filename)
+                nodes[node['id']] = node
 
-                node = {}
-                node['id'] = zip_info.filename
-                node['parent'] = find_parent(zip_info.filename)
-                node['text'] = zip_info.filename
-                if is_dir(zip_info):
-                    icon = "fa fa-folder fa-fw"
-                else:
-                    icon = "fa fa-file-o fa-fw"
-                node['icon'] = icon
-                node['state'] = {'opened': True}
-                tree_data.append(node)
+        # directories do not have to be part of the zip file, so we have to
+        # manually add these nodes if they are missing
+        check_ids = list(nodes.keys())  # make a copy we can iterate over
+        for nid in check_ids:
+            node = nodes[nid]
+            parent_id = node['parent']
+            if parent_id not in nodes and parent_id != "#":
+                parent_node = node_from_filename(parent_id)
+                nodes[parent_id] = parent_node
+                # print("Added missing folder node:", parent_id)
+
+        tree_data = [nodes[key] for key in sorted(nodes.keys())]
 
         return json.dumps(tree_data)
 
