@@ -21,6 +21,7 @@ FILE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 # project directory
 PROJECT_DIR = os.path.join(FILE_DIR, "../teweb/")
 # directory of omex archives
+# ARCHIVE_DIR = os.path.join(FILE_DIR, "../archives/L1V3")
 ARCHIVE_DIR = os.path.join(FILE_DIR, "../archives")
 
 # This is so my local_settings.py gets loaded.
