@@ -12,6 +12,27 @@ importlib.reload(libcombine)
 def short_format(format):
     """ Returns short format string for given full format string.
 
+    http://identifiers.org/combine.specifications/omex-metadata
+    -> omex-metadata
+
+    http://identifiers.org/combine.specifications/sbml.level-3.version-1
+    -> sbml.level-3.version-1
+
+    :param format:
+    :return:
+    """
+    tokens = format.split("/")
+    return tokens[-1]
+
+def base_format(format):
+    """ Returns the base format string for given full format string.
+
+    http://identifiers.org/combine.specifications/omex-metadata
+    -> omex-metadata
+
+    http://identifiers.org/combine.specifications/sbml.level-3.version-1
+    -> sbml
+
     :param format:
     :return:
     """
@@ -19,7 +40,6 @@ def short_format(format):
     short = tokens[-1].split('.')[0]
     short = short.replace('+xml', '')
     return short
-
 
 def metadata_for_location(co_archive, location):
     """ Returns the metadata for given location.

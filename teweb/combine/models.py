@@ -162,6 +162,7 @@ class Archive(models.Model):
             info['location'] = location
             info['format'] = format
             info['short_format'] = comex.short_format(format)
+            info['base_format'] = comex.base_format(format)
             info['master'] = entry.getMaster()
             info['metadata'] = comex.metadata_for_location(omex, location=location)
 

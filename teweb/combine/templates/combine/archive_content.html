@@ -23,8 +23,9 @@
                 <table id="entries" class="table table-striped table-condensed table-hover">
                     <thead>
                     <tr>
-                        <th></th>
-                        <th></th>
+                        <th class="hidden hidden-xs"></th>
+                        <th>master</th>
+                        <th>icon</th>
                         <th>format</th>
                         <th>location</th>
                         <th class="hidden-xs">metadata</th>
@@ -32,18 +33,19 @@
                     </thead>
                     {% for entry in entries %}
                         <tr>
-                            <td><span class="badge">{{ loop.index }}</span></td>
+                            <td class="hidden hidden-xs"><span class="badge">{{ loop.index }}</span></td>
                             <td>{% if entry.master %}
                                 <i class="fa fa-star fa-fw" title="master"></i>
                             {% endif %}
                             </td>
                             <td>
-                                {% if entry.short_format in ['cellml', 'sed-ml', 'sbml', 'sbgn', 'omex-manifest'] %}
+                                {% if entry.base_format in ['cellml', 'sed-ml', 'sbml', 'sbgn', 'omex-manifest', 'omex-metadata'] %}
                                     <img height=20 title="{{ entry.format }}"
-                                         src="{{ static('combine/images/mediatype/')}}{{ entry.short_format }}.png">
-                                {% else %}
-                                    <code title="{{ entry.format }}">{{ entry.short_format }}</code>
+                                         src="{{ static('combine/images/mediatype/')}}{{ entry.base_format }}.png">
                                 {% endif %}
+                            </td>
+                            <td>
+                                <code title="{{ entry.format }}">{{ entry.short_format }}</code>
                             </td>
                             <td>
                                 {% if entry.location == './manifest.xml' %}
