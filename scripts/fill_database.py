@@ -74,6 +74,7 @@ def add_archives_to_database():
             tag, created = Tag.objects.get_or_create(name="test", type=Tag.TagType.misc)
             if created:
                 tag.save()
+            new_archive.tags.add(tag)
 
             tags_info = comex.tags_info(f)
             for tag_info in tags_info:
@@ -81,8 +82,9 @@ def add_archives_to_database():
                                                          type=tag_info['type'])
                 if created:
                     tag.save()
+                new_archive.tags.add(tag)
 
-            new_archive.tags.add(tag)
+
 
 if __name__ == "__main__":
 

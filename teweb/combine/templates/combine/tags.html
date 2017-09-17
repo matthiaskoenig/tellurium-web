@@ -18,7 +18,8 @@
                         <th>tag</th>
                         <th>type</th>
                         <th>name</th>
-                        <td>archives</td>
+                        <th>count</th>
+                        <th>archives</th>
                     </tr>
                     </thead>
 
@@ -32,6 +33,7 @@
                         </td>
                         <td>{{ tag.type }}</td>
                         <td>{{ tag.name }}</td>
+                        <td>{{ tag.archives.all()|length }}</td>
                         <td>{% if tag.archives.all() %}
                             {%  for archive in tag.archives.all() %}
                                 <a href="{{ url('combine:archive', args=[archive.id]) }}"><span class="label label-primary">{{ archive.name }}</span></a>
