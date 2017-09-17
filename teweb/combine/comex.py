@@ -37,7 +37,7 @@ def tags_info(archive_path):
         entry = omex.getEntry(i)
         format = entry.getFormat()
         location = entry.getLocation()
-        format_id = short_format(format)
+        format_id = base_format(format)
 
         if format_id in ['sbml', 'cellml', 'sed-ml', 'sbgn', 'sbol']:
             tags_info.append({

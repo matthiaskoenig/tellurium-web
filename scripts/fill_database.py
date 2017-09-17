@@ -77,6 +77,7 @@ def add_archives_to_database():
             new_archive.tags.add(tag)
 
             tags_info = comex.tags_info(f)
+            print(tags_info)
             for tag_info in tags_info:
                 tag, created = Tag.objects.get_or_create(name=tag_info['name'],
                                                          type=tag_info['type'])
