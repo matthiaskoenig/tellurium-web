@@ -35,6 +35,7 @@ import django
 django.setup()
 
 from combine.models import Archive, Tag, hash_for_file
+from combine import comex
 from django.core.files import File
 
 
@@ -73,6 +74,13 @@ def add_archives_to_database():
             tag, created = Tag.objects.get_or_create(name="test", type=Tag.TagType.misc)
             if created:
                 tag.save()
+
+            tags_info = comex.tags_info(f)
+            for tag_info in tags_info:
+                tag, created = Tag.objects.get_or_create(name=tag_info['name'],
+                                                         type=tag_info['type'])
+                if created:
+                    tag.save()
 
             new_archive.tags.add(tag)
 

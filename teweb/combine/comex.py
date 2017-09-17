@@ -11,6 +11,10 @@ import libcombine
 import importlib
 importlib.reload(libcombine)
 
+from collections import namedtuple
+
+
+
 
 ################################################
 # Tag helpers
@@ -21,8 +25,31 @@ def tags_info(archive_path):
     :param archive_path:
     :return:
     """
-    # add the file formats
-    pass
+    tags_info = []
+
+    # add the file formats from omex
+    omex = libcombine.CombineArchive()
+    if omex.initializeFromArchive(archive_path) is None:
+        print("Invalid Combine Archive: {}", archive_path)
+        return None
+
+    for i in range(omex.getNumEntries()):
+        entry = omex.getEntry(i)
+        format = entry.getFormat()
+        location = entry.getLocation()
+        format_id = short_format(format)
+
+        if format_id in ['sbml', 'cellml', 'sed-ml', 'sbgn', 'sbol']:
+            tags_info.append({
+                'type': 'format',
+                'name': format_id,
+            })
+
+    # add the SBML contents
+    # add the SED-ML contents
+
+    omex.cleanUp()
+    return tags_info
 
 
 
