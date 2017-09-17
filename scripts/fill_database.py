@@ -34,7 +34,7 @@ sys.path.append(PROJECT_DIR)
 import django
 django.setup()
 
-from combine.models import Archive, hash_for_file
+from combine.models import Archive, Tag, hash_for_file
 from django.core.files import File
 
 
@@ -58,7 +58,7 @@ def add_archives_to_database():
         md5 = hash_for_file(f, hash_type='MD5')
         existing_archive = Archive.objects.filter(md5=md5)
         # archive exists already based on the MD5 checksum
-        if len(existing_archive)>0:
+        if len(existing_archive) > 0:
             print("Archive already exists, not recreated: {}".format(f))
         else:
             name = os.path.basename(f)
@@ -68,6 +68,13 @@ def add_archives_to_database():
             new_archive.md5 = hash_for_file(f, hash_type='MD5')
             new_archive.full_clean()
             new_archive.save()
+
+            # add Tags
+            tag, created = Tag.objects.get_or_create(name="test", type=Tag.TagType.misc)
+            if created:
+                tag.save()
+
+            new_archive.tags.add(tag)
 
 if __name__ == "__main__":
 

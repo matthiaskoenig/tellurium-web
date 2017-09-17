@@ -155,7 +155,7 @@ def archive_entry(request, archive_id, entry_index):
     archive = get_object_or_404(Archive, pk=archive_id)
 
     with NamedTemporaryFile(mode='w+b') as f:
-        archive.extract_entry(entry_index, f.name)
+        archive.entry_extract(entry_index, f.name)
 
         # get content_type with magic
         content_type = magic.from_file(f.name)

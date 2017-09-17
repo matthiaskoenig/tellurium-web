@@ -18,6 +18,7 @@
                                 <th>archive</th>
                                 <th>download</th>
                                 <th>name</th>
+                                <th>tags</th>
                                 <th class="hidden-xs">md5</th>
                                 <th>action</th>
                                 <th>status</th>
@@ -38,6 +39,12 @@
                                                 <span class="label label-primary">{{ archive.name }}
                                         </span></a>
                                     </td>
+                                    <td>{% for tag in archive.tags.all() %}
+                                        <span class="label label-default">{{ tag.type }}</span><span class="label label-warning">{{ tag.name }}</span>
+                                        {% endfor %}
+
+                                    </td>
+
                                     <td class="hidden-xs">{{ archive.md5_short }}</td>
                                     <!-- action -->
                                     <td>{% if archive.task_id %}

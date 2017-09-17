@@ -2,12 +2,11 @@
 Models definitions.
 """
 import logging
-
 import hashlib
-import json
-import zipfile
+
 from django.db import models
 from django.utils import timezone
+from djchoices import DjangoChoices, ChoiceItem
 
 import libcombine
 from celery.result import AsyncResult
@@ -48,6 +47,24 @@ def hash_for_file(file, hash_type='MD5', blocksize=65536):
 # Models
 # ===============================================================================
 
+class Tag(models.Model):
+    """ Tag class to describe content of files or archives.
+    """
+    # Choices
+    class TagType(DjangoChoices):
+        format = ChoiceItem("format")
+        source = ChoiceItem("source")
+        simulation = ChoiceItem("sim")
+        model = ChoiceItem("model")
+        misc = ChoiceItem("misc")
+
+    name = models.CharField(max_length=300)
+    type = models.CharField(max_length=4, choices=TagType.choices)
+
+    class Meta:
+        unique_together = ('name', 'type')
+
+
 class Archive(models.Model):
     """ Combine Archive class.
 
@@ -58,6 +75,7 @@ class Archive(models.Model):
     created = models.DateTimeField('date published', editable=False)
     md5 = models.CharField(max_length=36, blank=True)
     task_id = models.CharField(max_length=100, blank=True)
+    tags = models.ManyToManyField(Tag, related_name="archives")
 
     def __str__(self):
         return self.name
@@ -76,7 +94,6 @@ class Archive(models.Model):
     def md5_short(self):
         return self.md5[0:8]
 
-
     @property
     def status(self):
         """ Returns the task status of the task.
@@ -89,146 +106,56 @@ class Archive(models.Model):
         else:
             return None
 
-    def zip_entries(self):
-        """ Returns the entries of the combine archive zip file.
+    @property
+    def path(self):
+        return str(self.file.path)
 
-        These are all files in the zip files. Not all of these
-        have to be managed in the entries of the Combine Archive.
+    def omex(self):
+        """ Open CombineArchive for given archive.
 
-        The JSON data is in the following format (jstree)
-        tree_data = [
-            {"id": "ajson1", "parent": "#", "text": "Simple root node", "state": {"opened": True, "selected": True}},
-            {"id": "ajson2", "parent": "#", "text": "Root node 2", "state": {"opened": True}},
-            {"id": "ajson3", "parent": "ajson2", "text": "Child 1"},
-            {"id": "ajson4", "parent": "ajson2", "text": "Child 2", "icon": "fa fa-play"}
-        ]
-
-        :return: entries of the zip file
+        Don't forget to close the omex after using it.
+        :return:
         """
-        is_dir = lambda filename: filename.endswith('/')
-
-        def find_parent(filename):
-            if filename.endswith('/'):
-                filename = filename[:-1]
-            tokens = filename.split("/")
-            if len(tokens) == 1:
-                return '#'
-            return '/'.join(tokens[:-1]) + '/'
-
-        def node_from_filename(filename):
-            node = {}
-            node['id'] = filename
-            node['parent'] = find_parent(filename)
-            node['text'] = filename
-            if filename.endswith('/'):
-                icon = "fa fa-folder fa-fw"
-            else:
-                icon = "fa fa-file-o fa-fw"
-            node['icon'] = icon
-            node['state'] = {'opened': True}
-            return node
-
-        path = str(self.file.path)
-        nodes = {}
-        with zipfile.ZipFile(path) as zip:
-            # zip.printdir()
-            for zip_info in zip.infolist():
-                # print(zip_info)
-                # zip_info.filename
-                # zip_info.date_time
-                # zip_info.file_size
-                node = node_from_filename(zip_info.filename)
-                nodes[node['id']] = node
-
-        # directories do not have to be part of the zip file, so we have to
-        # manually add these nodes if they are missing
-        check_ids = list(nodes.keys())  # make a copy we can iterate over
-        for nid in check_ids:
-            node = nodes[nid]
-            parent_id = node['parent']
-            if parent_id not in nodes and parent_id != "#":
-                parent_node = node_from_filename(parent_id)
-                nodes[parent_id] = parent_node
-                # print("Added missing folder node:", parent_id)
-
-        tree_data = [nodes[key] for key in sorted(nodes.keys())]
-
-        return json.dumps(tree_data)
+        omex = libcombine.CombineArchive()
+        if omex.initializeFromArchive(self.path) is None:
+            logger.error("Invalid Combine Archive: {}", self)
+            return None
+        return omex
 
     def entries(self):
         """ Get entries and omex object from given archive.
 
-        :param archive:
         :return: entries in the combine archive (managed via manifest)
         """
-        path = str(self.file.path)
+        return comex.entries_info(self.path)
 
-        # read combine archive contents & metadata
-        omex = libcombine.CombineArchive()
-        if omex.initializeFromArchive(path) is None:
-            logger.error("Invalid Combine Archive: {}", self)
-            return None
+    def entry_extract(self, index, filename):
+        """ Extracts entry at index to filename.
 
-        # add entries
-        entries = []
-        for i in range(omex.getNumEntries()):
-            entry = omex.getEntry(i)
-            location = entry.getLocation()
-            format = entry.getFormat()
-            info = {}
-            info['location'] = location
-            info['format'] = format
-            info['short_format'] = comex.short_format(format)
-            info['base_format'] = comex.base_format(format)
-            info['master'] = entry.getMaster()
-            info['metadata'] = comex.metadata_for_location(omex, location=location)
-
-            entries.append(info)
-
-        # add root information
-        format = 'http://identifiers.org/combine.specifications/omex'
-        info = {
-            'location': '.',
-            'format': format,
-            'short_format': comex.short_format(format),
-            'base_format': comex.base_format(format),
-            'metadata': comex.metadata_for_location(omex, '.'),
-            'master': None
-        }
-        entries.append(info)
-
-        omex.cleanUp()
-        return entries
-
-    def extract_entry(self, index, filename):
-        path = str(self.file.path)
-
-        # read combine archive contents & metadata
-        omex = libcombine.CombineArchive()
-        if omex.initializeFromArchive(path) is None:
-            logger.error("Invalid Combine Archive: {}", self)
-            return None
-
+        :param index:
+        :param filename:
+        :return:
+        """
+        omex = self.omex()
         entry = omex.getEntry(index)
         omex.extractEntry(entry.getLocation(), filename)
-
         omex.cleanUp()
 
-    def get_entry_content(self, index):
-        path = str(self.file.path)
+    def entry_content(self, index):
+        """ Extracts entry content at given index.
 
-        # read combine archive contents & metadata
-        omex = libcombine.CombineArchive()
-        if omex.initializeFromArchive(path) is None:
-            print("Invalid Combine Archive")
-            return None
+        :param index: index of entry
+        :return: content
+        """
+        omex = self.omex()
         entry = omex.getEntry(index)
         content = omex.extractEntryToString(entry.getLocation())
-
         omex.cleanUp()
         return content
 
-# ===============================================================================
-# Tag
-# ===============================================================================
-# TODO: implement
+    def zip_entries(self):
+        """ Returns the entries of the combine archive zip file.
+
+        :return: entries of the zip file
+        """
+        return comex.zip_tree_content(self.path)

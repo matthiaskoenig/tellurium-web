@@ -11,6 +11,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $DIR
 cd ../teweb/
 rm combine.sqlite3
+rm -rf combine/migrations/*
 
 # clean setup
 python manage.py makemigrations
