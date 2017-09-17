@@ -609,7 +609,7 @@ def create_plot3D(sed_doc, output, dgs_dict):
     :param output:
     :return:
     """
-    # TODO: analoque to the plot2D
+    # TODO: analogue to the plot2D
 
     return None
 
