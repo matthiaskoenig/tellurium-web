@@ -18,6 +18,9 @@ urlpatterns = [
     url(r'^upload$', views.upload, name='upload'),
     url(r'^runall$', views.runall, name='runall'),
 
+    url(r'^tags/$', views.tags, name='tags'),
+    url(r'^tags/(?P<tag_id>[0-9]+)/$', views.tag, name='tag'),
+
     url(r'^taskresults$', views.taskresults, name='taskresults'),
     url(r'^taskresults/(?P<taskresult_id>[0-9]+)/$', views.taskresult, name='taskresult'),
 

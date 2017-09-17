@@ -18,6 +18,8 @@ from django.core.files.temp import NamedTemporaryFile
 
 from django_celery_results.models import TaskResult
 from celery.result import AsyncResult
+
+from combine.models import Tag
 from .tasks import execute_omex
 
 from .models import Archive
@@ -266,13 +268,51 @@ def taskresult(request, taskresult_id):
     """
     taskresult = get_object_or_404(TaskResult, pk=taskresult_id)
     archives = Archive.objects.filter(task_id=taskresult.task_id)
-
     context = {
         'taskresult': taskresult,
         'archives': archives,
     }
 
     return render(request, 'combine/taskresult.html', context)
+
+
+######################
+# TAGS
+######################
+def tags(request):
+    """ View the tags.
+
+    :param request:
+    :return:
+    """
+    tags = Tag.objects.all()
+    context = {
+        'tags': tags,
+    }
+    return render(request, 'combine/tags.html', context)
+
+
+def tag(request, tag_id):
+    """ Single tag view.
+
+    :param request:
+    :param tag_id:
+    :return:
+    """
+    tag = get_object_or_404(Tag, pk=tag_id)
+    archives = tag.archives.all()
+    tasks = []
+    for archive in archives:
+        task = None
+        if archive.task_id:
+            task = AsyncResult(archive.task_id)
+        tasks.append(task)
+    context = {
+        'tag': tag,
+        'archives': archives,
+        'tasks': tasks,
+    }
+    return render(request, 'combine/tag.html', context)
 
 
 ############################################
