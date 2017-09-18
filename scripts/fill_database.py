@@ -25,8 +25,9 @@ PROJECT_DIR = os.path.join(FILE_DIR, "../teweb/")
 ARCHIVE_DIRS = [
     # os.path.join(FILE_DIR, "../archives"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives"),
-    os.path.join(FILE_DIR, "../../sedml-test-suite/archives/biomodels"),
-
+    # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/biomodels"),
+    # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/jws"),
+    os.path.join(FILE_DIR, "../../sedml-test-suite/archives/specification/"),
 ]
 
 # This is so my local_settings.py gets loaded.
