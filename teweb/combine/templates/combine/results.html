@@ -2,12 +2,14 @@
 
 {% block head %}
     <script src="{{ static('combine/js/plotly-1.30.0.min.js') }}"></script>
+    {% include "combine/archive_content_head.html" %}
 {% endblock %}
 
 {% block content %}
 <div class="row">
+    <div class="col-lg-6">
     {% include "combine/archive_content.html" %}
-
+    </div>
 
     {% if plot2Ds %}
         {% for info in plot2Ds %}
@@ -60,7 +62,7 @@
 {% endblock %}
 
 {% block javascript %}
-    {% include "combine/archive_content_js.html" %}
+    {% include "combine/archive_js.html" %}
 
     {% if plot2Ds %}
         {% for info in plot2Ds %}

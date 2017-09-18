@@ -1,62 +1,28 @@
 """
-Models.
+Models definitions.
 """
+import logging
 import hashlib
 
 from django.db import models
 from django.utils import timezone
-from django.core.validators import ValidationError
+from djchoices import DjangoChoices, ChoiceItem
 
-
-import libcombine
-from .omex import metadata_for_location, short_format
-
+try:
+    import libcombine
+except ImportError:
+    import tecombine as libcombine
 from celery.result import AsyncResult
+from . import comex, validators
+
+logger = logging.getLogger(__name__)
 
 
 # ===============================================================================
 # Utility functions for models
 # ===============================================================================
-def validate_omex(fieldFile):
-    """ Validator for the omex file.
-    Necessary to run basic file checks on upload.
-    Otherwise the archives will create problems on execution.
 
-    :param fieldFile:
-    :return:
-    """
-
-    print('*'*80)
-    print(fieldFile)
-    print(type(fieldFile))
-    print('*' * 80)
-
-    # check that it is a jar file
-    path = fieldFile.path
-    print(path)
-    file = fieldFile.path
-    print(file)
-
-    # omex = tecombine.OpenCombine(path)
-    # omex.listContents()
-
-    # FIXME: currently not completely implemented.
-
-    """
-    # libcombine
-    # Try to read the archive
-    omex = libcombine.CombineArchive()
-    if not omex.initializeFromArchive(path):
-        print("Invalid Combine Archive")
-        raise ValidationError(
-            _('Invalid archive: %(file)s'),
-            code='invalid',
-            params={'file': 'file'},
-        )
-    """
-
-
-def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
+def hash_for_file(file, hash_type='MD5', blocksize=65536):
     """ Calculate the md5_hash for a file.
 
         Calculating a hash for a file is always useful when you need to check if two files
@@ -71,7 +37,8 @@ def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
         hasher = hashlib.md5()
     elif hash_type == 'SHA1':
         hasher == hashlib.sha1()
-    with open(filepath, 'rb') as f:
+
+    with open(file, 'rb') as f:
         buf = f.read(blocksize)
         while len(buf) > 0:
             hasher.update(buf)
@@ -80,16 +47,38 @@ def hash_for_file(filepath, hash_type='MD5', blocksize=65536):
 
 
 # ===============================================================================
-# Archive
+# Models
 # ===============================================================================
 
+class Tag(models.Model):
+    """ Tag class to describe content of files or archives.
+    """
+    # Choices
+    class TagType(DjangoChoices):
+        format = ChoiceItem("format")
+        source = ChoiceItem("source")
+        simulation = ChoiceItem("sim")
+        model = ChoiceItem("model")
+        misc = ChoiceItem("misc")
+
+    name = models.CharField(max_length=300)
+    type = models.CharField(max_length=4, choices=TagType.choices)
+
+    class Meta:
+        unique_together = ('name', 'type')
+
+
 class Archive(models.Model):
-    """ Combine Archive class. """
+    """ Combine Archive class.
+
+    Stores the combine archives.
+    """
     name = models.CharField(max_length=200)
-    file = models.FileField(upload_to='archives', validators=[validate_omex])
+    file = models.FileField(upload_to='archives', validators=[validators.validate_omex])
     created = models.DateTimeField('date published', editable=False)
-    md5 = models.CharField(max_length=36)
+    md5 = models.CharField(max_length=36, blank=True)
     task_id = models.CharField(max_length=100, blank=True)
+    tags = models.ManyToManyField(Tag, related_name="archives")
 
     def __str__(self):
         return self.name
@@ -100,106 +89,76 @@ class Archive(models.Model):
             self.created = timezone.now()
 
         if not self.md5:
-            # the file is uploaded at this point
-            # file_path = str(self.file.path)
             self.md5 = hash_for_file(self.file, hash_type='MD5')
-
-            # check via hash if the archive is already existing
-            # not really necessary, we allow for duplicate archives
 
         return super(Archive, self).save(*args, **kwargs)
 
     @property
+    def md5_short(self):
+        return self.md5[0:8]
+
+    @property
     def status(self):
+        """ Returns the task status of the task.
+
+        :return:
+        """
         if self.task_id:
             result = AsyncResult(self.task_id)
             return result.status
         else:
             return None
 
-    def get_entries(self):
-        """ Get entries and omex object from given archive.
+    @property
+    def path(self):
+        return str(self.file.path)
 
-        :param archive:
+    def omex(self):
+        """ Open CombineArchive for given archive.
+
+        Don't forget to close the omex after using it.
         :return:
         """
-        path = str(self.file.path)
-
-        # read combine archive contents & metadata
         omex = libcombine.CombineArchive()
-        print(path)
-        if omex.initializeFromArchive(path) is None:
-            print("Invalid Combine Archive")
+        if omex.initializeFromArchive(self.path) is None:
+            logger.error("Invalid Combine Archive: {}", self)
             return None
+        return omex
 
-        entries = []
-        for i in range(omex.getNumEntries()):
+    def entries(self):
+        """ Get entries and omex object from given archive.
 
-            entry = omex.getEntry(i)
+        :return: entries in the combine archive (managed via manifest)
+        """
+        return comex.entries_info(self.path)
 
-            # ! hardcopy the required information so archive can be closed again.
-            info = {}
-            location = entry.getLocation()
-            info['location'] = location
+    def entry_extract(self, index, filename):
+        """ Extracts entry at index to filename.
 
-            format = entry.getFormat()
-            info['format'] = format
-            info['short_format'] = short_format(format)
-
-
-            master = entry.getMaster()
-            info['master'] = master
-
-            # printMetaDataFor(omex, location=location)
-            metadata = metadata_for_location(omex, location=location)
-
-            info['metadata'] = metadata
-            entries.append(info)
-
-
-            # the entry could now be extracted via
-            # archive.extractEntry(entry.getLocation(), <filename or folder>)
-
-            # or used as string
-            # content = archive.extractEntryToString(entry.getLocation());
-
-        omex.cleanUp()
-
-        return omex, entries
-
-    def extract_entry(self, index, filename):
-        path = str(self.file.path)
-
-        # read combine archive contents & metadata
-        omex = libcombine.CombineArchive()
-        print(path)
-        if omex.initializeFromArchive(path) is None:
-            print("Invalid Combine Archive")
-            return None
-
+        :param index:
+        :param filename:
+        :return:
+        """
+        omex = self.omex()
         entry = omex.getEntry(index)
         omex.extractEntry(entry.getLocation(), filename)
-
         omex.cleanUp()
 
+    def entry_content(self, index):
+        """ Extracts entry content at given index.
 
-
-    def get_entry_content(self, index):
-        path = str(self.file.path)
-
-        # read combine archive contents & metadata
-        omex = libcombine.CombineArchive()
-        print(path)
-        if omex.initializeFromArchive(path) is None:
-            print("Invalid Combine Archive")
-            return None
+        :param index: index of entry
+        :return: content
+        """
+        omex = self.omex()
         entry = omex.getEntry(index)
         content = omex.extractEntryToString(entry.getLocation())
-
         omex.cleanUp()
         return content
 
-# ===============================================================================
-# Tag
-# ===============================================================================
-# TODO: implement
+    def zip_entries(self):
+        """ Returns the entries of the combine archive zip file.
+
+        :return: entries of the zip file
+        """
+        return comex.zip_tree_content(self.path)

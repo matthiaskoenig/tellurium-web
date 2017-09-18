@@ -1,0 +1,117 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title"><i class="fa fa-archive fa-fw"></i> Combine Archives</h2>
+    </div>
+
+    <div class="panel-body">
+        {% if archives %}
+            <table id="archives" class="table table-striped table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th>archive</th>
+                    <th>download</th>
+                    <th>name</th>
+                    <th>tags</th>
+                    <th class="hidden-xs">md5</th>
+                    <th>action</th>
+                    <th>status</th>
+                    <th>results</th>
+                    <th class="hidden hidden-xs">created</th>
+                </tr>
+                </thead>
+                {% for archive in archives %}
+
+                    <tr>
+                        <td><a href="{{ url('combine:archive', args=[archive.id]) }}">
+                            <span class="badge">{{ archive.id }}</span></a>
+                        </td>
+                        <td><a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
+                            <i class="fa fa-download fa-lg black"></i></a></td>
+                        <td>
+                            <a href="{{ url('combine:archive', args=[archive.id]) }}">
+                                    <span class="label label-primary">{{ archive.name }}
+                            </span></a>
+                        </td>
+                        <td>{% for tag in archive.tags.all() %}
+                            <a href="{{ url('combine:tag', args=[tag.id]) }}">
+                                <span class="label label-default">{{ tag.type }}</span><span
+                                    class="label label-warning">{{ tag.name }}</span>
+                            </a>
+                        {% endfor %}
+
+                        </td>
+
+                        <td class="hidden-xs">{{ archive.md5_short }}</td>
+                        <!-- action -->
+                        <td>{% if archive.task_id %}
+                            {% with task = tasks[loop.index0] %}
+                                <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
+                                    {% if task %}
+                                        {% if task.status == 'SUCCESS' %}
+                                            <span class="btn btn-default btn-xs">
+                                            <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN
+                                        {% elif task.status == 'FAILURE' %}
+                                            <span class="btn btn-danger btn-xs">
+                                            <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY
+                                        {% else %}
+                                            <span class="btn btn-info btn-xs">
+                                            <i class="fa fa-cog fa-spin fa-fw" title="EXECUTING"></i> EXECUTING
+                                        {% endif %}
+                                    {% endif %}
+                                    </span>
+                                </a>
+                            {% endwith %}
+                        {% endif %}
+
+                            {% if not archive.task_id %}
+                                <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
+                                <span class="btn btn-success btn-xs">
+                                <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN</span></a>
+                            {% endif %}
+                        </td>
+                        <!-- status -->
+                        <td>{% if archive.task_id %}
+                            {% with task = tasks[loop.index0] %}
+                                {% if task.status == "SUCCESS" %}
+                                    <span class="label label-success"><i
+                                            class="fa fa-check-square fa-fw"></i> {{ task.status }}</span>
+                                {% elif task.status == "FAILURE" %}
+                                    <span class="label label-danger"><i
+                                            class="fa fa-minus-square fa-fw"></i> {{ task.status }}</span>
+                                {% else %}
+                                    <span class="label label-info"
+                                          title="{{ task }}">{{ task.status }}</span>
+                                {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            <i class="fa fa-ban fa-fw fa-lg grey"></i>
+                        {% endif %}
+                        </td>
+                        <!-- results -->
+                        <td>{% if archive.task_id %}
+                            {% with task = tasks[loop.index0] %}
+                                {% if task.status == "SUCCESS" %}
+                                    <a href="{{ url('combine:results', args=[archive.id])}}">
+                                        <i class="fa fa-line-chart fa-fw fa-lg"></i>
+                                    </a>
+                                {% else %}
+                                    <i class="fa fa-ban fa-fw fa-lg grey"></i>
+                                {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            <i class="fa fa-ban fa-fw fa-lg grey"></i>
+                        {% endif %}
+
+                        </td>
+
+                        <td class="hidden hidden-xs">{{ archive.created }}</td>
+
+                    </tr>
+                {% endfor %}
+
+            </table>
+        {% else %}
+            <p>No archives available. Upload archive below.</p>
+        {% endif %}
+    </div>
+</div>

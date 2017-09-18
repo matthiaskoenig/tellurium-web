@@ -5,15 +5,18 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
+<div class="row">
+    <div class="col-lg-6">
     {% include "combine/archive_content.html" %}
-    {% include "combine/task_content.html" %}
     </div>
 
-
+    <div class="col-lg-6">
+    {% include "combine/task_content.html" %}
+    </div>
+</div>
 {% endblock %}
 
 
 {% block javascript %}
-    {%  include "combine/archive_content_js.html" %}
+    {%  include "combine/archive_js.html" %}
 {% endblock %}

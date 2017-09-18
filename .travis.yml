@@ -1,10 +1,9 @@
 # travis only runs on ubuntu 14.04
 sudo: required
-dist: precise
 os: linux
 
 language: python
-# cache: pip
+cache: pip
 python:
   - "3.5"
   - "3.6"

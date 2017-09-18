@@ -1,0 +1,10 @@
+{% block javascript %}
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function () {
+            $('#archives').DataTable({
+                "order": [[6, "desc"]],
+                "pageLength": 25
+            });
+        });
+    </script>
+{% endblock %}

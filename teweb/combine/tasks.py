@@ -24,7 +24,6 @@ import tempfile
 import shutil
 import matplotlib
 import tellurium
-import libcombine
 
 from six import iteritems
 
