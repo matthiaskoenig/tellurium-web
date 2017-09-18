@@ -21,8 +21,13 @@ FILE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 # project directory
 PROJECT_DIR = os.path.join(FILE_DIR, "../teweb/")
 # directory of omex archives
-# ARCHIVE_DIR = os.path.join(FILE_DIR, "../archives/L1V3")
-ARCHIVE_DIR = os.path.join(FILE_DIR, "../archives")
+
+ARCHIVE_DIRS = [
+    # os.path.join(FILE_DIR, "../archives"),
+    # os.path.join(FILE_DIR, "../../sedml-test-suite/archives"),
+    os.path.join(FILE_DIR, "../../sedml-test-suite/archives/biomodels"),
+
+]
 
 # This is so my local_settings.py gets loaded.
 os.chdir(PROJECT_DIR)
@@ -39,7 +44,6 @@ from combine import comex
 from django.core.files import File
 
 
-
 def add_archives_to_database():
     """ Add archives to database.
 
@@ -48,11 +52,12 @@ def add_archives_to_database():
     # list files
     omex_files = []
 
-    for subdir, dirs, files in os.walk(ARCHIVE_DIR):
-        for file in files:
-            path = os.path.join(subdir, file)
-            if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
-                omex_files.append(path)
+    for archive_dir in ARCHIVE_DIRS:
+        for subdir, dirs, files in os.walk(archive_dir):
+            for file in files:
+                path = os.path.join(subdir, file)
+                if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
+                    omex_files.append(path)
 
     for f in sorted(omex_files):
         print('-' * 80)
@@ -72,10 +77,10 @@ def add_archives_to_database():
             new_archive.save()
 
             # add Tags
-            tag, created = Tag.objects.get_or_create(name="test", type=Tag.TagType.misc)
-            if created:
-                tag.save()
-            new_archive.tags.add(tag)
+            # tag, created = Tag.objects.get_or_create(name="test", type=Tag.TagType.misc)
+            # if created:
+            #     tag.save()
+            # new_archive.tags.add(tag)
 
             tags_info = comex.tags_info(f)
             print(tags_info)

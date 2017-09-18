@@ -6,7 +6,11 @@ Getting information out of the files.
 import json
 import zipfile
 
-import libcombine
+try:
+    import libcombine
+except ImportError:
+    import tecombine as libcombine
+
 # FIXME: this is a bugfix for https://github.com/sbmlteam/libCombine/issues/15
 import importlib
 importlib.reload(libcombine)

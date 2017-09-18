@@ -6,8 +6,6 @@ from django.template.defaultfilters import filesizeformat
 from django.utils.deconstruct import deconstructible
 from django.core.exceptions import ValidationError
 
-import libcombine
-
 
 def validate_omex(data):
     """ Validate that file is a combine archive.

@@ -27,8 +27,17 @@ from .forms import UploadArchiveForm
 from .git import get_commit
 
 import tellurium
-import libsedml
-import libcombine
+
+try:
+    import libsedml
+except ImportError:
+    import tesedml as libsedml
+
+try:
+    import libcombine
+except ImportError:
+    import tecombine as libcombine
+
 import importlib
 importlib.reload(libcombine)
 
@@ -319,12 +328,15 @@ def tag(request, tag_id):
 # EXECUTE COMBINE ARCHIVES
 ############################################
 @login_required
-def runall(request):
+def runall(request, status=None):
     """ Executes all archives.
 
     :param request:
     :return:
     """
+    # TODO: implement allow filtering by status
+
+
     all_archives = Archive.objects.all().order_by('-created')
     for archive in all_archives:
         result = execute_omex.delay(archive_id=archive.id)

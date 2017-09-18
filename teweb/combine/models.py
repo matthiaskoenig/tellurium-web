@@ -8,7 +8,10 @@ from django.db import models
 from django.utils import timezone
 from djchoices import DjangoChoices, ChoiceItem
 
-import libcombine
+try:
+    import libcombine
+except ImportError:
+    import tecombine as libcombine
 from celery.result import AsyncResult
 from . import comex, validators
 
