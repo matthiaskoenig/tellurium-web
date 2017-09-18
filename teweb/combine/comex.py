@@ -72,7 +72,12 @@ def tags_info(archive_path):
                     'name': 'model:{}'.format(name)
                 })
 
-            print(language)
+        if len(doc.getListOfDataDescriptions()) > 0:
+            tags_info.append({
+                'type': 'sedml',
+                'name': 'DataDescription'
+            })
+
 
 
 
