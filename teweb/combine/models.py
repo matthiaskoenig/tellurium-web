@@ -59,6 +59,7 @@ class Tag(models.Model):
         source = ChoiceItem("source")
         simulation = ChoiceItem("sim")
         model = ChoiceItem("model")
+        sedml = ChoiceItem("sedml")
         misc = ChoiceItem("misc")
 
     name = models.CharField(max_length=300)
