@@ -39,6 +39,7 @@ from combine import comex
 from django.core.files import File
 
 
+
 def add_archives_to_database():
     """ Add archives to database.
 
@@ -86,6 +87,10 @@ def add_archives_to_database():
                 new_archive.tags.add(tag)
 
 
+def create_superuser():
+    from django.contrib.auth.models import User
+    User.objects.create_superuser('mkoenig', 'konigmatt@googlemail.com', os.environ['DJANGO_ADMIN_PASSWORD'])
+
 
 if __name__ == "__main__":
 
@@ -93,3 +98,4 @@ if __name__ == "__main__":
     print('Creating archives')
     print('-' * 80)
     add_archives_to_database()
+    create_superuser()

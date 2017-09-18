@@ -27,7 +27,3 @@ rm combine/migrations/*
 echo "* Upload archives *"
 cd $DIR
 python fill_database.py
-
-# create super user
-cd ../teweb/
-python manage.py createsuperuser

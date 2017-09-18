@@ -11,10 +11,6 @@ import libcombine
 import importlib
 importlib.reload(libcombine)
 
-from collections import namedtuple
-
-
-
 
 ################################################
 # Tag helpers
@@ -50,8 +46,6 @@ def tags_info(archive_path):
 
     omex.cleanUp()
     return tags_info
-
-
 
 
 ################################################
