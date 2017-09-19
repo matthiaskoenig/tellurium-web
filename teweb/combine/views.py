@@ -4,8 +4,6 @@ Tellurium SED-ML Tools Views
 Creates the HTML views of the web-interface.
 """
 import logging
-# FIXME: replace iteritems with py3 construct
-from six import iteritems
 
 import pandas
 import numpy as np
@@ -398,7 +396,7 @@ def results(request, archive_id):
     outputs = []
 
     dgs_json = task.result["dgs"]
-    for sedmlFile, dgs_dict in iteritems(dgs_json):
+    for sedmlFile, dgs_dict in dgs_json.items():
 
         sedml_str = omex.getSEDML(sedmlFile).decode('UTF-8')
         doc = libsedml.readSedMLFromString(str(sedml_str))
