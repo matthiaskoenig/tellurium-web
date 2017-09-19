@@ -78,10 +78,6 @@ def tags_info(archive_path):
                 'name': 'DataDescription'
             })
 
-
-
-
-
     omex.cleanUp()
     return tags_info
 
