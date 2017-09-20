@@ -547,7 +547,6 @@ def create_plot2D(sed_doc, output, dgs_dict):
         print(x)
         print(y)
 
-
         Nrepeats = len(x[0])
         for k in range(Nrepeats):
             trace_id = "{}_{}".format(curve_id, k)
@@ -578,7 +577,7 @@ def create_plot2D(sed_doc, output, dgs_dict):
             color: '{}'
         }}
     }};
-                """.format(curve_id, x_tr, y_tr, mode,
+                """.format(trace_id, x_tr, y_tr, mode,
                            name, color)
 
         # TODO: color, linewidth, markersize, alpha, label
