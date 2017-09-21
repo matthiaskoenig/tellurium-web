@@ -164,7 +164,7 @@ def archive_entry(request, archive_id, entry_index):
     archive = get_object_or_404(Archive, pk=archive_id)
 
     with NamedTemporaryFile(mode='w+b') as f:
-        archive.entry_extract(entry_index, f.name)
+        archive.extract_entry_by_index(entry_index, f.name)
 
         # get content_type with magic
         content_type = magic.from_file(f.name)
@@ -391,22 +391,20 @@ def results(request, archive_id):
         return redirect('combine:archive', archive_id)
 
     # output context
-    path = str(archive.file.path)
-    omex = tellurium.tecombine.OpenCombine(path)
     outputs = []
 
     dgs_json = task.result["dgs"]
-    for sedmlFile, dgs_dict in dgs_json.items():
+    for sedml_location, dgs_dict in dgs_json.items():
 
-        sedml_str = omex.getSEDML(sedmlFile).decode('UTF-8')
-        doc = libsedml.readSedMLFromString(str(sedml_str))
+        sedml_str = archive.entry_content_by_location(sedml_location)
+        sed_doc = libsedml.readSedMLFromString(sedml_str)
 
         # Store html and JSON to render results
         reports = []
         plot2Ds = []
         plot3Ds = []
 
-        for output in doc.getListOfOutputs():
+        for output in sed_doc.getListOfOutputs():
             outputs.append(output)
 
             # check what kind of output
@@ -417,19 +415,19 @@ def results(request, archive_id):
             info["typeCode"] = typeCode
 
             if typeCode == libsedml.SEDML_OUTPUT_REPORT:
-                df = create_report(doc, output, dgs_dict)
+                df = create_report(sed_doc, output, dgs_dict)
                 html = df.to_html()
                 html = html.replace('<table border="1" class="dataframe">', '<table class="table table-striped table-condensed table-hover">')
                 info["html"] = html
                 reports.append(info)
 
             elif typeCode == libsedml.SEDML_OUTPUT_PLOT2D:
-                plot2D = create_plot2D(doc, output, dgs_dict)
+                plot2D = create_plot2D(sed_doc, output, dgs_dict)
                 info["js"] = plot2D
                 plot2Ds.append(info)
 
             elif typeCode == libsedml.SEDML_OUTPUT_PLOT3D:
-                plot3D = create_plot3D(doc, output, dgs_dict)
+                plot3D = create_plot3D(sed_doc, output, dgs_dict)
                 info["js"] = plot3D
                 plot3Ds.append(info)
 
@@ -441,7 +439,7 @@ def results(request, archive_id):
 
     # add results context
     context.update({
-        'doc': doc,
+        'doc': sed_doc,
         'outputs': outputs,
         'reports': reports,
         'plot2Ds': plot2Ds,
@@ -475,8 +473,7 @@ def create_report(sed_doc, output, dgs_dict):
         data = [item for sublist in data for item in sublist]  # flatten list
         columns.append(data)
 
-    df = pandas.DataFrame(np.column_stack(columns), columns=headers)
-    return df
+    return pandas.DataFrame(np.column_stack(columns), columns=headers)
 
 
 def create_plot2D(sed_doc, output, dgs_dict):

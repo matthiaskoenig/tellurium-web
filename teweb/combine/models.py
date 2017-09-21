@@ -133,7 +133,7 @@ class Archive(models.Model):
         """
         return comex.entries_info(self.path)
 
-    def entry_extract(self, index, filename):
+    def extract_entry_by_index(self, index, filename):
         """ Extracts entry at index to filename.
 
         :param index:
@@ -145,7 +145,19 @@ class Archive(models.Model):
         omex.extractEntry(entry.getLocation(), filename)
         omex.cleanUp()
 
-    def entry_content(self, index):
+    def extract_entry_by_location(self, location, filename):
+        """ Extracts entry at location to filename.
+
+        :param location:
+        :param filename:
+        :return:
+        """
+        omex = self.omex()
+        entry = omex.getEntryByLocation(location)
+        omex.extractEntry(location, filename)
+        omex.cleanUp()
+
+    def entry_content_by_index(self, index):
         """ Extracts entry content at given index.
 
         :param index: index of entry
@@ -153,6 +165,18 @@ class Archive(models.Model):
         """
         omex = self.omex()
         entry = omex.getEntry(index)
+        content = omex.extractEntryToString(entry.getLocation())
+        omex.cleanUp()
+        return content
+
+    def entry_content_by_location(self, location):
+        """ Extracts entry content at given location.
+
+        :param location: location of entry
+        :return: content
+        """
+        omex = self.omex()
+        entry = omex.getEntryByLocation(location)
         content = omex.extractEntryToString(entry.getLocation())
         omex.cleanUp()
         return content

@@ -23,7 +23,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 import tempfile
 import shutil
 import matplotlib
-import tellurium
+from tellurium.sedml import tesedml
 
 from six import iteritems
 
@@ -36,52 +36,51 @@ from celery import shared_task, task
 # Celery Tasks
 # --------------------------------------------------
 
-@task(name="adding numbers")
-def add(x, y):
-    return x + y
-
 
 @task(name="execute omex")
-def execute_omex(archive_id, debug=True):
+def execute_omex(archive_id, debug=False):
     """
     Execute omex.
     """
-    # TODO: error handling for cleanup
     matplotlib.pyplot.switch_backend("Agg")
 
     print("*** START RUNNING OMEX ***")
     results = {}
 
-    # read archive
-    archive = get_object_or_404(Archive, pk=archive_id)
+    # get archive, raises ObjectDoesNotExist
+    archive = Archive.objects.get(pk=archive_id)
     omex_path = str(archive.file.path)
 
     # execute archive
     # FIXME: execute without making images for speedup
-    tmp_dir = tempfile.mkdtemp()
-    dgs_all = tellurium.sedml.tesedml.executeOMEX(omex_path, workingDir=tmp_dir)
+    try:
+        tmp_dir = tempfile.mkdtemp()
 
-    if debug:
-        print("dgs_all:", dgs_all)
+        # returns all the data generators
+        dgs_all = tesedml.executeCombineArchive(omex_path, workingDir=tmp_dir)
 
-    # JSON serializable results (np.array to list)
-    print("-" * 80)
-    dgs_json = {}
-    for f_tmp, dgs in iteritems(dgs_all):
-        print(f_tmp)
-        sedmlFile = f_tmp.replace(tmp_dir + "/", "")
-        print(sedmlFile)
-        for key in dgs:
-            dgs[key] = dgs[key].tolist()
-            print(key, ':', dgs[key])
-        dgs_json[sedmlFile] = dgs
-    print("-" * 80)
+        if debug:
+            print("dgs_all:", dgs_all)
 
-    # cleanup
-    shutil.rmtree(tmp_dir)
+        # JSON serializable results (np.array to list)
+        print("-" * 80)
+        dgs_json = {}
+        for f_tmp, dgs in iteritems(dgs_all):
+            sedml_location = f_tmp.replace(tmp_dir + "/", "")
+            print(sedml_location)
+            for key in dgs:
+                dgs[key] = dgs[key].tolist()
+                # print(key, ':', dgs[key])
+            dgs_json[sedml_location] = dgs
+        print("-" * 80)
 
-    # store results of execution for rendering
-    results['dgs'] = dgs_json
+        # store results of execution for rendering
+        results['dgs'] = dgs_json
+
+    finally:
+        # cleanup
+        shutil.rmtree(tmp_dir)
 
     print("*** FINISHED RUNNING OMEX ***")
     return results
+
