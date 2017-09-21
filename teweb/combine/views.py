@@ -109,9 +109,6 @@ def archive_context(archive):
 
     # zip entries: json tree data
     zip_entries = archive.zip_entries()
-    print("*" * 80)
-    print(zip_entries)
-    print("*" * 80)
 
     # task and taskresult
     task = None
@@ -541,8 +538,8 @@ def create_plot2D(sed_doc, output, dgs_dict):
         # create the traces from curve data
         x = dgs_dict[xId]
         y = dgs_dict[yId]
-        print(x)
-        print(y)
+        # print(x)
+        # print(y)
 
         Nrepeats = len(x[0])
         for k in range(Nrepeats):

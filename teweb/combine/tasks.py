@@ -59,8 +59,8 @@ def execute_omex(archive_id, debug=False):
         # returns all the data generators
         dgs_all = tesedml.executeCombineArchive(omex_path, workingDir=tmp_dir)
 
-        if debug:
-            print("dgs_all:", dgs_all)
+        #if debug:
+        #    print("dgs_all:", dgs_all)
 
         # JSON serializable results (np.array to list)
         print("-" * 80)
