@@ -1,4 +1,11 @@
 <div class="panel panel-default">
+   <!-- navigate archives -->
+    <a href="{{ url('combine:archive_previous', args=[archive.id]) }}"
+       title="Previous archive"><span class="btn-xs btn-primary"><i
+            class="fa fa-arrow-circle-o-left fa-fw"></i></span></a>
+    <a href="{{ url('combine:archive_next', args=[archive.id]) }}"
+       title="Next archive"><span class="btn-xs btn-primary"><i
+            class="fa fa-arrow-circle-o-right fa-fw"></i></span></a>
     <div class="panel-heading">
 
         <h2 class="panel-title">
@@ -9,13 +16,14 @@
                     class="fa fa-download fa-fw"></i></a>
 
             <span class="pull-right">
-                <a href="{{ url('combine:archive_previous', args=[archive.id]) }}"
-                   title="Previous archive"><span class="btn-xs btn-primary"><i
-                        class="fa fa-arrow-circle-o-left fa-fw"></i></span></a>
-                <a href="{{ url('combine:archive_next', args=[archive.id]) }}"
-                   title="Next archive"><span class="btn-xs btn-primary"><i
-                        class="fa fa-arrow-circle-o-right fa-fw"></i></span></a>
-                </span>
+                <!-- delete archive -->
+                {% if request.user.is_authenticated %}
+                <a href="{{ url('combine:delete_archive', args=[archive.id]) }}" title="Delete archive {{ archive.id }}: {{ archive.name }}"><span class="btn-xs btn-danger"
+                                                                                                              onclick="return confirm('Are you sure you want to delete: {{ archive }}?')">
+                    <i class="fa fa-trash fa-fw"></i></span></a>
+                {% endif %}
+            </span>
+
         </h2>
 
     </div>

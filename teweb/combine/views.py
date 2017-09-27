@@ -148,6 +148,19 @@ def download_archive(request, archive_id):
 
     return response
 
+@login_required
+def delete_archive(request, archive_id):
+    """ Delete archive.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    archive = get_object_or_404(Archive, pk=archive_id)
+    archive.delete()
+
+    return redirect('combine:index')
+
 
 def archive_entry(request, archive_id, entry_index):
     """ Display an entry in the archive.
