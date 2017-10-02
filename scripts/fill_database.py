@@ -27,7 +27,8 @@ ARCHIVE_DIRS = [
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/biomodels"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/jws"),
-    os.path.join(FILE_DIR, "../../sedml-test-suite/archives/specification/"),
+    # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/specification/"),
+    os.path.join(FILE_DIR, "../../sed-ml/specification/level-1-version-3/examples/__omex__"),
 ]
 
 # This is so my local_settings.py gets loaded.
