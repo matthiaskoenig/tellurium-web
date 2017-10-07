@@ -14,7 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+VERSION = "0.1.0"
 INTERNAL_IPS = ['127.0.0.1']
 
 # Quick-start development settings - unsuitable for production
@@ -118,13 +118,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -145,3 +141,14 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+try:
+    from teweb.deploy_settings import *
+
+    print("*" * 40)
+    print("RUNNING IN DEPLOYMENT")
+    print("*" * 40)
+except ImportError as e:
+    print("*" * 40)
+    print("RUNNING IN DEVELOP")
+    print("*" * 40)
