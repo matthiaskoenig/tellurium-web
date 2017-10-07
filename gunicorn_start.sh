@@ -13,7 +13,7 @@ echo "Starting $NAME as `whoami`"
 
 # Activate the virtual environment
 cd $DJANGODIR
-source /var/www/test/venv/bin/activate
+source /home/mkoenig/envs/tellurium_webapp/bin/activate
 export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
 export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 
@@ -23,7 +23,7 @@ test -d $RUNDIR || mkdir -p $RUNDIR
 
 # Start your Django Unicorn
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
-exec /home/mkoenig/envs/flutype_webapp/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+exec /home/mkoenig/envs/tellurium_webapp/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
   --name $NAME \
   --workers $NUM_WORKERS \
   --user $USER \

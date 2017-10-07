@@ -63,7 +63,7 @@ class Tag(models.Model):
         misc = ChoiceItem("misc")
 
     name = models.CharField(max_length=300)
-    type = models.CharField(max_length=4, choices=TagType.choices)
+    type = models.CharField(max_length=20, choices=TagType.choices)
 
     class Meta:
         unique_together = ('name', 'type')

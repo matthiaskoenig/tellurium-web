@@ -9,7 +9,9 @@ django-celery-beat
 
 jinja2>=2.9.6
 python-magic>=0.4.13
+psycopg2
+gunicorn
 
-# tellurium>=2.0.0
--e git+https://github.com/sys-bio/tellurium.git@2.0-sedml-L1V3#egg=tellurium
+# tellurium>=2.0.2
+-e git+https://github.com/sys-bio/tellurium.git@master#egg=tellurium
 
