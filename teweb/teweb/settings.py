@@ -26,7 +26,7 @@ SECRET_KEY = 'mi4#6w7)^@$x5=0=t9=8vb7+4*hlf%iqxpt$6o@_k4al0!w&xn'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'systemscience.de', 'www.systemscience.de']
 
 
 # Application definition
