@@ -21,6 +21,8 @@
                         <span class="label label-info"
                               title="{{ task }}">{{ task.status }}</span>
                     {% endif %}
+            {% else %}
+                <span class="label label-default">None</span> Archive has not been executed.
             {% endif %}
 
             <!-- task id -->

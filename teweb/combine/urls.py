@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^(?P<archive_id>[0-9]+)/next$', views.archive_next, name='archive_next'),
     url(r'^(?P<archive_id>[0-9]+)/results$', views.results, name='results'),
     url(r'^(?P<archive_id>[0-9]+)/run$', views.run_archive, name='run_archive'),
+    url(r'^(?P<archive_id>[0-9]+)/delete$', views.delete_archive, name='delete_archive'),
     url(r'^(?P<archive_id>[0-9]+)/download$', views.download_archive, name='download_archive'),
 
     url(r'^(?P<archive_id>[0-9]+)/(?P<entry_index>[0-9]+)$', views.archive_entry, name='archive_entry'),

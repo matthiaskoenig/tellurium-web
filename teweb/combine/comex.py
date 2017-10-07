@@ -11,6 +11,11 @@ try:
 except ImportError:
     import tecombine as libcombine
 
+try:
+    import libsedml
+except ImportError:
+    import tesedml as libsedml
+
 # FIXME: this is a bugfix for https://github.com/sbmlteam/libCombine/issues/15
 import importlib
 importlib.reload(libcombine)
@@ -33,20 +38,45 @@ def tags_info(archive_path):
         print("Invalid Combine Archive: {}", archive_path)
         return None
 
+    sedml_entries = []
+    sbml_entries = []
     for i in range(omex.getNumEntries()):
         entry = omex.getEntry(i)
         format = entry.getFormat()
         location = entry.getLocation()
         format_id = base_format(format)
 
-        if format_id in ['sbml', 'cellml', 'sed-ml', 'sbgn', 'sbol']:
+        if format_id in ['sbml', 'cellml', 'sed-ml', 'sedml', 'sbgn', 'sbol']:
             tags_info.append({
                 'type': 'format',
                 'name': format_id,
             })
+        if format_id == 'sbml':
+            sbml_entries.append(entry)
+        if format_id in ['sedml', 'sed-ml']:
+            sedml_entries.append(entry)
 
     # add the SBML contents
     # add the SED-ML contents
+    for entry in sedml_entries:
+        content = omex.extractEntryToString(entry.getLocation())
+        doc = libsedml.readSedMLFromString(content)  # type: libsedml.SedDocument
+        print(doc)
+
+        for model in doc.getListOfModels():
+            language = model.getLanguage()
+            if language:
+                name = language.split(':')[-1]
+                tags_info.append({
+                    'type': 'sedml',
+                    'name': 'model:{}'.format(name)
+                })
+
+        if len(doc.getListOfDataDescriptions()) > 0:
+            tags_info.append({
+                'type': 'sedml',
+                'name': 'DataDescription'
+            })
 
     omex.cleanUp()
     return tags_info
@@ -286,3 +316,7 @@ def get_content(archive):
     print(path)
     print_archive(fileName=path)
 
+
+if __name__ == "__main__":
+    path = "../../archives/CombineArchiveShowCase.omex"
+    tags_info(archive_path=path)

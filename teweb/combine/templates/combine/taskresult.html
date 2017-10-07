@@ -10,7 +10,6 @@
             </div>
 
             <div class="panel-body">
-
                 <table id="taskresults" class="table table-striped table-condensed table-hover">
                     <thead>
                     <tr>
@@ -27,38 +26,38 @@
                     </thead>
                     <tr>
                         <td><span class="badge">{{ tr.id }}</span></td>
-                    <td>{% if archives %}
-                        {%  for archive in archives %}
+                        <td>{% if archives %}
+                            {% for archive in archives %}
                             <a href="{{ url('combine:archive', args=[archive.id]) }}"><span class="label label-primary">{{ archive.name }}</span></a>
-                        {% endfor %}
-                        {% endif %}
-                    </td>
-                    <td>{{ tr.task_id }}</td>
-                    <td>
-                        {% with status = tr.status %}
-                        {% if status == "SUCCESS" %}
+                            {% endfor %}
+                            {% endif %}
+                        </td>
+                        <td>{{ tr.task_id }}</td>
+                        <td>
+                            {% with status = tr.status %}
+                            {% if status == "SUCCESS" %}
                             <span class="label label-success"><i
                                     class="fa fa-check-square fa-fw"></i> {{ status }}</span>
-                        {% elif status == "FAILURE" %}
+                            {% elif status == "FAILURE" %}
                             <span class="label label-danger"><i
                                     class="fa fa-minus-square fa-fw"></i> {{ status }}</span>
-                        {% else %}
+                            {% else %}
                             <span class="label label-info">{{ status }}</span>
-                        {% endif %}
-                        {% endwith %}
-                    </td>
-                    <td>{{ tr.content_type }}</td>
-                    <td>{{ tr.content_encoding }}</td>
-                    <td>{{ tr.date_done }}</td>
-                    <td>{{ tr.hidden }}</td>
-                    <td>{{ tr.meta }}</td>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td>{{ tr.content_type }}</td>
+                        <td>{{ tr.content_encoding }}</td>
+                        <td>{{ tr.date_done }}</td>
+                        <td>{{ tr.hidden }}</td>
+                        <td>{{ tr.meta }}</td>
                     </tr>
                 </table>
             </div>
         </div>
 
-            {%  if tr.traceback %}
-            <div class="panel panel-default">
+        {% if tr.traceback %}
+        <div class="panel panel-default">
             <div class="panel-heading">
                 <h2 class="panel-title"><i class="fa fa-play"></i> Traceback</h2>
             </div>
@@ -67,23 +66,23 @@
                 <code class="prettyprint">{{ tr.traceback|safe }}</code>
                 </pre>
             </div>
-            </div>
-            {% endif %}
+        </div>
+        {% endif %}
 
-            {%  if tr.result %}
-            <div class="panel panel-default">
+        {% if tr.result %}
+        <div class="panel panel-default">
             <div class="panel-heading">
                 <h2 class="panel-title"><i class="fa fa-play"></i> Result</h2>
             </div>
             <div class="panel-body">
                 <pre>
-                <code>{{ tr.result|safe }}</code>
+                <codes>{{ tr.result|safe }}</codes>
                 </pre>
             </div>
-            </div>
-            {% endif %}
+        </div>
+        {% endif %}
 
-        {%  endwith %}
+        {% endwith %}
 
     </div>
 </div>
