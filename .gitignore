@@ -7,3 +7,6 @@ teweb/combine/__pycache__/
 teweb/combine.sqlite3
 teweb/media/
 teweb/teweb/__pycache__/
+
+# deploy settings
+teweb/teweb/deploy_settings.py
