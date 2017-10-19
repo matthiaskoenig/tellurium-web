@@ -1,6 +1,10 @@
 .idea/
 *.pyc
+*.log
+*.bak
+*.sav
 *~
+
 teweb/static/
 # teweb/combine/migrations/
 teweb/combine/__pycache__/
@@ -10,3 +14,10 @@ teweb/teweb/__pycache__/
 
 # deploy settings
 teweb/teweb/deploy_settings.py
+
+# latex files
+docs/manuscript/main.aux
+docs/manuscript/main.bbl
+docs/manuscript/main.blg
+docs/manuscript/main.log
+docs/manuscript/main.synctex.gz

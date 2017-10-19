@@ -23,12 +23,12 @@ PROJECT_DIR = os.path.join(FILE_DIR, "../teweb/")
 # directory of omex archives
 
 ARCHIVE_DIRS = [
-    # os.path.join(FILE_DIR, "../archives"),
+    os.path.join(FILE_DIR, "../archives"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/biomodels"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/jws"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/specification/"),
-    os.path.join(FILE_DIR, "../../sed-ml/specification/level-1-version-3/examples/__omex__"),
+    # os.path.join(FILE_DIR, "../../sed-ml/specification/level-1-version-3/examples/__omex__"),
 ]
 
 # This is so my local_settings.py gets loaded.
@@ -97,6 +97,7 @@ def add_archives_to_database():
 def create_superuser():
     from django.contrib.auth.models import User
     User.objects.create_superuser('mkoenig', 'konigmatt@googlemail.com', os.environ['DJANGO_ADMIN_PASSWORD'])
+    User.objects.create_superuser('janek89', 'janekg89@hotmail.de', os.environ['DJANGO_ADMIN_PASSWORD'])
 
 
 if __name__ == "__main__":
