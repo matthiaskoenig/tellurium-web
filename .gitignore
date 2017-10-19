@@ -1,16 +1,27 @@
+# pycharm
 .idea/
+
+# generic files
 *.pyc
 *.log
 *.bak
 *.sav
 *~
 
+# database files
 teweb/static/
-# teweb/combine/migrations/
-teweb/combine/__pycache__/
+teweb/combine/migrations/
 teweb/combine.sqlite3
 teweb/media/
+
+# cache
+teweb/__pycache__/
 teweb/teweb/__pycache__/
+teweb/combine/__pycache__/
+teweb/combine/fixtures/__pycache__/
+teweb/combine/oven/__pycache__/
+scripts/__pycache__/
+tests/functional/__pycache__/
 
 # deploy settings
 teweb/teweb/deploy_settings.py
@@ -21,3 +32,4 @@ docs/manuscript/main.bbl
 docs/manuscript/main.blg
 docs/manuscript/main.log
 docs/manuscript/main.synctex.gz
+docs/images/icons/
