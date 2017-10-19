@@ -4,99 +4,98 @@
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 [![Coverage Status](https://coveralls.io/repos/github/matthiaskoenig/tellurium-web/badge.svg?branch=master)](https://coveralls.io/github/matthiaskoenig/tellurium-web?branch=master)
 
-Online tools for running [CombineArchives](http://co.mbine.org/documents/archive) (*.omex) with [tellurium](http://tellurium.analogmachine.org/).   
-Model descriptions in 
-[SBML](http://sbml.org) and simulation descriptions in [SED-ML](http://sed-ml.org) are supported.
+Web based database and tools for running simulation experiments in computational biology 
+based on [COMBINE Archives](http://co.mbine.org/documents/archive) (*.omex) 
+using [tellurium](http://tellurium.analogmachine.org/) as simulation backend. 
+
+A [COMBINE Archive](http://co.mbine.org/documents/archive) is a single zip file containing the various documents 
+necessary for the description of a model and all associated data and procedures. 
+This includes for instance, but not limited to, simulation experiment descriptions, 
+all models needed to run the simulations and associated data files. 
+The archive is encoded using the Open Modeling EXchange format (OMEX).
+
+[tellurium](http://tellurium.analogmachine.org/) is a python environment for reproducible dynamical modeling 
+of biological Networks. 
+
+In the current version, model descriptions in the Systems Biology Markup Language ([SBML](http://sbml.org)), the 
+de facto standard for encoding mathematical models in computational biology, and simulation descriptions in 
+in the Simulation Experiment Description Markup Language ([SED-ML](http://sed-ml.org)). 
 
 
+## Features
+- upload and managing of COMBINE archives
+- COMBINE archive viewer
+- running COMBINE archive based simulation experiments
+- [SBML](http://sbml.org) models (all level and versions, i.e. L2 and L3)
+- [SED-ML](http://sed-ml.org) simulations (all level and versions, i.e., L1V1, L1V2 & L1V3)
 
 <img title="Screenshot Tellurium Web Tools" src="./docs/images/screenshot-0.1.png" width="600" />
 
-Screenshot of the CombineArchive upload and list of Archives. 
-Among others the [Combine Showcase Archive](https://github.com/SemsProject/CombineArchiveShowCase) is included.
+Screenshot of the COMBINE archive upload functionality and the COMBINE archive browser.
+
+`Tellurium Web` have been tested with a wide range of archives, among others 
+- [COMBINE Archive Showcase](https://github.com/SemsProject/CombineArchiveShowCase)
+- [JWS] () archives
+
+The following technology is used in `Tellurium Web`
+* Web framework: [django](https://www.djangoproject.com/)
+* Database layer: [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
+* Task queue: [celery](http://www.celeryproject.org/) Distributed task queue
+* Message broker: [redis](https://redis.io/) Redis is an open source in-memory data structure store, used as a database, cache and message broker.
+* Interactive plots: [plotly.js](https://github.com/plotly/plotly.js)
 
 ## License
 * Source Code: [LGPLv3](http://opensource.org/licenses/LGPL-3.0)
 * Documentation: [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
 
-## Installation
-`tellurium-web` requires 
-- `python 3.5` or `python 3.6`.
-- `redis` installation as message broker (for installation script see `linux-setup`) or `rabbitmq-server`
-- `postgres`
 
+# Installation
+`tellurium-web` supports `python 3.5` or `python 3.6`.
 
-### Setup
+## Basic Setup
+Clone repository
+```
+git clone https://github.com/matthiaskoenig/tellurium-web.git
+cd tellurium-web
+```
+Create virtual environment
 ```
 mkvirtualenv tellurium-web
 (tellurium-web) pip install -r requirements.txt
 ```
-
-The test server can be run via
+Set necessary environment variables for database
 ```
-(tellurium-web) cd teweb
-(tellurium-web) python manage.py makemigrations
-(tellurium-web) python manage.py makemigrations combine
-
-(tellurium-web) python manage.py migrate
-(tellurium-web) python manage.py runserver
-(tellurium-web) python manage.py createsuperuser
+(tellurium-web) export DJANGO_ADMIN_PASSWORD="test"
 ```
-Database can be filled via
+Set environment variable and create database
 ```
-(tellurium-web) ./scripts/fill_db.sh
+(tellurium-web) ./scripts/create_db.sh
 ```
 
-# Celery
-Start a test worker 
+## Task Queue
+`Tellurium Web` uses a task queue to manage the execution of simulation experiments. 
+To provide the functionality of simulation execution `redis` as message broker must be setup 
+and a `celery` worker must be started
+
+To install redis on Ubuntu use the installation script
+```
+./scripts/install_redis.sh 2>&1 | tee ./scripts/install_redis.log
+```
+
+To start a `celery` test worker run 
 ```
 (tellurium-web) celery -A teweb worker -l info
 ```
 
-### gunicorn
-To test if gunicorn can serve the WSGI application use
+# Run
+The test server is run via
 ```
-(tellurium-web) cd teweb
-(tellurium-web) gunicorn --bind 0.0.0.0:8000 teweb.wsgi:application
+(tellurium-web) python manage.py runserver 8001
 ```
-This will not serve the static files but check if the WSGI django works with gunicorn,
-which is close to the actual deployment setup.
-
-Gunicorn can be installed via
-```
-sudo apt-get install gunicorn
-```
-
 
 ## Changelog
-*v0.1* [?]
+*v0.1.0* [?]
 - initial release
 
 
-# Technology
-This section gives an overview over the employed technology in `tellurium-web`
-
-### Web framework 
-* [django](https://www.djangoproject.com/)
-
-### Database layer
-* [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
-
-### Task queue
-The execution of the CombineArchives and the simulations are performed
-in a task queue. Task queues are used as a mechanism to distribute work across threads or machines.
-* [celery](http://www.celeryproject.org/) Distributed task queue
-* [redis](https://redis.io/) Redis is an open source (BSD licensed), 
-in-memory data structure store, used as a database, cache and message broker.
-* [jobtastic](https://github.com/PolicyStat/jobtastic)
-
-
-### Interactive plots
-python plot framework (interactive)
-* [plotly](https://plot.ly/python/) with examples https://plot.ly/python/line-charts/
-* [bokeh](https://bokeh.pydata.org/en/latest/) 
-* [plotly.js](https://github.com/plotly/plotly.js) 
-
-### Docker 
-* development & deployment in container
-* reproducible environments for testing
+&copy; 2017 Matthias König

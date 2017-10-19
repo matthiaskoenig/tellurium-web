@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 CELERYD_NODES="worker1"
 CELERY_BIN="/home/mkoenig/envs/tellurium_webapp/bin/celery"
