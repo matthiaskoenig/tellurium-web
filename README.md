@@ -60,7 +60,7 @@ cd tellurium-web
 ```
 Create virtual environment
 ```
-mkvirtualenv tellurium-web
+mkvirtualenv tellurium-web --python=python3
 (tellurium-web) pip install -r requirements.txt
 ```
 Set necessary environment variables for database
@@ -82,14 +82,16 @@ To install redis on Ubuntu use the installation script
 ./scripts/install_redis.sh 2>&1 | tee ./scripts/install_redis.log
 ```
 
-To start a `celery` test worker run 
+To start a `celery` test worker change in the `teweb` folder start a worker via
 ```
+(tellurium-web) cd teweb
 (tellurium-web) celery -A teweb worker -l info
 ```
 
 # Run
 The test server is run via
 ```
+(tellurium-web) cd teweb
 (tellurium-web) python manage.py runserver 8001
 ```
 
