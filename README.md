@@ -33,10 +33,11 @@ in the Simulation Experiment Description Markup Language ([SED-ML](http://sed-ml
 
 Screenshot of the COMBINE archive upload functionality and the COMBINE archive browser.
 
-`Tellurium Web` have been tested with a wide range of archives, among others 
+`Tellurium Web` has been tested with a wide range of archives, among others 
 - [COMBINE Archive Showcase](https://github.com/SemsProject/CombineArchiveShowCase)
-- [JWS] () archives
+- [JWS online](https://jjj.bio.vu.nl/) archives
 
+## Technology
 The following technology is used in `Tellurium Web`
 * Web framework: [django](https://www.djangoproject.com/)
 * Database layer: [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
@@ -96,8 +97,9 @@ The test server is run via
 ```
 
 ## Changelog
-*v0.1.0* [?]
+*v0.1.0* [2017-10-19]
 - initial release
+- core functionality implemented
 
 
 &copy; 2017 Matthias König
