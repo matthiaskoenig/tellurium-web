@@ -8,16 +8,14 @@
 `Tellurium Web` are an online database and simulation tools for running reproducible simulation experiments in computational biology. 
  
 The `Tellurium Web` workflow is based around [COMBINE Archives](http://co.mbine.org/documents/archive) (`*.omex`)
-as an exchange format using [Tellurium](http://tellurium.analogmachine.org/) as simulation backend. 
+as an exchange format. [Tellurium](http://tellurium.analogmachine.org/), a python environment for reproducible dynamical modeling 
+of biological networks, is used as simulation backend with [libroadrunner](http://libroadrunner.org/) as high performance simulation engine. 
 
 A [COMBINE Archive](http://co.mbine.org/documents/archive) is a single zip file containing the various documents 
 necessary for the description of a model and all associated data and procedures. 
 This includes for instance, but not limited to, simulation experiment descriptions, 
 all models needed to run the simulations and associated data files. 
 The archive is encoded using the Open Modeling EXchange format (OMEX).
-
-[Tellurium](http://tellurium.analogmachine.org/) is a python environment for reproducible dynamical modeling 
-of biological Networks. 
 
 The current version of `Tellurium Web` supports model descriptions in the Systems Biology Markup Language ([SBML](http://sbml.org)), 
 the de facto standard for encoding mathematical models in computational biology, and simulation descriptions in 
@@ -31,27 +29,15 @@ simulation experiments.
 - supports [SBML](http://sbml.org) models (all level and versions, i.e. `L2V*` and `L3V*`)
 - supports [SED-ML](http://sed-ml.org) simulations (all level and versions, i.e., `L1V1`, `L1V2` & `L1V3`)
 
-<img title="Screenshot Tellurium Web Tools" src="./docs/images/screenshot-0.1.png" width="800" />
-
-Screenshot of the COMBINE archive upload functionality and COMBINE archive browser.
-
 `Tellurium Web` has been tested with a wide range of archives, among others 
 - [COMBINE Archive Showcase](https://github.com/SemsProject/CombineArchiveShowCase)
 - [JWS online](https://jjj.bio.vu.nl/) archives
 
-## Technology
-The following technology is used in `Tellurium Web`
-* Web framework: [django](https://www.djangoproject.com/)
-* Database layer: [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
-* Task queue: [celery](http://www.celeryproject.org/) Distributed task queue
-* Message broker: [redis](https://redis.io/) Redis is an open source in-memory data structure store, used as a database, cache and message broker.
-* Interactive plots: [plotly.js](https://github.com/plotly/plotly.js)
-
-`Tellurium Web` is based existing technology and standards in the [COMBINE (Coordinating standards for modeling in biology)](http://co.mbine.org/) 
-initative, i.e., 
+`Tellurium Web` is based existing technology and standards in the "Coordinating standards for modeling in biology" ([COMBINE](http://co.mbine.org/))  
+initative, e.g., 
 * [SBML](http://sbml.org) for computational models
 * [SED-ML](http://sed-ml.org) for simulation experiments
-* [COMBINE Archives](http://co.mbine.org/documents/archive) for the exchange of models and simulation experiments
+* [COMBINE Archives](http://co.mbine.org/documents/archive) for the exchange of data
 
 <a href="http://co.mbine.org/" alt="COMBINE" target="_blank"><img src="./docs/images/logos/combine.png" height="25"></a> &nbsp;&nbsp;
 <a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img src="./docs/images/logos/omex.png" height="25"></a> &nbsp;&nbsp;
@@ -61,10 +47,21 @@ initative, i.e.,
 <a href="http://tellurium.analogmachine.org/" alt="Tellurium" target="_blank"><img src="./docs/images/logos/te.png" height="25"></a> &nbsp;&nbsp;
 <a href="http://antimony.sourceforge.net//" alt="Antimony" target="_blank"><img src="./docs/images/logos/antimony.png" height="25"></a> &nbsp;&nbsp;
 
+## Screenshots
+Screenshot of the COMBINE archive upload functionality and COMBINE archive browser:
+<img title="Screenshot Tellurium Web Tools" src="./docs/images/screenshot-0.1.png" width="800" />
+
+## Technology
+The following technology is used in `Tellurium Web`
+* Web framework: [django](https://www.djangoproject.com/)
+* Database layer: [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
+* Task queue: [celery](http://www.celeryproject.org/) Distributed task queue
+* Message broker: [redis](https://redis.io/) Redis is an open source in-memory data structure store, used as a database, cache and message broker.
+* Interactive plots: [plotly.js](https://github.com/plotly/plotly.js)
+
 ## License
 * Source Code: [LGPLv3](http://opensource.org/licenses/LGPL-3.0)
 * Documentation: [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
-
 
 # Installation
 `tellurium-web` supports `python 3.5` or `python 3.6`.
@@ -112,7 +109,7 @@ The test server is run via
 (tellurium-web) python manage.py runserver 8001
 ```
 
-## Changelog
+# Changelog
 *v0.1.0* [2017-10-19]
 - initial release
 - core functionality implemented
