@@ -1,5 +1,7 @@
 <h1><img title="tellurium logo" src="./teweb/combine/static/combine/images/logos/te-web.png" height="40" />&nbsp;&nbsp;Tellurium Web</h1>
 
+[![DOI](https://zenodo.org/badge/70522136.svg)](https://zenodo.org/badge/latestdoi/70522136)
+[![GitHub version](https://badge.fury.io/gh/matthiaskoenig%2Ftellurium-web.svg)](https://badge.fury.io/gh/matthiaskoenig%2Ftellurium-web)
 [![Build Status](https://travis-ci.org/matthiaskoenig/tellurium-web.svg?branch=develop)](https://travis-ci.org/matthiaskoenig/tellurium-web)
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 [![Coverage Status](https://coveralls.io/repos/github/matthiaskoenig/tellurium-web/badge.svg?branch=master)](https://coveralls.io/github/matthiaskoenig/tellurium-web?branch=master)
@@ -110,6 +112,9 @@ The test server is run via
 ```
 
 # Changelog
+*v0.2.0* [?]
+
+
 *v0.1.0* [2017-10-19]
 - initial release
 - core functionality implemented
