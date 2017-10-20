@@ -7,7 +7,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/matthiaskoenig/tellurium-web/badge.svg?branch=master)](https://coveralls.io/github/matthiaskoenig/tellurium-web?branch=master)
 
  
-`Tellurium Web` are an online database and simulation tools for running reproducible simulation experiments in computational biology. 
+`Tellurium Web` provides an online database and simulation tools for running reproducible simulation experiments in computational biology. 
  
 The `Tellurium Web` workflow is based around [COMBINE Archives](http://co.mbine.org/documents/archive) (`*.omex`)
 as an exchange format. [Tellurium](http://tellurium.analogmachine.org/), a python environment for reproducible dynamical modeling 
@@ -64,6 +64,12 @@ The following technology is used in `Tellurium Web`
 ## License
 * Source Code: [LGPLv3](http://opensource.org/licenses/LGPL-3.0)
 * Documentation: [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
+
+## Funding
+Matthias König is supported by the Federal Ministry of Education and Research (BMBF, Germany) 
+within the research network Systems Medicine of the Liver (LiSyM, grant number 031L0054).
+<a href="http://www.lisym.org/" alt="LiSyM" target="_blank"><img src="./docs/images/logos/lisym.png" height="35"></a> &nbsp;&nbsp;
+<a href="http://www.bmbf.de/" alt="BMBF" target="_blank"><img src="./docs/images/logos/bmbf.png" height="35"></a> &nbsp;&nbsp;
 
 # Installation
 `tellurium-web` supports `python 3.5` or `python 3.6`.
