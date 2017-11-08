@@ -1,12 +1,15 @@
 """
 Models definitions.
 """
+import uuid as uuid_lib
+
 import logging
 import hashlib
 
 from django.db import models
 from django.utils import timezone
 from djchoices import DjangoChoices, ChoiceItem
+from django.contrib.auth.models import User
 
 try:
     import libcombine
@@ -50,23 +53,32 @@ def hash_for_file(file, hash_type='MD5', blocksize=65536):
 # Models
 # ===============================================================================
 
+class TagType(DjangoChoices):
+    format = ChoiceItem("format")
+    source = ChoiceItem("source")
+    simulation = ChoiceItem("sim")
+    model = ChoiceItem("model")
+    sedml = ChoiceItem("sedml")
+    misc = ChoiceItem("misc")
+
 class Tag(models.Model):
     """ Tag class to describe content of files or archives.
     """
     # Choices
-    class TagType(DjangoChoices):
-        format = ChoiceItem("format")
-        source = ChoiceItem("source")
-        simulation = ChoiceItem("sim")
-        model = ChoiceItem("model")
-        sedml = ChoiceItem("sedml")
-        misc = ChoiceItem("misc")
+
 
     name = models.CharField(max_length=300)
     type = models.CharField(max_length=20, choices=TagType.choices)
+    uuid = models.UUIDField(  # Used by the API to look up the record
+                            db_index=True,
+                            default=uuid_lib.uuid4,
+                            editable=False)
+    def __str__(self):
+        return self.name
 
     class Meta:
         unique_together = ('name', 'type')
+
 
 
 class Archive(models.Model):
@@ -80,6 +92,11 @@ class Archive(models.Model):
     md5 = models.CharField(max_length=36, blank=True)
     task_id = models.CharField(max_length=100, blank=True)
     tags = models.ManyToManyField(Tag, related_name="archives")
+    user = models.ForeignKey(User, blank=True, null=True)
+    uuid = models.UUIDField(  # Used by the API to look up the record
+        db_index=True,
+        default=uuid_lib.uuid4,
+        editable=False)
 
     def __str__(self):
         return self.name

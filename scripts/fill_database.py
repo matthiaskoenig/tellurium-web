@@ -97,7 +97,7 @@ def add_archives_to_database():
 def create_superuser():
     from django.contrib.auth.models import User
     User.objects.create_superuser('mkoenig', 'konigmatt@googlemail.com', os.environ['DJANGO_ADMIN_PASSWORD'])
-    User.objects.create_superuser('janek89', 'janekg89@hotmail.de', os.environ['DJANGO_ADMIN_PASSWORD'])
+    User.objects.create_superuser('janek89', 'janekg89@hotmail.de',os.environ['DJANGO_ADMIN_PASSWORD'])
 
 
 if __name__ == "__main__":

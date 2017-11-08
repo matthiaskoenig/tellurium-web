@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_celery_results',
+    'rest_framework',
+    'rest_framework_swagger',
+    'django_filters',
     # 'debug_toolbar'
 ]
 
@@ -83,7 +86,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'teweb.wsgi.application'
 
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
 
+    ],
+    'DEFAULT_FILTER_BACKENDS': ( 'rest_framework.filters.SearchFilter',
+                                 'django_filters.rest_framework.DjangoFilterBackend',
+                                )
+
+}
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
@@ -141,6 +155,9 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+LOGIN_URL = 'rest_framework:login'
+LOGOUT_URL = 'rest_framework:logout'
 
 try:
     from teweb.deploy_settings import *
