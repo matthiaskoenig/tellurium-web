@@ -1,9 +1,8 @@
+{% import 'combine/macros.html' as macros %}
 <!-- tag content -->
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h2 class="panel-title"><i class="fa fa-bookmark"></i> Tag
-            <span class="label label-default">{{ tag.type }}</span><span class="label label-warning">{{ tag.name }}</span>
-        </h2>
+        <h2 class="panel-title"><i class="fa fa-bookmark"></i> Tag {{ macros.tag_html(tag) }}</h2>
     </div>
 
     <div class="panel-body">
@@ -12,19 +11,19 @@
             <tr>
                 <th>id</th>
                 <th>tag</th>
-                <th>type</th>
+                <th>category</th>
                 <th>name</th>
+                <th>uuid</th>
                 <th>count</th>
                 <th>archives</th>
             </tr>
             </thead>
             <tr>
                 <td><span class="badge">{{ tag.id }}</span></td>
-                <td>
-                    <span class="label label-default">{{ tag.type }}</span><span class="label label-warning">{{ tag.name }}</span>
-                </td>
-                <td>{{ tag.type }}</td>
+                <td>{{ macros.tag_html(tag) }}</td>
+                <td>{{ tag.category }}</td>
                 <td>{{ tag.name }}</td>
+                <td>{{ tag.uuid }}</td>
                 <td>{% if archives %}
                     {{ archives|length }}
                     {% endif %}

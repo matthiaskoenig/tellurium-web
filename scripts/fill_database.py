@@ -87,8 +87,8 @@ def add_archives_to_database():
             tags_info = comex.tags_info(f)
             print(tags_info)
             for tag_info in tags_info:
-                tag, created = Tag.objects.get_or_create(name=tag_info['name'],
-                                                         type=tag_info['type'])
+                tag, created = Tag.objects.get_or_create(name=tag_info.name,
+                                                         category=tag_info.category)
                 if created:
                     tag.save()
                 new_archive.tags.add(tag)
