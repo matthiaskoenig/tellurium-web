@@ -33,3 +33,6 @@ docs/manuscript/main.blg
 docs/manuscript/main.log
 docs/manuscript/main.synctex.gz
 docs/images/icons/
+
+# jupyter checkpoints
+api/.ipynb_checkpoints/
