@@ -1,20 +1,20 @@
 celery>=4.1.0
 redis>=2.10.6
 
-django>=1.11.6
+django>=1.11.7
 django-debug-toolbar>=1.8
 django-choices>=1.6.0
 django-celery-results>=1.0.1
 django-celery-beat
-django-filter-1.1.0
-django-rest-swagger-2.1.2
-djangorestframework-3.7.3
+django-filter>=1.1.0
+django-rest-swagger>=2.1.2
+djangorestframework>=3.7.3
 coreapi>=1.32.0
-markdown-2.6.9
+markdown>=2.6.9
 jinja2>=2.9.6
 python-magic>=0.4.13
 psycopg2
 gunicorn
 
-# tellurium>=2.0.5
--e git+https://github.com/sys-bio/tellurium.git@master#egg=tellurium
+tellurium>=2.0.8
+# -e git+https://github.com/sys-bio/tellurium.git@master#egg=tellurium
