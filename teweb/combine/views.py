@@ -666,8 +666,10 @@ class ArchiveViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = ArchiveSerializer
     lookup_field = 'uuid'
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
     filter_fields = ('name','task_id','tags','created')
+    search_fields = ('name','tags__name','created')
+
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -678,9 +680,9 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = TagSerializer
     lookup_field = 'uuid'
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
     filter_fields = ('name','type')
-
+    search_fields = ('name', 'type')
 
 
 # ViewSets define the view behavior.
