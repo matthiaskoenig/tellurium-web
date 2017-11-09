@@ -661,41 +661,59 @@ def check_state(request, archive_id):
     return JsonResponse(data)
 
 
+###################################
+# REST API
+###################################
+# TODO: authentication, get queries allowed for everyone, all other queries for authenticated
+# TODO:
+
+
+def webservices(request):
+    """ Web services page. """
+    context = {
+
+    }
+    return render(request, 'combine/webservices.html', context)
+
+
 class ArchiveViewSet(viewsets.ModelViewSet):
+    """ REST archives.
+
+    lookup_field defines the url of the detailed view.
+    permission_classes define which users is allowed to do what.
+    """
     queryset = Archive.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     serializer_class = ArchiveSerializer
     lookup_field = 'uuid'
-    filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
-    filter_fields = ('name','task_id','tags','created')
-    search_fields = ('name','tags__name','created')
-
+    filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
+    filter_fields = ('name', 'task_id', 'tags', 'created')
+    search_fields = ('name', 'tags__name', 'created')
 
     def perform_create(self, serializer):
+        # automatically set the user on create
         serializer.save(user=self.request.user)
 
 
 class TagViewSet(viewsets.ModelViewSet):
+    """ REST tags. """
     queryset = Tag.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = TagSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
-    filter_fields = ('name','type')
+    filter_fields = ('name', 'type')
     search_fields = ('name', 'type')
 
 
-# ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
-    """
+    """ REST users.
+
     A viewset for viewing and editing user instances.
     """
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
     queryset = User.objects.all()
     filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
-    filter_fields = ('is_staff','username')
-    search_fields = ('is_staff','username',"email")
-
-
-
+    filter_fields = ('is_staff', 'username')
+    search_fields = ('is_staff', 'username', "email")
