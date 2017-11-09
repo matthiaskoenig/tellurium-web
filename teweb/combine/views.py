@@ -665,7 +665,11 @@ def check_state(request, archive_id):
 # REST API
 ###################################
 # TODO: authentication, get queries allowed for everyone, all other queries for authenticated
-# TODO:
+# TODO: provide url for download of archives
+# TODO: use tag names in REST API
+# TODO: API versioning
+# TODO: improved swagger documentation
+# TODO: fixed ids
 
 
 def webservices(request):
@@ -702,8 +706,8 @@ class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
-    filter_fields = ('name', 'type')
-    search_fields = ('name', 'type')
+    filter_fields = ('category', 'name')
+    search_fields = ('category', 'name')
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -714,6 +718,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
     queryset = User.objects.all()
-    filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
+    filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
     filter_fields = ('is_staff', 'username')
     search_fields = ('is_staff', 'username', "email")
