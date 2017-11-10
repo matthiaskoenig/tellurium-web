@@ -11,7 +11,7 @@ from .forms import UploadArchiveForm
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OMEX_SHOWCASE_PATH = os.path.join(BASE_DIR, '../../archives/CombineArchiveShowCase.omex')
 
-BASE_URL = '/combine/'
+BASE_URL = '/'
 
 
 class ArchiveMethodTests(TestCase):

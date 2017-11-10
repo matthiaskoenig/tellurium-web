@@ -1,0 +1,50 @@
+<!--
+Definition of reusable macro function in templates
+-->
+
+<!-- Measurement type -->
+{% macro tag_html(tag) %}
+<a href="{{ url('combine:tag', args=[tag.id]) }}"><span class="label label-default">{{ tag.category }}</span><span class="label label-warning">{{ tag.name }}</span></a>
+{% endmacro %}
+
+<!-- User -->
+{% macro user(user) %}
+{% if user %}
+<i class="fa fa-fw fa-user"></i> {{ user.first_name }} {{ user.last_name }}<br />
+{% else %}
+<i class="fa fa-fw fa-ban"></i>
+{% endif %}
+{% endmacro %}
+
+<!-- Status -->
+{% macro status(status) %}
+{% if status == "finished" %}
+<i class="fa fa-fw fa-check-square-o text-success" title="{{ status }}"></i>
+{% elif status == "in progress" %}
+    <i class="fa fa-fw fa-cog" title="{{ status }}"></i>
+{% endif %}
+{{ status }}</td>
+{% endmacro %}
+
+<!-- Step type -->
+{%  macro step_type(step) %}
+{% with name = step.__class__.__name__ %}
+{% if name == "Washing" %}
+    <i class="fa fa-fw fa-shower text-primary"></i> {{ name }}
+{% elif name == "Drying" %}
+    <i class="fa fa-fw fa-bullhorn text-warning"></i> {{ name }}
+{% elif name == "Spotting" %}
+    <i class="fa fa-fw fa-anchor"></i> {{ name }} / Immobilization
+{% elif name == "Quenching" %}
+    <i class="fa fa-fw fa-chain-broken text-danger"></i> {{ name }}
+{% elif name == "Incubating" %}
+    <i class="fa fa-fw fa-tint"></i> {{ name }}
+{% elif name == "IncubatingAnalyt" %}
+    <i class="fa fa-fw fa-tint" aria-hidden="true"></i>Incubating Analyte
+{% elif name == "Blocking" %}
+    <i class="fa fa-fw fa-pause text-danger" aria-hidden="true"></i> {{ name }}
+{% elif name == "Scanning" %}
+    <i class="fa fa-fw fa-camera text-success" aria-hidden="true"></i> {{ name }}
+{% endif %}
+{% endwith %}
+{% endmacro %}

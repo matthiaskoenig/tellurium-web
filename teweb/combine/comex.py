@@ -20,6 +20,9 @@ except ImportError:
 import importlib
 importlib.reload(libcombine)
 
+from collections import namedtuple
+TagInfo = namedtuple("TagInfo", "category name")
+
 
 ################################################
 # Tag helpers
@@ -47,10 +50,9 @@ def tags_info(archive_path):
         format_id = base_format(format)
 
         if format_id in ['sbml', 'cellml', 'sed-ml', 'sedml', 'sbgn', 'sbol']:
-            tags_info.append({
-                'type': 'format',
-                'name': format_id,
-            })
+            tags_info.append(
+                TagInfo(category='format', name=format_id)
+            )
         if format_id == 'sbml':
             sbml_entries.append(entry)
         if format_id in ['sedml', 'sed-ml']:
@@ -67,16 +69,14 @@ def tags_info(archive_path):
             language = model.getLanguage()
             if language:
                 name = language.split(':')[-1]
-                tags_info.append({
-                    'type': 'sedml',
-                    'name': 'model:{}'.format(name)
-                })
+                tags_info.append(
+                    TagInfo(category='sedml', name='model:{}'.format(name))
+                )
 
         if len(doc.getListOfDataDescriptions()) > 0:
-            tags_info.append({
-                'type': 'sedml',
-                'name': 'DataDescription'
-            })
+            tags_info.append(
+                TagInfo(category='sedml', name='DataDescription')
+            )
 
     omex.cleanUp()
     return tags_info

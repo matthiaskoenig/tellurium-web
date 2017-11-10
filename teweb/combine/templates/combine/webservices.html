@@ -1,0 +1,66 @@
+{% extends "combine/base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <h1 class="panel-title"><i class="fa fa-cube fa-fw"></i> REST web services</h1>
+                </div>
+
+                <div class="panel-body">
+                    Web Services provide access to tellurium-web in a language independent fashion.
+                    To use them programmatically, developers can create their own client application to automate
+                    the access to the database directly from their simulation software, tools or databases.
+                    tellurium-web can be automatically accessed via RESTful Web Services via HTTP requests.
+
+                    COMBINE archives can be accessed using simple http GET requests to either retrieve a complete
+                    COMBINE archive.
+
+                    The entry point of the API is available from <a href="" title="REST API">here</a>.
+
+                    The REST API provides access the COMBINE archives, tags and users of Tellurium Web.
+
+                    <h2>REST endpoints (urls)</h2>
+                    <ul>
+                        <li><code>/api/</code>: API entry point and schema (swagger)</li>
+                        <li><code><a href="">/api/archives/</a></code>: access COMBINE archives</li>
+                        <li><code>/api/archive/{uuid}</code>: access single COMBINE archive</li>
+                        <li><code>/api/tags/</code>: access tags for COMBINE archives</li>
+                        <li><code>/api/tag{uuid}</code>: access single tag</li>
+                        <li><code>/api/users/</code>: access users</li>
+                        <li><code>/api/user/{uuid}</code>: access single user</li>
+                    </ul>
+
+                    <h2>Authentication</h2>
+                    For a subset of the REST functionality a login is required.
+                    Login with your tellurium-web credentials at `./api/`
+
+                    To authenticate via python use the following code snippet
+
+                    <pre><code># base url
+base_url = http://127.0.0.1:8001
+
+# authentication
+auth = coreapi.auth.BasicAuthentication(
+    username='mkoenig',
+    password='*******'
+)
+client = coreapi.Client(auth=auth)
+document = client.get(base_url + "/api/")</code></pre>
+
+                    <h2>Python Examples</h2>
+
+                    How to access the the (core) api in python is demonstrated in the example notebook
+                    <a href="https://github.com/matthiaskoenig/tellurium-web/blob/rest_api/api/api.ipynb">api.ipynb</a>.
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}
+

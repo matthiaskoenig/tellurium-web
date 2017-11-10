@@ -12,17 +12,24 @@ import magic
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, FileResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.files.temp import NamedTemporaryFile
-
 from django_celery_results.models import TaskResult
 from celery.result import AsyncResult
+from rest_framework.response import Response
 
-from combine.models import Tag
+
 from .tasks import execute_omex
-
-from .models import Archive
+from .models import Archive, Tag
+from .serializers import ArchiveSerializer,TagSerializer, UserSerializer
 from .forms import UploadArchiveForm
 from .git import get_commit
+from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets
+from django_filters import rest_framework as filters
+import rest_framework.filters as filters_rest
+
 
 import tellurium
 
@@ -652,3 +659,65 @@ def check_state(request, archive_id):
         }
 
     return JsonResponse(data)
+
+
+###################################
+# REST API
+###################################
+# TODO: authentication, get queries allowed for everyone, all other queries for authenticated
+# TODO: provide url for download of archives
+# TODO: use tag names in REST API
+# TODO: API versioning
+# TODO: improved swagger documentation
+# TODO: fixed ids
+
+
+def webservices(request):
+    """ Web services page. """
+    context = {
+
+    }
+    return render(request, 'combine/webservices.html', context)
+
+
+class ArchiveViewSet(viewsets.ModelViewSet):
+    """ REST archives.
+
+    lookup_field defines the url of the detailed view.
+    permission_classes define which users is allowed to do what.
+    """
+    queryset = Archive.objects.all()
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ArchiveSerializer
+    lookup_field = 'uuid'
+    filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
+    filter_fields = ('name', 'task_id', 'tags', 'created')
+    search_fields = ('name', 'tags__name', 'created')
+
+    def perform_create(self, serializer):
+        # automatically set the user on create
+        serializer.save(user=self.request.user)
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    """ REST tags. """
+    queryset = Tag.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TagSerializer
+    lookup_field = 'uuid'
+    filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
+    filter_fields = ('category', 'name')
+    search_fields = ('category', 'name')
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """ REST users.
+
+    A viewset for viewing and editing user instances.
+    """
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = User.objects.all()
+    filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
+    filter_fields = ('is_staff', 'username')
+    search_fields = ('is_staff', 'username', "email")
