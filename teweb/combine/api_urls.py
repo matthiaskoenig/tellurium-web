@@ -10,8 +10,8 @@ from rest_framework_swagger.views import get_swagger_view
 
 from . import views as teweb_views
 
-# schema_view = get_schema_view(title='Tellurium API')  # Django rest framework
-schema_view = get_swagger_view(title='Tellurium API')  # Swagger
+# schema_view = get_schema_view(title='Tellurium Web API')  # Django rest framework
+schema_view = get_swagger_view(title='Tellurium Web API')  # Swagger
 
 router = routers.DefaultRouter()
 router.register(r'users', teweb_views.UserViewSet, base_name='user')
