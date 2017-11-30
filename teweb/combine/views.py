@@ -689,12 +689,12 @@ class ArchiveViewSet(viewsets.ModelViewSet):
     lookup_field defines the url of the detailed view.
     permission_classes define which users is allowed to do what.
     """
-    #user = User.objects.get(username=request.user)
-    global_user = User.objects.get(username="global")
+    #global_user = User.objects.get(username="global")
     #queryset = Archive.objects.filter(user=global_user)
-    queryset = Archive.objects.filter(user=global_user)
+    queryset = Archive.objects.all()
 
-    permission_classes = (IsOwnerOrReadOnly, IsAdminUserOrReadOnly)
+
+    permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = ArchiveSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)

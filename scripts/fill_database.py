@@ -45,6 +45,14 @@ from combine.models import Archive, Tag, hash_for_file
 from combine import comex
 from django.core.files import File
 from django.contrib.auth.models import User
+from collections import namedtuple
+
+UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
+user_defs = [
+    UserDef("janekg89", "Jan", "Grzegorzewski", "janekg89@hotmail.de", True),
+    UserDef("mkoenig", "Matthias", "König", "konigmatt@googlemail.com", True),
+    UserDef("testuser", False, False, False, False),
+    UserDef("global", False, False, False, False)]
 
 
 def get_omex_file_paths(ARCHIVE_DIRS):
@@ -103,17 +111,40 @@ def add_archives_to_database():
                 new_archive.tags.add(tag)
 
 
-def create_superuser():
-    User.objects.create_superuser('mkoenig', 'konigmatt@googlemail.com', os.environ['DJANGO_ADMIN_PASSWORD'])
-    User.objects.create_superuser('janek89', 'janekg89@hotmail.de',os.environ['DJANGO_ADMIN_PASSWORD'])
-    User.objects.create_superuser('global', 'konigmatt@googlemail.com', os.environ['DJANGO_ADMIN_PASSWORD'])
 
+def create_users(user_defs, delete_all=True):
+    """ Create users in database from user definitions.
 
+    :param delete_all: deletes all existing users
+    :return:
+    """
+    if not user_defs:
+        user_defs = []
+
+    # deletes all users
+    if delete_all:
+        User.objects.all().delete()
+
+    # adds user to database
+    for user_def in user_defs:
+        if user_def.superuser:
+            user = User.objects.create_superuser(username=user_def.username, email=user_def.email,
+                                                 password= os.environ['DJANGO_ADMIN_PASSWORD'])
+        else:
+            user = User.objects.create_user(username=user_def.username, email=user_def.email,
+                                            password= os.environ['DJANGO_ADMIN_PASSWORD'])
+        user.last_name = user_def.last_name
+        user.first_name = user_def.first_name
+        user.save()
+
+    # display users
+    for user in User.objects.all():
+        print('\t', user.username, user.email, user.password)
 
 if __name__ == "__main__":
 
     print('-'*80)
     print('Creating archives')
     print('-' * 80)
-    create_superuser()
+    create_users(user_defs=user_defs, delete_all=True)
     add_archives_to_database()
