@@ -25,7 +25,10 @@ from .serializers import ArchiveSerializer,TagSerializer, UserSerializer
 from .forms import UploadArchiveForm
 from .git import get_commit
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
+from rest_framework.request import Request
+
+from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly
 from rest_framework import viewsets
 from django_filters import rest_framework as filters
 import rest_framework.filters as filters_rest
@@ -686,8 +689,12 @@ class ArchiveViewSet(viewsets.ModelViewSet):
     lookup_field defines the url of the detailed view.
     permission_classes define which users is allowed to do what.
     """
-    queryset = Archive.objects.all()
-    permission_classes = (IsAuthenticated, )
+    #user = User.objects.get(username=request.user)
+    global_user = User.objects.get(username="global")
+    #queryset = Archive.objects.filter(user=global_user)
+    queryset = Archive.objects.filter(user=global_user)
+
+    permission_classes = (IsOwnerOrReadOnly, IsAdminUserOrReadOnly)
     serializer_class = ArchiveSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
@@ -698,11 +705,24 @@ class ArchiveViewSet(viewsets.ModelViewSet):
         # automatically set the user on create
         serializer.save(user=self.request.user)
 
+    def list(self, request):
+         global_user = User.objects.get(username="global")
+
+         if request.user.is_authenticated():
+            queryset = Archive.objects.filter(user__in=[global_user,request.user])
+         else:
+             queryset = Archive.objects.filter(user=global_user)
+         serializer_context = {
+             'request': Request(request),
+         }
+         serializer = ArchiveSerializer(queryset, many=True, context=serializer_context)
+         return Response(serializer.data)
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """ REST tags. """
     queryset = Tag.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = TagSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
@@ -716,7 +736,7 @@ class UserViewSet(viewsets.ModelViewSet):
     A viewset for viewing and editing user instances.
     """
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
     filter_fields = ('is_staff', 'username')

@@ -1,7 +1,6 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from . import views
-
 app_name = 'combine'
 urlpatterns = [
 
@@ -32,6 +31,7 @@ urlpatterns = [
 
     url(r'^test$', views.test_view, name='test_view'),
 
+    #url(r'^api/', include('combine.api_urls', namespace='api')),
 
     # ajax check
     # /combine/5/check_state

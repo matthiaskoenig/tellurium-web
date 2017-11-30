@@ -44,6 +44,20 @@ django.setup()
 from combine.models import Archive, Tag, hash_for_file
 from combine import comex
 from django.core.files import File
+from django.contrib.auth.models import User
+
+
+def get_omex_file_paths(ARCHIVE_DIRS):
+
+    # list files
+    omex_files = []
+    for archive_dir in ARCHIVE_DIRS:
+        for subdir, dirs, files in os.walk(archive_dir):
+            for file in files:
+                path = os.path.join(subdir, file)
+                if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
+                    omex_files.append(path)
+    return omex_files
 
 
 def add_archives_to_database():
@@ -52,14 +66,7 @@ def add_archives_to_database():
     :return:
     """
     # list files
-    omex_files = []
-
-    for archive_dir in ARCHIVE_DIRS:
-        for subdir, dirs, files in os.walk(archive_dir):
-            for file in files:
-                path = os.path.join(subdir, file)
-                if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
-                    omex_files.append(path)
+    omex_files = get_omex_file_paths(ARCHIVE_DIRS)
 
     for f in sorted(omex_files):
         print('-' * 80)
@@ -73,6 +80,8 @@ def add_archives_to_database():
             name = os.path.basename(f)
             django_file = File(open(f, 'rb'))
             new_archive = Archive(name=name)
+            global_user = User.objects.get(username="global")
+            new_archive.user = global_user
             new_archive.file.save(name, django_file, save=False)
             new_archive.md5 = hash_for_file(f, hash_type='MD5')
             new_archive.full_clean()
@@ -95,7 +104,6 @@ def add_archives_to_database():
 
 
 def create_superuser():
-    from django.contrib.auth.models import User
     User.objects.create_superuser('mkoenig', 'konigmatt@googlemail.com', os.environ['DJANGO_ADMIN_PASSWORD'])
     User.objects.create_superuser('janek89', 'janekg89@hotmail.de',os.environ['DJANGO_ADMIN_PASSWORD'])
     User.objects.create_superuser('global', 'konigmatt@googlemail.com', os.environ['DJANGO_ADMIN_PASSWORD'])
@@ -107,5 +115,5 @@ if __name__ == "__main__":
     print('-'*80)
     print('Creating archives')
     print('-' * 80)
-    add_archives_to_database()
     create_superuser()
+    add_archives_to_database()
