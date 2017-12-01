@@ -75,7 +75,7 @@ class ViewAPILogedInSuperUser(TestCase):
         url = reverse('api:archive-detail',kwargs={"uuid": "52075550-c236-4e0c-93d7-ea10411a53d4"})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-io        self.assertContains(response, 'L1V3_ikappab.omex')
+        self.assertContains(response, 'L1V3_ikappab.omex')
 
     def test_delete_user(self):
         url = reverse('api:user-detail', kwargs={'pk': '2'})

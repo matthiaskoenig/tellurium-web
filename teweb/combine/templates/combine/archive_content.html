@@ -42,7 +42,7 @@
                 </tr>
                 </thead>
                 {% for entry in entries %}
-                    <tr>
+                    <tr id="archive_content">
                         <td class="hidden hidden-xs"><span class="badge">{{ loop.index }}</span></td>
                         <td>{% if entry.master %}
                             <i class="fa fa-star fa-fw" title="master"></i>
@@ -57,7 +57,7 @@
                         <td>
                             <code title="{{ entry.format }}">{{ entry.short_format }}</code>
                         </td>
-                        <td>
+                        <td class="location">
                             {% if entry.location in ['.', './manifest.xml'] %}
                                 {{ entry.location }}
                             {% else %}
@@ -106,7 +106,7 @@
         {% else %}
             <p>No entries in archive metadata.</p>
         {% endif %}
-
+        <div id="table_field_description"></div>
         <span class="label label-primary" title="ZIP Content">zip content</span>
         <div id="json_tree"></div>
         <script>
@@ -118,6 +118,18 @@
                     }
                 });
             });
+        </script>
+
+        <script>
+            $("tr#archive_content").click(function(e){     //function_td
+                var $row = $(this).closest("tr");    // Find the row
+                var $text = $row.find(".location").text(); // Find the text
+
+                // Let's test it out
+                var div = document.getElementById('table_field_description');
+                div.innerHTML = $text;
+            });
+
         </script>
 
     </div>
