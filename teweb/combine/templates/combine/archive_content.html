@@ -107,18 +107,41 @@
             <p>No entries in archive metadata.</p>
         {% endif %}
         <div id="table_field_description"></div>
+
         <span class="label label-primary" title="ZIP Content">zip content</span>
+
         <div id="json_tree"></div>
+
+
+
+
         <script>
-            $(function () {
+            var endpoint = './zip_tree';
+
+        $.ajax({
+            method: "GET",
+            url: endpoint,
+            success: function (data) {
                 $('#json_tree').jstree({
                     'core': {
                         'multiple': false,
-                        'data': JSON.parse('{{ tree_data_json|safe }}')
+                        'data': data
                     }
+
                 });
-            });
+            },
+            error: function (error_data) {
+                console.log("error");
+                console.log(error_data);
+
+            }
+        })
         </script>
+
+
+
+
+
 
         <script>
             $("tr#archive_content").click(function(e){     //function_td
@@ -129,8 +152,10 @@
                 var div = document.getElementById('table_field_description');
                 div.innerHTML = $text;
             });
-
         </script>
+
+
+
 
     </div>
 </div>

@@ -8,6 +8,7 @@ import logging
 import pandas
 import numpy as np
 import magic
+import json
 
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, FileResponse, JsonResponse
@@ -16,6 +17,7 @@ from django.contrib.auth.models import User
 from django.core.files.temp import NamedTemporaryFile
 from django_celery_results.models import TaskResult
 from celery.result import AsyncResult
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 
@@ -25,7 +27,7 @@ from .serializers import ArchiveSerializer,TagSerializer, UserSerializer
 from .forms import UploadArchiveForm
 from .git import get_commit
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.request import Request
 
 from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly
@@ -137,6 +139,18 @@ def archive_context(archive):
         'task_result': task_result,
     }
     return context
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def archive_tree_api(request, archive_id):
+    archive = get_object_or_404(Archive, pk=archive_id)
+    parsed = archive.zip_entries()
+    parsed = json.loads(parsed)
+    return Response(parsed)
+
+
+
+
 
 
 def download_archive(request, archive_id):
@@ -741,3 +755,5 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
     filter_fields = ('is_staff', 'username')
     search_fields = ('is_staff', 'username', "email")
+
+
