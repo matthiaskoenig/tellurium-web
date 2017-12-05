@@ -126,6 +126,7 @@ def zip_tree_content(path):
     with zipfile.ZipFile(path) as zip:
         # zip.printdir()
         for zip_info in zip.infolist():
+
             # print(zip_info)
             # zip_info.filename
             # zip_info.date_time
@@ -135,14 +136,17 @@ def zip_tree_content(path):
 
     # directories do not have to be part of the zip file, so we have to
     # manually add these nodes if they are missing
-    check_ids = list(nodes.keys())  # make a copy we can iterate over
-    for nid in check_ids:
-        node = nodes[nid]
-        parent_id = node['parent']
-        if parent_id not in nodes and parent_id != "#":
-            parent_node = node_from_filename(parent_id)
-            nodes[parent_id] = parent_node
-            # print("Added missing folder node:", parent_id)
+    length_nodes = 0
+    while len(nodes) > length_nodes:
+        check_ids = list(nodes.keys())  # make a copy we can iterate over
+        length_nodes = len(nodes)
+        for nid in check_ids:
+            node = nodes[nid]
+            parent_id = node['parent']
+            if parent_id not in check_ids and parent_id != "#":
+                parent_node = node_from_filename(parent_id)
+                nodes[parent_id] = parent_node
+                print("Added missing folder node:", parent_id)
 
     tree_data = [nodes[key] for key in sorted(nodes.keys())]
 

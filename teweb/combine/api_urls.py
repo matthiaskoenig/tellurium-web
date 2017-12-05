@@ -20,5 +20,5 @@ router.register(r'archives', teweb_views.ArchiveViewSet, base_name='archive')
 
 urlpatterns = [
     url(r'^$', schema_view),
-]
+    ]
 urlpatterns += router.urls

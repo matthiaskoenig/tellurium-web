@@ -8,6 +8,7 @@ import logging
 import pandas
 import numpy as np
 import magic
+import json
 
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, FileResponse, JsonResponse
@@ -16,6 +17,7 @@ from django.contrib.auth.models import User
 from django.core.files.temp import NamedTemporaryFile
 from django_celery_results.models import TaskResult
 from celery.result import AsyncResult
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 
@@ -25,7 +27,10 @@ from .serializers import ArchiveSerializer,TagSerializer, UserSerializer
 from .forms import UploadArchiveForm
 from .git import get_commit
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.request import Request
+
+from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly
 from rest_framework import viewsets
 from django_filters import rest_framework as filters
 import rest_framework.filters as filters_rest
@@ -134,6 +139,18 @@ def archive_context(archive):
         'task_result': task_result,
     }
     return context
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def archive_tree_api(request, archive_id):
+    archive = get_object_or_404(Archive, pk=archive_id)
+    parsed = archive.zip_entries()
+    parsed = json.loads(parsed)
+    return Response(parsed)
+
+
+
+
 
 
 def download_archive(request, archive_id):
@@ -686,8 +703,12 @@ class ArchiveViewSet(viewsets.ModelViewSet):
     lookup_field defines the url of the detailed view.
     permission_classes define which users is allowed to do what.
     """
+    #global_user = User.objects.get(username="global")
+    #queryset = Archive.objects.filter(user=global_user)
     queryset = Archive.objects.all()
-    permission_classes = (IsAuthenticated, )
+
+
+    permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = ArchiveSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
@@ -698,11 +719,24 @@ class ArchiveViewSet(viewsets.ModelViewSet):
         # automatically set the user on create
         serializer.save(user=self.request.user)
 
+    def list(self, request):
+         global_user = User.objects.get(username="global")
+
+         if request.user.is_authenticated():
+            queryset = Archive.objects.filter(user__in=[global_user,request.user])
+         else:
+             queryset = Archive.objects.filter(user=global_user)
+         serializer_context = {
+             'request': Request(request),
+         }
+         serializer = ArchiveSerializer(queryset, many=True, context=serializer_context)
+         return Response(serializer.data)
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """ REST tags. """
     queryset = Tag.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = TagSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
@@ -716,8 +750,10 @@ class UserViewSet(viewsets.ModelViewSet):
     A viewset for viewing and editing user instances.
     """
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
     filter_fields = ('is_staff', 'username')
     search_fields = ('is_staff', 'username', "email")
+
+

@@ -39,7 +39,7 @@ def hash_for_file(file, hash_type='MD5', blocksize=65536):
     if hash_type == 'MD5':
         hasher = hashlib.md5()
     elif hash_type == 'SHA1':
-        hasher == hashlib.sha1()
+        hasher = hashlib.sha1()
 
     with open(file, 'rb') as f:
         buf = f.read(blocksize)

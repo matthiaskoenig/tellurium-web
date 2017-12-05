@@ -1,7 +1,6 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from . import views
-
 app_name = 'combine'
 urlpatterns = [
 
@@ -13,6 +12,7 @@ urlpatterns = [
     url(r'^(?P<archive_id>[0-9]+)/run$', views.run_archive, name='run_archive'),
     url(r'^(?P<archive_id>[0-9]+)/delete$', views.delete_archive, name='delete_archive'),
     url(r'^(?P<archive_id>[0-9]+)/download$', views.download_archive, name='download_archive'),
+    url(r'^(?P<archive_id>[0-9]+)/zip_tree$', views.archive_tree_api, name='zip_data'),
 
     url(r'^(?P<archive_id>[0-9]+)/(?P<entry_index>[0-9]+)$', views.archive_entry, name='archive_entry'),
 
@@ -32,6 +32,7 @@ urlpatterns = [
 
     url(r'^test$', views.test_view, name='test_view'),
 
+    #url(r'^api/', include('combine.api_urls', namespace='api')),
 
     # ajax check
     # /combine/5/check_state
