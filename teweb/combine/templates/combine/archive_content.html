@@ -169,16 +169,21 @@
                 }
                 var entry_detail = get_detail(r.join(', '));
                 if(typeof entry_detail !== 'undefined' ){
+                    // add title
                     $("#title").text(" "+entry_detail.location);
                     add_master_icon(entry_detail);
                     add_format_icon(entry_detail);
+
+                    //add entries of meta data
+                    if(entry_detail.metadata !== 'undefined'){
+                        for (var key in entry_detail.metadata) {
+                            addItem(key, entry_detail.metadata[key]);
+                    }
+                    }
                   }
 
 
-                for (var key in entry_detail) {
-                    addItem(key, entry_detail[key]);
-
-                    }});
+                });
 
              function add_master_icon(entry_detail) {
                  if(entry_detail.master){
@@ -195,6 +200,8 @@
                         title : entry_detail.format
                     }));}
              }
+
+
 
             function addItem(key, value) {
 
@@ -229,7 +236,6 @@
                 parser = new DOMParser();
                 xmlDoc = parser.parseFromString(data,"text/xml");
                 console.log(xmlDoc.getElementsByTagName("rdf:Description")[1]);
-
             },
             error: function (error_data) {
                 console.log("error");

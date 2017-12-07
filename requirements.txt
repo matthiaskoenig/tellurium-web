@@ -16,6 +16,6 @@ jinja2>=2.10
 python-magic>=0.4.13
 psycopg2>=2.7.3.2
 gunicorn>=19.7.1
-
+rdflib>=4.2.2
 tellurium>=2.0.12
 # -e git+https://github.com/sys-bio/tellurium.git@master#egg=tellurium
