@@ -168,6 +168,9 @@
                   r.push(data.instance.get_node(data.selected[i]).id);
                 }
                 var entry_detail = get_detail(r.join(', '));
+                console.log(entry_detail);
+
+
                 if(typeof entry_detail !== 'undefined' ){
                     // add title
                     $("#title").text(" "+entry_detail.location);
@@ -204,6 +207,7 @@
 
 
             function addItem(key, value) {
+
 
                 $("#item_detail").append('<dl><dt>' + key + '</dt><dd>' + value + '</dd></dl>');
             }

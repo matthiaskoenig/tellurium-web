@@ -146,7 +146,7 @@ def zip_tree_content(path):
             if parent_id not in check_ids and parent_id != "#":
                 parent_node = node_from_filename(parent_id)
                 nodes[parent_id] = parent_node
-                print("Added missing folder node:", parent_id)
+                #print("Added missing folder node:", parent_id)
 
     tree_data = [nodes[key] for key in sorted(nodes.keys())]
 

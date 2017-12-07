@@ -118,7 +118,8 @@ def archive_context(archive):
     """ Context required to render archive_content"""
     # omex entries
     entries = archive.entries()
-    print(json.dumps(entries))
+    for entry in entries:
+        print(entry["metadata"])
 
     # zip entries: json tree data
     zip_entries = archive.zip_entries()
