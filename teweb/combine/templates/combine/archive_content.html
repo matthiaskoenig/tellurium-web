@@ -106,13 +106,20 @@
         {% else %}
             <p>No entries in archive metadata.</p>
         {% endif %}
-        <div id="table_field_description"></div>
 
         <span class="label label-primary" title="ZIP Content">zip content</span>
 
-        <div id="json_tree"></div>
+        <div class="row">
+            <div class="col-sm-6"id="json_tree"></div>
+            <div class="col-sm-6">
+                <div id="title_div">
+                    <h3 id="title"></h3>
+                </div>
+                <div id="item_detail">
+                </div>
+            </div>
 
-
+        </div>
 
 
         <script>
@@ -138,21 +145,103 @@
         })
         </script>
 
-
-
-
-
-
         <script>
             $("tr#archive_content").click(function(e){     //function_td
                 var $row = $(this).closest("tr");    // Find the row
                 var $text = $row.find(".location").text(); // Find the text
 
                 // Let's test it out
-                var div = document.getElementById('table_field_description');
+                var div = document.getElementById('item_detail');
                 div.innerHTML = $text;
             });
         </script>
+
+        <script>
+             $('#json_tree')
+              // listen for event
+              .on('changed.jstree', function (e, data) {
+                  $("#item_detail").empty();
+                  $("#title").empty();
+
+                var i, j, r = [];
+                for(i = 0, j = data.selected.length; i < j; i++) {
+                  r.push(data.instance.get_node(data.selected[i]).id);
+                }
+                var entry_detail = get_detail(r.join(', '));
+                if(typeof entry_detail !== 'undefined' ){
+                    $("#title").text(" "+entry_detail.location);
+                    add_master_icon(entry_detail);
+                    add_format_icon(entry_detail);
+                  }
+
+
+                for (var key in entry_detail) {
+                    addItem(key, entry_detail[key]);
+
+                    }});
+
+             function add_master_icon(entry_detail) {
+                 if(entry_detail.master){
+                 $("#title").append(' '+'<i class="fa fa-star fa-fw" title="master"></i>')
+             }}
+
+             function add_format_icon (entry_detail){
+                 format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
+                 if(typeof entry_detail.base_format !== 'undefined' && format_list.indexOf(entry_detail.base_format)>=0){
+                 var src="{{static('combine/images/mediatype/')}}"+entry_detail.base_format+".png";
+                 $('#title').prepend($('<img>', {
+                        src : src,
+                        height : 20,
+                        title : entry_detail.format
+                    }));}
+             }
+
+            function addItem(key, value) {
+
+                $("#item_detail").append('<dl><dt>' + key + '</dt><dd>' + value + '</dd></dl>');
+            }
+
+
+            function get_detail(location) {
+                 var i, j, r = [];
+                 var entries = {{entries_json|safe}};
+                 for( i = 0; i < entries.length; i++) {
+                     if (entries[i].location == location){
+                         return entries[i]
+                     }
+                 }
+
+
+            }
+
+        </script>
+
+
+        <script>
+            var endpoint = './0';
+            var text, parser, xmlDoc;
+
+
+        $.ajax({
+            method: "GET",
+            url: endpoint,
+            success: function (data) {
+                parser = new DOMParser();
+                xmlDoc = parser.parseFromString(data,"text/xml");
+                console.log(xmlDoc.getElementsByTagName("rdf:Description")[1]);
+
+            },
+            error: function (error_data) {
+                console.log("error");
+                console.log(error_data);
+
+            }
+        })
+        </script>
+
+
+
+
 
 
 

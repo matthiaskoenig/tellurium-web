@@ -134,6 +134,7 @@ def archive_context(archive):
     context = {
         'archive': archive,
         'entries': entries,
+        'entries_json':json.dumps(entries),
         'tree_data_json': zip_entries,
         'task': task,
         'task_result': task_result,
