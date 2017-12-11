@@ -1,3 +1,4 @@
+{% import 'combine/macros.html' as macros %}
 {% extends "combine/base.html" %}
 
 {% block content %}
@@ -26,12 +27,8 @@
                     {% for tag in tags %}
                     <tr>
                         <td><span class="badge">{{ tag.id }}</span></td>
-                        <td>
-                            <a href="{{ url('combine:tag', args=[tag.id]) }}">
-                                        <span class="label label-default">{{ tag.type }}</span><span class="label label-warning">{{ tag.name }}</span>
-                            </a>
-                        </td>
-                        <td>{{ tag.type }}</td>
+                        <td>{{ macros.tag_html(tag) }}</td>
+                        <td>{{ tag.category }}</td>
                         <td>{{ tag.name }}</td>
                         <td>{{ tag.archives.all()|length }}</td>
                         <td>{% if tag.archives.all() %}

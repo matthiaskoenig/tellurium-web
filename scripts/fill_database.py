@@ -44,6 +44,15 @@ django.setup()
 from combine.models import Archive, Tag, hash_for_file
 from combine import comex
 from django.core.files import File
+from django.contrib.auth.models import User
+from collections import namedtuple
+
+UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
+user_defs = [
+    UserDef("janekg89", "Jan", "Grzegorzewski", "janekg89@hotmail.de", True),
+    UserDef("mkoenig", "Matthias", "König", "konigmatt@googlemail.com", True),
+    UserDef("testuser", False, False, False, False),
+    UserDef("global", False, False, False, False)]
 
 
 def add_archives_to_database():
@@ -52,14 +61,7 @@ def add_archives_to_database():
     :return:
     """
     # list files
-    omex_files = []
-
-    for archive_dir in ARCHIVE_DIRS:
-        for subdir, dirs, files in os.walk(archive_dir):
-            for file in files:
-                path = os.path.join(subdir, file)
-                if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
-                    omex_files.append(path)
+    omex_files = comex.get_omex_file_paths(ARCHIVE_DIRS)
 
     for f in sorted(omex_files):
         print('-' * 80)
@@ -73,6 +75,8 @@ def add_archives_to_database():
             name = os.path.basename(f)
             django_file = File(open(f, 'rb'))
             new_archive = Archive(name=name)
+            global_user = User.objects.get(username="global")
+            new_archive.user = global_user
             new_archive.file.save(name, django_file, save=False)
             new_archive.md5 = hash_for_file(f, hash_type='MD5')
             new_archive.full_clean()
@@ -94,16 +98,39 @@ def add_archives_to_database():
                 new_archive.tags.add(tag)
 
 
-def create_superuser():
-    from django.contrib.auth.models import User
-    User.objects.create_superuser('mkoenig', 'konigmatt@googlemail.com', os.environ['DJANGO_ADMIN_PASSWORD'])
-    User.objects.create_superuser('janek89', 'janekg89@hotmail.de', os.environ['DJANGO_ADMIN_PASSWORD'])
+def create_users(user_defs, delete_all=True):
+    """ Create users in database from user definitions.
+
+    :param delete_all: deletes all existing users
+    :return:
+    """
+    if not user_defs:
+        user_defs = []
+
+    # deletes all users
+    if delete_all:
+        User.objects.all().delete()
+
+    # adds user to database
+    for user_def in user_defs:
+        if user_def.superuser:
+            user = User.objects.create_superuser(username=user_def.username, email=user_def.email,
+                                                 password= os.environ['DJANGO_ADMIN_PASSWORD'])
+        else:
+            user = User.objects.create_user(username=user_def.username, email=user_def.email,
+                                            password= os.environ['DJANGO_ADMIN_PASSWORD'])
+        user.last_name = user_def.last_name
+        user.first_name = user_def.first_name
+        user.save()
+
+    # display users
+    for user in User.objects.all():
+        print('\t', user.username, user.email, user.password)
 
 
 if __name__ == "__main__":
-
     print('-'*80)
     print('Creating archives')
     print('-' * 80)
+    create_users(user_defs=user_defs, delete_all=True)
     add_archives_to_database()
-    create_superuser()

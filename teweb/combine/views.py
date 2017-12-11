@@ -8,7 +8,11 @@ import logging
 import pandas
 import numpy as np
 import magic
+import json
+import rdflib
+import os
 
+from rest_framework.reverse import reverse
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, FileResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -16,16 +20,20 @@ from django.contrib.auth.models import User
 from django.core.files.temp import NamedTemporaryFile
 from django_celery_results.models import TaskResult
 from celery.result import AsyncResult
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 
 from .tasks import execute_omex
 from .models import Archive, Tag
-from .serializers import ArchiveSerializer,TagSerializer, UserSerializer
+from .serializers import ArchiveSerializer, TagSerializer, UserSerializer
 from .forms import UploadArchiveForm
 from .git import get_commit
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.request import Request
+
+from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly
 from rest_framework import viewsets
 from django_filters import rest_framework as filters
 import rest_framework.filters as filters_rest
@@ -79,18 +87,11 @@ def archives(request, form=None):
     :return:
     """
     archives = Archive.objects.all().order_by('-created')
-    tasks = []
-    for archive in archives:
-        task = None
-        if archive.task_id:
-            task = AsyncResult(archive.task_id)
-        tasks.append(task)
 
     if form is None:
         form = UploadArchiveForm()
     context = {
         'archives': archives,
-        'tasks': tasks,
         'form': form
     }
     return render(request, 'combine/archives.html', context)
@@ -104,8 +105,20 @@ def archive_view(request, archive_id):
     :param archive_id:
     :return:
     """
+    #meta_data=request.GET.get("./0")
+    #print(meta_data)
     archive = get_object_or_404(Archive, pk=archive_id)
+    # url = reverse('combine:archive', kwargs={'archive_id': archive_id}, request=request)
+    with NamedTemporaryFile(mode='r+') as f:
+         archive.extract_entry_by_index(0, f.name)
+         meta_data = f.read()
+    # g = rdflib.Graph()
+    # meta_data_parsed = g.parse(meta_data)
+    # print(meta_data_parsed)
+
     context = archive_context(archive)
+    if request.method =='POST':
+        print(request.POST.get("description"))
     return render(request, 'combine/archive.html', context)
 
 
@@ -113,6 +126,8 @@ def archive_context(archive):
     """ Context required to render archive_content"""
     # omex entries
     entries = archive.entries()
+
+
 
     # zip entries: json tree data
     zip_entries = archive.zip_entries()
@@ -129,11 +144,20 @@ def archive_context(archive):
     context = {
         'archive': archive,
         'entries': entries,
+        'entries_json':json.dumps(entries),
         'tree_data_json': zip_entries,
         'task': task,
         'task_result': task_result,
     }
     return context
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def archive_tree_api(request, archive_id):
+    archive = get_object_or_404(Archive, pk=archive_id)
+    parsed = archive.zip_entries()
+    parsed = json.loads(parsed)
+    return Response(parsed)
 
 
 def download_archive(request, archive_id):
@@ -686,8 +710,12 @@ class ArchiveViewSet(viewsets.ModelViewSet):
     lookup_field defines the url of the detailed view.
     permission_classes define which users is allowed to do what.
     """
+    #global_user = User.objects.get(username="global")
+    #queryset = Archive.objects.filter(user=global_user)
     queryset = Archive.objects.all()
-    permission_classes = (IsAuthenticated, )
+
+
+    permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = ArchiveSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
@@ -698,11 +726,24 @@ class ArchiveViewSet(viewsets.ModelViewSet):
         # automatically set the user on create
         serializer.save(user=self.request.user)
 
+    def list(self, request):
+         global_user = User.objects.get(username="global")
+
+         if request.user.is_authenticated:
+            queryset = Archive.objects.filter(user__in=[global_user,request.user])
+         else:
+             queryset = Archive.objects.filter(user=global_user)
+         serializer_context = {
+             'request': Request(request),
+         }
+         serializer = ArchiveSerializer(queryset, many=True, context=serializer_context)
+         return Response(serializer.data)
+
 
 class TagViewSet(viewsets.ModelViewSet):
     """ REST tags. """
     queryset = Tag.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = TagSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
@@ -716,8 +757,10 @@ class UserViewSet(viewsets.ModelViewSet):
     A viewset for viewing and editing user instances.
     """
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
     filter_fields = ('is_staff', 'username')
     search_fields = ('is_staff', 'username', "email")
+
+

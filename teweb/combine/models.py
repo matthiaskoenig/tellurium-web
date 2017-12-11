@@ -11,6 +11,8 @@ from django.utils import timezone
 from djchoices import DjangoChoices, ChoiceItem
 from django.contrib.auth.models import User
 
+from celery.result import AsyncResult
+
 try:
     import libcombine
 except ImportError:
@@ -39,7 +41,7 @@ def hash_for_file(file, hash_type='MD5', blocksize=65536):
     if hash_type == 'MD5':
         hasher = hashlib.md5()
     elif hash_type == 'SHA1':
-        hasher == hashlib.sha1()
+        hasher = hashlib.sha1()
 
     with open(file, 'rb') as f:
         buf = f.read(blocksize)
@@ -94,7 +96,7 @@ class Archive(models.Model):
     md5 = models.CharField(max_length=36, blank=True)
     task_id = models.CharField(max_length=100, blank=True)
     tags = models.ManyToManyField(Tag, related_name="archives")
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     uuid = models.UUIDField(  # Used by the API to look up the record
         db_index=True,
         default=uuid_lib.uuid4,
@@ -132,6 +134,14 @@ class Archive(models.Model):
     @property
     def path(self):
         return str(self.file.path)
+
+    @property
+    def task(self):
+        task = None
+        if self.task_id:
+            task = AsyncResult(self.task_id)
+        return task
+
 
     def omex(self):
         """ Open CombineArchive for given archive.

@@ -3,8 +3,10 @@ Helper functions to work with combine archives and zip files.
 
 Getting information out of the files.
 """
+import os
 import json
 import zipfile
+import warnings
 
 try:
     import libcombine
@@ -16,12 +18,35 @@ try:
 except ImportError:
     import tesedml as libsedml
 
+
 # FIXME: this is a bugfix for https://github.com/sbmlteam/libCombine/issues/15
 import importlib
 importlib.reload(libcombine)
 
 from collections import namedtuple
 TagInfo = namedtuple("TagInfo", "category name")
+
+
+def get_omex_file_paths(archive_dirs):
+    """ Returns list of given combine archive paths from given list of directories.
+
+    :param archive_dirs:
+    :return:
+    """
+
+    # list files
+    omex_files = []
+    for archive_dir in archive_dirs:
+
+        if not os.path.exists(archive_dir):
+            warnings.warn("Directory does not exist: {}".format(archive_dir))
+
+        for subdir, dirs, files in os.walk(archive_dir):
+            for file in files:
+                path = os.path.join(subdir, file)
+                if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
+                    omex_files.append(path)
+    return omex_files
 
 
 ################################################
@@ -109,11 +134,18 @@ def zip_tree_content(path):
             return '#'
         return '/'.join(tokens[:-1]) + '/'
 
+    def find_name(filename):
+        splited_file = filename.split("/")
+        if splited_file[-1] == "":
+            return splited_file[-2]
+        return splited_file[-1]
+
+
     def node_from_filename(filename):
         node = {}
         node['id'] = filename
         node['parent'] = find_parent(filename)
-        node['text'] = filename
+        node['text'] = find_name(filename)
         if filename.endswith('/'):
             icon = "fa fa-folder fa-fw"
         else:
@@ -126,6 +158,7 @@ def zip_tree_content(path):
     with zipfile.ZipFile(path) as zip:
         # zip.printdir()
         for zip_info in zip.infolist():
+
             # print(zip_info)
             # zip_info.filename
             # zip_info.date_time
@@ -135,14 +168,17 @@ def zip_tree_content(path):
 
     # directories do not have to be part of the zip file, so we have to
     # manually add these nodes if they are missing
-    check_ids = list(nodes.keys())  # make a copy we can iterate over
-    for nid in check_ids:
-        node = nodes[nid]
-        parent_id = node['parent']
-        if parent_id not in nodes and parent_id != "#":
-            parent_node = node_from_filename(parent_id)
-            nodes[parent_id] = parent_node
-            # print("Added missing folder node:", parent_id)
+    length_nodes = 0
+    while len(nodes) > length_nodes:
+        check_ids = list(nodes.keys())  # make a copy we can iterate over
+        length_nodes = len(nodes)
+        for nid in check_ids:
+            node = nodes[nid]
+            parent_id = node['parent']
+            if parent_id not in check_ids and parent_id != "#":
+                parent_node = node_from_filename(parent_id)
+                nodes[parent_id] = parent_node
+                #print("Added missing folder node:", parent_id)
 
     tree_data = [nodes[key] for key in sorted(nodes.keys())]
 
