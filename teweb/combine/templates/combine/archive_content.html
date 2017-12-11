@@ -38,7 +38,6 @@
                     <th>icon</th>
                     <th>format</th>
                     <th>location</th>
-                    <th class="hidden-xs">metadata</th>
                 </tr>
                 </thead>
                 {% for entry in entries %}
@@ -66,40 +65,6 @@
                             {% endif %}
                         </td>
 
-                        <td class="hidden-xs">
-                            {% if entry.metadata %}
-                                {% with md = entry.metadata %}
-
-                                    <span data-toggle="popover"
-                                          data-html="true"
-                                          class="btn-xs btn-default"
-                                          title="{% for creator in md.creators %}
-                                                <b>{{ creator.givenName }} {{ creator.familyName }}</b>
-                                                {% if creator.organisation %}
-                                                ({{ creator.organisation }})
-                                                {% endif %}<br/>
-                                               {% endfor %}"
-                                          data-content="{% if md.created %}
-                                                        <b>created</b><br />
-                                                        <code>{{ md.created }}</code><br />
-                                                     {% endif %}
-                                                     {% if md.modified %}
-                                                     <b>modified</b><br />
-                                                     {% endif %}
-                                                        {% for mod in md.modified %}
-                                                            <code>{{ mod }}</code><br/>
-                                                        {% endfor %}"> <i class="fa fa-plus-square-o fa-fw"
-                                                                          title="metadata"></i></span>
-                                {% endwith %}
-                            {% endif %}
-
-                            {% if entry.metadata %}
-                                {% with md = entry.metadata %}
-                                    {{ md.description }}
-                                {% endwith %}
-                            {% endif %}
-                        </td>
-
                     </tr>
                 {% endfor %}
             </table>
@@ -112,6 +77,7 @@
         <div class="row">
             <div class="col-sm-6"id="json_tree"></div>
             <div class="col-sm-6">
+                <div id="button-div"></div>
                 <div id="title_div">
                     <h3 id="title"></h3>
                 </div>
@@ -149,49 +115,136 @@
             $("tr#archive_content").click(function(e){     //function_td
                 var $row = $(this).closest("tr");    // Find the row
                 var $text = $row.find(".location").text(); // Find the text
-
                 // Let's test it out
-                var div = document.getElementById('item_detail');
-                div.innerHTML = $text;
+                diplay_entry_detail($text);
             });
         </script>
 
         <script>
              $('#json_tree')
               // listen for event
+
               .on('changed.jstree', function (e, data) {
+                   var  entry = data.selected[0];
+                  $("#button-div").empty();
+                   add_button("add");
+                   add_button("edit");
+                   add_button("delete");
+                   diplay_entry_detail(entry);
+                });
+
+             function add_button(name){
+                 var myButton = document.createElement("span");
+                 var icon = document.createElement("i");
+                 myButton.className="btn btn-default btn-space";
+                 var edit = false;
+                 if(name=="add"){
+                     icon.className="fa fa-plus fa-fw";
+                     icon.title="create new rdf entry";
+
+                 }
+                 else if(name=="delete"){
+                     icon.className="fa fa-minus fa-fw";
+                     icon.title="create new rdf entry";
+                 }
+                 else if(name="edit"){
+                     myButton.setAttribute("id","editButton");
+                     //myButton.setAttribute("onclick","diplay_edit_detail()");
+
+                     icon.className="fa fa-pencil fa-fw";
+                     icon.title="create new rdf entry";
+
+                     }
+                 myButton.appendChild(icon);
+                 myButton.append(name);
+                 var placeHolder= document.getElementById('button-div');
+                 placeHolder.appendChild(myButton);
+
+                }
+
+
+
+
+        </script>
+        <script>
+            $(document).on('click','#editButton',function(){
+                var entry = $('#json_tree').jstree('get_selected',true)[0]["id"];
+                diplay_entry_detail(entry, true);
+            });
+        </script>
+
+        <script>
+
+             function diplay_entry_detail(selected_entry, edit=false){
                   $("#item_detail").empty();
                   $("#title").empty();
-
-                var i, j, r = [];
-                for(i = 0, j = data.selected.length; i < j; i++) {
-                  r.push(data.instance.get_node(data.selected[i]).id);
-                }
-                var entry_detail = get_detail(r.join(', '));
-                console.log(entry_detail);
-
-
-                if(typeof entry_detail !== 'undefined' ){
-                    // add title
-                    $("#title").text(" "+entry_detail.location);
-                    add_master_icon(entry_detail);
-                    add_format_icon(entry_detail);
-
-                    //add entries of meta data
-                    if(entry_detail.metadata !== 'undefined'){
-                        for (var key in entry_detail.metadata) {
-                            addItem(key, entry_detail.metadata[key]);
-                    }
-                    }
+                  var splited_fn= selected_entry.split("/");
+                  var fn = splited_fn[splited_fn.length-1];
+                  var entry_detail = get_detail($.trim(selected_entry));
+                  if(typeof entry_detail !== 'undefined' ){
+                        // add title
+                        $("#title").text(" "+fn);
+                        add_master_icon(entry_detail);
+                        add_format_icon(entry_detail);
+                        //add entries of meta data
+                        if(entry_detail.metadata !== 'undefined'){
+                            var meta = entry_detail.metadata;
+                            add_description(meta,edit);
+                            for (creator in meta.creators){
+                                addContact(meta.creators[creator]);
+                            }
+                        }
                   }
 
+             }
 
-                });
+
+
 
              function add_master_icon(entry_detail) {
                  if(entry_detail.master){
                  $("#title").append(' '+'<i class="fa fa-star fa-fw" title="master"></i>')
              }}
+
+             function add_description (metadata,edit){
+
+                 if (edit==true){
+                     var textArea = document.createElement("textarea");
+                     textArea.cols="50";
+                     textArea.size="10";
+                     textArea.append(metadata["description"]);
+                     description =textArea.outerHTML
+                 }
+                 else {
+                     var description = metadata["description"];
+                 }
+                 $("#item_detail").append('<dl><dt>' + "Description" + '</dt><dd>' + description + '</dd></dl>');
+                 $("#item_detail").append('<dl><dt>' + "Created"+ '</dt><dd>' + metadata["created"] + '</dd></dl>');
+                 $("#item_detail").append('<dl><dt>' +"Modified"+'</dt>'+modified_content(metadata["modified"])+'</dl>');
+             }
+
+             function modified_content( modified){
+                  content="";
+                   for(var date in  modified){
+                     content+='<dd>' + modified[date]+ '</dd>'
+                 }
+                 return content
+             }
+
+            function formatDate(date) {
+              var monthNames = [
+                "January", "February", "March",
+                "April", "May", "June", "July",
+                "August", "September", "October",
+                "November", "December"
+              ];
+
+              var day = date.getDate();
+              var monthIndex = date.getMonth();
+              var year = date.getFullYear();
+
+              return day + ' ' + monthNames[monthIndex] + ' ' + year;
+            }
 
              function add_format_icon (entry_detail){
                  format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
@@ -204,56 +257,25 @@
                     }));}
              }
 
+             function addContact(creator){
+                 contact_content = '<dl><dt>'+creator["givenName"]+' '+creator["familyName"]+'</dt><dd>'+creator["organisation"]+"</dd><dd>"+creator["email"]+"</dd></dl>";
+                 $("#item_detail").append(contact_content);
 
-
-            function addItem(key, value) {
-
-
-                $("#item_detail").append('<dl><dt>' + key + '</dt><dd>' + value + '</dd></dl>');
-            }
+             }
 
 
             function get_detail(location) {
                  var i, j, r = [];
-                 var entries = {{entries_json|safe}};
+                 var entries = {{entries_json| safe}};
                  for( i = 0; i < entries.length; i++) {
-                     if (entries[i].location == location){
+                     if (entries[i].location == location || entries[i].location == "./"+location){
                          return entries[i]
                      }
                  }
 
 
             }
-
         </script>
-
-
-        <script>
-            var endpoint = './0';
-            var text, parser, xmlDoc;
-
-
-        $.ajax({
-            method: "GET",
-            url: endpoint,
-            success: function (data) {
-                parser = new DOMParser();
-                xmlDoc = parser.parseFromString(data,"text/xml");
-                console.log(xmlDoc.getElementsByTagName("rdf:Description")[1]);
-            },
-            error: function (error_data) {
-                console.log("error");
-                console.log(error_data);
-
-            }
-        })
-        </script>
-
-
-
-
-
-
 
 
     </div>

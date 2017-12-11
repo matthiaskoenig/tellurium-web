@@ -109,11 +109,18 @@ def zip_tree_content(path):
             return '#'
         return '/'.join(tokens[:-1]) + '/'
 
+    def find_name(filename):
+        splited_file = filename.split("/")
+        if splited_file[-1] == "":
+            return splited_file[-2]
+        return splited_file[-1]
+
+
     def node_from_filename(filename):
         node = {}
         node['id'] = filename
         node['parent'] = find_parent(filename)
-        node['text'] = filename
+        node['text'] = find_name(filename)
         if filename.endswith('/'):
             icon = "fa fa-folder fa-fw"
         else:

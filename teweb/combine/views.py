@@ -9,7 +9,10 @@ import pandas
 import numpy as np
 import magic
 import json
+import rdflib
+import os
 
+from rest_framework.reverse import reverse
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, FileResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -109,7 +112,20 @@ def archive_view(request, archive_id):
     :param archive_id:
     :return:
     """
+    #meta_data=request.GET.get("./0")
+    #print(meta_data)
     archive = get_object_or_404(Archive, pk=archive_id)
+    # url = reverse('combine:archive', kwargs={'archive_id': archive_id}, request=request)
+    with NamedTemporaryFile(mode='r+') as f:
+         archive.extract_entry_by_index(0, f.name)
+         meta_data = f.read()
+    # g = rdflib.Graph()
+    # meta_data_parsed = g.parse(meta_data)
+    # print(meta_data_parsed)
+
+
+
+
     context = archive_context(archive)
     return render(request, 'combine/archive.html', context)
 
@@ -118,8 +134,8 @@ def archive_context(archive):
     """ Context required to render archive_content"""
     # omex entries
     entries = archive.entries()
-    for entry in entries:
-        print(entry["metadata"])
+
+
 
     # zip entries: json tree data
     zip_entries = archive.zip_entries()
