@@ -26,21 +26,107 @@ from django.core.files import File
 from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
 from rest_framework import status
 from django.core.urlresolvers import reverse
-
+from combine.models import Archive, Tag, hash_for_file
 from combine.comex import get_omex_file_paths
-
+from django.contrib.auth.models import User
+from collections import namedtuple
+from combine import comex
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OMEX_SHOWCASE_PATH = os.path.join(BASE_DIR, '../../archives/CombineArchiveShowCase.omex')
 # This is so my local_settings.py gets loaded.
-
 BASE_URL = '/'
+UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
+user_defs = [
+    UserDef("janekg89", "Jan", "Grzegorzewski", "janekg89@hotmail.de", True),
+    UserDef("mkoenig", "Matthias", "König", "konigmatt@googlemail.com", True),
+    UserDef("testuser", False, False, False, False),
+    UserDef("global", False, False, False, False)]
+ARCHIVE_DIRS = ["../../archives"]
 
+
+def add_archives_to_database():
+    """ Add archives to database.
+
+    :return:
+    """
+    # list files
+    omex_files = comex.get_omex_file_paths(ARCHIVE_DIRS)
+
+    for f in sorted(omex_files):
+        print('-' * 80)
+        print(f)
+        md5 = hash_for_file(f, hash_type='MD5')
+        existing_archive = Archive.objects.filter(md5=md5)
+        # archive exists already based on the MD5 checksum
+        if len(existing_archive) > 0:
+            print("Archive already exists, not recreated: {}".format(f))
+        else:
+            name = os.path.basename(f)
+            django_file = File(open(f, 'rb'))
+            new_archive = Archive(name=name)
+            global_user = User.objects.get(username="global")
+            new_archive.user = global_user
+            new_archive.file.save(name, django_file, save=False)
+            new_archive.md5 = hash_for_file(f, hash_type='MD5')
+            new_archive.full_clean()
+            new_archive.save()
+
+            # add Tags
+            # tag, created = Tag.objects.get_or_create(name="test", type=Tag.TagType.misc)
+            # if created:
+            #     tag.save()
+            # new_archive.tags.add(tag)
+
+            tags_info = comex.tags_info(f)
+            print(tags_info)
+            for tag_info in tags_info:
+                tag, created = Tag.objects.get_or_create(name=tag_info.name,
+                                                         category=tag_info.category)
+                if created:
+                    tag.save()
+                new_archive.tags.add(tag)
+
+
+def create_users(user_defs, delete_all=True):
+    """ Create users in database from user definitions.
+
+    :param delete_all: deletes all existing users
+    :return:
+    """
+    if not user_defs:
+        user_defs = []
+
+    # deletes all users
+    if delete_all:
+        User.objects.all().delete()
+
+    # adds user to database
+    for user_def in user_defs:
+        if user_def.superuser:
+            user = User.objects.create_superuser(username=user_def.username, email=user_def.email,
+                                                 password= os.environ['DJANGO_ADMIN_PASSWORD'])
+        else:
+            user = User.objects.create_user(username=user_def.username, email=user_def.email,
+                                            password= os.environ['DJANGO_ADMIN_PASSWORD'])
+        user.last_name = user_def.last_name
+        user.first_name = user_def.first_name
+        user.save()
+
+    # display users
+    for user in User.objects.all():
+        print('\t', user.username, user.email, user.password)
 
 
 class ViewAPILogedInSuperUser(TestCase):
     """Test suite for the api views."""
+
+    @classmethod
+    def setUpTestData(cls):
+        create_users(user_defs=user_defs, delete_all=True)
+        add_archives_to_database()
+
     def setUp(self):
         self.client.login(username='mkoenig', password=os.environ['DJANGO_ADMIN_PASSWORD'])
 
@@ -86,7 +172,6 @@ class ViewAPILogedInSuperUser(TestCase):
 
     def test_create_archive(self):
         url = reverse('api:archive-list')
-        ARCHIVE_DIRS = ["../archives"]
         omex_files = get_omex_file_paths(ARCHIVE_DIRS)
         f = omex_files[0]
         name = os.path.basename(f)
@@ -136,6 +221,11 @@ class ViewAPILogedInSuperUser(TestCase):
 
 
 class ViewAPILogedOut(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        create_users(user_defs=user_defs, delete_all=True)
+        add_archives_to_database()
 
     def test_list_archives(self):
         """
@@ -193,6 +283,12 @@ class ViewAPILogedOut(TestCase):
 
 class ViewAPILogedIn(TestCase):
     """Test suite for the api views."""
+
+    @classmethod
+    def setUpTestData(cls):
+        create_users(user_defs=user_defs, delete_all=True)
+        add_archives_to_database()
+
     def setUp(self):
         self.client.login(username='testuser', password=os.environ['DJANGO_ADMIN_PASSWORD'])
 
@@ -253,7 +349,7 @@ class ViewAPILogedIn(TestCase):
 
     def test_create_archive(self):
         url = reverse('api:archive-list')
-        ARCHIVE_DIRS = ["../archives"]
+        ARCHIVE_DIRS = ["../../archives"]
         omex_files = get_omex_file_paths(ARCHIVE_DIRS)
         f = omex_files[0]
         name = os.path.basename(f)
