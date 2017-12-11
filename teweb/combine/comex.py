@@ -3,6 +3,7 @@ Helper functions to work with combine archives and zip files.
 
 Getting information out of the files.
 """
+import os
 import json
 import zipfile
 
@@ -16,12 +17,31 @@ try:
 except ImportError:
     import tesedml as libsedml
 
+
 # FIXME: this is a bugfix for https://github.com/sbmlteam/libCombine/issues/15
 import importlib
 importlib.reload(libcombine)
 
 from collections import namedtuple
 TagInfo = namedtuple("TagInfo", "category name")
+
+
+def get_omex_file_paths(archive_dirs):
+    """ Returns list of given combine archive paths from given list of directories.
+
+    :param archive_dirs:
+    :return:
+    """
+
+    # list files
+    omex_files = []
+    for archive_dir in archive_dirs:
+        for subdir, dirs, files in os.walk(archive_dir):
+            for file in files:
+                path = os.path.join(subdir, file)
+                if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
+                    omex_files.append(path)
+    return omex_files
 
 
 ################################################

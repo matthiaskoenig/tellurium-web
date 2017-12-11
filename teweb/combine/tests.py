@@ -22,18 +22,14 @@ django.setup()
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files import File
-
-from .forms import UploadArchiveForm
-from .models import hash_for_file
-
+from django.core.urlresolvers import reverse
 
 from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
 from rest_framework import status
-from django.core.urlresolvers import reverse
 
-from scripts.fill_database import get_omex_file_paths
-
-
+from .forms import UploadArchiveForm
+from .models import hash_for_file
+from . import comex
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OMEX_SHOWCASE_PATH = os.path.join(BASE_DIR, '../../archives/CombineArchiveShowCase.omex')
@@ -77,7 +73,6 @@ class ArchiveMethodTests(TestCase):
         form = UploadArchiveForm(post_dict, file_dict)
         self.assertTrue(form.is_valid())
 
-
     # OMEX Tests
     def test_omex(self):
         # TODO: implement & upload archive & fill database tests for the test database
@@ -86,17 +81,18 @@ class ArchiveMethodTests(TestCase):
         # print(archive)
         # get_content(archive)
 
+
 class ViewTestCase(TestCase):
     """Test suite for the api views."""
     def setUp(self):
         """Define the test client and other test variables."""
         self.BASE_URL = "http://127.0.0.1:8001"
-        self.ARCHIVE_DIRS = ["../test_archives"]
+        self.ARCHIVE_DIRS = [os.path.join(BASE_DIR, "../test_archives")]
         auth = coreapi.auth.BasicAuthentication(username='mkoenig',
                                                 password=os.environ['DJANGO_ADMIN_PASSWORD'])
         self.client = APIClient(auth)
         self.document = self.client.get(BASE_URL + "/api/")
-        self.omex_files = get_omex_file_paths(self.ARCHIVE_DIRS)
+        self.omex_files = comex.get_omex_file_paths(self.ARCHIVE_DIRS)
 
     def test_get_archives(self):
         for f in self.omex_files:
@@ -105,12 +101,12 @@ class ViewTestCase(TestCase):
             django_file = File(open(f, 'rb'))
 
     def test_api_can_create_archive(self):
-        f= self.omex_files[0]
+        f = self.omex_files[0]
         name = os.path.basename(f)
         md5 = hash_for_file(f, hash_type='MD5')
         django_file = File(open(f, 'rb'))
-        archive_data = {'name':name,'file':django_file,'tags':[],'md5': md5}
-        self.ducument["archives"]["create"]=archive_data
+        archive_data = {'name': name, 'file': django_file, 'tags': [], 'md5': md5}
+        self.document["archives"]["create"] = archive_data
         response = self.client.action(self.document["archives", "create"])
 
 
@@ -126,9 +122,7 @@ class ViewTestCase(TestCase):
         assert response.status_code == 200
 
 
-
-
-class ViewAPILogedOut(TestCase):
+class ViewAPILoggedOut(TestCase):
     """Test suite for the api views."""
     def setUp(self):
         """Define the test client and other test variables."""
@@ -138,11 +132,11 @@ class ViewAPILogedOut(TestCase):
         response = self.client.get('http://testserver/api/users')
         assert response.status_code == 403
 
-class ViewAPILogedIn(TestCase):
+
+class ViewAPILoggedIn(TestCase):
     """Test suite for the api views."""
     def setUp(self):
         self.client.login(username='mkoenig', password=os.environ['DJANGO_ADMIN_PASSWORD'])
-
 
     def test_list_users(self):
         """
@@ -156,14 +150,14 @@ class ViewAPILogedIn(TestCase):
 
     def test_create_user(self):
         url = reverse('api:user-list')
-        post = {"username":"user1","password":"test1"}
-        response = self.client.post(url,post)
+        post = {"username": "user1", "password": "test1"}
+        response = self.client.post(url, post)
         self.assertEquals(response.status_code, 201)
         response = self.client.get(url)
         self.assertContains(response, 'user1')
 
     def test_detail_user(self):
-        url = reverse('api:user-detail', kwargs={'pk':'2'})
+        url = reverse('api:user-detail', kwargs={'pk': '2'})
         response = self.client.get(url)
         data = response.json()
 
@@ -173,7 +167,7 @@ class ViewAPILogedIn(TestCase):
         self.assertEquals(response.status_code, 204)
 
 
-class ViewAPILogedOut(TestCase):
+class ViewAPILoggedOut(TestCase):
     def test_list_users(self):
         """
         Ensure we can create a new account object.
@@ -183,34 +177,3 @@ class ViewAPILogedOut(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, 'janek89')
         self.assertContains(response, 'mkoenig')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
