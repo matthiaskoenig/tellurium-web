@@ -87,7 +87,8 @@ class ViewTestCase(TestCase):
     def setUp(self):
         """Define the test client and other test variables."""
         self.BASE_URL = "http://127.0.0.1:8001"
-        self.ARCHIVE_DIRS = [os.path.join(BASE_DIR, "../test_archives")]
+        test_archive_dir = os.path.abspath(os.path.join(BASE_DIR, "../../test_archives"))
+        self.ARCHIVE_DIRS = [test_archive_dir]
         auth = coreapi.auth.BasicAuthentication(username='mkoenig',
                                                 password=os.environ['DJANGO_ADMIN_PASSWORD'])
         self.client = APIClient(auth)
@@ -106,7 +107,7 @@ class ViewTestCase(TestCase):
         md5 = hash_for_file(f, hash_type='MD5')
         django_file = File(open(f, 'rb'))
         archive_data = {'name': name, 'file': django_file, 'tags': [], 'md5': md5}
-        self.document["archives"]["create"] = archive_data
+        self.ducument["archives"]["create"] = archive_data
         response = self.client.action(self.document["archives", "create"])
 
 
@@ -119,7 +120,7 @@ class ViewTestCase(TestCase):
     def test_get_user(self):
         client = RequestsClient()
         response = client.get('http://testserver/api/users')
-        assert response.status_code == 200
+        self.assertEquals(response.status_code, 200)
 
 
 class ViewAPILoggedOut(TestCase):
@@ -130,7 +131,7 @@ class ViewAPILoggedOut(TestCase):
 
     def test_get_user(self):
         response = self.client.get('http://testserver/api/users')
-        assert response.status_code == 403
+        self.assertEquals(response.status_code, 403)
 
 
 class ViewAPILoggedIn(TestCase):
@@ -172,7 +173,7 @@ class ViewAPILoggedOut(TestCase):
         """
         Ensure we can create a new account object.
         """
-        url = reverse('api:archive-list')
+        url = reverse('api:user-list')
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, 'janek89')

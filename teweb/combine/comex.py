@@ -6,6 +6,7 @@ Getting information out of the files.
 import os
 import json
 import zipfile
+import warnings
 
 try:
     import libcombine
@@ -36,6 +37,9 @@ def get_omex_file_paths(archive_dirs):
     # list files
     omex_files = []
     for archive_dir in archive_dirs:
+        if not os.path.exists(archive_dir):
+            warnings.warn("Directory does not exist: {}".format(archive_dir))
+
         for subdir, dirs, files in os.walk(archive_dir):
             for file in files:
                 path = os.path.join(subdir, file)
