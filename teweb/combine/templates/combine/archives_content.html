@@ -14,7 +14,6 @@
                     <th>download</th>
                     <th>name</th>
                     <th>tags</th>
-                    <th class="hidden-xs">md5</th>
                     <th>action</th>
                     <th>status</th>
                     <th>results</th>
@@ -29,18 +28,12 @@
                         </td>
                         <td><a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
                             <i class="fa fa-download fa-lg black"></i></a></td>
-                        <td>
-                            <a href="{{ url('combine:archive', args=[archive.id]) }}">
-                                    <span class="label label-primary">{{ archive.name }}
-                            </span></a>
-                        </td>
+                        <td>{{ macros.archive_html(archive) }}</td>
                         <td>
                             {% for tag in archive.tags.all() %}
                                 {{ macros.tag_html(tag) }}
                             {% endfor %}
                         </td>
-
-                        <td class="hidden-xs">{{ archive.md5_short }}</td>
                         <!-- action -->
                         <!--TODO: write in macro-->
                         <td>{% if archive.task_id %}
