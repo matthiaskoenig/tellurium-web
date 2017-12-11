@@ -116,10 +116,9 @@ def archive_view(request, archive_id):
     # meta_data_parsed = g.parse(meta_data)
     # print(meta_data_parsed)
 
-
-
-
     context = archive_context(archive)
+    if request.method =='POST':
+        print(request.POST.get("description"))
     return render(request, 'combine/archive.html', context)
 
 
