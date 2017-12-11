@@ -81,8 +81,10 @@
                 <div id="title_div">
                     <h3 id="title"></h3>
                 </div>
-                <div id="item_detail">
-                </div>
+                <form id="form_detail" method="post">
+                    <div id="item_detail"></div>
+                </form>
+
             </div>
 
         </div>
@@ -178,9 +180,9 @@
                   var entry_detail = get_detail($.trim(selected_entry));
                   if(typeof entry_detail !== 'undefined' ){
                         // add title
-                        add_button("add");
+                        //add_button("add");
                         add_button("edit");
-                        add_button("delete");
+                        //add_button("delete");
                         $("#title").text(" "+fn);
                         add_master_icon(entry_detail);
                         add_format_icon(entry_detail);
@@ -203,20 +205,27 @@
              }}
 
              function add_description (metadata,edit){
-
                  if (edit==true){
+                     $("#item_detail").append('<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">');
                      var textArea = document.createElement("textarea");
                      textArea.cols="50";
-                     textArea.size="10";
+                     textArea.rows="5";
+                     textArea.setAttribute("name","description");
                      textArea.append(metadata["description"]);
-                     description =textArea.outerHTML
+                     description =textArea.outerHTML;
+                     $("#button-div").append('<input type="submit" value="OK">')
+
                  }
                  else {
                      var description = metadata["description"];
                  }
+
+
                  $("#item_detail").append('<dl><dt>' + "Description" + '</dt><dd>' + description + '</dd></dl>');
                  $("#item_detail").append('<dl><dt>' + "Created"+ '</dt><dd>' + metadata["created"] + '</dd></dl>');
                  $("#item_detail").append('<dl><dt>' +"Modified"+'</dt>'+modified_content(metadata["modified"])+'</dl>');
+
+
              }
 
              function modified_content( modified){
