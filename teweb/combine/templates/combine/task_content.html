@@ -18,9 +18,7 @@
 
         <!-- task result -->
         {% if task_result %}
-            <a href="{{ url('combine:taskresult', args=[task_result.pk]) }}">
-                <span class="btn btn-default btn-xs">TaskResult</span>
-            </a>
+            <a href="{{ url('combine:taskresult', args=[task_result.pk]) }}"><span class="btn btn-default btn-xs">TaskResult</span></a>
         {% endif %}
 
         <!-- task id -->
