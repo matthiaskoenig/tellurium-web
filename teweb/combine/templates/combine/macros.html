@@ -14,6 +14,73 @@ Definition of reusable macro function in templates
 {% endmacro %}
 
 
+<!-- Tasks -->
+{% macro task_status(task) %}
+    {% if task.status == "SUCCESS" %}
+        <span class="label label-success"><i
+                class="fa fa-check-square fa-fw"></i> {{ task.status }}</span>
+    {% elif task.status == "FAILURE" %}
+        <span class="label label-danger"><i
+                class="fa fa-minus-square fa-fw"></i> {{ task.status }}</span>
+    {% else %}
+        <span class="label label-info"
+              title="{{ task }}">{{ task.status }}</span>
+    {% endif %}
+{% endmacro %}
+
+{%  macro archive_status(archive) %}
+{% if archive.task_id %}
+    {{ task_status(archive.task) }}
+{% else %}
+    <i class="fa fa-ban fa-fw fa-lg grey"></i>
+{% endif %}
+{% endmacro %}
+
+
+
+{% macro archive_results(archive) %}
+{% if archive.task_id %}
+    {% with task = archive.task %}
+        {% if task.status == "SUCCESS" %}
+            <a href="{{ url('combine:results', args=[archive.id])}}">
+                <i class="fa fa-line-chart fa-fw fa-lg"></i>
+            </a>
+        {% else %}
+            <i class="fa fa-ban fa-fw fa-lg grey"></i>
+        {% endif %}
+    {% endwith %}
+{% else %}
+    <i class="fa fa-ban fa-fw fa-lg grey"></i>
+{% endif %}
+{% endmacro %}
+
+
+{%  macro archive_action(archive) %}
+{% if archive.task_id %}
+    {% with task = archive.task %}
+        <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
+            {% if task %}
+                {% if task.status == 'SUCCESS' %}
+                    <span class="btn btn-default btn-xs">
+                    <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN
+                {% elif task.status == 'FAILURE' %}
+                    <span class="btn btn-danger btn-xs">
+                    <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY
+                {% else %}
+                    <span class="btn btn-info btn-xs">
+                    <i class="fa fa-cog fa-spin fa-fw" title="EXECUTING"></i> EXECUTING
+                {% endif %}
+            {% endif %}
+            </span>
+        </a>
+    {% endwith %}
+{% else %}
+    <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
+    <span class="btn btn-success btn-xs">
+    <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN</span></a>
+{% endif %}
+{% endmacro %}
+
 <!-- User -->
 {% macro user(user) %}
 {% if user %}

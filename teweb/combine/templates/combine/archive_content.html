@@ -1,3 +1,5 @@
+{% import 'combine/macros.html' as macros %}
+
 <div class="panel panel-default">
    <!-- navigate archives -->
     <a href="{{ url('combine:archive_previous', args=[archive.id]) }}"
@@ -9,9 +11,8 @@
     <div class="panel-heading">
 
         <h2 class="panel-title">
-            <i class="fa fa-archive fa-fw"></i>
             <a href="{{ url('combine:archive', args=[archive.id]) }}">
-                <span class="label label-primary">{{ archive }}</span></a>
+                {{ macros.archive_html(archive) }}
             <a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive"><i
                     class="fa fa-download fa-fw"></i></a>
 

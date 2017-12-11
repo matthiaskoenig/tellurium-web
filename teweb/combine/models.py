@@ -11,6 +11,8 @@ from django.utils import timezone
 from djchoices import DjangoChoices, ChoiceItem
 from django.contrib.auth.models import User
 
+from celery.result import AsyncResult
+
 try:
     import libcombine
 except ImportError:
@@ -132,6 +134,14 @@ class Archive(models.Model):
     @property
     def path(self):
         return str(self.file.path)
+
+    @property
+    def task(self):
+        task = None
+        if self.task_id:
+            task = AsyncResult(self.task_id)
+        return task
+
 
     def omex(self):
         """ Open CombineArchive for given archive.
