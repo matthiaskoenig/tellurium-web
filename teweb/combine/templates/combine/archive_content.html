@@ -77,12 +77,12 @@
         <div class="row">
             <div class="col-sm-6"id="json_tree"></div>
             <div class="col-sm-6">
-                <div id="button-div"></div>
-                <div id="title_div">
-                    <h3 id="title"></h3>
-                </div>
                 <form id="form_detail" method="post">
-                    <div id="item_detail"></div>
+                    <div id="button-div"></div>
+                    <div id="title_div">
+                        <h3 id="title"></h3>
+                    </div>
+                        <div id="item_detail"></div>
                 </form>
 
             </div>
@@ -206,14 +206,14 @@
 
              function add_description (metadata,edit){
                  if (edit==true){
-                     $("#item_detail").append('<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">');
+                     $("#item_detail").append('<input type="hidden"  name="csrfmiddlewaretoken" value="{{ csrf_token }}">');
                      var textArea = document.createElement("textarea");
                      textArea.cols="50";
                      textArea.rows="5";
                      textArea.setAttribute("name","description");
                      textArea.append(metadata["description"]);
                      description =textArea.outerHTML;
-                     $("#button-div").append('<input type="submit" value="OK">')
+                     $("#button-div").append('<input class="btn btn-default" type="submit" value="Save">')
 
                  }
                  else {
@@ -266,18 +266,26 @@
                  if (edit==true){
                      var givenNameInput=document.createElement("input");
                      givenNameInput.setAttribute("value",creator["givenName"]);
+                     givenNameInput.setAttribute("placeholder", "First Name");
+
                      var givenName = givenNameInput.outerHTML;
 
                      var familyNameInput=document.createElement("input");
                      familyNameInput.setAttribute("value",creator["familyName"]);
+                     familyNameInput.setAttribute("placeholder","Family Name");
+
                      var familyName = familyNameInput.outerHTML;
 
                      var organisationInput=document.createElement("input");
                      organisationInput.setAttribute("value",creator["organisation"]);
+                     organisationInput.setAttribute("placeholder","Organisation");
+
                      var organisation = organisationInput.outerHTML;
 
                      var emailInput=document.createElement("input");
                      emailInput.setAttribute("value",creator["email"]);
+                     emailInput.setAttribute("placeholder","Email");
+
                      var email = emailInput.outerHTML;
                  }
                  else{
