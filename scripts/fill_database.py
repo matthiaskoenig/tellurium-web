@@ -55,26 +55,13 @@ user_defs = [
     UserDef("global", False, False, False, False)]
 
 
-def get_omex_file_paths(ARCHIVE_DIRS):
-
-    # list files
-    omex_files = []
-    for archive_dir in ARCHIVE_DIRS:
-        for subdir, dirs, files in os.walk(archive_dir):
-            for file in files:
-                path = os.path.join(subdir, file)
-                if os.path.isfile(path) and (path.endswith('.omex') or path.endswith('.sedx')):
-                    omex_files.append(path)
-    return omex_files
-
-
 def add_archives_to_database():
     """ Add archives to database.
 
     :return:
     """
     # list files
-    omex_files = get_omex_file_paths(ARCHIVE_DIRS)
+    omex_files = comex.get_omex_file_paths(ARCHIVE_DIRS)
 
     for f in sorted(omex_files):
         print('-' * 80)
@@ -111,7 +98,6 @@ def add_archives_to_database():
                 new_archive.tags.add(tag)
 
 
-
 def create_users(user_defs, delete_all=True):
     """ Create users in database from user definitions.
 
@@ -141,8 +127,8 @@ def create_users(user_defs, delete_all=True):
     for user in User.objects.all():
         print('\t', user.username, user.email, user.password)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     print('-'*80)
     print('Creating archives')
     print('-' * 80)

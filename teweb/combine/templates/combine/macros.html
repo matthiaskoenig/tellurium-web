@@ -2,9 +2,9 @@
 Definition of reusable macro function in templates
 -->
 
-<!-- Measurement type -->
+<!-- Tags -->
 {% macro tag_html(tag) %}
-<a href="{{ url('combine:tag', args=[tag.id]) }}"><span class="label label-default">{{ tag.category }}</span><span class="label label-warning">{{ tag.name }}</span></a>
+<a href="{{ url('combine:tag', args=[tag.id]) }}"><span class="label label-default"><i class="fa fa-fw fa-tag"></i> {{ tag.category }}</span><span class="label label-warning">{{ tag.name }}</span></a>
 {% endmacro %}
 
 <!-- User -->

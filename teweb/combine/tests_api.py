@@ -27,7 +27,7 @@ from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, AP
 from rest_framework import status
 from django.core.urlresolvers import reverse
 
-from scripts.fill_database import get_omex_file_paths
+from combine.comex import get_omex_file_paths
 
 
 

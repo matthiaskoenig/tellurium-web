@@ -21,12 +21,15 @@ django.setup()
 
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
+
+from django.core.files import File
+from django.core.urlresolvers import reverse
+
+from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
+from rest_framework import status
 from .forms import UploadArchiveForm
-
-
-
-
-
+from .models import hash_for_file
+from . import comex
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OMEX_SHOWCASE_PATH = os.path.join(BASE_DIR, '../../archives/CombineArchiveShowCase.omex')
@@ -70,7 +73,6 @@ class ArchiveMethodTests(TestCase):
         form = UploadArchiveForm(post_dict, file_dict)
         self.assertTrue(form.is_valid())
 
-
     # OMEX Tests
     def test_omex(self):
         # TODO: implement & upload archive & fill database tests for the test database
@@ -78,32 +80,5 @@ class ArchiveMethodTests(TestCase):
         # archive = Archive.objects.get(pk=1)
         # print(archive)
         # get_content(archive)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
