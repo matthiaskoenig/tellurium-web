@@ -729,7 +729,7 @@ class ArchiveViewSet(viewsets.ModelViewSet):
     def list(self, request):
          global_user = User.objects.get(username="global")
 
-         if request.user.is_authenticated():
+         if request.user.is_authenticated:
             queryset = Archive.objects.filter(user__in=[global_user,request.user])
          else:
              queryset = Archive.objects.filter(user=global_user)
