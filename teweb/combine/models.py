@@ -94,7 +94,7 @@ class Archive(models.Model):
     md5 = models.CharField(max_length=36, blank=True)
     task_id = models.CharField(max_length=100, blank=True)
     tags = models.ManyToManyField(Tag, related_name="archives")
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     uuid = models.UUIDField(  # Used by the API to look up the record
         db_index=True,
         default=uuid_lib.uuid4,

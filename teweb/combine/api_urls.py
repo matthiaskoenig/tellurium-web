@@ -18,6 +18,7 @@ router.register(r'users', teweb_views.UserViewSet, base_name='user')
 router.register(r'tags', teweb_views.TagViewSet, base_name='tag')
 router.register(r'archives', teweb_views.ArchiveViewSet, base_name='archive')
 
+app_name = 'combine'
 urlpatterns = [
     url(r'^$', schema_view),
     ]
