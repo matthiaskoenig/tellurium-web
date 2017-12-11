@@ -25,7 +25,7 @@ from django.core.files import File
 
 from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
 from rest_framework import status
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from combine.models import Archive, Tag, hash_for_file
 from combine.comex import get_omex_file_paths
 from django.contrib.auth.models import User
