@@ -26,7 +26,7 @@ from rest_framework.response import Response
 
 from .tasks import execute_omex
 from .models import Archive, Tag
-from .serializers import ArchiveSerializer,TagSerializer, UserSerializer
+from .serializers import ArchiveSerializer, TagSerializer, UserSerializer
 from .forms import UploadArchiveForm
 from .git import get_commit
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
@@ -87,18 +87,11 @@ def archives(request, form=None):
     :return:
     """
     archives = Archive.objects.all().order_by('-created')
-    tasks = []
-    for archive in archives:
-        task = None
-        if archive.task_id:
-            task = AsyncResult(archive.task_id)
-        tasks.append(task)
 
     if form is None:
         form = UploadArchiveForm()
     context = {
         'archives': archives,
-        'tasks': tasks,
         'form': form
     }
     return render(request, 'combine/archives.html', context)
@@ -166,10 +159,6 @@ def archive_tree_api(request, archive_id):
     parsed = archive.zip_entries()
     parsed = json.loads(parsed)
     return Response(parsed)
-
-
-
-
 
 
 def download_archive(request, archive_id):

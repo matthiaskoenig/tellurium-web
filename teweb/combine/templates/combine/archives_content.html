@@ -10,8 +10,8 @@
             <table id="archives" class="table table-striped table-condensed table-hover">
                 <thead>
                 <tr>
-                    <th>archive</th>
-                    <th>download</th>
+                    <th></th>
+                    <th></th>
                     <th>name</th>
                     <th>tags</th>
                     <th>action</th>
@@ -34,68 +34,9 @@
                                 {{ macros.tag_html(tag) }}
                             {% endfor %}
                         </td>
-                        <!-- action -->
-                        <!--TODO: write in macro-->
-                        <td>{% if archive.task_id %}
-                            {% with task = tasks[loop.index0] %}
-                                <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
-                                    {% if task %}
-                                        {% if task.status == 'SUCCESS' %}
-                                            <span class="btn btn-default btn-xs">
-                                            <i class="fa fa-forward fa-fw" title="RERUN"></i> RERUN
-                                        {% elif task.status == 'FAILURE' %}
-                                            <span class="btn btn-danger btn-xs">
-                                            <i class="fa fa-refresh fa-fw" title="RETRY"></i> RETRY
-                                        {% else %}
-                                            <span class="btn btn-info btn-xs">
-                                            <i class="fa fa-cog fa-spin fa-fw" title="EXECUTING"></i> EXECUTING
-                                        {% endif %}
-                                    {% endif %}
-                                    </span>
-                                </a>
-                            {% endwith %}
-                            {% endif %}
-
-                            {% if not archive.task_id %}
-                                <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
-                                <span class="btn btn-success btn-xs">
-                                <i class="fa fa-play-circle fa-fw" title="RUN"></i> RUN</span></a>
-                            {% endif %}
-                        </td>
-                        <!-- status -->
-                        <td>{% if archive.task_id %}
-                            {% with task = tasks[loop.index0] %}
-                                {% if task.status == "SUCCESS" %}
-                                    <span class="label label-success"><i
-                                            class="fa fa-check-square fa-fw"></i> {{ task.status }}</span>
-                                {% elif task.status == "FAILURE" %}
-                                    <span class="label label-danger"><i
-                                            class="fa fa-minus-square fa-fw"></i> {{ task.status }}</span>
-                                {% else %}
-                                    <span class="label label-info"
-                                          title="{{ task }}">{{ task.status }}</span>
-                                {% endif %}
-                            {% endwith %}
-                        {% else %}
-                            <i class="fa fa-ban fa-fw fa-lg grey"></i>
-                        {% endif %}
-                        </td>
-                        <!-- results -->
-                        <td>{% if archive.task_id %}
-                            {% with task = tasks[loop.index0] %}
-                                {% if task.status == "SUCCESS" %}
-                                    <a href="{{ url('combine:results', args=[archive.id])}}">
-                                        <i class="fa fa-line-chart fa-fw fa-lg"></i>
-                                    </a>
-                                {% else %}
-                                    <i class="fa fa-ban fa-fw fa-lg grey"></i>
-                                {% endif %}
-                            {% endwith %}
-                        {% else %}
-                            <i class="fa fa-ban fa-fw fa-lg grey"></i>
-                        {% endif %}
-
-                        </td>
+                        <td>{{ macros.archive_action(archive) }}</td>
+                        <td>{{ macros.archive_status(archive) }}</td>
+                        <td>{{ macros.archive_results(archive) }}</td>
                         <td>
                             <!-- delete archive -->
                             {% if request.user.is_authenticated %}

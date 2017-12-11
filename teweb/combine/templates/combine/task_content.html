@@ -1,4 +1,4 @@
-
+{% import 'combine/macros.html' as macros %}
     <div class="panel panel-default">
 
         <div class="panel-heading">
@@ -11,16 +11,7 @@
 
             <!-- status -->
             {% if task %}
-                   {% if task.status == "SUCCESS" %}
-                        <span class="label label-success"><i
-                                class="fa fa-check-square fa-fw"></i> {{ task.status }}</span>
-                    {% elif task.status == "FAILURE" %}
-                        <span class="label label-danger"><i
-                                class="fa fa-minus-square fa-fw"></i> {{ task.status }}</span>
-                    {% else %}
-                        <span class="label label-info"
-                              title="{{ task }}">{{ task.status }}</span>
-                    {% endif %}
+                {{ macros.task_status(task) }}
             {% else %}
                 <span class="label label-default">None</span> Archive has not been executed.
             {% endif %}
