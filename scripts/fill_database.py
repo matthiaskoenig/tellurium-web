@@ -15,13 +15,11 @@ http://eli.thegreenplace.net/2014/02/15/programmatically-populating-a-django-dat
 """
 import os
 import sys
-import warnings
 
 FILE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-# project directory
 PROJECT_DIR = os.path.join(FILE_DIR, "../teweb/")
-# directory of omex archives
 
+# directories with OMEX archives
 ARCHIVE_DIRS = [
     os.path.join(FILE_DIR, "../archives"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives"),
@@ -43,8 +41,8 @@ django.setup()
 
 from combine.data import UserDef, create_users, add_archives_to_database
 
-
-user_defs = [
+# user definitions for database
+user_definitions = [
     UserDef("janekg89", "Jan", "Grzegorzewski", "janekg89@hotmail.de", True),
     UserDef("mkoenig", "Matthias", "König", "konigmatt@googlemail.com", True),
     UserDef("testuser", False, False, False, False),
@@ -54,5 +52,5 @@ if __name__ == "__main__":
     print('-'*80)
     print('Creating archives')
     print('-' * 80)
-    create_users(user_defs=user_defs, delete_all=True)
+    create_users(user_defs=user_definitions, delete_all=True)
     add_archives_to_database(ARCHIVE_DIRS)

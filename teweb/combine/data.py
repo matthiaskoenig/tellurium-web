@@ -2,15 +2,14 @@
 Data and helper functions for filling the database.
 """
 
-
 import os
+from collections import namedtuple
 
-from combine.models import Archive, Tag, hash_for_file
-from combine import comex
 from django.core.files import File
 from django.contrib.auth.models import User
 
-from collections import namedtuple
+from combine.models import Archive, Tag, hash_for_file
+from combine import comex
 
 UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
 
@@ -47,12 +46,7 @@ def add_archives_to_database(archive_dirs):
             new_archive.full_clean()
             new_archive.save()
 
-            # add Tags
-            # tag, created = Tag.objects.get_or_create(name="test", type=Tag.TagType.misc)
-            # if created:
-            #     tag.save()
-            # new_archive.tags.add(tag)
-
+            # create tag info
             tags_info = comex.tags_info(f)
             print(tags_info)
             for tag_info in tags_info:

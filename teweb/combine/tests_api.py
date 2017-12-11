@@ -22,7 +22,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files import File
 
 
-
 from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
@@ -258,12 +257,10 @@ class ViewAPILoggedIn(TestCase):
         response = self.client.post(url,post)
         self.assertEquals(response.status_code, 403)
 
-
     def test_detail_user(self):
         url = reverse('api:user-detail', kwargs={'pk':'2'})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 403)
-
 
     def test_delete_user(self):
         url = reverse('api:user-detail', kwargs={'pk': '2'})
