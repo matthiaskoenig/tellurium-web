@@ -4,8 +4,15 @@ Definition of reusable macro function in templates
 
 <!-- Tags -->
 {% macro tag_html(tag) %}
-<a href="{{ url('combine:tag', args=[tag.id]) }}"><span class="label label-default"><i class="fa fa-fw fa-tag"></i> {{ tag.category }}</span><span class="label label-warning">{{ tag.name }}</span></a>
+<a href="{{ url('combine:tag', args=[tag.id]) }}"><span class="btn btn-default btn-xs"><i class="fa fa-fw fa-tag"></i> {{ tag.category }}:<b>{{ tag.name }}</b></span></a>
 {% endmacro %}
+
+
+<!-- Archives -->
+{% macro archive_html(archive) %}
+<a href="{{ url('combine:archive', args=[archive.id]) }}"><span class="btn btn-primary btn-xs"><i class="fa fa-fw fa-archive"></i> {{ archive.name }}</span></a>
+{% endmacro %}
+
 
 <!-- User -->
 {% macro user(user) %}
@@ -24,27 +31,4 @@ Definition of reusable macro function in templates
     <i class="fa fa-fw fa-cog" title="{{ status }}"></i>
 {% endif %}
 {{ status }}</td>
-{% endmacro %}
-
-<!-- Step type -->
-{%  macro step_type(step) %}
-{% with name = step.__class__.__name__ %}
-{% if name == "Washing" %}
-    <i class="fa fa-fw fa-shower text-primary"></i> {{ name }}
-{% elif name == "Drying" %}
-    <i class="fa fa-fw fa-bullhorn text-warning"></i> {{ name }}
-{% elif name == "Spotting" %}
-    <i class="fa fa-fw fa-anchor"></i> {{ name }} / Immobilization
-{% elif name == "Quenching" %}
-    <i class="fa fa-fw fa-chain-broken text-danger"></i> {{ name }}
-{% elif name == "Incubating" %}
-    <i class="fa fa-fw fa-tint"></i> {{ name }}
-{% elif name == "IncubatingAnalyt" %}
-    <i class="fa fa-fw fa-tint" aria-hidden="true"></i>Incubating Analyte
-{% elif name == "Blocking" %}
-    <i class="fa fa-fw fa-pause text-danger" aria-hidden="true"></i> {{ name }}
-{% elif name == "Scanning" %}
-    <i class="fa fa-fw fa-camera text-success" aria-hidden="true"></i> {{ name }}
-{% endif %}
-{% endwith %}
 {% endmacro %}

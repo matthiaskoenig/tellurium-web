@@ -21,8 +21,6 @@
     <script src="{{ static('combine/js/datatables-1.10.16.min.js') }}"></script>
 
 
-
-
     {% block head %}{% endblock %}
 </head>
 
@@ -38,59 +36,45 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ url('combine:index') }}"><img style="height:18px"
-                                                                             src="{{ static('combine/images/logos/te-web-banner-white.png') }}" title="Tellurium Web"></a>
+            <a class="navbar-brand" href="{{ url('combine:index') }}">
+                <img style="height:25px" src="{{ static('combine/images/logos/te-web.png') }}"
+                     title="Tellurium Web">
+            </a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="{{ url('combine:index') }}" title="Overview Combine Archives"><i class="fa fa-archive fa-fw"></i> Archives</a></li>
-                <li><a href="{{ url('combine:upload') }}" title="Upload Combine Archive"><i class="fa fa-upload fa-fw"></i> Upload</a></li>
-                <li><a href="{{ url('combine:tags') }}" title="Tags for Combine Archive"><i class="fa fa-bookmark fa-fw"></i> Tags</a></li>
+                <li><a href="{{ url('combine:index') }}" title="Overview Combine Archives"><i
+                        class="fa fa-archive fa-fw"></i> Archives</a></li>
+                <li><a href="{{ url('combine:upload') }}" title="Upload Combine Archive"><i
+                        class="fa fa-upload fa-fw"></i> Upload</a></li>
+                <li><a href="{{ url('combine:tags') }}" title="Tags for Combine Archive"><i
+                        class="fa fa-tags fa-fw"></i> Tags</a></li>
                 {% if request.user.is_authenticated %}
-                    <li><a href="{{ url('combine:taskresults') }}" title="Overview TaskResults"><i class="fa fa-server fa-fw"></i> TaskResults</a></li>
+                    <li><a href="{{ url('combine:taskresults') }}" title="Overview TaskResults"><i
+                            class="fa fa-server fa-fw"></i> TaskResults</a></li>
 
                     <li class="dropdown">
                         <a data-toggle="dropdown" role="button" aria-expanded="false">
-                            <i class="fa fa-play-circle fa-fw"></i> Run Archives <span class="caret" title="Run Combine Archives"></span></a>
+                            <i class="fa fa-play-circle fa-fw"></i> Run Archives <span class="caret"
+                                                                                       title="Run Combine Archives"></span></a>
 
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="{{ url('combine:runall') }}" title="Run All Combine Archives"><i class="fa fa-play-circle fa-fw"></i> Run <span class="label label-default">ALL</span></a></a></li>
+                            <li><a href="{{ url('combine:runall') }}" title="Run All Combine Archives"><i
+                                    class="fa fa-play-circle fa-fw"></i> Run <span
+                                    class="label label-default">ALL</span></a></a></li>
                             <!--
                             <li><a href="{{ url('combine:runall') }}" title="Run Failed Combine Archives"><i class="fa fa-play-circle fa-fw"></i> Run <span class="label label-danger">FAILURE</span></a></li>
                             -->
                         </ul>
                     </li>
-                     <li><a href="{{ url('admin:index') }}" title="Admin Interface" target="_blank"><i class="fa fa-cog fa-fw"></i> Admin</a></li>
+                    <li><a href="{{ url('admin:index') }}" title="Admin Interface" target="_blank"><i
+                            class="fa fa-cog fa-fw"></i> Admin</a></li>
                 {% endif %}
-
             </ul>
 
 
-             <ul class="nav navbar-nav navbar-right">
-                <li><a href="{{ url('combine:webservices') }}" title="REST Web Services">
-                    <i class="fa fa-cube fa-fw"></i> Web Services</a>
-                </li>
-
-                <li><a href="{{ url('combine:about') }}" title="About Tellurium Web">
-                    <i class="fa fa-info fa-fw"></i> About</a>
-                </li>
-
-                <li class="dropdown">
-                    <a data-toggle="dropdown" role="button" aria-expanded="false"><i
-                            class="fa fa-comments fa-fw"></i> Contact <span
-                            class="caret" title="Contact Information"></span> </a>
-                    <ul class="dropdown-menu" role="menu">
-
-                        <li><a href="https://github.com/matthiaskoenig/tellurium-web" title="Source code on github" target="_blank">
-                 <i class="fa fa-github fa-fw"></i> Github</a></li>
-                        <li><a href="https://github.com/matthiaskoenig/tellurium-web/issues" title="Report Issue" target="_blank"><i class="fa fa-fire fa-fw"></i> Report Issue</a></li>
-                        <li><a href="mailto:konigmatt@googlemail.com" title="Send Email" target="_blank"><i class="fa fa-envelope fa-fw"></i> Send Email</a></li>
-
-
-                    </ul>
-                </li>
-
+            <ul class="nav navbar-nav navbar-right">
                 {% if request.user.is_authenticated %}
                     <li class="dropdown">
                         <a data-toggle="dropdown" role="button" aria-expanded="false"><i
@@ -98,17 +82,24 @@
                                 class="caret" title="User Information"></span> </a>
                         <ul class="dropdown-menu" role="menu">
 
-                            <li><a href="{{ url('logout') }}?next={{ request.path }}"> <i class="fa fa-sign-out fa-fw"> </i> Logout</a></li>
+                            <li><a href="{{ url('logout') }}?next={{ request.path }}"> <i
+                                    class="fa fa-sign-out fa-fw"> </i> Logout</a></li>
                         </ul>
                     </li>
-
                 {% else %}
                     <li><a href="{{ url('login') }}?next={{ request.path }}"><i
                             class="fa fa-sign-in fa-fw"></i> Login</a></li>
                 {% endif %}
-            <li><a href="http://sysbioapps.dyndns.org/SED-ML_Web_Tools" target="_blank" title="SED-ML webtools"><i
-                            class="fa fa-external-link fa-fw"></i></a></li>
+                <li><a href="{{ url('combine:webservices') }}" title="REST Web Services">
+                    <i class="fa fa-cube fa-fw"></i> API</a>
+                </li>
 
+                <li><a href="{{ url('combine:about') }}" title="About Tellurium Web">
+                    <i class="fa fa-info fa-fw"></i> About</a>
+                </li>
+                <li><a href="https://github.com/matthiaskoenig/tellurium-web" title="Source code on github"
+                       target="_blank">
+                    <i class="fa fa-github fa-fw"></i> Github</a></li>
 
             </ul>
         </div><!--/.nav-collapse -->
@@ -123,7 +114,6 @@
         </div>
     </div>
 </div>
-
 
 
 {% block javascript %}{% endblock %}
