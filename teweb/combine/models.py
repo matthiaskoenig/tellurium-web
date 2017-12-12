@@ -20,6 +20,9 @@ except ImportError:
 from celery.result import AsyncResult
 from . import comex, validators
 
+from combine.managers import ArchiveManager
+
+
 logger = logging.getLogger(__name__)
 
 MAX_TEXT_LENGTH = 500
@@ -99,9 +102,12 @@ class Archive(models.Model):
     tags = models.ManyToManyField(Tag, related_name="archives")
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     uuid = models.UUIDField(  # Used by the API to look up the record
+
         db_index=True,
         default=uuid_lib.uuid4,
         editable=False)
+    objects = ArchiveManager()
+
 
     def __str__(self):
         return self.name

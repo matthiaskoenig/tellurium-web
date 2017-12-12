@@ -26,35 +26,11 @@ def add_archives_to_database(archive_dirs):
     for f in sorted(omex_files):
         print('-' * 80)
         print(f)
-        md5 = hash_for_file(f, hash_type='MD5')
-        existing_archive = Archive.objects.filter(md5=md5)
-        # archive exists already based on the MD5 checksum
-        if len(existing_archive) > 0:
+        # default user is "global" but can be changed by adding user= < User Object >, user = User.username( string)
+        _, created = Archive.objects.get_or_create(archive_path=f)
+        if not created:
             print("Archive already exists, not recreated: {}".format(f))
-        else:
-            name = os.path.basename(f)
-            tokens = name.split(".")
-            if len(tokens) > 1:
-                name = ".".join(tokens[0:-1])
 
-            django_file = File(open(f, 'rb'))
-            new_archive = Archive(name=name)
-            global_user = User.objects.get(username="global")
-            new_archive.user = global_user
-            new_archive.file.save(name, django_file, save=False)
-            new_archive.md5 = hash_for_file(f, hash_type='MD5')
-            new_archive.full_clean()
-            new_archive.save()
-
-            # create tag info
-            tags_info = comex.tags_info(f)
-            print(tags_info)
-            for tag_info in tags_info:
-                tag, created = Tag.objects.get_or_create(name=tag_info.name,
-                                                         category=tag_info.category)
-                if created:
-                    tag.save()
-                new_archive.tags.add(tag)
 
 
 def create_users(user_defs, delete_all=True):
