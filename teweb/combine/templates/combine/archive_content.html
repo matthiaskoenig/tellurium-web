@@ -164,10 +164,46 @@
 
                 }
         </script>
+
+        <script>
+            var csrftoken = Cookies.get('csrftoken');
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+        </script>
+
         <script>
             $(document).on('click','#editButton',function(){
                 var entry = $('#json_tree').jstree('get_selected',true)[0]["id"];
                 diplay_entry_detail(entry, edit=true);
+            });
+        </script>
+
+        <script>
+            var frm = $('#form_detail');
+            frm.submit(function () {
+                $.ajax({
+                    type: frm.attr('method'),
+                    url: frm.attr('action'),
+                    data: {"data": frm.serializeJSON()},
+                    success: function (data) {
+                        console.log("success"); // another sanity check
+
+
+                    },
+                    error: function(data) {
+                        $("#item_detail").html("Something went wrong!");
+                    }
+                });
+                return false;
             });
         </script>
 
@@ -193,7 +229,7 @@
                             var meta = entry_detail.metadata;
                             add_description(meta,edit);
                             for (creator in meta.creators){
-                                addContact(meta.creators[creator],edit);
+                                addContact(meta.creators,creator,edit);
                             }
                         }
                   }
@@ -207,7 +243,8 @@
 
              function add_description (metadata,edit){
                  if (edit==true){
-                     $("#item_detail").append('<input type="hidden"  name="csrfmiddlewaretoken" value="{{ csrf_token }}">');
+                     var form = document.getElementById("form_detail");
+
                      var textArea = document.createElement("textarea");
                      textArea.cols="50";
                      textArea.rows="5";
@@ -216,17 +253,23 @@
                      description =textArea.outerHTML;
                      $("#button-div").append('<input class="btn btn-default" type="submit" value="Save">')
 
+                     // hidden Input for created and modified
+                     var createdInput=document.createElement("input");
+                     createdInput.setAttribute("value",metadata["created"]);
+                     createdInput.setAttribute("type", "hidden");
+                     createdInput.setAttribute("name", "created");
+                     form.appendChild(createdInput);
+
+
+
+
                  }
                  else {
                      var description = metadata["description"];
                  }
-
-
                  $("#item_detail").append('<dl><dt>' + "Description" + '</dt><dd>' + description + '</dd></dl>');
                  $("#item_detail").append('<dl><dt>' + "Created"+ '</dt><dd>' + metadata["created"] + '</dd></dl>');
                  $("#item_detail").append('<dl><dt>' +"Modified"+'</dt>'+modified_content(metadata["modified"])+'</dl>');
-
-
              }
 
              function modified_content( modified){
@@ -237,20 +280,6 @@
                  return content
              }
 
-            function formatDate(date) {
-              var monthNames = [
-                "January", "February", "March",
-                "April", "May", "June", "July",
-                "August", "September", "October",
-                "November", "December"
-              ];
-
-              var day = date.getDate();
-              var monthIndex = date.getMonth();
-              var year = date.getFullYear();
-
-              return day + ' ' + monthNames[monthIndex] + ' ' + year;
-            }
 
              function add_format_icon (entry_detail){
                  format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
@@ -263,37 +292,44 @@
                     }));}
              }
 
-             function addContact(creator,edit){
+             function addContact(creators,creator,edit){
                  if (edit==true){
                      var givenNameInput=document.createElement("input");
-                     givenNameInput.setAttribute("value",creator["givenName"]);
+                     givenNameInput.setAttribute("value",creators[creator]["givenName"]);
                      givenNameInput.setAttribute("placeholder", "First Name");
+                     givenNameInput.setAttribute("name", "creators["+creator+"][givenName]");
+
+
 
                      var givenName = givenNameInput.outerHTML;
 
                      var familyNameInput=document.createElement("input");
-                     familyNameInput.setAttribute("value",creator["familyName"]);
+                     familyNameInput.setAttribute("value",creators[creator]["familyName"]);
                      familyNameInput.setAttribute("placeholder","Family Name");
+                     familyNameInput.setAttribute("name", "creators["+creator+"][familyName]");
 
                      var familyName = familyNameInput.outerHTML;
 
                      var organisationInput=document.createElement("input");
-                     organisationInput.setAttribute("value",creator["organisation"]);
+                     organisationInput.setAttribute("value",creators[creator]["organisation"]);
                      organisationInput.setAttribute("placeholder","Organisation");
+                     organisationInput.setAttribute("name", "creators["+creator+"][organisation]");
 
                      var organisation = organisationInput.outerHTML;
 
                      var emailInput=document.createElement("input");
-                     emailInput.setAttribute("value",creator["email"]);
+                     emailInput.setAttribute("value",creators[creator]["email"]);
                      emailInput.setAttribute("placeholder","Email");
+                     emailInput.setAttribute("name", "creators["+creator+"][email]");
+
 
                      var email = emailInput.outerHTML;
                  }
                  else{
-                     var givenName = creator["givenName"];
-                     var familyName = creator["familyName"];
-                     var organisation = creator["organisation"];
-                     var email=creator["email"];
+                     var givenName = creators[creator]["givenName"];
+                     var familyName = creators[creator]["familyName"];
+                     var organisation = creators[creator]["organisation"];
+                     var email=creators[creator]["email"];
                  }
 
                  contact_content = '<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>";

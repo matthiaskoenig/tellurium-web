@@ -85,6 +85,8 @@ class Tag(models.Model):
         unique_together = ('category', 'name')
 
 
+
+
 class Archive(models.Model):
     """ Combine Archive class.
 
@@ -216,3 +218,21 @@ class Archive(models.Model):
         :return: entries of the zip file
         """
         return comex.zip_tree_content(self.path)
+
+
+class Dates(models.Model):
+    date = models.DateTimeField()
+
+class Creators(models.Model):
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    organisation= models.CharField(max_length=500, blank=True, null=True)
+    email = models.EmailField(max_length=200, blank=True, null=True)
+
+class ArchiveEntry(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    created = models.DateTimeField(editable=False)
+    modified = models.ManyToManyField(Dates)
+    creators = models.ManyToManyField(Creators)
+    archive = models.ForeignKey(Archive, on_delete=models.CASCADE)

@@ -105,20 +105,15 @@ def archive_view(request, archive_id):
     :param archive_id:
     :return:
     """
-    #meta_data=request.GET.get("./0")
-    #print(meta_data)
-    archive = get_object_or_404(Archive, pk=archive_id)
-    # url = reverse('combine:archive', kwargs={'archive_id': archive_id}, request=request)
-    with NamedTemporaryFile(mode='r+') as f:
-         archive.extract_entry_by_index(0, f.name)
-         meta_data = f.read()
-    # g = rdflib.Graph()
-    # meta_data_parsed = g.parse(meta_data)
-    # print(meta_data_parsed)
 
+    archive = get_object_or_404(Archive, pk=archive_id)
     context = archive_context(archive)
+
+
     if request.method =='POST':
-        print(request.POST.get("description"))
+        #do the validation here. I think since I access data via rest api. I do not need to send back data and refresh page.
+        print(request.POST.getlist('data'))
+
     return render(request, 'combine/archive.html', context)
 
 
