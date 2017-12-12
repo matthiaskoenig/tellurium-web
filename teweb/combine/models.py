@@ -22,6 +22,7 @@ from . import comex, validators
 
 logger = logging.getLogger(__name__)
 
+MAX_TEXT_LENGTH = 500
 
 # ===============================================================================
 # Utility functions for models
@@ -67,8 +68,8 @@ class TagCategory(DjangoChoices):
 class Tag(models.Model):
     """ Tag class to describe content of files or archives. """
 
-    name = models.CharField(max_length=300)
-    category = models.CharField(max_length=20, choices=TagCategory.choices)
+    name = models.CharField(max_length=MAX_TEXT_LENGTH)
+    category = models.CharField(max_length=MAX_TEXT_LENGTH, choices=TagCategory.choices)
     uuid = models.UUIDField(  # Used by the API to look up the record
                             db_index=True,
                             default=uuid_lib.uuid4,
@@ -85,14 +86,12 @@ class Tag(models.Model):
         unique_together = ('category', 'name')
 
 
-
-
 class Archive(models.Model):
-    """ Combine Archive class.
+    """ COMBINE Archive class.
 
     Stores the combine archives.
     """
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=MAX_TEXT_LENGTH)
     file = models.FileField(upload_to='archives', validators=[validators.validate_omex])
     created = models.DateTimeField('date published', editable=False)
     md5 = models.CharField(max_length=36, blank=True)
@@ -143,7 +142,6 @@ class Archive(models.Model):
         if self.task_id:
             task = AsyncResult(self.task_id)
         return task
-
 
     def omex(self):
         """ Open CombineArchive for given archive.
@@ -219,20 +217,79 @@ class Archive(models.Model):
         """
         return comex.zip_tree_content(self.path)
 
+########################################
+# RDF information
+########################################
+#
+# http://co.mbine.org/standards/qualifiers
+
+MODEL_QUALIFIER_PREFIX = "http://biomodels.net/model-qualifiers/"
+BIOLOGICAL_QUALIFIER_PREFIX = "http://biomodels.net/biological-qualifiers/"
+
+# TODO: fill up the information from http://co.mbine.org/standards/qualifiers
+ModelQualifierType = {
+    "is": [0, "identity", "The modelling object represented by the model element is identical with the subject of the referenced resource (modelling object B). For instance, this qualifier might be used to link an encoded model to a database of models."],
+    "isDescribedBy": 1,
+    "isDerivedFrom": 2,
+    "isInstanceOf": 3,
+    "hasInstance": 4,
+}
+
+BiologicalQualifierType = {
+    "is": 0,
+    "hasPart": 1,
+    "isPartOf": 2,
+    "isVersionOf": 3,
+    "hasVersion": 4,
+    "isHomologTo": 5,
+    "isDescribedBy": 6,
+    "isEncodedBy": 7,
+    "encodes": 8,
+    "occursIn": 9,
+    "hasProperty": 10,
+    "isPropertyOf": 11,
+    "hasTaxon": 12,
+}
 
 class Dates(models.Model):
     date = models.DateTimeField()
 
-class Creators(models.Model):
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
-    organisation= models.CharField(max_length=500, blank=True, null=True)
-    email = models.EmailField(max_length=200, blank=True, null=True)
+
+class Creator(models.Model):
+    first_name = models.CharField(max_length=MAX_TEXT_LENGTH)
+    last_name = models.CharField(max_length=MAX_TEXT_LENGTH)
+    organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+    email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+
+
+class Triple(models.Model):
+    subject = models.TextField()
+    predicate = models.TextField()
+    object = models.TextField()
+
+    # TODO: We want subset of biomodels triples
+    # TODO: get list of biomodels qualifiers
+
 
 class ArchiveEntry(models.Model):
-    name = models.CharField(max_length=200)
+    """ Entry information.
+    This is the content of the manifest file.
+    """
+    archive = models.ForeignKey(Archive, on_delete=models.CASCADE)
+    location = models.CharField(max_length=MAX_TEXT_LENGTH)
+    format = models.CharField(max_length=MAX_TEXT_LENGTH)
+    master = models.BooleanField(default=False)
+
+
+class ArchiveEntryMeta(models.Model):
+    """ Metadata for given Archive entry.
+
+     From this information the metadata.rdf file for the archive can be generated.
+     """
+    entry = models.OneToOneField(ArchiveEntry, on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
+    creators = models.ManyToManyField(Creator)
     created = models.DateTimeField(editable=False)
     modified = models.ManyToManyField(Dates)
-    creators = models.ManyToManyField(Creators)
-    archive = models.ForeignKey(Archive, on_delete=models.CASCADE)
+    triples = models.ManyToManyField(Triple)
+
