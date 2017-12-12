@@ -22,7 +22,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files import File
 
 
-
 from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
@@ -37,7 +36,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OMEX_SHOWCASE_PATH = os.path.join(BASE_DIR, '../../archives/CombineArchiveShowCase.omex')
 # This is so my local_settings.py gets loaded.
 BASE_URL = '/'
-UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
+
+from combine.data import UserDef, create_users, add_archives_to_database
+
 user_defs = [
     UserDef("janekg89", "Jan", "Grzegorzewski", "janekg89@hotmail.de", True),
     UserDef("mkoenig", "Matthias", "König", "konigmatt@googlemail.com", True),
@@ -46,90 +47,16 @@ user_defs = [
 ARCHIVE_DIRS = ["../../archives"]
 
 
-def add_archives_to_database():
-    """ Add archives to database.
-
-    :return:
-    """
-    # list files
-    omex_files = comex.get_omex_file_paths(ARCHIVE_DIRS)
-
-    for f in sorted(omex_files):
-        print('-' * 80)
-        print(f)
-        md5 = hash_for_file(f, hash_type='MD5')
-        existing_archive = Archive.objects.filter(md5=md5)
-        # archive exists already based on the MD5 checksum
-        if len(existing_archive) > 0:
-            print("Archive already exists, not recreated: {}".format(f))
-        else:
-            name = os.path.basename(f)
-            django_file = File(open(f, 'rb'))
-            new_archive = Archive(name=name)
-            global_user = User.objects.get(username="global")
-            new_archive.user = global_user
-            new_archive.file.save(name, django_file, save=False)
-            new_archive.md5 = hash_for_file(f, hash_type='MD5')
-            new_archive.full_clean()
-            new_archive.save()
-
-            # add Tags
-            # tag, created = Tag.objects.get_or_create(name="test", type=Tag.TagType.misc)
-            # if created:
-            #     tag.save()
-            # new_archive.tags.add(tag)
-
-            tags_info = comex.tags_info(f)
-            print(tags_info)
-            for tag_info in tags_info:
-                tag, created = Tag.objects.get_or_create(name=tag_info.name,
-                                                         category=tag_info.category)
-                if created:
-                    tag.save()
-                new_archive.tags.add(tag)
-
-
-def create_users(user_defs, delete_all=True):
-    """ Create users in database from user definitions.
-
-    :param delete_all: deletes all existing users
-    :return:
-    """
-    if not user_defs:
-        user_defs = []
-
-    # deletes all users
-    if delete_all:
-        User.objects.all().delete()
-
-    # adds user to database
-    for user_def in user_defs:
-        if user_def.superuser:
-            user = User.objects.create_superuser(username=user_def.username, email=user_def.email,
-                                                 password= os.environ['DJANGO_ADMIN_PASSWORD'])
-        else:
-            user = User.objects.create_user(username=user_def.username, email=user_def.email,
-                                            password= os.environ['DJANGO_ADMIN_PASSWORD'])
-        user.last_name = user_def.last_name
-        user.first_name = user_def.first_name
-        user.save()
-
-    # display users
-    for user in User.objects.all():
-        print('\t', user.username, user.email, user.password)
-
-
 class ViewAPILogedInSuperUser(TestCase):
     """Test suite for the api views."""
 
     @classmethod
     def setUpTestData(cls):
         create_users(user_defs=user_defs, delete_all=True)
-        add_archives_to_database()
+        add_archives_to_database(ARCHIVE_DIRS)
 
     def setUp(self):
         self.client.login(username='mkoenig', password=os.environ['DJANGO_ADMIN_PASSWORD'])
-
 
     def test_list_users(self):
         """
@@ -205,7 +132,6 @@ class ViewAPILogedInSuperUser(TestCase):
         response = self.client.post(url, post)
         self.assertEquals(response.status_code, 400)
 
-
     def test_create_tags(self):
         """
         Ensure we can create a new account object.
@@ -218,14 +144,12 @@ class ViewAPILogedInSuperUser(TestCase):
         self.assertContains(response, 'test1')
 
 
-
-
-class ViewAPILogedOut(TestCase):
+class ViewAPILoggedOut(TestCase):
 
     @classmethod
     def setUpTestData(cls):
         create_users(user_defs=user_defs, delete_all=True)
-        add_archives_to_database()
+        add_archives_to_database(ARCHIVE_DIRS)
 
     def test_list_archives(self):
         """
@@ -254,16 +178,14 @@ class ViewAPILogedOut(TestCase):
 
     def test_create_user(self):
         url = reverse('api:user-list')
-        post = {"username":"user1","password":"test1"}
-        response = self.client.post(url,post)
+        post = {"username": "user1", "password": "test1"}
+        response = self.client.post(url, post)
         self.assertEquals(response.status_code, 403)
-
 
     def test_detail_user(self):
         url = reverse('api:user-detail', kwargs={'pk':'2'})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 403)
-
 
     def test_delete_user(self):
         url = reverse('api:user-detail', kwargs={'pk': '2'})
@@ -281,17 +203,17 @@ class ViewAPILogedOut(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, 'L1V3_ikappab.omex')
 
-class ViewAPILogedIn(TestCase):
+
+class ViewAPILoggedIn(TestCase):
     """Test suite for the api views."""
 
     @classmethod
     def setUpTestData(cls):
         create_users(user_defs=user_defs, delete_all=True)
-        add_archives_to_database()
+        add_archives_to_database(ARCHIVE_DIRS)
 
     def setUp(self):
         self.client.login(username='testuser', password=os.environ['DJANGO_ADMIN_PASSWORD'])
-
 
     def test_list_archives(self):
         """
@@ -335,12 +257,10 @@ class ViewAPILogedIn(TestCase):
         response = self.client.post(url,post)
         self.assertEquals(response.status_code, 403)
 
-
     def test_detail_user(self):
         url = reverse('api:user-detail', kwargs={'pk':'2'})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 403)
-
 
     def test_delete_user(self):
         url = reverse('api:user-detail', kwargs={'pk': '2'})
@@ -380,12 +300,3 @@ class ViewAPILogedIn(TestCase):
         self.client.login(username='testuser', password=os.environ['DJANGO_ADMIN_PASSWORD'])
         response = self.client.delete(url_detail)
         self.assertEquals(response.status_code, 204)
-
-
-
-
-
-
-
-
-
