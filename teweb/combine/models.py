@@ -267,6 +267,9 @@ class ArchiveEntry(models.Model):
 
     objects = ArchiveEntryManager()
 
+    class Meta:
+        verbose_name_plural = "archive entries"
+
 
 class ArchiveEntryMeta(models.Model):
     """ Metadata for given Archive entry.
