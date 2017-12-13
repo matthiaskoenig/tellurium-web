@@ -76,11 +76,12 @@ class ArchiveManager(models.Manager):
             try:
                 if isinstance(kwargs['user'], string_types):
                     user = User.objects.get(username=kwargs["user"])
-                else:
+                elif isinstance(kwargs['user'], User):
                     user = kwargs["user"]
             except KeyError:
                 user = User.objects.get(username="global")
             archive.user = user
+            archive.save()
 
             # create and add tags to archive
             tags_info = comex.tags_info(path)
