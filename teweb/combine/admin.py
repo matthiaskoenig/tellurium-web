@@ -20,11 +20,11 @@ class TagAdmin(admin.ModelAdmin):
     fields = ('name', 'category')
 
 
-@admin.register(Creator)
-class CreatorAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'organisation', 'email')
-    list_filter = ('organisation',)
-    fields = ('first_name', 'last_name', 'organisation', 'email')
+@admin.register(ArchiveEntry)
+class ArchiveEntryAdmin(admin.ModelAdmin):
+    list_display = ('archive', 'location', 'base_format', 'short_format', 'format', 'master', 'metadata')
+    list_filter = ('format', 'master')
+    fields = ('archive', 'location', 'format', 'master')
 
 
 @admin.register(Triple)
@@ -34,11 +34,11 @@ class TripleAdmin(admin.ModelAdmin):
     fields = ('subject', 'predicate', 'object')
 
 
-@admin.register(ArchiveEntry)
-class ArchiveEntryAdmin(admin.ModelAdmin):
-    list_display = ('archive', 'location', 'format', 'master', 'metadata')
-    list_filter = ('format', 'master')
-    fields = ('archive', 'location', 'format', 'master')
+@admin.register(Creator)
+class CreatorAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'organisation', 'email')
+    list_filter = ('organisation',)
+    fields = ('first_name', 'last_name', 'organisation', 'email')
 
 
 @admin.register(MetaData)

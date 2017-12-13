@@ -206,18 +206,6 @@ def omex():
     return omex
 
 
-def extract_entry_by_index(self, index, filename):
-    """ Extracts entry at index to filename.
-
-    :param index:
-    :param filename:
-    :return:
-    """
-    omex = self.omex()
-    entry = omex.getEntry(index)
-    omex.extractEntry(entry.getLocation(), filename)
-    omex.cleanUp()
-
 def extract_entry_by_location(self, location, filename):
     """ Extracts entry at location to filename.
 
@@ -242,6 +230,7 @@ def entry_content_by_index(self, index):
     omex.cleanUp()
     return content
 
+
 def entry_content_by_location(self, location):
     """ Extracts entry content at given location.
 
@@ -255,9 +244,10 @@ def entry_content_by_location(self, location):
     return content
 
 
-
 def entries_info(archive_path):
-    """ Creates entries information for given archive.
+    """ Parse entry information for given COMBINE archive.
+
+    This is the main entry function to retrieve information from COMBINE archives.
 
     :param archive_path:
     :return:
@@ -269,40 +259,45 @@ def entries_info(archive_path):
         print("Invalid Combine Archive: {}", archive_path)
         return None
 
+    # metadata
+    metadata_locations = []
+
     # add entries
-    entries = []
+    entries_dict = {}
     for i in range(omex.getNumEntries()):
         entry = omex.getEntry(i)
         location = entry.getLocation()
         format = entry.getFormat()
-        info = {}
-        info['location'] = location
-        info['format'] = format
-        info['short_format'] = short_format(format)
-        info['base_format'] = base_format(format)
-        info['master'] = entry.getMaster()
-        info['metadata'] = metadata_for_location(omex, location=location)
 
-        entries.append(info)
+        entries_dict[location] = {
+            'location': location,
+            'format': format,
+            'master': entry.getMaster()
+        }
+
+        # collect metadata files in archive
+        if format.endswith("omex-metadata"):
+            metadata_locations.append(location)
 
     # add root information
-    format = 'http://identifiers.org/combine.specifications/omex'
-    info = {
+    entries_dict['.'] = {
         'location': '.',
-        'format': format,
-        'short_format': short_format(format),
-        'base_format': base_format(format),
-        'metadata': metadata_for_location(omex, '.'),
+        'format': 'http://identifiers.org/combine.specifications/omex',
         'master': False
     }
-    entries.append(info)
 
-    from pprint import pprint
-    pprint(entries)
+    # parse metadata files & add the metadata for the locations
+
+    # info['metadata'] = metadata_for_location(omex, location=location)
 
     omex.cleanUp()
-    return entries
+    return entries, metadata
 
+
+
+def parse_metadata(metadata_locations):
+    # TODO: implement
+    pass
 
 def short_format(format):
     """ Returns short format string for given full format string.
@@ -336,6 +331,23 @@ def base_format(format):
     short = tokens[-1].split('.')[0]
     short = short.replace('+xml', '')
     return short
+
+
+# TODO: necessary to parse all the metadata information from the COMBINE archive
+# i.e. opening all the metadata files and parse all the information
+#
+# - metadata*.rdf
+# A COMBINE archive can include multiple metadata elements adding information about different content files. To
+# identify the file a metadata element refers to, the rdf:about attribute of the relevant metadata structure should
+# use the same value as used in the location attribute of the respective Content element
+#
+# 1. Read all RDF triple serializations from the combine archive (could also be turtle, or other formats)
+#   <content location="metadata.rdf" format="http://identifiers.org/combine.specifications/omex-metadata"/>
+#   <content location="metadata.ttl" format="http://identifiers.org/combine.specifications/omex-metadata"/>
+
+
+
+
 
 
 def metadata_for_location(co_archive, location):

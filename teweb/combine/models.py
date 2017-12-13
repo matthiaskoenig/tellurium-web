@@ -2,24 +2,21 @@
 Models definitions.
 """
 import uuid as uuid_lib
-
 import logging
 
 from django.db import models
-from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from djchoices import DjangoChoices, ChoiceItem
+from django.utils import timezone
 from django.contrib.auth.models import User
-
+from djchoices import DjangoChoices, ChoiceItem
 from celery.result import AsyncResult
 
 try:
     import libcombine
 except ImportError:
     import tecombine as libcombine
-from celery.result import AsyncResult
+
 from . import comex, validators
-from .comex import short_format, base_format
 
 from combine.managers import ArchiveManager, ArchiveEntryManager, MetaDataManager, hash_for_file
 logger = logging.getLogger(__name__)
@@ -153,7 +150,6 @@ class Archive(models.Model):
         """
         return comex.zip_tree_content(self.path)
 
-
     def has_entries(self):
         """ Check if ArchiveEntries exist for archive. """
         return self.entries.count() > 0
@@ -182,12 +178,11 @@ class ArchiveEntry(models.Model):
 
     @property
     def short_format(self):
-        return short_format(self.format)
+        return comex.short_format(self.format)
 
     @property
     def base_format(self):
-        return  base_format(self.format)
-
+        return comex.base_format(self.format)
 
 
 ########################################
@@ -211,7 +206,7 @@ class Triple(models.Model):
     predicate = models.TextField()
     object = models.TextField()
 
-    # TODO: We want subset of biomodels triples (via model managers)
+    # TODO: We want subset of biomodels triples (via model managers and known subset of BioModels predicates)
 
 
 class MetaData(models.Model):
@@ -230,4 +225,3 @@ class MetaData(models.Model):
 
     class Meta:
         verbose_name_plural = "meta data"
-
