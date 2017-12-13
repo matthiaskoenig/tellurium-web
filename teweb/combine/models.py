@@ -7,6 +7,7 @@ import logging
 
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 from djchoices import DjangoChoices, ChoiceItem
 from django.contrib.auth.models import User
 
@@ -123,6 +124,10 @@ class Archive(models.Model):
             task = AsyncResult(self.task_id)
         return task
 
+    # OMEX related functions
+    # FIXME: clean up the omex related functions. These should only be used once
+    # on the import of the file but not be part of the model
+
     def omex(self):
         """ Open CombineArchive for given archive.
 
@@ -135,7 +140,7 @@ class Archive(models.Model):
             return None
         return omex
 
-    def entries(self):
+    def omex_entries(self):
         """ Get entries and omex object from given archive.
 
         :return: entries in the combine archive (managed via manifest)
@@ -197,16 +202,30 @@ class Archive(models.Model):
         """
         return comex.zip_tree_content(self.path)
 
+    @property
+    def description(self):
+        description = ""
+        try:
+            entry = self.entries.get(location=".")
+            metadata = entry.metadata
+            if metadata and metadata.description:
+                description = description
+        except ObjectDoesNotExist:
+            pass
+        return description
+
+
 
 # TODO: store the actual file for the entry (use archive and location to store the file), use a FileField
 class ArchiveEntry(models.Model):
     """ Entry information.
     This is the content of the manifest file.
     """
-    archive = models.ForeignKey(Archive, on_delete=models.CASCADE)
+    archive = models.ForeignKey(Archive, on_delete=models.CASCADE, related_name="entries")
     location = models.CharField(max_length=MAX_TEXT_LENGTH)
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
     master = models.BooleanField(default=False)
+    metadata = models.OneToOneField("MetaData", on_delete=models.SET_NULL, null=True)
 
     objects = ArchiveEntryManager()
 
@@ -244,7 +263,6 @@ class MetaData(models.Model):
      From this information the metadata.rdf file for the archive can be generated.
      The information consists of general VCard information and additional RDF.
      """
-    entry = models.OneToOneField(ArchiveEntry, on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
     creators = models.ManyToManyField(Creator)
     created = models.DateTimeField(editable=False,null=True, blank=True)

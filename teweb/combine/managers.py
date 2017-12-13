@@ -83,21 +83,31 @@ class ArchiveManager(models.Manager):
             archive.user = user
             archive.save()
 
-            # create and add tags to archive
+            # create tags for archive
             tags_info = comex.tags_info(path)
             for tag_info in tags_info:
-                tag, created_t = Tag.objects.get_or_create(name=tag_info.name,category=tag_info.category)
+                tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
                 archive.tags.add(tag)
 
-            for entry in archive.entries():
-                entry_dict = {}
-                entry_dict["entry"] = entry
-                entry_dict["archive"] = archive
-                new_archive_entry, created_archive_entry = ArchiveEntry.objects.get_or_create(**entry_dict)
-                entry_metadata_dic = {"entry": new_archive_entry}
+            # create entries for archives
+            for entry in archive.omex_entries():
+                entry_dict = {
+                    "archive": archive,
+                }
+                archive_entry, _ = ArchiveEntry.objects.get_or_create(**entry_dict)
+
+                # create single metadata for every entry (no need for get_or_create)
+                entry_metadata_dic = {}
                 if "metadata" in entry and isinstance(entry["metadata"], dict):
                     entry_metadata_dic["metadata"] = entry["metadata"]
-                MetaData.objects.get_or_create(**entry_metadata_dic)
+
+                '''
+                metadata = MetaData.objects.create(**entry_metadata_dic)
+                print(metadata)
+
+                archive_entry.metadata = metadata
+                '''
+                archive_entry.save()
 
             return archive, created_archive
 
@@ -123,6 +133,47 @@ class ArchiveEntryManager(models.Manager):
 class MetaDataManager(models.Manager):
     """ Manager for ArchiveEntryMeta. """
 
+    def create(self, *args, **kwargs):
+        Creator = apps.get_model("combine", model_name="Creator")
+        Date = apps.get_model("combine", model_name="Date")
+
+        metadata = kwargs.get("metadata")
+        if metadata:
+            # fields required to generate ArchiveEntryMeta
+            del kwargs["metadata"]
+            if "description" in metadata:
+                kwargs["description"] = metadata["description"]
+            kwargs["created"] = metadata["created"]
+
+            # create initial meta entry
+            entry_meta, created_meta = super(MetaDataManager, self).get_or_create(*args, **kwargs)
+
+            # add creator information
+            for creator_info in metadata["creators"]:
+                creator_dict = {
+                    "first_name": creator_info["givenName"],
+                    "last_name": creator_info["familyName"],
+                    "organisation": creator_info["organisation"],
+                    "email": creator_info["email"]
+                }
+                creator, _ = Creator.objects.get_or_create(**creator_dict)
+                entry_meta.creators.add(creator)
+                creator.save()
+            entry_meta.save()
+
+            # add modified stamps
+            for modified_date in metadata["modified"]:
+                modified, _ = Date.objects.get_or_create(date=modified_date)
+                entry_meta.modified.add(modified)
+                modified.save()
+            entry_meta.save()
+
+            return entry_meta, created_meta
+
+        return super(MetaDataManager, self).create(*args, **kwargs)
+
+
+    """
     def get_or_create(self, *args, **kwargs):
 
         Creator = apps.get_model("combine", model_name="Creator")
@@ -162,3 +213,4 @@ class MetaDataManager(models.Manager):
             return entry_meta, created_meta
 
         return super(MetaDataManager, self).get_or_create(*args, **kwargs)
+    """
