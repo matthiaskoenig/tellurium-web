@@ -125,91 +125,6 @@ class Archive(models.Model):
             task = AsyncResult(self.task_id)
         return task
 
-    # OMEX related functions
-    # FIXME: clean up the omex related functions. These should only be used once
-    # on the import of the file but not be part of the model
-
-    def omex(self):
-        """ Open CombineArchive for given archive.
-
-        Don't forget to close the omex after using it.
-        :return:
-        """
-        omex = libcombine.CombineArchive()
-        if omex.initializeFromArchive(self.path) is None:
-            logger.error("Invalid Combine Archive: {}", self)
-            return None
-        return omex
-
-    def omex_entries(self):
-        """ Get entries and omex object from given archive.
-
-        :return: entries in the combine archive (managed via manifest)
-        """
-        return comex.entries_info(self.path)
-
-    def extract_entry_by_index(self, index, filename):
-        """ Extracts entry at index to filename.
-
-        :param index:
-        :param filename:
-        :return:
-        """
-        omex = self.omex()
-        entry = omex.getEntry(index)
-        omex.extractEntry(entry.getLocation(), filename)
-        omex.cleanUp()
-
-    def extract_entry_by_location(self, location, filename):
-        """ Extracts entry at location to filename.
-
-        :param location:
-        :param filename:
-        :return:
-        """
-        omex = self.omex()
-        entry = omex.getEntryByLocation(location)
-        omex.extractEntry(location, filename)
-        omex.cleanUp()
-
-    def entry_content_by_index(self, index):
-        """ Extracts entry content at given index.
-
-        :param index: index of entry
-        :return: content
-        """
-        omex = self.omex()
-        entry = omex.getEntry(index)
-        content = omex.extractEntryToString(entry.getLocation())
-        omex.cleanUp()
-        return content
-
-    def entry_content_by_location(self, location):
-        """ Extracts entry content at given location.
-
-        :param location: location of entry
-        :return: content
-        """
-        omex = self.omex()
-        entry = omex.getEntryByLocation(location)
-        content = omex.extractEntryToString(entry.getLocation())
-        omex.cleanUp()
-        return content
-
-    def zip_entries(self):
-        """ Returns the entries of the combine archive zip file.
-
-        :return: entries of the zip file
-        """
-        return comex.zip_tree_content(self.path)
-
-
-    def is_entries(self):
-        if (len(self.entries.all()) > 0):
-            return True
-        else:
-            return False
-
     @property
     def description(self):
         """ Get description from the metadata of top level entry."""
@@ -222,6 +137,26 @@ class Archive(models.Model):
         except ObjectDoesNotExist:
             pass
         return description
+
+    def omex_entries(self):
+        """ Get entries and omex object from given archive.
+
+        :return: entries in the combine archive (managed via manifest)
+        """
+        return comex.entries_info(self.path)
+
+    def zip_entries(self):
+        """ Returns the entries of the combine archive zip file.
+        This is the basis of creating the tree.
+
+        :return: entries of the zip file
+        """
+        return comex.zip_tree_content(self.path)
+
+
+    def has_entries(self):
+        """ Check if ArchiveEntries exist for archive. """
+        return self.entries.count() > 0
 
 
 

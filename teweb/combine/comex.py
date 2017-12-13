@@ -20,8 +20,8 @@ except ImportError:
 
 
 # FIXME: this is a bugfix for https://github.com/sbmlteam/libCombine/issues/15
-import importlib
-importlib.reload(libcombine)
+# import importlib
+# importlib.reload(libcombine)
 
 from collections import namedtuple
 TagInfo = namedtuple("TagInfo", "category name")
@@ -187,6 +187,74 @@ def zip_tree_content(path):
 ################################################
 # Combine Archives
 ################################################
+
+
+# OMEX related functions
+# FIXME: clean up the omex related functions. These should only be used once
+# on the import of the file but not be part of the model
+
+def omex():
+    """ Open CombineArchive for given archive.
+
+    Don't forget to close the omex after using it.
+    :return:
+    """
+    omex = libcombine.CombineArchive()
+    if omex.initializeFromArchive(self.path) is None:
+        logger.error("Invalid Combine Archive: {}", self)
+        return None
+    return omex
+
+
+def extract_entry_by_index(self, index, filename):
+    """ Extracts entry at index to filename.
+
+    :param index:
+    :param filename:
+    :return:
+    """
+    omex = self.omex()
+    entry = omex.getEntry(index)
+    omex.extractEntry(entry.getLocation(), filename)
+    omex.cleanUp()
+
+def extract_entry_by_location(self, location, filename):
+    """ Extracts entry at location to filename.
+
+    :param location:
+    :param filename:
+    :return:
+    """
+    omex = self.omex()
+    entry = omex.getEntryByLocation(location)
+    omex.extractEntry(location, filename)
+    omex.cleanUp()
+
+def entry_content_by_index(self, index):
+    """ Extracts entry content at given index.
+
+    :param index: index of entry
+    :return: content
+    """
+    omex = self.omex()
+    entry = omex.getEntry(index)
+    content = omex.extractEntryToString(entry.getLocation())
+    omex.cleanUp()
+    return content
+
+def entry_content_by_location(self, location):
+    """ Extracts entry content at given location.
+
+    :param location: location of entry
+    :return: content
+    """
+    omex = self.omex()
+    entry = omex.getEntryByLocation(location)
+    content = omex.extractEntryToString(entry.getLocation())
+    omex.cleanUp()
+    return content
+
+
 
 def entries_info(archive_path):
     """ Creates entries information for given archive.

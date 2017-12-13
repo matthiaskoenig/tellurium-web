@@ -198,7 +198,10 @@ def archive_entry(request, archive_id, entry_index):
     entry_index = int(entry_index)
     archive = get_object_or_404(Archive, pk=archive_id)
 
+
     with NamedTemporaryFile(mode='w+b') as f:
+        from comex import extr
+
         archive.extract_entry_by_index(entry_index, f.name)
 
         # get content_type with magic

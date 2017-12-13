@@ -26,11 +26,10 @@
             </span>
 
         </h2>
-
     </div>
 
     <div class="panel-body">
-        {% if archive.is_entries() %}
+        {% if archive.has_entries() %}
             <table id="entries" class="table table-striped table-condensed table-hover">
                 <thead>
                 <tr>
