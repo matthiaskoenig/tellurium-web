@@ -8,7 +8,7 @@ from .models import Archive, Tag, Creator, Triple, ArchiveEntry, MetaData
 
 @admin.register(Archive)
 class ArchiveAdmin(admin.ModelAdmin):
-    list_display = ('name', 'file', 'created', 'md5_short', 'task_id', 'user', 'uuid')
+    list_display = ('name', 'description', 'file', 'created', 'md5_short', 'task_id', 'user', 'uuid')
     list_filter = ('user',)
     fields = ('name', 'file', 'user', 'tags')
 
@@ -36,12 +36,12 @@ class TripleAdmin(admin.ModelAdmin):
 
 @admin.register(ArchiveEntry)
 class ArchiveEntryAdmin(admin.ModelAdmin):
-    list_display = ('archive', 'location', 'format', 'master')
+    list_display = ('archive', 'location', 'format', 'master', 'metadata')
     list_filter = ('format', 'master')
     fields = ('archive', 'location', 'format', 'master')
 
 
 @admin.register(MetaData)
-class ArchiveEntryMetaAdmin(admin.ModelAdmin):
-    list_display = ('entry', 'description', 'created')
+class MetaDataAdmin(admin.ModelAdmin):
+    list_display = ('description', 'created')
     fields = ('entry', 'description', 'creators')

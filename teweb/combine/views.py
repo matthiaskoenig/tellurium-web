@@ -120,7 +120,7 @@ def archive_view(request, archive_id):
 def archive_context(archive):
     """ Context required to render archive_content"""
     # omex entries
-    entries = archive.entries()
+    entries = archive.omex_entries()
 
 
 

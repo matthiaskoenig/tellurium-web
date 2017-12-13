@@ -41,7 +41,7 @@
                     <th>location</th>
                 </tr>
                 </thead>
-                {% for entry in archive.archive_entries.all()  %}
+                {% for entry in archive.entries.all()  %}
                     <tr id="archive_content">
                         <td class="hidden hidden-xs"><span class="badge">{{ loop.index }}</span></td>
                         <td>{% if entry.master %}
@@ -338,7 +338,7 @@
 
             function get_detail(location) {
                  var i, j, r = [];
-                 //var entries = {{ archive.archive_entries.all() }}
+                 //var entries = {{ archive.entries.all() }}
                  var entries = {{entries_json| safe}};
                  for( i = 0; i < entries.length; i++) {
                      if (entries[i].location == location || entries[i].location == "./"+location){
