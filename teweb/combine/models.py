@@ -237,6 +237,7 @@ class Date(models.Model):
 
 
 class Creator(models.Model):
+    """ RDF creator of archive entry. """
     first_name = models.CharField(max_length=MAX_TEXT_LENGTH)
     last_name = models.CharField(max_length=MAX_TEXT_LENGTH)
     organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
