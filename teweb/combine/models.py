@@ -18,6 +18,7 @@ except ImportError:
     import tecombine as libcombine
 from celery.result import AsyncResult
 from . import comex, validators
+from .comex import short_format, base_format
 
 from combine.managers import ArchiveManager, ArchiveEntryManager, MetaDataManager, hash_for_file
 logger = logging.getLogger(__name__)
@@ -197,13 +198,19 @@ class Archive(models.Model):
         """
         return comex.zip_tree_content(self.path)
 
+    def is_entries(self):
+        if (len(self.archive_entries.all()) > 0):
+            return True
+        else:
+            return False
+
 
 # TODO: store the actual file for the entry (use archive and location to store the file), use a FileField
 class ArchiveEntry(models.Model):
     """ Entry information.
     This is the content of the manifest file.
     """
-    archive = models.ForeignKey(Archive, on_delete=models.CASCADE)
+    archive = models.ForeignKey(Archive, on_delete=models.CASCADE,related_name="archive_entries")
     location = models.CharField(max_length=MAX_TEXT_LENGTH)
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
     master = models.BooleanField(default=False)
@@ -212,6 +219,14 @@ class ArchiveEntry(models.Model):
 
     class Meta:
         verbose_name_plural = "archive entries"
+
+    @property
+    def short_format(self):
+        return short_format(self.format)
+
+    @property
+    def base_format(self):
+        return  base_format(self.format)
 
 
 ########################################

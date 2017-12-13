@@ -30,7 +30,7 @@
     </div>
 
     <div class="panel-body">
-        {% if entries %}
+        {% if archive.is_entries() %}
             <table id="entries" class="table table-striped table-condensed table-hover">
                 <thead>
                 <tr>
@@ -41,7 +41,7 @@
                     <th>location</th>
                 </tr>
                 </thead>
-                {% for entry in archive. %}
+                {% for entry in archive.archive_entries.all()  %}
                     <tr id="archive_content">
                         <td class="hidden hidden-xs"><span class="badge">{{ loop.index }}</span></td>
                         <td>{% if entry.master %}
@@ -103,7 +103,6 @@
                         'multiple': false,
                         'data': data
                     }
-
                 });
             },
             error: function (error_data) {
@@ -119,19 +118,17 @@
                 var $row = $(this).closest("tr");    // Find the row
                 var $text = $row.find(".location").text(); // Find the text
                 // Let's test it out
-                diplay_entry_detail($text);
+                display_entry_detail($text);
             });
         </script>
 
         <script>
              $('#json_tree')
               // listen for event
-
               .on('changed.jstree', function (e, data) {
                    var  entry = data.selected[0];
                   $("#button-div").empty();
-
-                   diplay_entry_detail(entry);
+                   display_entry_detail(entry);
                 });
 
 
@@ -183,7 +180,7 @@
         <script>
             $(document).on('click','#editButton',function(){
                 var entry = $('#json_tree').jstree('get_selected',true)[0]["id"];
-                diplay_entry_detail(entry, edit=true);
+                display_entry_detail(entry, edit=true);
             });
         </script>
 
@@ -208,12 +205,13 @@
         </script>
 
         <script>
-             function diplay_entry_detail(selected_entry, edit=false){
+             function display_entry_detail(selected_entry, edit=false){
                   $("#item_detail").empty();
                   $("#title").empty();
                   $("#button-div").empty();
                   var splited_fn= selected_entry.split("/");
                   var fn = splited_fn[splited_fn.length-1];
+                  console.log($.trim(selected_entry));
                   var entry_detail = get_detail($.trim(selected_entry));
                   if(typeof entry_detail !== 'undefined' ){
                         // add title
@@ -340,6 +338,7 @@
 
             function get_detail(location) {
                  var i, j, r = [];
+                 //var entries = {{ archive.archive_entries.all() }}
                  var entries = {{entries_json| safe}};
                  for( i = 0; i < entries.length; i++) {
                      if (entries[i].location == location || entries[i].location == "./"+location){
