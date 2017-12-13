@@ -4,7 +4,6 @@ Models definitions.
 import uuid as uuid_lib
 
 import logging
-import hashlib
 
 from django.db import models
 from django.utils import timezone
@@ -20,39 +19,14 @@ except ImportError:
 from celery.result import AsyncResult
 from . import comex, validators
 
-from combine.managers import ArchiveManager
+from combine.managers import ArchiveManager, ArchiveEntryManager, ArchiveEntryMetaManager, hash_for_file
 
 
 logger = logging.getLogger(__name__)
 
 MAX_TEXT_LENGTH = 500
 
-# ===============================================================================
-# Utility functions for models
-# ===============================================================================
 
-def hash_for_file(file, hash_type='MD5', blocksize=65536):
-    """ Calculate the md5_hash for a file.
-
-        Calculating a hash for a file is always useful when you need to check if two files
-        are identical, or to make sure that the contents of a file were not changed, and to
-        check the integrity of a file when it is transmitted over a network.
-        he most used algorithms to hash a file are MD5 and SHA-1. They are used because they
-        are fast and they provide a good way to identify different files.
-        [http://www.pythoncentral.io/hashing-files-with-python/]
-    """
-    hasher = None
-    if hash_type == 'MD5':
-        hasher = hashlib.md5()
-    elif hash_type == 'SHA1':
-        hasher = hashlib.sha1()
-
-    with open(file, 'rb') as f:
-        buf = f.read(blocksize)
-        while len(buf) > 0:
-            hasher.update(buf)
-            buf = f.read(blocksize)
-    return hasher.hexdigest()
 
 
 # ===============================================================================
@@ -257,7 +231,8 @@ BiologicalQualifierType = {
     "hasTaxon": 12,
 }
 
-class Dates(models.Model):
+
+class Date(models.Model):
     date = models.DateTimeField()
 
 
@@ -266,6 +241,8 @@ class Creator(models.Model):
     last_name = models.CharField(max_length=MAX_TEXT_LENGTH)
     organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
     email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+
+
 
 
 class Triple(models.Model):
@@ -286,6 +263,9 @@ class ArchiveEntry(models.Model):
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
     master = models.BooleanField(default=False)
 
+    objects = ArchiveEntryManager()
+
+
 
 class ArchiveEntryMeta(models.Model):
     """ Metadata for given Archive entry.
@@ -295,7 +275,11 @@ class ArchiveEntryMeta(models.Model):
     entry = models.OneToOneField(ArchiveEntry, on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
     creators = models.ManyToManyField(Creator)
-    created = models.DateTimeField(editable=False)
-    modified = models.ManyToManyField(Dates)
+    created = models.DateTimeField(editable=False,null=True, blank=True)
+    modified = models.ManyToManyField(Date)
     triples = models.ManyToManyField(Triple)
+
+    objects = ArchiveEntryMetaManager()
+
+
 
