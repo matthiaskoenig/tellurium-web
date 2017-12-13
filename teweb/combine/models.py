@@ -20,19 +20,17 @@ from celery.result import AsyncResult
 from . import comex, validators
 
 from combine.managers import ArchiveManager, ArchiveEntryManager, ArchiveEntryMetaManager, hash_for_file
-
-
 logger = logging.getLogger(__name__)
 
+# ===============================================================================
+# Settings
+# ===============================================================================
 MAX_TEXT_LENGTH = 500
 
-
-
-
-# ===============================================================================
+# ================================
+# ===============================================
 # Models
 # ===============================================================================
-
 class TagCategory(DjangoChoices):
     format = ChoiceItem("format")
     source = ChoiceItem("source")
@@ -245,7 +243,6 @@ class Creator(models.Model):
     email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
 
 
-
 class Triple(models.Model):
     subject = models.TextField()
     predicate = models.TextField()
@@ -268,9 +265,6 @@ class ArchiveEntry(models.Model):
     master = models.BooleanField(default=False)
 
     objects = ArchiveEntryManager()
-
-
-
 
 
 class ArchiveEntryMeta(models.Model):
