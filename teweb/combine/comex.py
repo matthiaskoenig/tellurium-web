@@ -229,6 +229,9 @@ def entries_info(archive_path):
     }
     entries.append(info)
 
+    from pprint import pprint
+    pprint(entries)
+
     omex.cleanUp()
     return entries
 
