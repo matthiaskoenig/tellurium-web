@@ -204,16 +204,16 @@ class Archive(models.Model):
 
     @property
     def description(self):
+        """ Get description from the metadata of top level entry."""
         description = ""
         try:
             entry = self.entries.get(location=".")
             metadata = entry.metadata
             if metadata and metadata.description:
-                description = description
+                description = metadata.description
         except ObjectDoesNotExist:
             pass
         return description
-
 
 
 # TODO: store the actual file for the entry (use archive and location to store the file), use a FileField
@@ -225,12 +225,16 @@ class ArchiveEntry(models.Model):
     location = models.CharField(max_length=MAX_TEXT_LENGTH)
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
     master = models.BooleanField(default=False)
-    metadata = models.OneToOneField("MetaData", on_delete=models.SET_NULL, null=True)
+    metadata = models.ForeignKey("MetaData", on_delete=models.SET_NULL, null=True)
 
     objects = ArchiveEntryManager()
 
+    def __str__(self):
+        return "<ArchiveEntry: {}|{}>".format(self.archive, self.location)
+
     class Meta:
         verbose_name_plural = "archive entries"
+
 
 
 ########################################

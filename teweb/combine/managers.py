@@ -92,21 +92,19 @@ class ArchiveManager(models.Manager):
             # create entries for archives
             for entry in archive.omex_entries():
                 entry_dict = {
+                    "entry": entry,
                     "archive": archive,
                 }
                 archive_entry, _ = ArchiveEntry.objects.get_or_create(**entry_dict)
 
-                # create single metadata for every entry (no need for get_or_create)
-                entry_metadata_dic = {}
+                # create single metadata for every entry
                 if "metadata" in entry and isinstance(entry["metadata"], dict):
-                    entry_metadata_dic["metadata"] = entry["metadata"]
+                    metadata_dict = {
+                        "metadata": entry["metadata"],
+                    }
+                    metadata, created = MetaData.objects.create(**metadata_dict)
+                    archive_entry.metadata = metadata
 
-                '''
-                metadata = MetaData.objects.create(**entry_metadata_dic)
-                print(metadata)
-
-                archive_entry.metadata = metadata
-                '''
                 archive_entry.save()
 
             return archive, created_archive

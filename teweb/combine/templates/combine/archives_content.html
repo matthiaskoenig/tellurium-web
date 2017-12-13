@@ -13,6 +13,7 @@
                     <th></th>
                     <th></th>
                     <th>name</th>
+                    <!-- <th>description</th> -->
                     <th>tags</th>
                     <th>action</th>
                     <th>status</th>
@@ -29,6 +30,7 @@
                         <td><a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
                             <i class="fa fa-download fa-lg black"></i></a></td>
                         <td>{{ macros.archive_html(archive) }}</td>
+                        <!--<td>{{ archive.description }}</td>-->
                         <td>
                             {% for tag in archive.tags.all() %}
                                 {{ macros.tag_html(tag) }}
