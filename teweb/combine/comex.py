@@ -88,7 +88,6 @@ def tags_info(archive_path):
     for entry in sedml_entries:
         content = omex.extractEntryToString(entry.getLocation())
         doc = libsedml.readSedMLFromString(content)  # type: libsedml.SedDocument
-        print(doc)
 
         for model in doc.getListOfModels():
             language = model.getLanguage()
@@ -226,7 +225,7 @@ def entries_info(archive_path):
         'short_format': short_format(format),
         'base_format': base_format(format),
         'metadata': metadata_for_location(omex, '.'),
-        'master': None
+        'master': False
     }
     entries.append(info)
 

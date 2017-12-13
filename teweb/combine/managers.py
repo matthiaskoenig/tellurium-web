@@ -1,3 +1,7 @@
+"""
+Managers for models.
+"""
+
 from __future__ import absolute_import, print_function, unicode_literals
 from django.db import models
 from django.core.files import File
@@ -15,12 +19,6 @@ import hashlib
 # ===============================================================================
 # Utility functions for models
 # ===============================================================================
-
-
-
-
-
-
 def hash_for_file(file, hash_type='MD5', blocksize=65536):
     """ Calculate the md5_hash for a file.
 
@@ -45,7 +43,11 @@ def hash_for_file(file, hash_type='MD5', blocksize=65536):
     return hasher.hexdigest()
 
 
+# ===============================================================================
+# Manager
+# ===============================================================================
 class ArchiveManager(models.Manager):
+    """ Manager for Archive. """
 
     def get_or_create(self, *args, **kwargs):
         Tag = apps.get_model("combine", model_name="Tag")
@@ -53,24 +55,22 @@ class ArchiveManager(models.Manager):
         ArchiveEntryMeta = apps.get_model("combine", model_name="ArchiveEntryMeta")
 
         if "archive_path" in kwargs:
-            fp=kwargs["archive_path"]
+            path = kwargs["archive_path"]
             del kwargs["archive_path"]
 
-            # get or create the archive from hash
-            md5 = hash_for_file(fp, hash_type='MD5')
-            new_archive, created_a = super(ArchiveManager, self).get_or_create(md5=md5, *args, **kwargs)
+            # get or create the archive (uniqueness based on hash)
+            md5 = hash_for_file(path, hash_type='MD5')
+            archive, created_archive = super(ArchiveManager, self).get_or_create(md5=md5, *args, **kwargs)
 
-            # get name from file path
-            name = os.path.basename(fp)
-            tokens = name.split(".")
-            if len(tokens) > 1:
-                name = ".".join(tokens[0:-1])
-            new_archive.name = name
+            # get name without extension
+            name = os.path.basename(path)
+            archive.name = os.path.splitext(name)[0]
 
-            #add file to archive
-            with open(fp, 'rb') as f:
-                new_archive.file.save(name,File(f))
-            new_archive.created = timezone.now()
+            # store combine archive as file
+            with open(path, 'rb') as f:
+                archive.file.save(name, File(f))
+            # FIXME: unclear where to do this (in save, create?)
+            archive.created = timezone.now()
 
             # add User to Archive, User format can be string, or User object
             try:
@@ -78,42 +78,40 @@ class ArchiveManager(models.Manager):
                     user = User.objects.get(username=kwargs["user"])
                 else:
                     user = kwargs["user"]
-            except:
+            except KeyError:
                 user = User.objects.get(username="global")
-            new_archive.user = user
+            archive.user = user
 
-            #create and add tags to archive
-            tags_info = comex.tags_info(fp)
-            print(tags_info)
+            # create and add tags to archive
+            tags_info = comex.tags_info(path)
             for tag_info in tags_info:
                 tag, created_t = Tag.objects.get_or_create(name=tag_info.name,category=tag_info.category)
-                new_archive.tags.add(tag)
+                archive.tags.add(tag)
 
-            for entry in new_archive.entries():
+            for entry in archive.entries():
                 entry_dict = {}
                 entry_dict["entry"] = entry
-                entry_dict["archive"] = new_archive
+                entry_dict["archive"] = archive
                 new_archive_entry, created_archive_entry = ArchiveEntry.objects.get_or_create(**entry_dict)
-                entry_metadata_dic = {"entry":new_archive_entry}
-                if "metadata" in entry and isinstance(entry["metadata"],dict):
-                    entry_metadata_dic["metadata"]=entry["metadata"]
+                entry_metadata_dic = {"entry": new_archive_entry}
+                if "metadata" in entry and isinstance(entry["metadata"], dict):
+                    entry_metadata_dic["metadata"] = entry["metadata"]
                 ArchiveEntryMeta.objects.get_or_create(**entry_metadata_dic)
 
-            return new_archive, created_a
+            return archive, created_archive
 
         else:
-            return  super(ArchiveManager, self).get_or_create(*args, **kwargs)
+            return super(ArchiveManager, self).get_or_create(*args, **kwargs)
 
 
 class ArchiveEntryManager(models.Manager):
+    """ Manager for ArchiveEntry. """
+
     def get_or_create(self, *args, **kwargs):
-        if "entry" in kwargs:
-            entry = kwargs["entry"]
+        entry = kwargs.get("entry")
+        if entry:
+            # fields required to generate ArchiveEntry
             del kwargs["entry"]
-
-            if not entry["master"]:
-                entry["master"] = False
-
             kwargs["master"] = entry["master"]
             kwargs["format"] = entry["format"]
             kwargs["location"] = entry["location"]
@@ -121,46 +119,45 @@ class ArchiveEntryManager(models.Manager):
         return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
 
 
-
-
 class ArchiveEntryMetaManager(models.Manager):
+    """ Manager for ArchiveEntryMeta. """
+
     def get_or_create(self, *args, **kwargs):
 
         Creator = apps.get_model("combine", model_name="Creator")
         Date = apps.get_model("combine", model_name="Date")
 
-
-        if "metadata" in kwargs:
-            metadata = kwargs["metadata"]
+        metadata = kwargs.get("metadata")
+        if metadata:
+            # fields required to generate ArchiveEntryMeta
             del kwargs["metadata"]
             if "description" in metadata:
                 kwargs["description"] = metadata["description"]
             kwargs["created"] = metadata["created"]
 
-            archive_entry_meta_new , created_entry_meta = super(ArchiveEntryMetaManager, self).get_or_create(*args, **kwargs)
+            # create initial meta entry
+            entry_meta, created_meta = super(ArchiveEntryMetaManager, self).get_or_create(*args, **kwargs)
 
-            for creator in metadata["creators"]:
-                creator_dict = {"first_name": creator["givenName"],
-                                "last_name":creator["familyName"],
-                                "organisation":creator["organisation"],
-                                "email": creator["email"]}
-                new_creator, _ = Creator.objects.get_or_create(**creator_dict)
-                archive_entry_meta_new.creators.add(new_creator)
-                new_creator.save()
-                archive_entry_meta_new.save()
+            # add creator information
+            for creator_info in metadata["creators"]:
+                creator_dict = {
+                    "first_name": creator_info["givenName"],
+                    "last_name": creator_info["familyName"],
+                    "organisation": creator_info["organisation"],
+                    "email": creator_info["email"]
+                }
+                creator, _ = Creator.objects.get_or_create(**creator_dict)
+                entry_meta.creators.add(creator)
+                creator.save()
+            entry_meta.save()
 
-            for modified in metadata["modified"]:
-                modified_new, _ = Date.objects.get_or_create(date=modified)
-                archive_entry_meta_new.modified.add(modified_new)
-                modified_new.save()
-                archive_entry_meta_new.save()
+            # add modified stamps
+            for modified_date in metadata["modified"]:
+                modified, _ = Date.objects.get_or_create(date=modified_date)
+                entry_meta.modified.add(modified)
+                modified.save()
+            entry_meta.save()
 
-
-
-
-            return archive_entry_meta_new , created_entry_meta
-
+            return entry_meta, created_meta
 
         return super(ArchiveEntryMetaManager, self).get_or_create(*args, **kwargs)
-
-

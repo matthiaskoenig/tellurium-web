@@ -67,6 +67,9 @@ class Archive(models.Model):
     """ COMBINE Archive class.
 
     Stores the combine archives.
+
+    self.file: stores the original uploaded archive without any modifications.
+        All modifications are stored in the additional models like ArchiveEntry and ArchiveEntryMeta.
     """
     name = models.CharField(max_length=MAX_TEXT_LENGTH)
     file = models.FileField(upload_to='archives', validators=[validators.validate_omex])
@@ -81,7 +84,6 @@ class Archive(models.Model):
         default=uuid_lib.uuid4,
         editable=False)
     objects = ArchiveManager()
-
 
     def __str__(self):
         return self.name
@@ -244,7 +246,6 @@ class Creator(models.Model):
 
 
 
-
 class Triple(models.Model):
     subject = models.TextField()
     predicate = models.TextField()
@@ -253,6 +254,9 @@ class Triple(models.Model):
     # TODO: We want subset of biomodels triples
     # TODO: get list of biomodels qualifiers
 
+
+# TODO: store the actual file for the entry (use archive and location to store the file)
+#   FileField
 
 class ArchiveEntry(models.Model):
     """ Entry information.
@@ -264,6 +268,8 @@ class ArchiveEntry(models.Model):
     master = models.BooleanField(default=False)
 
     objects = ArchiveEntryManager()
+
+
 
 
 

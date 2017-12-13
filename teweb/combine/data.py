@@ -23,14 +23,13 @@ def add_archives_to_database(archive_dirs):
     # list files
     omex_files = comex.get_omex_file_paths(archive_dirs)
 
-    for f in sorted(omex_files):
+    for path in sorted(omex_files):
         print('-' * 80)
-        print(f)
+        print(path)
         # default user is "global" but can be changed by adding user= < User Object >, user = User.username( string)
-        _, created = Archive.objects.get_or_create(archive_path=f)
+        _, created = Archive.objects.get_or_create(archive_path=path)
         if not created:
-            print("Archive already exists, not recreated: {}".format(f))
-
+            print("Archive already exists, not recreated: {}".format(path))
 
 
 def create_users(user_defs, delete_all=True):
