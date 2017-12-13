@@ -5,7 +5,6 @@ Data and helper functions for filling the database.
 import os
 from collections import namedtuple
 
-from django.core.files import File
 from django.contrib.auth.models import User
 
 from combine.models import Archive, Tag, hash_for_file

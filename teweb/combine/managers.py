@@ -102,7 +102,7 @@ class ArchiveManager(models.Manager):
                     metadata_dict = {
                         "metadata": entry["metadata"],
                     }
-                    metadata, created = MetaData.objects.create(**metadata_dict)
+                    metadata, _ = MetaData.objects.create(**metadata_dict)
                     archive_entry.metadata = metadata
 
                 archive_entry.save()
