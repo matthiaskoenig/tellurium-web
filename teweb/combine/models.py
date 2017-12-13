@@ -19,7 +19,7 @@ except ImportError:
 from celery.result import AsyncResult
 from . import comex, validators
 
-from combine.managers import ArchiveManager, ArchiveEntryManager, ArchiveEntryMetaManager, hash_for_file
+from combine.managers import ArchiveManager, ArchiveEntryManager, MetaDataManager, hash_for_file
 logger = logging.getLogger(__name__)
 
 # ===============================================================================
@@ -27,11 +27,12 @@ logger = logging.getLogger(__name__)
 # ===============================================================================
 MAX_TEXT_LENGTH = 500
 
-# ================================
-# ===============================================
-# Models
+
+# ===============================================================================
+# Archives
 # ===============================================================================
 class TagCategory(DjangoChoices):
+    """ Categories for the tags. """
     format = ChoiceItem("format")
     source = ChoiceItem("source")
     simulation = ChoiceItem("sim")
@@ -41,8 +42,11 @@ class TagCategory(DjangoChoices):
 
 
 class Tag(models.Model):
-    """ Tag class to describe content of files or archives. """
+    """ Tag class to describe content of archives.
 
+    Archives can have associated tags describing the general content of the archive
+    and key files in the archive, e.g., content of SBML or SED-ML files.
+    """
     name = models.CharField(max_length=MAX_TEXT_LENGTH)
     category = models.CharField(max_length=MAX_TEXT_LENGTH, choices=TagCategory.choices)
     uuid = models.UUIDField(  # Used by the API to look up the record
@@ -53,10 +57,6 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
-    #@property
-    #def uuid(self):
-    #    return "-".join([self.category, self.name])
-
     class Meta:
         unique_together = ('category', 'name')
 
@@ -64,7 +64,7 @@ class Tag(models.Model):
 class Archive(models.Model):
     """ COMBINE Archive class.
 
-    Stores the combine archives.
+    The individual file entries are stored in the ArchiveEntries, the MetaData in the associated MetaData.
 
     self.file: stores the original uploaded archive without any modifications.
         All modifications are stored in the additional models like ArchiveEntry and ArchiveEntryMeta.
@@ -197,41 +197,27 @@ class Archive(models.Model):
         """
         return comex.zip_tree_content(self.path)
 
+
+# TODO: store the actual file for the entry (use archive and location to store the file), use a FileField
+class ArchiveEntry(models.Model):
+    """ Entry information.
+    This is the content of the manifest file.
+    """
+    archive = models.ForeignKey(Archive, on_delete=models.CASCADE)
+    location = models.CharField(max_length=MAX_TEXT_LENGTH)
+    format = models.CharField(max_length=MAX_TEXT_LENGTH)
+    master = models.BooleanField(default=False)
+
+    objects = ArchiveEntryManager()
+
+    class Meta:
+        verbose_name_plural = "archive entries"
+
+
 ########################################
 # RDF information
 ########################################
-#
-# http://co.mbine.org/standards/qualifiers
-
-MODEL_QUALIFIER_PREFIX = "http://biomodels.net/model-qualifiers/"
-BIOLOGICAL_QUALIFIER_PREFIX = "http://biomodels.net/biological-qualifiers/"
-
-# TODO: fill up the information from http://co.mbine.org/standards/qualifiers
-ModelQualifierType = {
-    "is": [0, "identity", "The modelling object represented by the model element is identical with the subject of the referenced resource (modelling object B). For instance, this qualifier might be used to link an encoded model to a database of models."],
-    "isDescribedBy": 1,
-    "isDerivedFrom": 2,
-    "isInstanceOf": 3,
-    "hasInstance": 4,
-}
-
-BiologicalQualifierType = {
-    "is": 0,
-    "hasPart": 1,
-    "isPartOf": 2,
-    "isVersionOf": 3,
-    "hasVersion": 4,
-    "isHomologTo": 5,
-    "isDescribedBy": 6,
-    "isEncodedBy": 7,
-    "encodes": 8,
-    "occursIn": 9,
-    "hasProperty": 10,
-    "isPropertyOf": 11,
-    "hasTaxon": 12,
-}
-
-
+# This is all the content of the metadata files.
 class Date(models.Model):
     date = models.DateTimeField()
 
@@ -249,32 +235,14 @@ class Triple(models.Model):
     predicate = models.TextField()
     object = models.TextField()
 
-    # TODO: We want subset of biomodels triples
-    # TODO: get list of biomodels qualifiers
+    # TODO: We want subset of biomodels triples (via model managers)
 
 
-# TODO: store the actual file for the entry (use archive and location to store the file)
-#   FileField
-
-class ArchiveEntry(models.Model):
-    """ Entry information.
-    This is the content of the manifest file.
-    """
-    archive = models.ForeignKey(Archive, on_delete=models.CASCADE)
-    location = models.CharField(max_length=MAX_TEXT_LENGTH)
-    format = models.CharField(max_length=MAX_TEXT_LENGTH)
-    master = models.BooleanField(default=False)
-
-    objects = ArchiveEntryManager()
-
-    class Meta:
-        verbose_name_plural = "archive entries"
-
-
-class ArchiveEntryMeta(models.Model):
-    """ Metadata for given Archive entry.
+class MetaData(models.Model):
+    """ MetaData information.
 
      From this information the metadata.rdf file for the archive can be generated.
+     The information consists of general VCard information and additional RDF.
      """
     entry = models.OneToOneField(ArchiveEntry, on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
@@ -283,7 +251,8 @@ class ArchiveEntryMeta(models.Model):
     modified = models.ManyToManyField(Date)
     triples = models.ManyToManyField(Triple)
 
-    objects = ArchiveEntryMetaManager()
+    objects = MetaDataManager()
 
-
+    class Meta:
+        verbose_name_plural = "meta data"
 

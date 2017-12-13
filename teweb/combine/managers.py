@@ -52,7 +52,7 @@ class ArchiveManager(models.Manager):
     def get_or_create(self, *args, **kwargs):
         Tag = apps.get_model("combine", model_name="Tag")
         ArchiveEntry = apps.get_model("combine", model_name="ArchiveEntry")
-        ArchiveEntryMeta = apps.get_model("combine", model_name="ArchiveEntryMeta")
+        MetaData = apps.get_model("combine", model_name="MetaData")
 
         if "archive_path" in kwargs:
             path = kwargs["archive_path"]
@@ -97,7 +97,7 @@ class ArchiveManager(models.Manager):
                 entry_metadata_dic = {"entry": new_archive_entry}
                 if "metadata" in entry and isinstance(entry["metadata"], dict):
                     entry_metadata_dic["metadata"] = entry["metadata"]
-                ArchiveEntryMeta.objects.get_or_create(**entry_metadata_dic)
+                MetaData.objects.get_or_create(**entry_metadata_dic)
 
             return archive, created_archive
 
@@ -120,7 +120,7 @@ class ArchiveEntryManager(models.Manager):
         return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
 
 
-class ArchiveEntryMetaManager(models.Manager):
+class MetaDataManager(models.Manager):
     """ Manager for ArchiveEntryMeta. """
 
     def get_or_create(self, *args, **kwargs):
@@ -137,7 +137,7 @@ class ArchiveEntryMetaManager(models.Manager):
             kwargs["created"] = metadata["created"]
 
             # create initial meta entry
-            entry_meta, created_meta = super(ArchiveEntryMetaManager, self).get_or_create(*args, **kwargs)
+            entry_meta, created_meta = super(MetaDataManager, self).get_or_create(*args, **kwargs)
 
             # add creator information
             for creator_info in metadata["creators"]:
@@ -161,4 +161,4 @@ class ArchiveEntryMetaManager(models.Manager):
 
             return entry_meta, created_meta
 
-        return super(ArchiveEntryMetaManager, self).get_or_create(*args, **kwargs)
+        return super(MetaDataManager, self).get_or_create(*args, **kwargs)

@@ -3,7 +3,7 @@ Admin pages.
 """
 from django.contrib import admin
 
-from .models import Archive, Tag, Creator, Triple, ArchiveEntry, ArchiveEntryMeta
+from .models import Archive, Tag, Creator, Triple, ArchiveEntry, MetaData
 
 
 @admin.register(Archive)
@@ -41,7 +41,7 @@ class ArchiveEntryAdmin(admin.ModelAdmin):
     fields = ('archive', 'location', 'format', 'master')
 
 
-@admin.register(ArchiveEntryMeta)
+@admin.register(MetaData)
 class ArchiveEntryMetaAdmin(admin.ModelAdmin):
     list_display = ('entry', 'description', 'created')
     fields = ('entry', 'description', 'creators')
