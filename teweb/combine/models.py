@@ -205,7 +205,6 @@ class Archive(models.Model):
             pass
         return entry
 
-
     def omex_entries(self):
         """ Get entries and omex object from given archive.
 
@@ -213,13 +212,14 @@ class Archive(models.Model):
         """
         return comex.entries_info(self.path)
 
-    def zip_entries(self):
-        """ Returns the entries of the combine archive zip file.
-        This is the basis of creating the tree.
+    def tree_json(self):
+        """ Gets the zip tree as JSON for the archive.
 
-        :return: entries of the zip file
+        The entry information is added to the tree.
         """
-        return comex.zip_tree_content(self.path)
+        entries = self.entries.all()
+        return comex.zip_tree_content(self.path, entries)
+
 
     def has_entries(self):
         """ Check if ArchiveEntries exist for archive. """
@@ -258,9 +258,4 @@ class ArchiveEntry(models.Model):
     @property
     def name(self):
         return os.path.splitext(self.location)[0]
-
-
-
-
-
 

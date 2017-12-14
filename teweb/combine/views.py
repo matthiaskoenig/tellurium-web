@@ -122,11 +122,6 @@ def archive_context(archive):
     # omex entries
     entries = archive.omex_entries()
 
-
-
-    # zip entries: json tree data
-    zip_entries = archive.zip_entries()
-
     # task and taskresult
     task = None
     task_result = None
@@ -138,7 +133,7 @@ def archive_context(archive):
 
     context = {
         'archive': archive,
-        'entries_json':json.dumps(entries),
+        'entries_json': json.dumps(entries),
         'task': task,
         'task_result': task_result,
     }
@@ -765,6 +760,6 @@ class UserViewSet(viewsets.ModelViewSet):
 @permission_classes((AllowAny,))
 def archive_tree_api(request, archive_id):
     archive = get_object_or_404(Archive, pk=archive_id)
-    parsed = archive.zip_entries()
+    parsed = archive.tree_json()
     parsed = json.loads(parsed)
     return Response(parsed)

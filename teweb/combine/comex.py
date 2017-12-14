@@ -7,7 +7,7 @@ import os
 import json
 import zipfile
 import warnings
-
+from pprint import pprint
 try:
     import libcombine
 except ImportError:
@@ -109,7 +109,7 @@ def tags_info(archive_path):
 ################################################
 # Zip
 ################################################
-def zip_tree_content(path):
+def zip_tree_content(path, entries=None):
     """ Returns the entries of the combine archive zip file.
 
     These are all files in the zip files. Not all of these
@@ -155,7 +155,6 @@ def zip_tree_content(path):
 
     nodes = {}
     with zipfile.ZipFile(path) as zip:
-        # zip.printdir()
         for zip_info in zip.infolist():
 
             # print(zip_info)
@@ -177,10 +176,38 @@ def zip_tree_content(path):
             if parent_id not in check_ids and parent_id != "#":
                 parent_node = node_from_filename(parent_id)
                 nodes[parent_id] = parent_node
-                #print("Added missing folder node:", parent_id)
+
+    # Add the root node
+    nodes['#'] = {
+        'text': '.',
+        'icon': 'fa fa-fw fa-archive'
+    }
+
+    # add entry data if existing
+    if entries:
+        for entry in entries:
+            # find node by location
+            node_id = entry.location
+            if node_id.startswith('./'):
+                node_id = node_id[2:]
+            elif node_id.startswith('.'):
+                node_id = node_id[1:]
+
+            if len(node_id) == 0:
+                node_id = "#"
+
+            # add entry information
+            node = nodes.get(node_id)
+            if node:
+                node['pk'] = entry.id
+                node['format'] = entry.format
+                node['master'] = entry.master
+                node['location'] = entry.location
+            else:
+                raise ValueError("All entries must be part of the zip file.")
 
     tree_data = [nodes[key] for key in sorted(nodes.keys())]
-
+    # pprint(tree_data)
     return json.dumps(tree_data)
 
 
