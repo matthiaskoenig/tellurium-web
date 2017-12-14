@@ -161,7 +161,7 @@ def zip_tree_content(path, entries=None):
         'parent': "#",
         'text': '.',
         'icon': 'fa fa-fw fa-archive',
-        'state': {'opened': True}
+        'state': {'opened': True, 'selected': True}
     }
 
     with zipfile.ZipFile(path) as zip:
