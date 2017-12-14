@@ -39,17 +39,22 @@ class IsAdminUserOrReadOnly(permissions.IsAdminUser):
         return request.method in permissions.SAFE_METHODS or is_admin
 
 
-class IsOwnerOrGlobalOrAdmin(permissions.IsAdminUser):
+class IsOwnerOrGlobalOrAdminReadOnly(permissions.IsAdminUser):
     """
     """
 
     def has_object_permission(self, request, view, obj):
-        # Write permissions are only allowed to the owner of the snippet.
+
+        #return obj.user == request.user or obj.user.username == "global"
+        return False
+
+
+    def has_permission(self, request, view):
         is_admin = super(
-            IsOwnerOrGlobalOrAdmin,
+            IsOwnerOrGlobalOrAdminReadOnly,
             self).has_permission(request, view)
-        print("*"*70)
+        # Python3: is_admin = super().has_permission(request, view)
+        return request.method in permissions.SAFE_METHODS or is_admin
 
-        print(obj.user)
 
-        return obj.user == request.user or obj.user.username == "global" or is_admin
+

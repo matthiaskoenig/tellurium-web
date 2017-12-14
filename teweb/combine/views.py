@@ -25,6 +25,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 
+
 from .tasks import execute_omex
 from .models import Archive, Tag, ArchiveEntry
 from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer
@@ -34,7 +35,7 @@ from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.request import Request
 
-from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, IsOwnerOrGlobalOrAdmin
+from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, IsOwnerOrGlobalOrAdminReadOnly
 from rest_framework import viewsets
 from django_filters import rest_framework as filters
 import rest_framework.filters as filters_rest
@@ -759,18 +760,22 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ZipTreeView(APIView):
 
-    permission_classes = (IsOwnerOrGlobalOrAdmin,)
-    queryset = Archive.objects.none()
+    queryset= Archive.objects.all()
+    permission_classes = (IsOwnerOrGlobalOrAdminReadOnly,)
+    serializer_class = ArchiveSerializer
 
     def get(self, request,*args, **kwargs):
         """
         Return a archive_zip.
         """
         archive_id = kwargs.get('archive_id')
-        archive = get_object_or_404(Archive, pk=archive_id)
-        parsed = archive.zip_entries()
+        #self.queryset.get(pk=archive_id)
+        queryset = get_object_or_404(Archive, pk=archive_id)
+        parsed = queryset.tree_json()
         parsed = json.loads(parsed)
         return Response(parsed)
 
-    def get_object(self,archive_id):
-        return get_object_or_404(Archive, pk=archive_id)
+    def get_queryet(self):
+        return get_object_or_404(Archive, pk=self.kwargs.get('archive_id'))
+
+
