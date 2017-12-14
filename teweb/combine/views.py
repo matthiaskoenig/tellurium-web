@@ -144,15 +144,6 @@ def archive_context(archive):
     }
     return context
 
-#todo: important !!!! fix permission
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-def archive_tree_api(request, archive_id):
-    archive = get_object_or_404(Archive, pk=archive_id)
-    parsed = archive.zip_entries()
-    parsed = json.loads(parsed)
-    return Response(parsed)
-
 
 def download_archive(request, archive_id):
     """ Download archive.
@@ -769,3 +760,11 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('is_staff', 'username', "email")
 
 
+#todo: important !!!! fix permission
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def archive_tree_api(request, archive_id):
+    archive = get_object_or_404(Archive, pk=archive_id)
+    parsed = archive.zip_entries()
+    parsed = json.loads(parsed)
+    return Response(parsed)
