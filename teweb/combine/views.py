@@ -21,6 +21,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django_celery_results.models import TaskResult
 from celery.result import AsyncResult
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
 from rest_framework.response import Response
 
 
@@ -33,7 +34,7 @@ from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.request import Request
 
-from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, IsOwnerOrGlobalOrAdmin
 from rest_framework import viewsets
 from django_filters import rest_framework as filters
 import rest_framework.filters as filters_rest
@@ -760,11 +761,20 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('is_staff', 'username', "email")
 
 
-#todo: important !!!! fix permission
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-def archive_tree_api(request, archive_id):
-    archive = get_object_or_404(Archive, pk=archive_id)
-    parsed = archive.zip_entries()
-    parsed = json.loads(parsed)
-    return Response(parsed)
+class ZipTreeView(APIView):
+
+    permission_classes = (IsOwnerOrGlobalOrAdmin,)
+    queryset = Archive.objects.none()
+
+    def get(self, request,*args, **kwargs):
+        """
+        Return a archive_zip.
+        """
+        archive_id = kwargs.get('archive_id')
+        archive = get_object_or_404(Archive, pk=archive_id)
+        parsed = archive.zip_entries()
+        parsed = json.loads(parsed)
+        return Response(parsed)
+
+    def get_object(self,archive_id):
+        return get_object_or_404(Archive, pk=archive_id)

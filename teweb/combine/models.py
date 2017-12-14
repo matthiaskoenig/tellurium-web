@@ -124,11 +124,10 @@ class Archive(models.Model):
     tags = models.ManyToManyField(Tag, related_name="archives")
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     uuid = models.UUIDField(  # Used by the API to look up the record
-
-
         db_index=True,
         default=uuid_lib.uuid4,
         editable=False)
+
     objects = ArchiveManager()
 
     def __str__(self):

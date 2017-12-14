@@ -85,12 +85,12 @@ class ViewAPILogedInSuperUser(TestCase):
         """
         Ensure we can create a new account object.
         """
-        archive= Archive.objects.get(name="L1V3_ikappab.omex")
+        archive= Archive.objects.get(name="L1V3_ikappab")
 
         url = reverse('api:archive-detail',kwargs={"uuid": archive.uuid})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, 'L1V3_ikappab.omex')
+        self.assertContains(response, 'L1V3_ikappab')
 
     def test_delete_user(self):
         url = reverse('api:user-detail', kwargs={'pk': '2'})
@@ -196,12 +196,12 @@ class ViewAPILoggedOut(TestCase):
         """
         Ensure we can create a new account object.
         """
-        archive= Archive.objects.get(name="L1V3_ikappab.omex")
+        archive= Archive.objects.get(name="L1V3_ikappab")
 
         url = reverse('api:archive-detail',kwargs={"uuid": archive.uuid})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, 'L1V3_ikappab.omex')
+        self.assertContains(response, 'L1V3_ikappab')
 
 
 class ViewAPILoggedIn(TestCase):
@@ -228,12 +228,12 @@ class ViewAPILoggedIn(TestCase):
         """
         Ensure we can create a new account object.
         """
-        archive= Archive.objects.get(name="L1V3_ikappab.omex")
+        archive= Archive.objects.get(name="L1V3_ikappab")
 
         url = reverse('api:archive-detail',kwargs={"uuid": archive.uuid})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, 'L1V3_ikappab.omex')
+        self.assertContains(response, 'L1V3_ikappab')
 
     def test_list_tags(self):
         """
@@ -278,16 +278,32 @@ class ViewAPILoggedIn(TestCase):
         archive_data = {'name': name+"test", 'file': django_file, 'tags': [], 'md5': md5}
         response = self.client.post(url, archive_data)
         self.assertEquals(response.status_code, 201)
+
+        # get zip tree url of created archive
+        archive_testuser = Archive.objects.get(user__username="testuser")
+        url_archive = reverse('combine:archive', kwargs={'archive_id':archive_testuser.id})
+        url_tree = url_archive + "zip_tree"
+
+        # check if zip tree is accessable for the user who created
+        response_tree = self.client.get(url_tree)
+        self.assertEquals(response_tree.status_code, 200)
+
+
+
         response = self.client.get(url)
         self.assertContains(response, name+"test")
         for archive in response.json():
-            if archive["name"]== name+"test":
+            if archive["name"] == name+"test":
                 new_archive = archive
 
         # should not be seen after logout
         self.client.logout()
         response = self.client.get(url)
         self.assertNotContains(response, name+"test")
+
+        #no permission for zip tree
+        response_tree = self.client.get(url_tree)
+        self.assertEquals(response_tree.status_code, 403)
 
         #no permission
         self.client.login(username='global', password=os.environ['DJANGO_ADMIN_PASSWORD'])
