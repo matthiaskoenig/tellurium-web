@@ -130,7 +130,7 @@ def zip_tree_content(path, entries=None):
             filename = filename[:-1]
         tokens = filename.split("/")
         if len(tokens) == 1:
-            return '#'
+            return '.'
         return '/'.join(tokens[:-1]) + '/'
 
     def find_name(filename):
@@ -139,21 +139,31 @@ def zip_tree_content(path, entries=None):
             return splited_file[-2]
         return splited_file[-1]
 
-
     def node_from_filename(filename):
-        node = {}
-        node['id'] = filename
-        node['parent'] = find_parent(filename)
-        node['text'] = find_name(filename)
+        icon = "fa fa-file-o fa-fw"
         if filename.endswith('/'):
             icon = "fa fa-folder fa-fw"
-        else:
-            icon = "fa fa-file-o fa-fw"
-        node['icon'] = icon
-        node['state'] = {'opened': True}
+
+        node = {
+            'id': filename,
+            'parent': find_parent(filename),
+            'text': find_name(filename),
+            'icon': icon,
+            'state': {'opened': True}
+        }
         return node
 
+
+    # Add the root node
     nodes = {}
+    nodes['.'] = {
+        'id': '.',
+        'parent': "#",
+        'text': '.',
+        'icon': 'fa fa-fw fa-archive',
+        'state': {'opened': True}
+    }
+
     with zipfile.ZipFile(path) as zip:
         for zip_info in zip.infolist():
 
@@ -177,27 +187,22 @@ def zip_tree_content(path, entries=None):
                 parent_node = node_from_filename(parent_id)
                 nodes[parent_id] = parent_node
 
-    # Add the root node
-    nodes['#'] = {
-        'text': '.',
-        'icon': 'fa fa-fw fa-archive'
-    }
-
-    # add entry data if existing
+    # add entry information
     if entries:
         for entry in entries:
+
             # find node by location
             node_id = entry.location
             if node_id.startswith('./'):
                 node_id = node_id[2:]
             elif node_id.startswith('.'):
                 node_id = node_id[1:]
-
             if len(node_id) == 0:
-                node_id = "#"
+                node_id = "."
+
+            node = nodes.get(node_id)
 
             # add entry information
-            node = nodes.get(node_id)
             if node:
                 node['pk'] = entry.id
                 node['format'] = entry.format
