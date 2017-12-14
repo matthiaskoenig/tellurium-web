@@ -272,7 +272,8 @@ def entries_info(archive_path):
         entries_dict[location] = {
             'location': location,
             'format': format,
-            'master': entry.getMaster()
+            'master': entry.getMaster(),
+            'metadata': metadata_for_location(omex, location=location)
         }
 
         # collect metadata files in archive
@@ -283,16 +284,15 @@ def entries_info(archive_path):
     entries_dict['.'] = {
         'location': '.',
         'format': 'http://identifiers.org/combine.specifications/omex',
-        'master': False
+        'master': False,
+        'metadata': metadata_for_location(omex, location=location)
     }
 
+    # TODO: implement
     # parse metadata files & add the metadata for the locations
 
-    # info['metadata'] = metadata_for_location(omex, location=location)
-
     omex.cleanUp()
-    return entries, metadata
-
+    return list(entries_dict.values())
 
 
 def parse_metadata(metadata_locations):
