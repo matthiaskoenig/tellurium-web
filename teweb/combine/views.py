@@ -25,15 +25,15 @@ from rest_framework.response import Response
 
 
 from .tasks import execute_omex
-from .models import Archive, Tag
-from .serializers import ArchiveSerializer, TagSerializer, UserSerializer
+from .models import Archive, Tag, ArchiveEntry
+from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer
 from .forms import UploadArchiveForm
 from .git import get_commit
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.request import Request
 
-from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly
 from rest_framework import viewsets
 from django_filters import rest_framework as filters
 import rest_framework.filters as filters_rest
@@ -144,7 +144,7 @@ def archive_context(archive):
     }
     return context
 
-
+#todo: important !!!! fix permission
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def archive_tree_api(request, archive_id):
@@ -707,11 +707,8 @@ class ArchiveViewSet(viewsets.ModelViewSet):
     lookup_field defines the url of the detailed view.
     permission_classes define which users is allowed to do what.
     """
-    #global_user = User.objects.get(username="global")
-    #queryset = Archive.objects.filter(user=global_user)
+
     queryset = Archive.objects.all()
-
-
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = ArchiveSerializer
     lookup_field = 'uuid'
@@ -735,6 +732,17 @@ class ArchiveViewSet(viewsets.ModelViewSet):
          }
          serializer = ArchiveSerializer(queryset, many=True, context=serializer_context)
          return Response(serializer.data)
+
+
+class ArchiveEntryViewSet(viewsets.ModelViewSet):
+    """ REST archive entries.
+
+        lookup_field defines the url of the detailed view.
+        permission_classes define which users is allowed to do what.
+        """
+    queryset = ArchiveEntry.objects.all()
+    permission_classes = (IsOwnerOfArchiveEntryOrReadOnly,)
+    serializer_class = ArchiveEntrySerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):

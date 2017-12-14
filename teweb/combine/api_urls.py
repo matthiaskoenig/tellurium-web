@@ -17,6 +17,8 @@ router = routers.DefaultRouter()
 router.register(r'users', teweb_views.UserViewSet, base_name='user')
 router.register(r'tags', teweb_views.TagViewSet, base_name='tag')
 router.register(r'archives', teweb_views.ArchiveViewSet, base_name='archive')
+router.register(r'archive-entries', teweb_views.ArchiveEntryViewSet, base_name='archive-entry')
+
 
 app_name = 'combine'
 urlpatterns = [

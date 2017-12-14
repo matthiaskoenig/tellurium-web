@@ -3,6 +3,7 @@ Models definitions.
 """
 import uuid as uuid_lib
 import logging
+import os
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
@@ -27,9 +28,55 @@ logger = logging.getLogger(__name__)
 MAX_TEXT_LENGTH = 500
 
 
+
+# ===============================================================================
+# Meta Data
+# ===============================================================================
+
+# This is all the content of the metadata files.
+
+
+class Date(models.Model):
+    date = models.DateTimeField()
+
+
+class Creator(models.Model):
+    """ RDF creator of archive entry. """
+    first_name = models.CharField(max_length=MAX_TEXT_LENGTH)
+    last_name = models.CharField(max_length=MAX_TEXT_LENGTH)
+    organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+    email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+
+########################################
+# RDF information
+########################################
+    # TODO: We want subset of biomodels triples (via model managers and known subset of BioModels predicates)
+class Triple(models.Model):
+    subject = models.TextField()
+    predicate = models.TextField()
+    object = models.TextField()
+
+class MetaData(models.Model):
+    """ MetaData information.
+
+     From this information the metadata.rdf file for the archive can be generated.
+     The information consists of general VCard information and additional RDF.
+     """
+    description = models.TextField(null=True, blank=True)
+    creators = models.ManyToManyField(Creator)
+    created = models.DateTimeField(editable=False,null=True, blank=True)
+    modified = models.ManyToManyField(Date)
+    triples = models.ManyToManyField(Triple)
+
+    objects = MetaDataManager()
+
+    class Meta:
+        verbose_name_plural = "meta data"
+
 # ===============================================================================
 # Archives
 # ===============================================================================
+
 class TagCategory(DjangoChoices):
     """ Categories for the tags. """
     format = ChoiceItem("format")
@@ -60,6 +107,7 @@ class Tag(models.Model):
         unique_together = ('category', 'name')
 
 
+
 class Archive(models.Model):
     """ COMBINE Archive class.
 
@@ -76,6 +124,7 @@ class Archive(models.Model):
     tags = models.ManyToManyField(Tag, related_name="archives")
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     uuid = models.UUIDField(  # Used by the API to look up the record
+
 
         db_index=True,
         default=uuid_lib.uuid4,
@@ -135,6 +184,28 @@ class Archive(models.Model):
             pass
         return description
 
+    @property
+    def metadata(self):
+        """ Get metadata from the metadata of top level entry."""
+        metadata = ""
+        try:
+            entry = self.entries.get(location=".")
+            metadata = entry.metadata
+        except ObjectDoesNotExist:
+            pass
+        return metadata
+
+    @property
+    def archive_entry(self):
+        """ Get metadata from the metadata of top level entry."""
+        metadata = ""
+        try:
+            entry = self.entries.get(location=".")
+        except ObjectDoesNotExist:
+            pass
+        return entry
+
+
     def omex_entries(self):
         """ Get entries and omex object from given archive.
 
@@ -184,44 +255,12 @@ class ArchiveEntry(models.Model):
     def base_format(self):
         return comex.base_format(self.format)
 
-
-########################################
-# RDF information
-########################################
-# This is all the content of the metadata files.
-class Date(models.Model):
-    date = models.DateTimeField()
+    @property
+    def name(self):
+        return os.path.splitext(self.location)[0]
 
 
-class Creator(models.Model):
-    """ RDF creator of archive entry. """
-    first_name = models.CharField(max_length=MAX_TEXT_LENGTH)
-    last_name = models.CharField(max_length=MAX_TEXT_LENGTH)
-    organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
-    email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
 
 
-class Triple(models.Model):
-    subject = models.TextField()
-    predicate = models.TextField()
-    object = models.TextField()
-
-    # TODO: We want subset of biomodels triples (via model managers and known subset of BioModels predicates)
 
 
-class MetaData(models.Model):
-    """ MetaData information.
-
-     From this information the metadata.rdf file for the archive can be generated.
-     The information consists of general VCard information and additional RDF.
-     """
-    description = models.TextField(null=True, blank=True)
-    creators = models.ManyToManyField(Creator)
-    created = models.DateTimeField(editable=False,null=True, blank=True)
-    modified = models.ManyToManyField(Date)
-    triples = models.ManyToManyField(Triple)
-
-    objects = MetaDataManager()
-
-    class Meta:
-        verbose_name_plural = "meta data"

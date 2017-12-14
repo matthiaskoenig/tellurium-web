@@ -1,0 +1,148 @@
+{% import 'combine/macros.html' as macros %}
+
+<div class="panel panel-default">
+   <!-- navigate archives -->
+    <a href="{{ url('combine:archive_previous', args=[archive.id]) }}"
+       title="Previous archive"><span class="btn-xs btn-primary"><i
+            class="fa fa-arrow-circle-o-left fa-fw"></i></span></a>
+    <a href="{{ url('combine:archive_next', args=[archive.id]) }}"
+       title="Next archive"><span class="btn-xs btn-primary"><i
+            class="fa fa-arrow-circle-o-right fa-fw"></i></span></a>
+    <div class="panel-heading">
+
+        <h2 class="panel-title">
+            <a href="{{ url('combine:archive', args=[archive.id]) }}">
+                {{ macros.archive_html(archive) }}
+            <a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive"><i
+                    class="fa fa-download fa-fw"></i></a>
+
+            <span class="pull-right">
+                <!-- delete archive -->
+                {% if request.user.is_authenticated %}
+                <a href="{{ url('combine:delete_archive', args=[archive.id]) }}" title="Delete archive {{ archive.id }}: {{ archive.name }}"><span class="btn-xs btn-danger"
+                                                                                                              onclick="return confirm('Are you sure you want to delete: {{ archive }}?')">
+                    <i class="fa fa-trash fa-fw"></i></span></a>
+                {% endif %}
+            </span>
+        </h2>
+    </div>
+    <div class="panel-body">
+        {% if archive.has_entries() %}
+            <table id="entries" class="table table-striped table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th class="hidden hidden-xs"></th>
+                    <th>master</th>
+                    <th>icon</th>
+                    <th>format</th>
+                    <th>location</th>
+                </tr>
+                </thead>
+                {% for entry in archive.entries.all()  %}
+                    <tr id="archive_content">
+                        <td class="hidden hidden-xs"><span class="badge">{{ loop.index }}</span></td>
+                        <td>{% if entry.master %}
+                            <i class="fa fa-star fa-fw" title="master"></i>
+                        {% endif %}
+                        </td>
+                        <td>
+                            {% if entry.base_format in ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'] %}
+                                <img height=20 title="{{ entry.format }}"
+                                     src="{{ static('combine/images/mediatype/')}}{{ entry.base_format }}.png">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <code title="{{ entry.format }}">{{ entry.short_format }}</code>
+                        </td>
+                        <td class="location">
+                            {% if entry.location in ['.', './manifest.xml'] %}
+                                {{ entry.location}}
+                            {% else %}
+                                <a href="{{ url('combine:archive_entry', args=[archive.id, loop.index0]) }}"
+                                   target="_blank">{{ entry.location }}</a>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No entries in archive metadata.</p>
+        {% endif %}
+
+        <span class="label label-primary" title="ZIP Content">zip content</span>
+        <div class="row">
+            <!-- The zip tree -->
+            <div class="col-sm-6"id="json_tree"></div>
+            <!-- the entry directory -->
+            <div class="col-sm-6" id="entry_detail">
+                <form id="form_entry_detail" method="post">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+                    <div id="button-div">
+                    </div>
+
+                    <div id="title_div">
+                    </div>
+                    <div id="metadata_detail">
+                            <!--{{archive.metadata.description}} -->
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+
+
+
+        <script>
+
+            var endpoint = './zip_tree';
+        $.ajax({
+            method: "GET",
+            url: endpoint,
+            success: function (data) {
+                $('#json_tree').jstree({
+                    'core': {
+                        'multiple': false,
+                        'data': data
+                    }
+                });
+            },
+            error: function (error_data) {
+                console.log("error");
+                console.log(error_data);
+
+            }
+        })
+        </script>
+
+        <script>
+            var shown_entry = "{{ archive.archive_entry }}" ;
+            title = document.createElement("h3");
+            title.innerHTML = shown_entry.title;
+
+            title_div = document.getElementById("title_div");
+            title_div.appendChild(title);
+
+
+
+
+
+
+        </script>
+
+
+        <script>
+            $("tr#archive_content").click(function(e){     //function_td
+                var $row = $(this).closest("tr");    // Find the row
+                var $text = $row.find(".location").text(); // Find the text
+                // Let's test it out
+                //display_entry_detail($text);
+            });
+        </script>
+
+
+
+    </div>
+</div>

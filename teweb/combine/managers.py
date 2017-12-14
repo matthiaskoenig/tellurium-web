@@ -69,6 +69,7 @@ class ArchiveManager(models.Manager):
             # store combine archive as file
             with open(path, 'rb') as f:
                 archive.file.save(name, File(f))
+
             # FIXME: unclear where to do this (in save, create?)
             archive.created = timezone.now()
 
@@ -99,11 +100,14 @@ class ArchiveManager(models.Manager):
 
                 # create single metadata for every entry
                 if "metadata" in entry and isinstance(entry["metadata"], dict):
+
                     metadata_dict = {
                         "metadata": entry["metadata"],
                     }
                     metadata, _ = MetaData.objects.create(**metadata_dict)
                     archive_entry.metadata = metadata
+
+
                     metadata.save()
 
                 archive_entry.save()
