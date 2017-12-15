@@ -9,6 +9,11 @@ A BNode is a node where the exact URI is not known. URIRefs are also used to rep
 Literals represent attribute values, such as a name, a date, a number, etc.
 """
 
+# The serializing to XML
+# - drops order of the elements
+# - adds internal nodeIds in cases because the following is not set on xml elements:
+#       rdf:parseType="Resource" on vCard:n, vCard:org, dcterms:created, dcterms:modified
+
 import rdflib
 import os
 from rdflib.util import guess_format
@@ -58,6 +63,7 @@ def fix_path_prefix(el, prefix):
 
 def parse_rdf(path):
     """ Parses the rdf in graph. """
+    print("-" * 80)
     # file prefix to replace for relative paths
     prefix = "file://{}/".format(os.path.abspath(os.path.dirname(path)))
     print("File prefix:", prefix)
@@ -67,7 +73,8 @@ def parse_rdf(path):
     format = guess_format(path)
     print("Format:", format)
     g.parse(path, format=format)
-    print("graph has %s statements." % len(g))
+    print("Statements: %s" % len(g))
+    print("-" * 80)
 
     def fix_email(obj):
         """ Fixing wrong parsing of emails. """
@@ -81,7 +88,6 @@ def parse_rdf(path):
     bind_default_namespaces(g2)
 
     for subj, pred, obj in g:
-        print((subj, pred, obj))
 
         # fixing emails
         if pred == VCARD.hasEmail:
@@ -95,33 +101,20 @@ def parse_rdf(path):
         # add fixed triples
         g2.add((subj, pred, obj))
         print((subj, pred, obj))
-        print('-' * 80)
 
-        # if subj_str.startswith(prefix):
-        #   print("PREFIX found")
 
-        # set values
-        # g.set((subj, pred, Literal(43)))
-        # if URIRef
+    # Serializing the graph
+    if False:
+        s2 = g2.serialize(format='pretty-xml')
+        print(s2.decode("utf-8"))
 
-            # g.set((bob, FOAF.age, Literal(43)))  # replaces 42 set above
-            # print "Bob is now ", g.value(bob, FOAF.age)
+        print("\n\n")
 
-        # 'http://www.w3.org/2006/vcard/ns#hasEmail'
-
-    # s = g.serialize(format='n3')
-    s = g.serialize(format='pretty-xml')
-    # print(s.decode("utf-8"))
-
-    # TODO: set rdf:parseType="Resource" on vCard:n, vCard:org, dcterms:created, dcterms:modified
-
-    s2 = g2.serialize(format='pretty-xml')
-    print(s2.decode("utf-8"))
-
+        s2 = g2.serialize(format='turtle')
+        print(s2.decode("utf-8"))
 
 
     return g2
-
 
 
 if __name__ == "__main__":
@@ -129,3 +122,4 @@ if __name__ == "__main__":
     f2 = "../testdata/rdf/metadata2.rdf"
 
     parse_rdf(f2)
+    # parse_rdf(f1)

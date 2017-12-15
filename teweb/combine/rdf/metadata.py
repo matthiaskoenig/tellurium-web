@@ -18,6 +18,8 @@ As part of the writing the internal metadata information is serialized to a file
 import os
 import tempfile
 from pprint import pprint
+from rdflib import Graph, URIRef
+
 
 try:
     import libcombine
@@ -42,9 +44,15 @@ def read_metadata(archive_path):
         return None
 
     # find metadata locations and parse the information
+    graphs = []
+    locations = []
     for i in range(omex.getNumEntries()):
         entry = omex.getEntry(i)
         location = entry.getLocation()
+        if len(locations) > 0:
+            locations.append("./{}".format(location))
+        else:
+            locations.append(".")
         format = entry.getFormat()
 
         # read metadata from metadata files
@@ -58,20 +66,34 @@ def read_metadata(archive_path):
             g = parse_rdf(tmp.name)
             # close the tmp file
             tmp.close()
+            graphs.append(g)
 
-    # TODO: merge the multiple metafiles
+    # Merge the graphs from multiple files
+    # FIXME: this is poor mans merging which can result in blank node collisions !
+    # see: https://rdflib.readthedocs.io/en/stable/merging.html
+    g = graphs[0]
+    for k, g_next in enumerate(graphs):
+        if k > 0:
+            g += g_next
 
+    print(g.serialize(format='turtle').decode("utf-8"))
 
-    # parse the content
-    print('-' * 80)
-    print("PARSE METADATA:", location)
-    print('-' * 80)
-    metadata = parse_rdf(tmp.name)
+    # Split the graphs for the different locations, i.e.,
+    # single graphs for the various resources
+    graph_dict = {}
+    for location in locations:
+        print('-' * 80)
+        print("PARSE METADATA:", location)
+        print('-' * 80)
 
-    # dcterms:description
-    # dcterms:created
-    # dcterms:modified
-    # dcterms:creator + vcard information
+        gloc = Graph()
+        gloc += g.triples((URIRef(location), None, None))
+        print(gloc.serialize(format='turtle').decode("utf-8"))
+
+        # dcterms:description
+        # dcterms:created
+        # dcterms:modified
+        # dcterms:creator + vcard information
 
     omex.cleanUp()
     return metadata
@@ -127,5 +149,5 @@ if __name__ == "__main__":
     # TODO: implement
     omex_path = "../testdata/rdf/L1V3_vanderpol-sbml.omex"
     metadata = read_metadata(omex_path)
-    pprint(metadata)
-    write_metadata(metadata)
+    # pprint(metadata)
+    # write_metadata(metadata, file_path=None)
