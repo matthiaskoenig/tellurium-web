@@ -79,7 +79,7 @@ def read_metadata(archive_path):
     :return: metadata_dict
     """
 
-    def read_predicate(g, predicate):
+    def read_predicate(g, location, predicate):
         """ Only a single entry should exist in the graph directly
         connected to the location.
 
@@ -89,7 +89,7 @@ def read_metadata(archive_path):
         """
         results = []
 
-        for triple in g.triples((None, predicate, None)):
+        for triple in g.triples((URIRef(location), predicate, None)):
             (subj, pred, obj) = triple
 
             # not terminal node, but linear pathway, follow the trail
@@ -107,14 +107,29 @@ def read_metadata(archive_path):
             results.append(None)
         return results
 
-    def read_creators(g):
+    def read_creators(g, location):
         """
 
         :param g:
         :return:
         """
         creators = []
-        # TODO:
+        for triple in g.triples((URIRef(location), DCTERMS.creator, None)):
+            (subj, pred, obj) = triple
+
+            info = {}
+            for (s,p,o) in g.triples((obj, VCARD.hasEmail, None)):
+                info["email"] = str(o)
+
+            for (s,p,o) in g.triples((obj, VCARD.organization, None)):
+                info["organisation"] = str(o)
+
+            for (s,p,o) in g.triples((obj, VCARD.hasName, None)):
+                for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
+                    info["familyName"] = str(o2)
+                for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
+                    info["givenName"] = str(o2)
+            creators.append(info)
 
         return creators
 
@@ -125,10 +140,10 @@ def read_metadata(archive_path):
     for location, g in graph_dict.items():
         metadata = {}
         metadata['about'] = location
-        metadata['description'] = read_predicate(g, DCTERMS.description)[0]
-        metadata['created'] = read_predicate(g, DCTERMS.created)[0]
-        metadata['modified'] = read_predicate(g, DCTERMS.created)
-        metadata['creators'] = read_creators(g)
+        metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description)[0]
+        metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created)[0]
+        metadata['modified'] = read_predicate(g, location, DCTERMS.created)
+        metadata['creators'] = read_creators(g, location)
 
         metadata_dict[location] = metadata
 
