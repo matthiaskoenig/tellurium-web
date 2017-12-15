@@ -15,14 +15,67 @@ parsed in an internal representation.
 As part of the writing the internal metadata information is serialized to a file.
 """
 
+import os
+import tempfile
+from pprint import pprint
+
 try:
     import libcombine
 except ImportError:
     import tecombine as libcombine
 
 
-def parse_metadata(metadata_locations):
+from combine.rdf.parser import parse_rdf
+
+def read_metadata(archive_path):
+    """ Reads and parses all the metadata information from given COMBINE archive.
+
+
+    :param archive_path:
+    :return: metadata
+    """
+    metadata = None
+
+    omex = libcombine.CombineArchive()
+    if omex.initializeFromArchive(archive_path) is None:
+        print("Invalid Combine Archive: {}", archive_path)
+        return None
+
+    # find metadata locations and parse the information
+    for i in range(omex.getNumEntries()):
+        entry = omex.getEntry(i)
+        location = entry.getLocation()
+        format = entry.getFormat()
+
+        # collect metadata files in archive
+        if format.endswith("omex-metadata"):
+            metadata_locations.append(location)
+
+            # temporary file which is parsed
+            content = omex.extractEntryToString(entry.getLocation())
+            # print(content)
+
+            suffix = location.split('/')[-1]
+            tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
+            omex.extractEntry(location, tmp.name)
+
+            # parse the content
+            print('-'*80)
+            print("PARSE METADATA:", location)
+            print('-' * 80)
+            metadata = parse_rdf(tmp.name)
+
+            # close the tmp file
+            tmp.close()
+
+    omex.cleanUp()
+    return metadata
+
+
+def write_metadata(metadata, file_path):
     # TODO: implement
+    raise NotImplementedError
+
     pass
 
 
@@ -64,4 +117,6 @@ def metadata_for_location(co_archive, location):
 
 if __name__ == "__main__":
     # TODO: implement
-    parse_metadata()
+    omex_path = "../testdata/rdf/L1V3_vanderpol-sbml.omex"
+    metadata = read_metadata(omex_path)
+    pprint(metadata)

@@ -166,9 +166,6 @@ def entries_dict(archive_path):
         print("Invalid Combine Archive: {}", archive_path)
         return None
 
-    # metadata
-    metadata_locations = []
-
     # add entries
     entries_dict = {}
     for i in range(omex.getNumEntries()):
@@ -182,10 +179,6 @@ def entries_dict(archive_path):
             'master': entry.getMaster(),
             'metadata': metadata_for_location(omex, location=location)
         }
-
-        # collect metadata files in archive
-        if format.endswith("omex-metadata"):
-            metadata_locations.append(location)
 
     # add root information
     entries_dict['.'] = {
