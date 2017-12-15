@@ -44,4 +44,4 @@ class CreatorAdmin(admin.ModelAdmin):
 @admin.register(MetaData)
 class MetaDataAdmin(admin.ModelAdmin):
     list_display = ('description', 'created')
-    fields = ('entry', 'description', 'creators')
+    fields = ('description', 'creators')
