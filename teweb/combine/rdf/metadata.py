@@ -16,16 +16,22 @@ As part of the writing the internal metadata information is serialized to a file
 """
 
 import tempfile
-from rdflib import Graph, URIRef
-
+from rdflib import Graph, URIRef, BNode, Literal
+from pprint import pprint
+import warnings
 
 try:
     import libcombine
 except ImportError:
     import tecombine as libcombine
 
+from combine.rdf.parser import parse_rdf, bind_default_namespaces
 
-from combine.rdf.parser import parse_rdf
+
+from rdflib.namespace import Namespace
+VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
+DCTERMS = Namespace('http://purl.org/dc/terms/')
+BQMODEL = Namespace('http://biomodels.net/model-qualifiers/')
 
 
 ##############################################################
@@ -76,14 +82,51 @@ def read_metadata(archive_path):
     metadata_dict = {}
     graph_dict = read_rdf_graphs(archive_path=archive_path)
 
+    def read_single_predicate(g, predicate):
+        """ Only a single entry should exist in the graph directly
+        connected to the location.
+
+        :param field:
+        :param predicate:
+        :return:
+        """
+        triples = list(g.triples((None, predicate, None)))
+        if len(triples) > 1:
+            warnings.warn("Predicate occurs multiple times: {}".format(predicate))
+
+        if len(triples) > 0:
+            (subj, pred, obj) = triples[0]
+
+            # not terminal node, but linear pathway, follow the trail
+            while not isinstance(obj, Literal):
+                triples = list(g.triples((obj, None, None)))
+                if len(triples) == 0:
+                    return(str(obj))
+                    break
+                (subj, pred, obj) = triples[0]
+
+            return str(obj)
+        return None
+
+
+    for location, g in graph_dict.items():
+        metadata = {}
+
+        metadata['description'] = read_single_predicate(g, DCTERMS.description)
+        metadata['created'] = read_single_predicate(g, DCTERMS.created)
+
+
+        metadata_dict[location] = metadata
 
     # parse the information from subgraph
-    # dcterms:description
+
     # dcterms:created
     # dcterms:modified
     # dcterms:creator + vcard information
 
 
+    pprint(metadata_dict)
+    return metadata_dict
 
 
 def read_rdf_graphs(archive_path):
@@ -144,6 +187,7 @@ def read_rdf_graphs(archive_path):
         print('-' * 80)
 
         gloc = transitive_subgraph(g, start=URIRef(location))
+        bind_default_namespaces(gloc)
         graph_dict[location] = gloc
         print(gloc.serialize(format='turtle').decode("utf-8"))
 
@@ -152,8 +196,14 @@ def read_rdf_graphs(archive_path):
 
 
 def transitive_subgraph(g, start, gloc=None):
-    """ Calculates recursively the transitive subgraph."""
-    if gloc == None:
+    """ Calculates recursively the transitive subgraph from given starting subject.
+
+    :param g: master graph to search in
+    :param start: starting subject.
+    :param gloc: resulting transitive subgraph
+    :return:
+    """
+    if gloc is None:
         gloc = Graph()
 
     # Search next edges & add to graph
@@ -166,6 +216,8 @@ def transitive_subgraph(g, start, gloc=None):
 
     return gloc
 
+
+
 def write_metadata(metadata, file_path):
 
     # FIXME: remove Description for emtpy tags (modfied, created
@@ -176,8 +228,9 @@ def write_metadata(metadata, file_path):
     print("-" * 80)
 
 
+########################################################################
 if __name__ == "__main__":
-    # TODO: implement
+
     omex_path = "../testdata/rdf/L1V3_vanderpol-sbml.omex"
     metadata = read_metadata(omex_path)
     # pprint(metadata)
