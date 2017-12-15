@@ -61,9 +61,14 @@ class ArchiveEntrySerializer(serializers.HyperlinkedModelSerializer):
     archive = serializers.HyperlinkedRelatedField(view_name='api:archive-detail', queryset=Archive.objects.all(), lookup_field='uuid')
     metadata = MetaDataSerializer()
 
+
+
+
     class Meta:
         model = ArchiveEntry
         fields = ['archive', 'location', 'format', 'master', 'metadata']
+
+
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

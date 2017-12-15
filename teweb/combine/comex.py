@@ -182,6 +182,7 @@ def entries_info(archive_path):
             'format': format,
             'master': entry.getMaster(),
             'metadata': metadata_for_location(omex, location=location)
+
         }
 
         # collect metadata files in archive

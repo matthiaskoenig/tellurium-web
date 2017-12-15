@@ -23,6 +23,7 @@ from celery.result import AsyncResult
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .serializers import ArchiveEntrySerializer
 
 
 
@@ -114,7 +115,16 @@ def archive_view(request, archive_id):
 
     if request.method =='POST':
         #do the validation here. I think since I access data via rest api. I do not need to send back data and refresh page.
-        print(request.POST.getlist('data'))
+        #data=request.POST.getlist('data')
+        data = request.POST["data"]
+
+        json_data = json.loads(data)
+
+        print(json.dumps(json_data, indent=4 , sort_keys=True))
+
+
+
+
 
     return render(request, 'combine/archive.html', context)
 
@@ -135,7 +145,6 @@ def archive_context(archive):
 
     context = {
         'archive': archive,
-        'entries_json': json.dumps(entries),
         'task': task,
         'task_result': task_result,
     }
@@ -746,7 +755,6 @@ class TagViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     """ REST users.
-
     A viewset for viewing and editing user instances.
     """
     serializer_class = UserSerializer
