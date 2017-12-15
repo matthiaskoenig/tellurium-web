@@ -14,4 +14,5 @@ def read_manifest(path):
 
 
 def write_manifest(path):
+    pass
 

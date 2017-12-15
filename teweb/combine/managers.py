@@ -158,6 +158,9 @@ class MetaDataManager(models.Manager):
         Date = apps.get_model("combine", model_name="Date")
 
         metadata = kwargs.get("metadata")
+        from pprint import pprint
+        pprint(metadata)
+
         if metadata:
             # fields required to generate ArchiveEntryMeta
             del kwargs["metadata"]

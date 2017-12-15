@@ -51,6 +51,33 @@ def read_metadata(archive_path):
         :param predicate:
         :return:
         """
+        result = None
+
+        for triple in g.triples((URIRef(location), predicate, None)):
+            (subj, pred, obj) = triple
+
+            # not terminal node, but linear pathway, follow the trail
+            while not isinstance(obj, Literal):
+                triples = list(g.triples((obj, None, None)))
+                if len(triples) == 0:
+                    warnings.warn("Something went wrong !")
+                    return str(obj)
+                    break
+
+                (subj, pred, obj) = triples[0]
+
+            result = str(obj)
+
+        return result
+
+
+    def read_predicate_list(g, location, predicate):
+        """ Multiple entries can exist
+
+        :param field:
+        :param predicate:
+        :return: list
+        """
         results = []
 
         for triple in g.triples((URIRef(location), predicate, None)):
@@ -67,8 +94,6 @@ def read_metadata(archive_path):
                 (subj, pred, obj) = triples[0]
 
             results.append(str(obj))
-        if len(results) == 0:
-            results.append(None)
         return results
 
     def read_creators(g, location):
@@ -98,6 +123,11 @@ def read_metadata(archive_path):
         return creators
 
     def read_triples(g):
+        """ Reads the triples in the graph.
+
+        :param g:
+        :return:
+        """
         triples = []
         for (s,p,o) in g.triples((None, None, None)):
             triples.append((str(s), str(p), str(o)))
@@ -110,9 +140,9 @@ def read_metadata(archive_path):
     for location, g in graph_dict.items():
         metadata = {}
         metadata['about'] = location
-        metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description)[0]
-        metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created)[0]
-        metadata['modified'] = read_predicate(g, location, DCTERMS.created)
+        metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description)
+        metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created)
+        metadata['modified'] = read_predicate_list(g, location, DCTERMS.modified)
         metadata['creators'] = read_creators(g, location)
         metadata['triples'] = read_triples(g)
 
