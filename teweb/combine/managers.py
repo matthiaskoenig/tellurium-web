@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 from combine import comex
+from .tags import create_tags_for_archive
 
 from six import string_types
 import os
@@ -50,6 +51,11 @@ class ArchiveManager(models.Manager):
     """ Manager for Archive. """
 
     def get_or_create(self, *args, **kwargs):
+        """ Function creating all the archive information from given file.
+        This is the main entry point for import of archives.
+        """
+
+        # get models
         Tag = apps.get_model("combine", model_name="Tag")
         ArchiveEntry = apps.get_model("combine", model_name="ArchiveEntry")
         MetaData = apps.get_model("combine", model_name="MetaData")
@@ -85,12 +91,12 @@ class ArchiveManager(models.Manager):
             archive.save()
 
             # create tags for archive
-            tags_info = comex.tags_info(path)
+            tags_info = create_tags_for_archive(path)
             for tag_info in tags_info:
                 tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
                 archive.tags.add(tag)
 
-            # create entries for archives
+            # create entries for files listed in the OMEX manifest.xml
             for entry in archive.omex_entries():
                 entry_dict = {
                     "entry": entry,
@@ -107,10 +113,12 @@ class ArchiveManager(models.Manager):
                     metadata, _ = MetaData.objects.create(**metadata_dict)
                     archive_entry.metadata = metadata
 
-
                     metadata.save()
 
                 archive_entry.save()
+
+            # add the additional entries from the zip content
+            # TODO: implement, see https://github.com/matthiaskoenig/tellurium-web/issues/73
 
             return archive, created_archive
 
@@ -174,46 +182,3 @@ class MetaDataManager(models.Manager):
             return entry_meta, created_meta
 
         return super(MetaDataManager, self).create(*args, **kwargs)
-
-
-    """
-    def get_or_create(self, *args, **kwargs):
-
-        Creator = apps.get_model("combine", model_name="Creator")
-        Date = apps.get_model("combine", model_name="Date")
-
-        metadata = kwargs.get("metadata")
-        if metadata:
-            # fields required to generate ArchiveEntryMeta
-            del kwargs["metadata"]
-            if "description" in metadata:
-                kwargs["description"] = metadata["description"]
-            kwargs["created"] = metadata["created"]
-
-            # create initial meta entry
-            entry_meta, created_meta = super(MetaDataManager, self).get_or_create(*args, **kwargs)
-
-            # add creator information
-            for creator_info in metadata["creators"]:
-                creator_dict = {
-                    "first_name": creator_info["givenName"],
-                    "last_name": creator_info["familyName"],
-                    "organisation": creator_info["organisation"],
-                    "email": creator_info["email"]
-                }
-                creator, _ = Creator.objects.get_or_create(**creator_dict)
-                entry_meta.creators.add(creator)
-                creator.save()
-            entry_meta.save()
-
-            # add modified stamps
-            for modified_date in metadata["modified"]:
-                modified, _ = Date.objects.get_or_create(date=modified_date)
-                entry_meta.modified.add(modified)
-                modified.save()
-            entry_meta.save()
-
-            return entry_meta, created_meta
-
-        return super(MetaDataManager, self).get_or_create(*args, **kwargs)
-    """

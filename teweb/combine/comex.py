@@ -7,7 +7,7 @@ import os
 import json
 import zipfile
 import warnings
-from pprint import pprint
+
 try:
     import libcombine
 except ImportError:
@@ -19,22 +19,16 @@ except ImportError:
     import tesedml as libsedml
 
 
-# FIXME: this is a bugfix for https://github.com/sbmlteam/libCombine/issues/15
-# import importlib
-# importlib.reload(libcombine)
-
-from collections import namedtuple
-TagInfo = namedtuple("TagInfo", "category name")
-
-
 def get_omex_file_paths(archive_dirs):
     """ Returns list of given combine archive paths from given list of directories.
 
-    :param archive_dirs:
-    :return:
+    Helper function used for instance for the bulk import of COMBINE archives in the
+    database.
+
+    :param archive_dirs: list of directories
+    :return: list of omex_files
     """
 
-    # list files
     omex_files = []
     for archive_dir in archive_dirs:
 
@@ -50,64 +44,7 @@ def get_omex_file_paths(archive_dirs):
 
 
 ################################################
-# Tag helpers
-################################################
-def tags_info(archive_path):
-    """ Reads the tags info from a given archive.
-
-    :param archive_path:
-    :return:
-    """
-    tags_info = []
-
-    # add the file formats from omex
-    omex = libcombine.CombineArchive()
-    if omex.initializeFromArchive(archive_path) is None:
-        print("Invalid Combine Archive: {}", archive_path)
-        return None
-
-    sedml_entries = []
-    sbml_entries = []
-    for i in range(omex.getNumEntries()):
-        entry = omex.getEntry(i)
-        format = entry.getFormat()
-        location = entry.getLocation()
-        format_id = base_format(format)
-
-        if format_id in ['sbml', 'cellml', 'sed-ml', 'sedml', 'sbgn', 'sbol']:
-            tags_info.append(
-                TagInfo(category='format', name=format_id)
-            )
-        if format_id == 'sbml':
-            sbml_entries.append(entry)
-        if format_id in ['sedml', 'sed-ml']:
-            sedml_entries.append(entry)
-
-    # add the SBML contents
-    # add the SED-ML contents
-    for entry in sedml_entries:
-        content = omex.extractEntryToString(entry.getLocation())
-        doc = libsedml.readSedMLFromString(content)  # type: libsedml.SedDocument
-
-        for model in doc.getListOfModels():
-            language = model.getLanguage()
-            if language:
-                name = language.split(':')[-1]
-                tags_info.append(
-                    TagInfo(category='sedml', name='model:{}'.format(name))
-                )
-
-        if len(doc.getListOfDataDescriptions()) > 0:
-            tags_info.append(
-                TagInfo(category='sedml', name='DataDescription')
-            )
-
-    omex.cleanUp()
-    return tags_info
-
-
-################################################
-# Zip
+# Zip files
 ################################################
 def zip_tree_content(path, entries=None):
     """ Returns the entries of the combine archive zip file.
@@ -152,7 +89,6 @@ def zip_tree_content(path, entries=None):
             'state': {'opened': True}
         }
         return node
-
 
     # Add the root node
     nodes = {}
@@ -217,67 +153,61 @@ def zip_tree_content(path, entries=None):
 
 
 ################################################
-# Combine Archives
+# COMBINE Archive
 ################################################
-
-
-# OMEX related functions
-# FIXME: clean up the omex related functions. These should only be used once
-# on the import of the file but not be part of the model
-
-def omex():
-    """ Open CombineArchive for given archive.
-
-    Don't forget to close the omex after using it.
-    :return:
-    """
-    omex = libcombine.CombineArchive()
-    if omex.initializeFromArchive(self.path) is None:
-        logger.error("Invalid Combine Archive: {}", self)
-        return None
-    return omex
-
-
-def extract_entry_by_location(self, location, filename):
-    """ Extracts entry at location to filename.
-
-    :param location:
-    :param filename:
-    :return:
-    """
-    omex = self.omex()
-    entry = omex.getEntryByLocation(location)
-    omex.extractEntry(location, filename)
-    omex.cleanUp()
-
-def entry_content_by_index(self, index):
-    """ Extracts entry content at given index.
-
-    :param index: index of entry
-    :return: content
-    """
-    omex = self.omex()
-    entry = omex.getEntry(index)
-    content = omex.extractEntryToString(entry.getLocation())
-    omex.cleanUp()
-    return content
-
-
-def entry_content_by_location(self, location):
-    """ Extracts entry content at given location.
-
-    :param location: location of entry
-    :return: content
-    """
-    omex = self.omex()
-    entry = omex.getEntryByLocation(location)
-    content = omex.extractEntryToString(entry.getLocation())
-    omex.cleanUp()
-    return content
+# def omex():
+#     """ Open CombineArchive for given archive.
+#
+#     Don't forget to close the omex after using it.
+#     :return:
+#     """
+#     omex = libcombine.CombineArchive()
+#     if omex.initializeFromArchive(self.path) is None:
+#         logger.error("Invalid Combine Archive: {}", self)
+#         return None
+#     return omex
+#
+#
+# def extract_entry_by_location(self, location, filename):
+#     """ Extracts entry at location to filename.
+#
+#     :param location:
+#     :param filename:
+#     :return:
+#     """
+#     omex = self.omex()
+#     entry = omex.getEntryByLocation(location)
+#     omex.extractEntry(location, filename)
+#     omex.cleanUp()
+#
+# def entry_content_by_index(self, index):
+#     """ Extracts entry content at given index.
+#
+#     :param index: index of entry
+#     :return: content
+#     """
+#     omex = self.omex()
+#     entry = omex.getEntry(index)
+#     content = omex.extractEntryToString(entry.getLocation())
+#     omex.cleanUp()
+#     return content
+#
+#
+# def entry_content_by_location(self, location):
+#     """ Extracts entry content at given location.
+#
+#     :param location: location of entry
+#     :return: content
+#     """
+#     omex = self.omex()
+#     entry = omex.getEntryByLocation(location)
+#     content = omex.extractEntryToString(entry.getLocation())
+#     omex.cleanUp()
+#     return content
 
 
 def entries_info(archive_path):
-    """ Parse entry information for given COMBINE archive.
+    """ Parse entry information from given COMBINE archive.
 
     This is the main entry function to retrieve information from COMBINE archives.
 
@@ -327,21 +257,16 @@ def entries_info(archive_path):
     return list(entries_dict.values())
 
 
-def parse_metadata(metadata_locations):
-    # TODO: implement
-    pass
-
 def short_format(format):
     """ Returns short format string for given full format string.
 
     http://identifiers.org/combine.specifications/omex-metadata
     -> omex-metadata
-
     http://identifiers.org/combine.specifications/sbml.level-3.version-1
     -> sbml.level-3.version-1
 
-    :param format:
-    :return:
+    :param format: full format string
+    :return: short format string
     """
     tokens = format.split("/")
     return tokens[-1]
@@ -352,17 +277,17 @@ def base_format(format):
 
     http://identifiers.org/combine.specifications/omex-metadata
     -> omex-metadata
-
     http://identifiers.org/combine.specifications/sbml.level-3.version-1
     -> sbml
 
-    :param format:
-    :return:
+    :param format: full format string
+    :return: base format string
     """
     tokens = format.split("/")
     short = tokens[-1].split('.')[0]
     short = short.replace('+xml', '')
     return short
+
 
 
 # TODO: necessary to parse all the metadata information from the COMBINE archive
@@ -378,8 +303,9 @@ def base_format(format):
 #   <content location="metadata.ttl" format="http://identifiers.org/combine.specifications/omex-metadata"/>
 
 
-
-
+def parse_metadata(metadata_locations):
+    # TODO: implement
+    pass
 
 
 def metadata_for_location(co_archive, location):
@@ -416,57 +342,3 @@ def metadata_for_location(co_archive, location):
              }
         )
     return info
-
-
-def print_metadata(co_archive, location):
-    """ Print metadata.
-
-    :param co_archive:
-    :param location:
-    :return:
-    """
-    info = metadata_for_location(co_archive=co_archive, location=location)
-    print(info)
-
-
-def print_archive(fileName):
-    """ Print the content of the archive.
-
-    :param fileName:
-    :return:
-    """
-    print(fileName)
-    archive = libcombine.CombineArchive()
-    if not archive.initializeFromArchive(str(fileName)):
-        print("Invalid Combine Archive")
-        return
-
-    printMetaDataFor(archive, ".")
-    print("Num Entries: {0}".format(archive.getNumEntries()))
-
-    for i in range(archive.getNumEntries()):
-        print(i)
-        entry = archive.getEntry(i)
-        print('entry: <{}>'.format(i), entry)
-
-        print(" {0}: location: {1} format: {2}".format(i, entry.getLocation(), entry.getFormat()))
-        print_metadata(archive, entry.getLocation())
-
-        # the entry could now be extracted via
-        # archive.extractEntry(entry.getLocation(), <filename or folder>)
-
-        # or used as string
-        # content = archive.extractEntryToString(entry.getLocation());
-
-    archive.cleanUp()
-
-
-def get_content(archive):
-    path = archive.file.path
-    print(path)
-    print_archive(fileName=path)
-
-
-if __name__ == "__main__":
-    path = "../../archives/CombineArchiveShowCase.omex"
-    tags_info(archive_path=path)
