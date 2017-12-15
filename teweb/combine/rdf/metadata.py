@@ -75,14 +75,11 @@ def metadata_for_location(co_archive, location):
 def read_metadata(archive_path):
     """ Reads and parses all the metadata information from given COMBINE archive.
 
-
     :param archive_path:
     :return: metadata_dict
     """
-    metadata_dict = {}
-    graph_dict = read_rdf_graphs(archive_path=archive_path)
 
-    def read_single_predicate(g, predicate):
+    def read_predicate(g, predicate):
         """ Only a single entry should exist in the graph directly
         connected to the location.
 
@@ -90,39 +87,50 @@ def read_metadata(archive_path):
         :param predicate:
         :return:
         """
-        triples = list(g.triples((None, predicate, None)))
-        if len(triples) > 1:
-            warnings.warn("Predicate occurs multiple times: {}".format(predicate))
+        results = []
 
-        if len(triples) > 0:
-            (subj, pred, obj) = triples[0]
+        for triple in g.triples((None, predicate, None)):
+            (subj, pred, obj) = triple
 
             # not terminal node, but linear pathway, follow the trail
             while not isinstance(obj, Literal):
                 triples = list(g.triples((obj, None, None)))
                 if len(triples) == 0:
-                    return(str(obj))
+                    warnings.warn("Something went wrong !")
+                    return str(obj)
                     break
+
                 (subj, pred, obj) = triples[0]
 
-            return str(obj)
-        return None
+            results.append(str(obj))
+        if len(results) == 0:
+            results.append(None)
+        return results
 
+    def read_creators(g):
+        """
+
+        :param g:
+        :return:
+        """
+        creators = []
+        # TODO:
+
+        return creators
+
+
+    metadata_dict = {}
+    graph_dict = read_rdf_graphs(archive_path=archive_path)
 
     for location, g in graph_dict.items():
         metadata = {}
-
-        metadata['description'] = read_single_predicate(g, DCTERMS.description)
-        metadata['created'] = read_single_predicate(g, DCTERMS.created)
-
+        metadata['about'] = location
+        metadata['description'] = read_predicate(g, DCTERMS.description)[0]
+        metadata['created'] = read_predicate(g, DCTERMS.created)[0]
+        metadata['modified'] = read_predicate(g, DCTERMS.created)
+        metadata['creators'] = read_creators(g)
 
         metadata_dict[location] = metadata
-
-    # parse the information from subgraph
-
-    # dcterms:created
-    # dcterms:modified
-    # dcterms:creator + vcard information
 
 
     pprint(metadata_dict)
