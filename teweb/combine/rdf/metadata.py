@@ -47,36 +47,44 @@ def read_metadata(archive_path):
         location = entry.getLocation()
         format = entry.getFormat()
 
-        # collect metadata files in archive
+        # read metadata from metadata files
         if format.endswith("omex-metadata"):
-            metadata_locations.append(location)
 
-            # temporary file which is parsed
-            content = omex.extractEntryToString(entry.getLocation())
-            # print(content)
-
+            # extract to temporary file
             suffix = location.split('/')[-1]
             tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
             omex.extractEntry(location, tmp.name)
 
-            # parse the content
-            print('-'*80)
-            print("PARSE METADATA:", location)
-            print('-' * 80)
-            metadata = parse_rdf(tmp.name)
-
+            g = parse_rdf(tmp.name)
             # close the tmp file
             tmp.close()
+
+    # TODO: merge the multiple metafiles
+
+
+    # parse the content
+    print('-' * 80)
+    print("PARSE METADATA:", location)
+    print('-' * 80)
+    metadata = parse_rdf(tmp.name)
+
+    # dcterms:description
+    # dcterms:created
+    # dcterms:modified
+    # dcterms:creator + vcard information
 
     omex.cleanUp()
     return metadata
 
 
 def write_metadata(metadata, file_path):
-    # TODO: implement
-    raise NotImplementedError
 
-    pass
+    # FIXME: remove Description for emtpy tags (modfied, created
+    # rdf: parseType = "Resource"
+    s = metadata.serialize(format='pretty-xml')
+    print("-" * 80)
+    print(s.decode("utf-8"))
+    print("-" * 80)
 
 
 def metadata_for_location(co_archive, location):
@@ -120,3 +128,4 @@ if __name__ == "__main__":
     omex_path = "../testdata/rdf/L1V3_vanderpol-sbml.omex"
     metadata = read_metadata(omex_path)
     pprint(metadata)
+    write_metadata(metadata)
