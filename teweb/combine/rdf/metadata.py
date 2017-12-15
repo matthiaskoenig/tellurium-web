@@ -122,7 +122,7 @@ def read_metadata(archive_path):
             for (s,p,o) in g.triples((obj, VCARD.hasEmail, None)):
                 info["email"] = str(o)
 
-            for (s,p,o) in g.triples((obj, VCARD.organization, None)):
+            for (s,p,o) in g.triples((obj, VCARD["organization-name"], None)):
                 info["organisation"] = str(o)
 
             for (s,p,o) in g.triples((obj, VCARD.hasName, None)):
