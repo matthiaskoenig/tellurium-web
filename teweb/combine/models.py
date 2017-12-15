@@ -38,6 +38,9 @@ class Date(models.Model):
     """
     date = models.DateTimeField()
 
+    def __str__(self):
+        return "<Date:{}>".format(self.date)
+
 
 class Creator(models.Model):
     """ RDF creator of archive entry. """
@@ -46,12 +49,18 @@ class Creator(models.Model):
     organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
     email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
 
+    def __str__(self):
+        return "<Creator:{} {}>".format(self.first_name, self.last_name)
+
 
 class Triple(models.Model):
     """ RDF triple store."""
     subject = models.TextField()
     predicate = models.TextField()
     object = models.TextField()
+
+    def __str__(self):
+        return "<Triple:({}, {}, {})>".format(self.subject, self.predicate, self.object)
 
 
 class MetaData(models.Model):
@@ -102,7 +111,7 @@ class Tag(models.Model):
                             editable=False)
 
     def __str__(self):
-        return self.name
+        return "<Tag:{}>".format(self.name)
 
     class Meta:
         unique_together = ('category', 'name')
@@ -131,7 +140,7 @@ class Archive(models.Model):
     objects = ArchiveManager()
 
     def __str__(self):
-        return self.name
+        return "<Archive:{}>".format(self.name)
 
     def save(self, *args, **kwargs):
         """ On save, update timestamps. """
