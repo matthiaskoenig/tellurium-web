@@ -13,8 +13,6 @@ try:
 except ImportError:
     import tecombine as libcombine
 
-from .rdf.metadata import metadata_for_location
-
 
 def get_omex_file_paths(archive_dirs):
     """ Returns list of given combine archive paths from given list of directories.
@@ -152,7 +150,7 @@ def zip_tree_content(path, entries=None):
 ################################################
 # COMBINE archive
 ################################################
-def entries_info(archive_path):
+def entries_dict(archive_path):
     """ Parse entry information from given COMBINE archive.
 
     This is the main entry function to retrieve information from COMBINE archives.
@@ -160,48 +158,38 @@ def entries_info(archive_path):
     :param archive_path:
     :return:
     """
-
     # read combine archive contents & metadata
     omex = libcombine.CombineArchive()
     if omex.initializeFromArchive(archive_path) is None:
         print("Invalid Combine Archive: {}", archive_path)
         return None
 
-    # metadata
-    metadata_locations = []
-
     # add entries
     entries_dict = {}
     for i in range(omex.getNumEntries()):
         entry = omex.getEntry(i)
         location = entry.getLocation()
+        # ensure all relative paths
+        if not location.startswith('.'):
+            location = "./{}".format(location)
+
         format = entry.getFormat()
 
         entries_dict[location] = {
             'location': location,
             'format': format,
             'master': entry.getMaster(),
-            'metadata': metadata_for_location(omex, location=location)
-
         }
-
-        # collect metadata files in archive
-        if format.endswith("omex-metadata"):
-            metadata_locations.append(location)
 
     # add root information
     entries_dict['.'] = {
         'location': '.',
         'format': 'http://identifiers.org/combine.specifications/omex',
         'master': False,
-        'metadata': metadata_for_location(omex, location=location)
     }
 
-    # TODO: implement
-    # parse metadata files & add the metadata for the locations
-
     omex.cleanUp()
-    return list(entries_dict.values())
+    return entries_dict
 
 
 def short_format(format):

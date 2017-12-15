@@ -18,6 +18,7 @@ except ImportError:
     import tecombine as libcombine
 
 from . import comex, validators
+from .rdf.metadata import read_metadata
 
 from combine.managers import ArchiveManager, ArchiveEntryManager, MetaDataManager, hash_for_file
 logger = logging.getLogger(__name__)
@@ -204,11 +205,18 @@ class Archive(models.Model):
         return entry
 
     def omex_entries(self):
-        """ Get entries and omex object from given archive.
+        """ Get entry information from manifest.
 
-        :return: entries in the combine archive (managed via manifest)
+        :return: dictionary {location: entry} for all entries in the manifest.xml
         """
-        return comex.entries_info(self.path)
+        return comex.entries_dict(self.path)
+
+    def omex_metadata(self):
+        """ Get metadata information from archive.
+
+        :return: dictionary {location: metadata}
+        """
+        return read_metadata(self.path)
 
     def zip_entries(self):
         pass
