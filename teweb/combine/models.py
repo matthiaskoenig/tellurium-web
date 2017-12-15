@@ -28,15 +28,13 @@ logger = logging.getLogger(__name__)
 MAX_TEXT_LENGTH = 500
 
 
-
 # ===============================================================================
 # Meta Data
 # ===============================================================================
-
-# This is all the content of the metadata files.
-
-
 class Date(models.Model):
+    """ Helper class for dates.
+    Used to manage the created and modified dates.
+    """
     date = models.DateTimeField()
 
 
@@ -48,22 +46,21 @@ class Creator(models.Model):
     email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
 
 
-
-
-########################################
-# RDF information
-########################################
-    # TODO: We want subset of biomodels triples (via model managers and known subset of BioModels predicates)
 class Triple(models.Model):
+    """ RDF triple store."""
     subject = models.TextField()
     predicate = models.TextField()
     object = models.TextField()
 
+
 class MetaData(models.Model):
     """ MetaData information.
 
-     From this information the metadata.rdf file for the archive can be generated.
-     The information consists of general VCard information and additional RDF.
+    Stores the RDF MetaData for a given object.
+    This consists of general information like descriptions, creators, created and modified dates
+    and additional set of triples for the object.
+
+    The information consists of general VCard information and additional RDF.
      """
     description = models.TextField(null=True, blank=True)
     creators = models.ManyToManyField(Creator)
@@ -73,16 +70,13 @@ class MetaData(models.Model):
 
     objects = MetaDataManager()
 
+
     class Meta:
         verbose_name_plural = "meta data"
 
-
-
-
 # ===============================================================================
-# Archives
+# COMBINE Archives
 # ===============================================================================
-
 class TagCategory(DjangoChoices):
     """ Categories for the tags. """
     format = ChoiceItem("format")
@@ -111,7 +105,6 @@ class Tag(models.Model):
 
     class Meta:
         unique_together = ('category', 'name')
-
 
 
 class Archive(models.Model):
@@ -217,6 +210,9 @@ class Archive(models.Model):
         """
         return comex.entries_info(self.path)
 
+    def zip_entries(self):
+        pass
+
     def tree_json(self):
         """ Gets the zip tree as JSON for the archive.
 
@@ -225,19 +221,16 @@ class Archive(models.Model):
         entries = self.entries.all()
         return comex.zip_tree_content(self.path, entries)
 
-
     def has_entries(self):
         """ Check if ArchiveEntries exist for archive. """
         return self.entries.count() > 0
 
 
-
 # TODO: store the actual file for the entry (use archive and location to store the file), use a FileField
 class ArchiveEntry(models.Model):
     """ Entry information.
-    This is the content of the manifest file.
+    This corresponds to the content of the manifest file.
     """
-
     archive = models.ForeignKey(Archive, on_delete=models.CASCADE, related_name="entries")
     location = models.CharField(max_length=MAX_TEXT_LENGTH)
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
@@ -253,14 +246,13 @@ class ArchiveEntry(models.Model):
         verbose_name_plural = "archive entries"
 
     @property
+    def name(self):
+        return os.path.splitext(self.location)[0]
+
+    @property
     def short_format(self):
         return comex.short_format(self.format)
 
     @property
     def base_format(self):
         return comex.base_format(self.format)
-
-    @property
-    def name(self):
-        return os.path.splitext(self.location)[0]
-
