@@ -759,23 +759,25 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class ZipTreeView(APIView):
-
-    queryset= Archive.objects.all()
+    queryset = Archive.objects.all()
     permission_classes = (IsOwnerOrGlobalOrAdminReadOnly,)
-    serializer_class = ArchiveSerializer
+
 
     def get(self, request,*args, **kwargs):
-        """
-        Return a archive_zip.
-        """
+       
         archive_id = kwargs.get('archive_id')
-        #self.queryset.get(pk=archive_id)
-        queryset = get_object_or_404(Archive, pk=archive_id)
-        parsed = queryset.tree_json()
+        archive = self.get_object(request)
+        parsed = archive.tree_json()
         parsed = json.loads(parsed)
         return Response(parsed)
 
-    def get_queryet(self):
-        return get_object_or_404(Archive, pk=self.kwargs.get('archive_id'))
+
+    def get_object(self,request):
+        archive = self.queryset.get(pk=self.kwargs.get('archive_id'))
+        self.user =archive.user
+        self.check_object_permissions(request,obj=archive)
+        return archive
+
+
 
 

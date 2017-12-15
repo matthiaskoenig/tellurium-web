@@ -92,6 +92,15 @@ class ViewAPILogedInSuperUser(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, 'L1V3_ikappab')
 
+        url_archive = reverse('combine:archive', kwargs={'archive_id': archive.id})
+        url_tree = url_archive + "zip_tree"
+
+        # permission for zip tree for global archive
+        response_tree = self.client.get(url_tree)
+        self.assertEquals(response_tree.status_code, 200)
+
+
+
     def test_delete_user(self):
         url = reverse('api:user-detail', kwargs={'pk': '2'})
         response = self.client.delete(url)
@@ -113,6 +122,13 @@ class ViewAPILogedInSuperUser(TestCase):
         self.client.logout()
         response = self.client.get(url)
         self.assertNotContains(response, name+"test")
+
+    def test_create_archive_entry(self):
+        """
+        Ensure we can create archive entry
+        :return:
+        """
+
 
     def test_list_tags(self):
         """
@@ -142,6 +158,9 @@ class ViewAPILogedInSuperUser(TestCase):
         self.assertEquals(response.status_code, 201)
         response = self.client.get(url)
         self.assertContains(response, 'test1')
+
+
+
 
 
 class ViewAPILoggedOut(TestCase):
@@ -279,13 +298,22 @@ class ViewAPILoggedIn(TestCase):
         response = self.client.post(url, archive_data)
         self.assertEquals(response.status_code, 201)
 
-        # get zip tree url of created archive
+        # get zip tree url of testuser and global archive
         archive_testuser = Archive.objects.get(user__username="testuser")
-        url_archive = reverse('combine:archive', kwargs={'archive_id':archive_testuser.id})
-        url_tree = url_archive + "zip_tree"
+        archive_global = Archive.objects.filter(user__username="global").first()
+
+        url_archive_testuser = reverse('combine:archive', kwargs={'archive_id':archive_testuser.id})
+        url_tree_testuser = url_archive_testuser + "zip_tree"
+
+        url_archive_global = reverse('combine:archive', kwargs={'archive_id': archive_global.id})
+        url_tree_global = url_archive_global + "zip_tree"
+
 
         # check if zip tree is accessable for the user who created
-        response_tree = self.client.get(url_tree)
+        response_tree = self.client.get(url_tree_testuser)
+        self.assertEquals(response_tree.status_code, 200)
+        #check if global archive zip accessable for user
+        response_tree = self.client.get(url_tree_global)
         self.assertEquals(response_tree.status_code, 200)
 
 
@@ -296,14 +324,18 @@ class ViewAPILoggedIn(TestCase):
             if archive["name"] == name+"test":
                 new_archive = archive
 
-        # should not be seen after logout
+        # should not be seen after logout testuser zip tree
         self.client.logout()
         response = self.client.get(url)
         self.assertNotContains(response, name+"test")
 
-        #no permission for zip tree
-        response_tree = self.client.get(url_tree)
+        #no permission for zip tree for logout of testuser
+        response_tree = self.client.get(url_tree_testuser)
         self.assertEquals(response_tree.status_code, 403)
+
+        #still permission for zip tree for global archive
+        response_tree = self.client.get(url_tree_global)
+        self.assertEquals(response_tree.status_code, 200)
 
         #no permission
         self.client.login(username='global', password=os.environ['DJANGO_ADMIN_PASSWORD'])
@@ -316,3 +348,5 @@ class ViewAPILoggedIn(TestCase):
         self.client.login(username='testuser', password=os.environ['DJANGO_ADMIN_PASSWORD'])
         response = self.client.delete(url_detail)
         self.assertEquals(response.status_code, 204)
+
+

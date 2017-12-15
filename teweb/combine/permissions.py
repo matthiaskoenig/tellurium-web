@@ -36,7 +36,7 @@ class IsAdminUserOrReadOnly(permissions.IsAdminUser):
             IsAdminUserOrReadOnly,
             self).has_permission(request, view)
         # Python3: is_admin = super().has_permission(request, view)
-        return request.method in permissions.SAFE_METHODS or is_admin
+        return request.method in permissions.SAFE_METHODS or request.user.is_staff
 
 
 class IsOwnerOrGlobalOrAdminReadOnly(permissions.IsAdminUser):
@@ -45,16 +45,17 @@ class IsOwnerOrGlobalOrAdminReadOnly(permissions.IsAdminUser):
 
     def has_object_permission(self, request, view, obj):
 
-        #return obj.user == request.user or obj.user.username == "global"
-        return False
+        return obj.user == request.user or obj.user.username == "global"
+        #return False
 
 
     def has_permission(self, request, view):
-        is_admin = super(
-            IsOwnerOrGlobalOrAdminReadOnly,
-            self).has_permission(request, view)
+        #is_admin = super(
+        #    IsOwnerOrGlobalOrAdminReadOnly,
+        #    self).has_permission(request, view)
         # Python3: is_admin = super().has_permission(request, view)
-        return request.method in permissions.SAFE_METHODS or is_admin
+        #return request.method in permissions.SAFE_METHODS
+        return True
 
 
 

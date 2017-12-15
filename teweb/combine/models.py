@@ -47,6 +47,9 @@ class Creator(models.Model):
     organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
     email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
 
+
+
+
 ########################################
 # RDF information
 ########################################
@@ -72,6 +75,9 @@ class MetaData(models.Model):
 
     class Meta:
         verbose_name_plural = "meta data"
+
+
+
 
 # ===============================================================================
 # Archives

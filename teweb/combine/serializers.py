@@ -20,14 +20,14 @@ class CreatorSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'organisation', 'email']
 
 
-class DateSerializer(serializers.ModelSerializer):
+class DateSerializer(serializers.SlugRelatedField, serializers.ModelSerializer):
 
     class Meta:
         model = Date
         fields = ['date']
 
 
-class TripleSerializer(serializers.ModelSerializer):
+class TripleSerializer( serializers.ModelSerializer):
 
     class Meta:
         model = Triple
@@ -36,8 +36,8 @@ class TripleSerializer(serializers.ModelSerializer):
 
 
 class MetaDataSerializer(serializers.HyperlinkedModelSerializer):
-    creators = CreatorSerializer(many=True)
-    modified = DateSerializer(many=True)
+    creators = CreatorSerializer(many=True, )
+    modified = DateSerializer(many=True, queryset=Date.objects.all(), slug_field="date")
 
 
     class Meta:
@@ -58,7 +58,7 @@ class ArchiveSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ArchiveEntrySerializer(serializers.HyperlinkedModelSerializer):
-    archive = serializers.HyperlinkedRelatedField(view_name='api:archive-detail', read_only=True, lookup_field='uuid')
+    archive = serializers.HyperlinkedRelatedField(view_name='api:archive-detail', queryset=Archive.objects.all(), lookup_field='uuid')
     metadata = MetaDataSerializer()
 
     class Meta:
