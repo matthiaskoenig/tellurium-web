@@ -9,7 +9,6 @@ from django.apps import apps
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-from combine import comex
 from .tags import create_tags_for_archive
 
 from six import string_types
