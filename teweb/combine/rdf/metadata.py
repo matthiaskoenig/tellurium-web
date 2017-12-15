@@ -29,6 +29,24 @@ except ImportError:
 
 from combine.rdf.parser import parse_rdf
 
+
+def transitive_subgraph(g, start, gloc=None):
+    """ Calculates recursively the transitive subgraph"""
+    if gloc == None:
+        gloc = Graph()
+
+    # Search next edges & add to graph
+    triples = list(g.triples((start, None, None)))
+    gloc += triples
+
+    # recursive adding of triples (starting now from object)
+    for (subj, pred, obj) in triples:
+        transitive_subgraph(g, start=obj, gloc=gloc)
+
+    print(gloc.serialize(format='turtle').decode("utf-8"))
+    return gloc
+
+
 def read_metadata(archive_path):
     """ Reads and parses all the metadata information from given COMBINE archive.
 
@@ -86,10 +104,9 @@ def read_metadata(archive_path):
         print("PARSE METADATA:", location)
         print('-' * 80)
 
-        gloc = Graph()
-        gloc += g.triples((URIRef(location), None, None))
-        print(gloc.serialize(format='turtle').decode("utf-8"))
+        transitive_subgraph(g, start=URIRef(location))
 
+        # parse the information from subgraph
         # dcterms:description
         # dcterms:created
         # dcterms:modified
