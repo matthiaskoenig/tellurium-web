@@ -13,8 +13,6 @@ try:
 except ImportError:
     import tecombine as libcombine
 
-from .rdf.metadata import metadata_for_location
-
 
 def get_omex_file_paths(archive_dirs):
     """ Returns list of given combine archive paths from given list of directories.
@@ -177,7 +175,6 @@ def entries_dict(archive_path):
             'location': location,
             'format': format,
             'master': entry.getMaster(),
-            'metadata': metadata_for_location(omex, location=location)
         }
 
     # add root information
@@ -185,7 +182,6 @@ def entries_dict(archive_path):
         'location': '.',
         'format': 'http://identifiers.org/combine.specifications/omex',
         'master': False,
-        'metadata': metadata_for_location(omex, location=location)
     }
 
     omex.cleanUp()

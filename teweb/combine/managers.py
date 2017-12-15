@@ -95,6 +95,9 @@ class ArchiveManager(models.Manager):
                 tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
                 archive.tags.add(tag)
 
+            # metadata parsed from archive (lookup via locations)
+            omex_metadata = archive.omex_metadata()
+
             # create entries for files listed in the OMEX manifest.xml
             for location, entry in archive.omex_entries().items():
                 entry_dict = {
@@ -104,10 +107,11 @@ class ArchiveManager(models.Manager):
                 archive_entry, _ = ArchiveEntry.objects.get_or_create(**entry_dict)
 
                 # create single metadata for every entry
-                if "metadata" in entry and isinstance(entry["metadata"], dict):
+                meta_dict = omex_metadata.get(location)
+                if meta_dict:
 
                     metadata_dict = {
-                        "metadata": entry["metadata"],
+                        "metadata": meta_dict,
                     }
                     metadata, _ = MetaData.objects.create(**metadata_dict)
                     archive_entry.metadata = metadata
@@ -152,19 +156,19 @@ class MetaDataManager(models.Manager):
             # fields required to generate ArchiveEntryMeta
             del kwargs["metadata"]
             if "description" in metadata:
-                kwargs["description"] = metadata["description"]
-            kwargs["created"] = metadata["created"]
+                kwargs["description"] = metadata.get("description")
+            kwargs["created"] = metadata.get("created")
 
             # create initial meta entry
             entry_meta, created_meta = super(MetaDataManager, self).get_or_create(*args, **kwargs)
 
             # add creator information
-            for creator_info in metadata["creators"]:
+            for creator_info in metadata.get("creators", []):
                 creator_dict = {
-                    "first_name": creator_info["givenName"],
-                    "last_name": creator_info["familyName"],
-                    "organisation": creator_info["organisation"],
-                    "email": creator_info["email"]
+                    "first_name": creator_info.get("givenName"),
+                    "last_name": creator_info.get("familyName"),
+                    "organisation": creator_info.get("organisation"),
+                    "email": creator_info.get("email"),
                 }
                 creator, _ = Creator.objects.get_or_create(**creator_dict)
                 entry_meta.creators.add(creator)
@@ -172,7 +176,7 @@ class MetaDataManager(models.Manager):
             entry_meta.save()
 
             # add modified stamps
-            for modified_date in metadata["modified"]:
+            for modified_date in metadata.get("modified", []):
                 modified, _ = Date.objects.get_or_create(date=modified_date)
                 entry_meta.modified.add(modified)
                 modified.save()

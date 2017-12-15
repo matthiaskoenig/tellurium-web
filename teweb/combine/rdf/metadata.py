@@ -36,6 +36,7 @@ BQMODEL = Namespace('http://biomodels.net/model-qualifiers/')
 
 ##############################################################
 
+'''
 def metadata_for_location(co_archive, location):
     """ Returns the metadata for given location.
 
@@ -70,7 +71,7 @@ def metadata_for_location(co_archive, location):
              }
         )
     return info
-
+'''
 
 def read_metadata(archive_path):
     """ Reads and parses all the metadata information from given COMBINE archive.
@@ -191,28 +192,33 @@ def read_rdf_graphs(archive_path):
             tmp.close()
             graphs.append(g)
 
-    # Merge the graphs from multiple files
-    # FIXME: this is poor mans merging which can result in blank node collisions !
-    # see: https://rdflib.readthedocs.io/en/stable/merging.html
-    g = graphs[0]
-    for k, g_next in enumerate(graphs):
-        if k > 0:
-            g += g_next
-
-    # print(g.serialize(format='turtle').decode("utf-8"))
-
-    # Split the graphs for the different locations, i.e.,
-    # single graphs for the various resources
+    # graph lookup via locations
     graph_dict = {}
-    for location in locations:
-        print('-' * 80)
-        print("PARSE METADATA:", location)
-        print('-' * 80)
 
-        gloc = transitive_subgraph(g, start=URIRef(location))
-        bind_default_namespaces(gloc)
-        graph_dict[location] = gloc
-        print(gloc.serialize(format='turtle').decode("utf-8"))
+    if len(graphs) > 0:
+        # Merge the graphs from multiple files
+        # FIXME: this is poor mans merging which can result in blank node collisions !
+        # see: https://rdflib.readthedocs.io/en/stable/merging.html
+
+        g = graphs[0]
+        for k, g_next in enumerate(graphs):
+            if k > 0:
+                g += g_next
+
+        # print(g.serialize(format='turtle').decode("utf-8"))
+
+        # Split the graphs for the different locations, i.e.,
+        # single graphs for the various resources
+
+        for location in locations:
+            print('-' * 80)
+            print("PARSE METADATA:", location)
+            print('-' * 80)
+
+            gloc = transitive_subgraph(g, start=URIRef(location))
+            bind_default_namespaces(gloc)
+            graph_dict[location] = gloc
+            print(gloc.serialize(format='turtle').decode("utf-8"))
 
     omex.cleanUp()
     return graph_dict
