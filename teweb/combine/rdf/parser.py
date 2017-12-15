@@ -61,20 +61,24 @@ def fix_path_prefix(el, prefix):
     return el
 
 
-def parse_rdf(path):
+def parse_rdf(path, debug=False):
     """ Parses the rdf in graph. """
-    print("-" * 80)
+
     # file prefix to replace for relative paths
     prefix = "file://{}/".format(os.path.abspath(os.path.dirname(path)))
-    print("File prefix:", prefix)
 
     # parse RDF graph
     g = rdflib.Graph()
     format = guess_format(path)
-    print("Format:", format)
     g.parse(path, format=format)
-    print("Statements: %s" % len(g))
-    print("-" * 80)
+
+    if debug:
+        print("-" * 80)
+        print("File prefix:", prefix)
+        print("Format:", format)
+        print("Statements: %s" % len(g))
+        print("-" * 80)
+
 
     def fix_email(obj):
         """ Fixing wrong parsing of emails. """
@@ -100,8 +104,8 @@ def parse_rdf(path):
 
         # add fixed triples
         g2.add((subj, pred, obj))
-        print((subj, pred, obj))
-
+        if debug:
+            print((subj, pred, obj))
 
     # Serializing the graph
     if False:

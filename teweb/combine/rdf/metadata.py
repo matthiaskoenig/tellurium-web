@@ -36,43 +36,6 @@ BQMODEL = Namespace('http://biomodels.net/model-qualifiers/')
 
 ##############################################################
 
-'''
-def metadata_for_location(co_archive, location):
-    """ Returns the metadata for given location.
-
-        :param co_archive:
-        :param location:
-        :return:
-        """
-
-    desc = co_archive.getMetadataForLocation(location)  # type: libcombine.OmexDescription
-    if desc.isEmpty():
-        return None
-
-    info = dict()  # type: dict
-    info['about'] = desc.getAbout()
-    info['description'] = desc.getDescription()
-    info['created'] = desc.getCreated().getDateAsString()
-    info['creators'] = []
-    info['modified'] = []
-
-    for i in range(desc.getNumModified()):
-        modified = desc.getModified(i).getDateAsString()
-        info['modified'].append(modified)
-
-    for i in range(desc.getNumCreators()):
-        vcard = desc.getCreator(i)  # type: libcombine.VCard
-        info['creators'].append(
-            {
-                'givenName': vcard.getGivenName(),
-                'familyName': vcard.getFamilyName(),
-                'email': vcard.getEmail(),
-                'organisation': vcard.getOrganization()
-             }
-        )
-    return info
-'''
-
 def read_metadata(archive_path):
     """ Reads and parses all the metadata information from given COMBINE archive.
 
@@ -155,8 +118,7 @@ def read_metadata(archive_path):
 
         metadata_dict[location] = metadata
 
-
-    pprint(metadata_dict)
+    # pprint(metadata_dict)
     return metadata_dict
 
 
@@ -218,14 +180,15 @@ def read_rdf_graphs(archive_path):
         # single graphs for the various resources
 
         for location in locations:
-            print('-' * 80)
-            print("PARSE METADATA:", location)
-            print('-' * 80)
-
             gloc = transitive_subgraph(g, start=URIRef(location))
             bind_default_namespaces(gloc)
             graph_dict[location] = gloc
-            print(gloc.serialize(format='turtle').decode("utf-8"))
+
+            if False:
+                print('-' * 80)
+                print("PARSE METADATA:", location)
+                print('-' * 80)
+                print(gloc.serialize(format='turtle').decode("utf-8"))
 
     omex.cleanUp()
     return graph_dict
@@ -251,7 +214,6 @@ def transitive_subgraph(g, start, gloc=None):
         transitive_subgraph(g, start=obj, gloc=gloc)
 
     return gloc
-
 
 
 def write_metadata(metadata, file_path):
