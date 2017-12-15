@@ -1,22 +1,24 @@
+"""
+Functions for reading and writing metadata to COMBINE archives.
+
+A COMBINE archive can include multiple metadata elements adding information about different content files. To
+identify the file a metadata element refers to, the rdf:about attribute of the relevant metadata structure should
+use the same value as used in the location attribute of the respective Content element
+
+1. Read all RDF triple serializations from the combine archive (could also be turtle, or other formats)
+  <content location="metadata.rdf" format="http://identifiers.org/combine.specifications/omex-metadata"/>
+  <content location="metadata.ttl" format="http://identifiers.org/combine.specifications/omex-metadata"/>
+
+As part of reading the metadata, all metadata files in the archive are
+parsed in an internal representation.
+
+As part of the writing the internal metadata information is serialized to a file.
+"""
 
 try:
     import libcombine
 except ImportError:
     import tecombine as libcombine
-
-
-
-# TODO: necessary to parse all the metadata information from the COMBINE archive
-# i.e. opening all the metadata files and parse all the information
-#
-# - metadata*.rdf
-# A COMBINE archive can include multiple metadata elements adding information about different content files. To
-# identify the file a metadata element refers to, the rdf:about attribute of the relevant metadata structure should
-# use the same value as used in the location attribute of the respective Content element
-#
-# 1. Read all RDF triple serializations from the combine archive (could also be turtle, or other formats)
-#   <content location="metadata.rdf" format="http://identifiers.org/combine.specifications/omex-metadata"/>
-#   <content location="metadata.ttl" format="http://identifiers.org/combine.specifications/omex-metadata"/>
 
 
 def parse_metadata(metadata_locations):
@@ -58,3 +60,8 @@ def metadata_for_location(co_archive, location):
              }
         )
     return info
+
+
+if __name__ == "__main__":
+    # TODO: implement
+    parse_metadata()

@@ -96,7 +96,7 @@ class ArchiveManager(models.Manager):
                 archive.tags.add(tag)
 
             # create entries for files listed in the OMEX manifest.xml
-            for entry in archive.omex_entries():
+            for location, entry in archive.omex_entries().items():
                 entry_dict = {
                     "entry": entry,
                     "archive": archive,

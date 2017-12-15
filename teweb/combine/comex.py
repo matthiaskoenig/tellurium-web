@@ -152,7 +152,7 @@ def zip_tree_content(path, entries=None):
 ################################################
 # COMBINE archive
 ################################################
-def entries_info(archive_path):
+def entries_dict(archive_path):
     """ Parse entry information from given COMBINE archive.
 
     This is the main entry function to retrieve information from COMBINE archives.
@@ -160,7 +160,6 @@ def entries_info(archive_path):
     :param archive_path:
     :return:
     """
-
     # read combine archive contents & metadata
     omex = libcombine.CombineArchive()
     if omex.initializeFromArchive(archive_path) is None:
@@ -196,11 +195,8 @@ def entries_info(archive_path):
         'metadata': metadata_for_location(omex, location=location)
     }
 
-    # TODO: implement
-    # parse metadata files & add the metadata for the locations
-
     omex.cleanUp()
-    return list(entries_dict.values())
+    return entries_dict
 
 
 def short_format(format):

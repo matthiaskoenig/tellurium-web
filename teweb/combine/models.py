@@ -204,11 +204,11 @@ class Archive(models.Model):
         return entry
 
     def omex_entries(self):
-        """ Get entries and omex object from given archive.
+        """ Get entry information from manifest.
 
-        :return: entries in the combine archive (managed via manifest)
+        :return: dictionary {location: entry} for all entries in the manifest.xml
         """
-        return comex.entries_info(self.path)
+        return comex.entries_dict(self.path)
 
     def zip_entries(self):
         pass
