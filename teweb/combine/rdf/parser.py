@@ -14,72 +14,91 @@ import os
 from rdflib.util import guess_format
 from pprint import pprint
 
-from rdflib import Graph
+from rdflib import Graph  # rdf graph
+from rdflib import URIRef, BNode, Literal  # node types
 
-# namespaces
-from rdflib.namespace import FOAF, DCTERMS
 from rdflib.namespace import Namespace
+VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
+DCTERMS = Namespace('http://purl.org/dc/terms/')
+BQMODEL = Namespace('http://biomodels.net/model-qualifiers/')
 
-NS = Namespace('http://www.w3.org/2006/vcard/ns#')
 
-# different node types
-from rdflib import URIRef, BNode, Literal
+def bind_default_namespaces(g):
+    """ Bind the namespace prefixes in graph
+
+    :param g:
+    :return:
+    """
+    g.bind(prefix="vCard", namespace=URIRef("http://www.w3.org/2006/vcard/ns#"))
+    g.bind(prefix="dcterms", namespace=URIRef("http://purl.org/dc/terms/"))
+    g.bind(prefix="bqmodel", namespace=URIRef("http://biomodels.net/model-qualifiers/"))
+
+
+def fix_path_prefix(el, prefix):
+    """ Fix prefix via replacement to get relative paths in triples. """
+    el_str = str(el)
+
+    # fix relative paths
+    if el_str.startswith(prefix):
+
+        # print("replacing prefix:", prefix)
+        el_str = el_str.replace(prefix, './')
+        if el_str == "./":
+            el_str = "."
+        # create correct node type
+        if isinstance(el, BNode):
+            el = BNode(el_str)
+        elif isinstance(el, URIRef):
+            el = URIRef(el_str)
+        elif isinstance(el, Literal):
+            el = Literal(el_str)
+
+    return el
 
 
 def parse_rdf(path):
-    """ Parses the rdf in graph"""
+    """ Parses the rdf in graph. """
+    # file prefix to replace for relative paths
+    prefix = "file://{}/".format(os.path.abspath(os.path.dirname(path)))
+    print("File prefix:", prefix)
+
+    # parse RDF graph
     g = rdflib.Graph()
     format = guess_format(path)
     print("Format:", format)
-
-    # get prefix to fix the relative files
-    prefix = "file://{}".format(os.path.abspath(os.path.dirname(path)))
-    print("PREFIX:", prefix)
-
-    result = g.parse(path, format=format)
-
+    g.parse(path, format=format)
     print("graph has %s statements." % len(g))
 
+    def fix_email(obj):
+        """ Fixing wrong parsing of emails. """
+        # remove email prefix
+        obj_str = str(obj).replace(prefix, '')
+        # fix node type
+        return Literal(obj_str)
 
-    def fix_prefix(el):
-        el_str = str(el)
-
-        # fix relative paths
-        if el_str.startswith(prefix):
-            # print("replacing prefix:", prefix)
-            el_str = el_str.replace(prefix, '.')
-            if el_str == "./":
-                el_str = "."
-            if isinstance(el, BNode):
-                el = BNode(el_str)
-            elif isinstance(el, URIRef):
-                el = URIRef(el_str)
-            elif isinstance(el, Literal):
-                el = Literal(el_str)
-            print(el)
-
-        return el
-
+    # new graph with fixed information
     g2 = Graph()
+    bind_default_namespaces(g2)
 
     for subj, pred, obj in g:
         print((subj, pred, obj))
 
-        # TODO: fix the emails
+        # fixing emails
+        if pred == VCARD.hasEmail:
+            obj = fix_email(obj)
 
-        # Fix the prefixes
-        subj = fix_prefix(subj)
-        pred = fix_prefix(pred)
-        obj = fix_prefix(obj)
+        # fix prefixes
+        subj = fix_path_prefix(subj, prefix)
+        pred = fix_path_prefix(pred, prefix)
+        obj = fix_path_prefix(obj, prefix)
 
-        # add triple
+        # add fixed triples
         g2.add((subj, pred, obj))
         print((subj, pred, obj))
         print('-' * 80)
 
         # if subj_str.startswith(prefix):
         #   print("PREFIX found")
-
 
         # set values
         # g.set((subj, pred, Literal(43)))
@@ -90,16 +109,18 @@ def parse_rdf(path):
 
         # 'http://www.w3.org/2006/vcard/ns#hasEmail'
 
-
-
     # s = g.serialize(format='n3')
     s = g.serialize(format='pretty-xml')
     # print(s.decode("utf-8"))
 
+    # TODO: set rdf:parseType="Resource" on vCard:n, vCard:org, dcterms:created, dcterms:modified
+
     s2 = g2.serialize(format='pretty-xml')
     print(s2.decode("utf-8"))
 
-    return g
+
+
+    return g2
 
 
 
