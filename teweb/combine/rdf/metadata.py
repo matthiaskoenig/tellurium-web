@@ -122,7 +122,7 @@ def read_metadata(archive_path):
     return metadata_dict
 
 
-def read_rdf_graphs(archive_path):
+def read_rdf_graphs(archive_path, debug=False):
     """ Reads all the RDF subgraphs for the locations in the COMBINE archive.
 
     :param archive_path:
@@ -141,22 +141,29 @@ def read_rdf_graphs(archive_path):
     locations = []
     for i in range(omex.getNumEntries()):
         entry = omex.getEntry(i)
+
+        # normalize the location of the entries
         location = entry.getLocation()
-        if len(locations) > 0:
-            locations.append("./{}".format(location))
-        else:
-            locations.append(".")
+        print(location)
+        if (len(location) > 1) and (not location.startswith(".")):
+            location = "./{}".format(location)
+
+        if len(location) == 0:
+            location = "."
+
+        locations.append(location)
         format = entry.getFormat()
 
         # read metadata from metadata files
         if format.endswith("omex-metadata"):
+            print(location, entry.getLocation())
 
             # extract to temporary file
             suffix = location.split('/')[-1]
             tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
-            omex.extractEntry(location, tmp.name)
+            omex.extractEntry(entry.getLocation(), tmp.name)
 
-            g = parse_rdf(tmp.name)
+            g = parse_rdf(tmp.name, debug=True)
             # close the tmp file
             tmp.close()
             graphs.append(g)
@@ -184,11 +191,13 @@ def read_rdf_graphs(archive_path):
             bind_default_namespaces(gloc)
             graph_dict[location] = gloc
 
-            if False:
+            if debug:
                 print('-' * 80)
                 print("PARSE METADATA:", location)
                 print('-' * 80)
                 print(gloc.serialize(format='turtle').decode("utf-8"))
+    else:
+        print("No graphs parsed.")
 
     omex.cleanUp()
     return graph_dict
@@ -229,7 +238,12 @@ def write_metadata(metadata, file_path):
 ########################################################################
 if __name__ == "__main__":
 
-    omex_path = "../testdata/rdf/L1V3_vanderpol-sbml.omex"
-    metadata = read_metadata(omex_path)
-    # pprint(metadata)
+    metadata = read_metadata("../testdata/rdf/L1V3_vanderpol-sbml.omex")
+    pprint(metadata)
+
+    print("-" * 80)
+
+    metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
+    pprint(metadata)
+
     # write_metadata(metadata, file_path=None)
