@@ -169,6 +169,10 @@ def entries_dict(archive_path):
     for i in range(omex.getNumEntries()):
         entry = omex.getEntry(i)
         location = entry.getLocation()
+        # ensure all relative paths
+        if not location.startswith('.'):
+            location = "./{}".format(location)
+
         format = entry.getFormat()
 
         entries_dict[location] = {

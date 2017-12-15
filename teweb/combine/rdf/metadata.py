@@ -134,6 +134,12 @@ def read_metadata(archive_path):
 
         return creators
 
+    def read_triples(g):
+        triples = []
+        for (s,p,o) in g.triples((None, None, None)):
+            triples.append((str(s), str(p), str(o)))
+
+        return triples
 
     metadata_dict = {}
     graph_dict = read_rdf_graphs(archive_path=archive_path)
@@ -145,6 +151,7 @@ def read_metadata(archive_path):
         metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created)[0]
         metadata['modified'] = read_predicate(g, location, DCTERMS.created)
         metadata['creators'] = read_creators(g, location)
+        metadata['triples'] = read_triples(g)
 
         metadata_dict[location] = metadata
 
