@@ -76,8 +76,8 @@
         <span class="label label-primary" title="ZIP Content">zip content</span>
         <div class="row">
             <!-- The zip tree -->
-            <div class="col-sm-6"id="json_tree">
-            </div>
+            <div class="col-sm-6" id="json_tree"></div>
+
             <!-- the entry detail -->
             <div class="col-sm-6" id="entry_detail">
                 <form id="form_detail" method="post">
@@ -86,40 +86,42 @@
                     <div id="manifest_detail">
                     </div>
                     <div id="item_detail"></div>
-
                 </form>
-
-
-
             </div>
-
+            
         </div>
 
+        <!-- idea dump
+        <div id="include"><iframe name="FileFrame" scrolling="yes" width="600" height="600"></iframe></div>
+        <script type="text/javascript">
+            $("#link").click(function(){
+                frames['FileFrame'].location.href="https://www.test.de"
+            });
+        </script>
+        -->
 
 
         <script>
 
             var endpoint = './zip_tree';
-        $.ajax({
-            method: "GET",
-            url: endpoint,
-            success: function (data) {
-                $('#json_tree').jstree({
-                    'core': {
-                        'multiple': false,
-                        'data': data
-                    }
-                });
-            },
-            error: function (error_data) {
-                console.log("error");
-                console.log(error_data);
+            $.ajax({
+                method: "GET",
+                url: endpoint,
+                success: function (data) {
+                    $('#json_tree').jstree({
+                        'core': {
+                            'multiple': false,
+                            'data': data
+                        }
+                    });
+                },
+                error: function (error_data) {
+                    console.log("error");
+                    console.log(error_data);
 
-            }
-        })
-        </script>
+                }
+            })
 
-        <script>
             $('#json_tree')
               // listen for event in json tree
               .on('changed.jstree', function (e, data) {
@@ -136,13 +138,9 @@
                 //display_entry_detail(pk);
                 //selected = $('#json_tree').jstree('select_node',location);
                 //var instance = $('#json_tree').jstree(true);
-
                 })
 
-
                 //console.log(instance.select_node(get_name(location)));
-
-
         </script>
 
         <script>
@@ -158,8 +156,6 @@
                          entry_title(data,edit);
                         $("#manifest_detail").empty();
                          add_manfifest_detail(data,edit);
-
-
 
                          if(data.metadata !== 'undefined'){
                             $("#item_detail").empty();
@@ -190,11 +186,8 @@
 
         <script>
             function entry_title(data){
-
                 var title_entry = document.getElementById("title_entry");
                 title_entry.innerHTML = get_title(data.location);
-
-
 
                 if (data.master){
                     title_entry.appendChild(get_master_icon(data.master));
@@ -202,7 +195,6 @@
                 format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
                 if (typeof base_format(data.format) !== 'undefined' && format_list.indexOf(base_format(data.format))>=0){
                      title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
-
                 }
             }
 
@@ -216,15 +208,14 @@
             }
 
             function get_title(location){
-                var splited_fn= location.split("/");
-                return " "+splited_fn[splited_fn.length-1];
-
+                var splited_fn = location.split("/");
+                return " " + splited_fn[splited_fn.length-1];
             }
 
             function get_master_icon(master){
                 var master_icon = document.createElement("i");
-                master_icon.setAttribute("class","fa fa-star fa-fw");
-                master_icon.setAttribute("title","master");
+                master_icon.setAttribute("class", "fa fa-star fa-fw");
+                master_icon.setAttribute("title", "master");
                 return master_icon
             }
 
@@ -248,8 +239,6 @@
                 format_div.appendChild(format_code);
 
                 return format_div
-
-
             }
 
              function base_format(format){
@@ -272,18 +261,10 @@
                  checkbox.checked= master;
                  checkbox.disabled = !edit;
 
-
-
-
-
                  checkbox_div.appendChild(checkbox_label);
                  checkbox_div.appendChild(checkbox);
 
-
-
                  return checkbox_div
-
-
              }
 
              function add_location(location){
@@ -295,23 +276,14 @@
                  dl.appendChild(dt);
                  dl.appendChild(dd);
                  return dl
-            }
-
+             }
 
              function add_manfifest_detail(data,edit){
                  var detail_manifest = document.getElementById("manifest_detail");
                  detail_manifest.appendChild(get_format_code(data));
                  detail_manifest.appendChild(add_master_checkbox(data.master,edit));
                  detail_manifest.appendChild(add_location(data.location));
-
-
-
-
              }
-
-
-
-
         </script>
 
         <script>
@@ -362,44 +334,39 @@
                 function addContact(creators,creator,edit){
                  if (edit==true){
 
-                     var idInuput=document.createElement("input");
+                     var idInuput = document.createElement("input");
                      idInuput.setAttribute("value",creators[creator]["id"]);
                      idInuput.setAttribute("type", "hidden");
                      idInuput.setAttribute("name", "creators["+creator+"][id]");
                      document.getElementById("item_detail").appendChild(idInuput);
 
 
-
-
-
-                     var givenNameInput=document.createElement("input");
+                     var givenNameInput = document.createElement("input");
                      givenNameInput.setAttribute("value",creators[creator]["first_name"]);
                      givenNameInput.setAttribute("placeholder", "First Name");
                      givenNameInput.setAttribute("name", "creators["+creator+"][first_name]");
 
 
-
                      var givenName = givenNameInput.outerHTML;
 
-                     var familyNameInput=document.createElement("input");
+                     var familyNameInput = document.createElement("input");
                      familyNameInput.setAttribute("value",creators[creator]["last_name"]);
                      familyNameInput.setAttribute("placeholder","Family Name");
                      familyNameInput.setAttribute("name", "creators["+creator+"][last_name]");
 
                      var familyName = familyNameInput.outerHTML;
 
-                     var organisationInput=document.createElement("input");
+                     var organisationInput = document.createElement("input");
                      organisationInput.setAttribute("value",creators[creator]["organisation"]);
                      organisationInput.setAttribute("placeholder","Organisation");
                      organisationInput.setAttribute("name", "creators["+creator+"][organisation]");
 
                      var organisation = organisationInput.outerHTML;
 
-                     var emailInput=document.createElement("input");
+                     var emailInput = document.createElement("input");
                      emailInput.setAttribute("value",creators[creator]["email"]);
                      emailInput.setAttribute("placeholder","Email");
                      emailInput.setAttribute("name", "creators["+creator+"][email]");
-
 
                      var email = emailInput.outerHTML;
                  }
@@ -412,8 +379,6 @@
 
                  var contact_content = '<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>";
                  $("#item_detail").append(contact_content);
-
-
              }
 
              function add_description (metadata,edit){
