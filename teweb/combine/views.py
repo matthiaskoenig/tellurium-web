@@ -27,7 +27,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-
+from combine import comex
 
 
 from .tasks import execute_omex
@@ -489,10 +489,15 @@ def results(request, archive_id):
     outputs = []
 
     dgs_json = task.result["dgs"]
-    for sedml_location, dgs_dict in dgs_json.items():
+    for sedml_path, dgs_dict in dgs_json.items():
+        sedml_location = comex._normalize_location(sedml_path)
 
-        sedml_str = archive.entry_content_by_location(sedml_location)
-        sed_doc = libsedml.readSedMLFromString(sedml_str)
+        print("SEDML location:", sedml_location)
+        archive_entries = ArchiveEntry.objects.filter(archive=archive.pk, location=sedml_location)
+        print(archive_entries)
+        # sedml_str = archive.entry_content_by_location(sedml_location)
+        # sed_doc = libsedml.readSedMLFromString(sedml_str)
+        sed_doc = libsedml.readSedMLFromFile(archive_entries[0].path)
 
         # Store html and JSON to render results
         reports = []

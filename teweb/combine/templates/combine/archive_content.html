@@ -36,6 +36,8 @@
                     <th>icon</th>
                     <th>format</th>
                     <th>location</th>
+                    <th class="hidden">name</th>
+
                 </tr>
                 </thead>
                 {% for entry in archive.entries.all()  %}
@@ -55,13 +57,14 @@
                             <code title="{{ entry.format }}">{{ entry.short_format }}</code>
                         </td>
                         <td class="location">
-                            {% if entry.location in ['.', './manifest.xml'] %}
-                                {{ entry.location }}
+                            {% if entry.location in ['.'] %}
+                                {{ entry.location}}
                             {% else %}
-                                <a href="{{ url('combine:archive_entry', args=[archive.id, loop.index0]) }}"
+                                <a href="{{ entry.file.url }}"
                                    target="_blank">{{ entry.location }}</a>
                             {% endif %}
                         </td>
+                        <td class="hidden" id="name"> {{entry.name}}</td>
 
                     </tr>
                 {% endfor %}
@@ -70,35 +73,33 @@
             <p>No entries in archive metadata.</p>
         {% endif %}
 
-
-
-
-
-
-
-
-
-        <span class="label label-primary" title="ZIP Content">{{ archive.name }}</span>
-
+        <span class="label label-primary" title="ZIP Content">zip content</span>
         <div class="row">
-            <div class="col-sm-6"id="json_tree"></div>
-            <div class="col-sm-6">
+            <!-- The zip tree -->
+            <div class="col-sm-6"id="json_tree">
+            </div>
+            <!-- the entry detail -->
+            <div class="col-sm-6" id="entry_detail">
                 <form id="form_detail" method="post">
                     <div id="button-div"></div>
-                    <div id="title_div">
-                        <h3 id="title"></h3>
+                    <h3 id="title_entry"></h3>
+                    <div id="manifest_detail">
                     </div>
-                        <div id="item_detail"></div>
+                    <div id="item_detail"></div>
+
                 </form>
+
+
 
             </div>
 
         </div>
 
 
-        <script>
-            var endpoint = './zip_tree';
 
+        <script>
+
+            var endpoint = './zip_tree';
         $.ajax({
             method: "GET",
             url: endpoint,
@@ -119,25 +120,215 @@
         </script>
 
         <script>
+            $('#json_tree')
+              // listen for event in json tree
+              .on('changed.jstree', function (e, data) {
+                  // get selected node
+                   selected = $('#json_tree').jstree(true).get_selected(true);
+                   var entry_pk = selected[0].original.pk;
+                   display_entry_detail(entry_pk);
+                });
+
             $("tr#archive_content").click(function(e){     //function_td
                 var $row = $(this).closest("tr");    // Find the row
-                var $text = $row.find(".location").text(); // Find the text
-                // Let's test it out
-                display_entry_detail($text);
+                var location = $row.find(".location").text(); // Find the text
+
+                //display_entry_detail(pk);
+                //selected = $('#json_tree').jstree('select_node',location);
+                //var instance = $('#json_tree').jstree(true);
+
+                })
+
+
+                //console.log(instance.select_node(get_name(location)));
+
+
+        </script>
+
+        <script>
+            function display_entry_detail(entry_pk, edit=false){
+
+                var endpoint_path = "/api/archive-entries/" + entry_pk+"/";
+                var endpoint = window.location.origin+endpoint_path;
+                $.ajax({
+                    url: endpoint,
+                    type:'Get',
+                    success: function (data) {
+                         add_button("edit");
+                         entry_title(data,edit);
+                        $("#manifest_detail").empty();
+                         add_manfifest_detail(data,edit);
+
+
+
+                         if(data.metadata !== 'undefined'){
+                            $("#item_detail").empty();
+                            var meta = data.metadata;
+                            add_description(meta,edit);
+                            for (var creator in meta.creators){
+                                addContact(meta.creators,creator,edit);
+                            }
+                        }
+                    },
+                    error: function (error_data) {
+                        console.log("error");
+                        console.log(error_data);
+                    }
+                })
+            }
+        </script>
+
+        <script>
+            $(document).on('click','#editButton',function(){
+                selected = $('#json_tree').jstree(true).get_selected(true);
+                var entry_pk = selected[0].original.pk;
+                display_entry_detail(entry_pk, edit=true);
+                hidden_input_archive_entry_pk(entry_pk);
+
             });
         </script>
 
         <script>
-             $('#json_tree')
-              // listen for event
-              .on('changed.jstree', function (e, data) {
-                   var  entry = data.selected[0];
-                  $("#button-div").empty();
-                   display_entry_detail(entry);
-                });
+            function entry_title(data){
+
+                var title_entry = document.getElementById("title_entry");
+                title_entry.innerHTML = get_title(data.location);
 
 
-             function add_button(name){
+
+                if (data.master){
+                    title_entry.appendChild(get_master_icon(data.master));
+                }
+                format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
+                if (typeof base_format(data.format) !== 'undefined' && format_list.indexOf(base_format(data.format))>=0){
+                     title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
+
+                }
+            }
+
+            function hidden_input_archive_entry_pk(pk){
+                 var archiveInput=document.createElement("input");
+                     archiveInput.setAttribute("value",pk);
+                     archiveInput.setAttribute("type", "hidden");
+                     archiveInput.setAttribute("name", "id");
+                 var form = document.getElementById("form_detail");
+                 form.appendChild(archiveInput);
+            }
+
+            function get_title(location){
+                var splited_fn= location.split("/");
+                return " "+splited_fn[splited_fn.length-1];
+
+            }
+
+            function get_master_icon(master){
+                var master_icon = document.createElement("i");
+                master_icon.setAttribute("class","fa fa-star fa-fw");
+                master_icon.setAttribute("title","master");
+                return master_icon
+            }
+
+            function get_format_icon(data){
+                var src="{{static('combine/images/mediatype/')}}"+base_format(data.format)+".png";
+                var format_icon = document.createElement("img");
+                format_icon.setAttribute("src", src);
+                format_icon.setAttribute("height",20);
+                format_icon.setAttribute("title",data.format);
+                return format_icon
+            }
+
+            function get_format_code(data){
+                var format_div = document.createElement("div");
+                var format_code = document.createElement("code");
+                format_code.setAttribute("title",data.format);
+                var format_label = document.createElement("label");
+                format_label.innerHTML = "Format";
+                format_code.innerHTML = base_format(data.format);
+                format_div.appendChild(format_label);
+                format_div.appendChild(format_code);
+
+                return format_div
+
+
+            }
+
+             function base_format(format){
+                var tokens = format.split('/').pop();
+                var short = tokens.split('.')[0];
+                 var result = short.replace("+xml",'');
+                 return result
+             }
+
+             function add_master_checkbox(master,edit){
+                 var checkbox_div = document.createElement("div");
+                 var checkbox_label = document.createElement("label");
+                 checkbox_label.innerHTML = "Master";
+
+                 var checkbox = document.createElement("INPUT");
+                 checkbox.type = "checkbox";
+                 checkbox.id = "checkbox1";
+
+                 checkbox.setAttribute("data-toggle", "toggle");
+                 checkbox.checked= master;
+                 checkbox.disabled = !edit;
+
+
+
+
+
+                 checkbox_div.appendChild(checkbox_label);
+                 checkbox_div.appendChild(checkbox);
+
+
+
+                 return checkbox_div
+
+
+             }
+
+             function add_location(location){
+                 var dl = document.createElement("dl");
+                 var dt = document.createElement("dt");
+                 var dd = document.createElement("dd");
+                 dt.innerHTML = "Location";
+                 dd.innerHTML = location;
+                 dl.appendChild(dt);
+                 dl.appendChild(dd);
+                 return dl
+            }
+
+
+             function add_manfifest_detail(data,edit){
+                 var detail_manifest = document.getElementById("manifest_detail");
+                 detail_manifest.appendChild(get_format_code(data));
+                 detail_manifest.appendChild(add_master_checkbox(data.master,edit));
+                 detail_manifest.appendChild(add_location(data.location));
+
+
+
+
+             }
+
+
+
+
+        </script>
+
+        <script>
+            function add_master_input(){
+                var master_output = document.createElement("input");
+                 master_output.setAttribute("value",document.getElementById('checkbox1').checked);
+                 master_output.setAttribute("name","master");
+                 master_output.setAttribute("type","hidden");
+                 master_output.setAttribute("id", "master_output");
+                 var form = document.getElementById("form_detail");
+                 form.appendChild(master_output);
+            }
+        </script>
+
+
+        <script>
+            function add_button(name){
                  var myButton = document.createElement("span");
                  var icon = document.createElement("i");
                  myButton.className="btn btn-default btn-space";
@@ -162,87 +353,68 @@
                  myButton.appendChild(icon);
                  myButton.append(name);
                  var placeHolder= document.getElementById('button-div');
+                 $('#button-div').empty();
+
                  placeHolder.appendChild(myButton);
 
                 }
-        </script>
 
-        <script>
-            var csrftoken = Cookies.get('csrftoken');
-            function csrfSafeMethod(method) {
-                // these HTTP methods do not require CSRF protection
-                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-            }
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    }
-                }
-            });
-        </script>
+                function addContact(creators,creator,edit){
+                 if (edit==true){
 
-        <script>
-            $(document).on('click','#editButton',function(){
-                var entry = $('#json_tree').jstree('get_selected',true)[0]["id"];
-                display_entry_detail(entry, edit=true);
-            });
-        </script>
-
-        <script>
-            var frm = $('#form_detail');
-            frm.submit(function () {
-                $.ajax({
-                    type: frm.attr('method'),
-                    url: frm.attr('action'),
-                    data: {"data": frm.serializeJSON()},
-                    success: function (data) {
-                        console.log("success"); // another sanity check
+                     var idInuput=document.createElement("input");
+                     idInuput.setAttribute("value",creators[creator]["id"]);
+                     idInuput.setAttribute("type", "hidden");
+                     idInuput.setAttribute("name", "creators["+creator+"][id]");
+                     document.getElementById("item_detail").appendChild(idInuput);
 
 
-                    },
-                    error: function(data) {
-                        $("#item_detail").html("Something went wrong!");
-                    }
-                });
-                return false;
-            });
-        </script>
 
-        <script>
-             function display_entry_detail(selected_entry, edit=false){
-                  $("#item_detail").empty();
-                  $("#title").empty();
-                  $("#button-div").empty();
-                  var splited_fn= selected_entry.split("/");
-                  var fn = splited_fn[splited_fn.length-1];
-                  console.log($.trim(selected_entry));
-                  var entry_detail = get_detail($.trim(selected_entry));
-                  if(typeof entry_detail !== 'undefined' ){
-                        // add title
-                        //add_button("add");
-                        add_button("edit");
-                        //add_button("delete");
-                        $("#title").text(" "+fn);
-                        add_master_icon(entry_detail);
-                        add_format_icon(entry_detail);
-                        //add entries of meta data
 
-                        if(entry_detail.metadata !== 'undefined'){
-                            var meta = entry_detail.metadata;
-                            add_description(meta,edit);
-                            for (creator in meta.creators){
-                                addContact(meta.creators,creator,edit);
-                            }
-                        }
-                  }
+
+                     var givenNameInput=document.createElement("input");
+                     givenNameInput.setAttribute("value",creators[creator]["first_name"]);
+                     givenNameInput.setAttribute("placeholder", "First Name");
+                     givenNameInput.setAttribute("name", "creators["+creator+"][first_name]");
+
+
+
+                     var givenName = givenNameInput.outerHTML;
+
+                     var familyNameInput=document.createElement("input");
+                     familyNameInput.setAttribute("value",creators[creator]["last_name"]);
+                     familyNameInput.setAttribute("placeholder","Family Name");
+                     familyNameInput.setAttribute("name", "creators["+creator+"][last_name]");
+
+                     var familyName = familyNameInput.outerHTML;
+
+                     var organisationInput=document.createElement("input");
+                     organisationInput.setAttribute("value",creators[creator]["organisation"]);
+                     organisationInput.setAttribute("placeholder","Organisation");
+                     organisationInput.setAttribute("name", "creators["+creator+"][organisation]");
+
+                     var organisation = organisationInput.outerHTML;
+
+                     var emailInput=document.createElement("input");
+                     emailInput.setAttribute("value",creators[creator]["email"]);
+                     emailInput.setAttribute("placeholder","Email");
+                     emailInput.setAttribute("name", "creators["+creator+"][email]");
+
+
+                     var email = emailInput.outerHTML;
+                 }
+                 else{
+                     var givenName = creators[creator]["first_name"];
+                     var familyName = creators[creator]["last_name"];
+                     var organisation = creators[creator]["organisation"];
+                     var email=creators[creator]["email"];
+                 }
+
+                 var contact_content = '<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>";
+                 $("#item_detail").append(contact_content);
+
 
              }
-
-             function add_master_icon(entry_detail) {
-                 if(entry_detail.master){
-                 $("#title").append(' '+'<i class="fa fa-star fa-fw" title="master"></i>')
-             }}
 
              function add_description (metadata,edit){
                  if (edit==true){
@@ -263,9 +435,6 @@
                      createdInput.setAttribute("name", "created");
                      form.appendChild(createdInput);
 
-
-
-
                  }
                  else {
                      var description = metadata["description"];
@@ -277,84 +446,65 @@
 
              function modified_content( modified){
                   content="";
-                   for(var date in  modified){
-                     content+='<dd>' + modified[date]+ '</dd>'
+                   for(var i in  modified){
+                     content+='<dd>' + modified[i]["date"]+ '</dd>'
                  }
                  return content
              }
-
-
-             function add_format_icon (entry_detail){
-                 format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
-                 if(typeof entry_detail.base_format !== 'undefined' && format_list.indexOf(entry_detail.base_format)>=0){
-                 var src="{{static('combine/images/mediatype/')}}"+entry_detail.base_format+".png";
-                 $('#title').prepend($('<img>', {
-                        src : src,
-                        height : 20,
-                        title : entry_detail.format
-                    }));}
-             }
-
-             function addContact(creators,creator,edit){
-                 if (edit==true){
-                     var givenNameInput=document.createElement("input");
-                     givenNameInput.setAttribute("value",creators[creator]["givenName"]);
-                     givenNameInput.setAttribute("placeholder", "First Name");
-                     givenNameInput.setAttribute("name", "creators["+creator+"][givenName]");
-
-
-
-                     var givenName = givenNameInput.outerHTML;
-
-                     var familyNameInput=document.createElement("input");
-                     familyNameInput.setAttribute("value",creators[creator]["familyName"]);
-                     familyNameInput.setAttribute("placeholder","Family Name");
-                     familyNameInput.setAttribute("name", "creators["+creator+"][familyName]");
-
-                     var familyName = familyNameInput.outerHTML;
-
-                     var organisationInput=document.createElement("input");
-                     organisationInput.setAttribute("value",creators[creator]["organisation"]);
-                     organisationInput.setAttribute("placeholder","Organisation");
-                     organisationInput.setAttribute("name", "creators["+creator+"][organisation]");
-
-                     var organisation = organisationInput.outerHTML;
-
-                     var emailInput=document.createElement("input");
-                     emailInput.setAttribute("value",creators[creator]["email"]);
-                     emailInput.setAttribute("placeholder","Email");
-                     emailInput.setAttribute("name", "creators["+creator+"][email]");
-
-
-                     var email = emailInput.outerHTML;
-                 }
-                 else{
-                     var givenName = creators[creator]["givenName"];
-                     var familyName = creators[creator]["familyName"];
-                     var organisation = creators[creator]["organisation"];
-                     var email=creators[creator]["email"];
-                 }
-
-                 contact_content = '<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>";
-                 $("#item_detail").append(contact_content);
-
-             }
-
-
-            function get_detail(location) {
-                 var i, j, r = [];
-                 //var entries = {{ archive.entries.all() }}
-                 var entries = {{entries_json| safe}};
-                 for( i = 0; i < entries.length; i++) {
-                     if (entries[i].location == location || entries[i].location == "./"+location){
-                         return entries[i]
-                     }
-                 }
-
-
-            }
         </script>
 
+        <script>
+            var csrftoken = Cookies.get('csrftoken');
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+        </script>
+
+        <script>
+
+            var frm = $('#form_detail');
+
+            frm.submit(function () {
+                add_master_input();
+                $.ajax({
+                    type: frm.attr('method'),
+                    url: frm.attr('action'),
+                    data: {"data": frm.serializeJSON()},
+                    success: function (data) {
+
+                        if(data.is_error){
+                            for (var error in data.errors){
+                                $("#item_detail").prepend("<div class='alert alert-danger' data-alert>"+error+":"+data.errors[error]+"</div>")
+                            }
+                        }
+                        else{
+                        console.log("success"); // another sanity check
+                        selected = $('#json_tree').jstree(true).get_selected(true);
+                        var entry_pk = selected[0].original.pk;
+                        display_entry_detail(entry_pk)}
+
+                    },
+                    error: function(data) {
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+                return false;
+            });
+        </script>
+        <script>
+            var checkbox = document.getElementsByClassName("checkIt");
+            checkbox.onchange = console.log("hi");
+            $("#checkbox1").on('change', function() {
+                })
+        </script>
 
     </div>
 </div>

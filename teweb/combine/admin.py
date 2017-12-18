@@ -22,7 +22,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(ArchiveEntry)
 class ArchiveEntryAdmin(admin.ModelAdmin):
-    list_display = ('archive', 'location', 'base_format', 'short_format', 'format', 'master', 'metadata')
+    list_display = ('archive', 'location', 'file', 'base_format', 'short_format', 'format', 'master', 'metadata')
     list_filter = ('master',)
     fields = ('archive', 'location', 'format', 'master')
 

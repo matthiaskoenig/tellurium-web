@@ -21,8 +21,9 @@ python manage.py migrate
 
 # clean everything
 echo "* Remove upload files *"
-rm media/archives/*
-rm combine/migrations/*
+rm -r media/archives/*
+rm -r media/files/*
+rm -r combine/migrations/*
 
 echo "* Upload archives *"
 cd $DIR
