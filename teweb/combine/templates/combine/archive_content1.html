@@ -83,7 +83,6 @@
                 <form id="form_detail" method="post">
                     <div id="button-div"></div>
                     <h3 id="title_entry"></h3>
-                    <div id="error_detail"></div>
                     <div id="item_detail"></div>
 
                 </form>
@@ -147,8 +146,6 @@
 
         <script>
             function display_entry_detail(entry_pk, edit=false){
-
-
 
                 var endpoint_path = "/api/archive-entries/" + entry_pk+"/";
                 var endpoint = window.location.origin+endpoint_path;
@@ -404,9 +401,8 @@
                     success: function (data) {
 
                         if(data.is_error){
-                            $("#error_detail").empty()
                             for (var error in data.errors){
-                                $("#error_detail").append("<div class='alert alert-danger' data-alert>"+error+":"+data.errors[error]+"</div>")
+                                $("#item_detail").prepend("<div class='alert alert-danger' data-alert>"+error+":"+data.errors[error]+"</div>")
                             }
                         }
                         else{
@@ -420,15 +416,12 @@
 
                     },
                     error: function(data) {
-                        $("#error_detail").html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
-                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
                         console.log(xhr.status + ": " + xhr.responseText);
                     }
                 });
                 return false;
             });
         </script>
-error
 
     </div>
 </div>

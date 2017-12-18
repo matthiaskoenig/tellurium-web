@@ -133,7 +133,6 @@ def archive_view(request, archive_id):
                 if bool(creator.changes()):
                     modified = True
                 creator.save()
-                return  JsonResponse({"errors":serializer_creator.errors, "is_error":False})
             else:
                 response = {"errors":serializer_creator.errors,"is_error":True}
                 return JsonResponse(response)
@@ -142,13 +141,16 @@ def archive_view(request, archive_id):
             date = Date.objects.create(date=timezone.now())
             archive_entry.metadata.modified.add(date)
 
+        return JsonResponse({"is_error": False})
 
 
 
 
 
 
-        #print(json.dumps(entrydata_dict, indent=4 , sort_keys=True))
+
+
+            #print(json.dumps(entrydata_dict, indent=4 , sort_keys=True))
         #DateSerializer.get()
         #todo validate data
         #CreatorSerializer.get()
