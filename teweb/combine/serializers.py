@@ -26,7 +26,6 @@ class CreatorSerializer(serializers.ModelSerializer):
         instance.last_name = validated_data.get("last_name",instance.last_name)
         instance.organisation = validated_data.get("organisation",instance.organisation)
         instance.email = validated_data.get("email",instance.email)
-        instance.save()
         return instance
 
 
@@ -61,7 +60,7 @@ class TripleSerializer( serializers.ModelSerializer):
 
 
 class MetaDataSerializer(serializers.HyperlinkedModelSerializer):
-    creators = CreatorSerializer(many=True, )
+    creators = CreatorSerializer(many=True)
     modified = DateSerializer(many=True)
 
 

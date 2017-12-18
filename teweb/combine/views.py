@@ -11,6 +11,8 @@ import magic
 import json
 import rdflib
 import os
+from django.utils import timezone
+
 
 from rest_framework.reverse import reverse
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
@@ -27,7 +29,7 @@ from rest_framework.response import Response
 
 
 from .tasks import execute_omex
-from .models import Archive, Tag, ArchiveEntry, Creator
+from .models import Archive, Tag, ArchiveEntry, Creator, Date
 from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer,DateSerializer,CreatorSerializer, MetaDataSerializer
 
 from .forms import UploadArchiveForm
@@ -114,19 +116,28 @@ def archive_view(request, archive_id):
 
 
     if request.method =='POST':
-        #do the validation here. I think since I access data via rest api. I do not need to send back data and refresh page.
-        #data=request.POST.getlist('data')
         data = request.POST["data"]
-
         entrydata_dict = json.loads(data)
+
+        archive_entry = ArchiveEntry.objects.get(id=entrydata_dict["id"])
+        modified = False
+
         for creator in entrydata_dict["creators"]:
             serializer_creator = CreatorSerializer(data = creator)
-            print(serializer_creator.is_valid())
-            print(serializer_creator.validated_data)
+            serializer_creator.is_valid()
             creator = Creator.objects.get(id = creator["id"])
-
             serializer_creator.save()
             serializer_creator.update(instance=creator,validated_data=serializer_creator.validated_data)
+            if bool(creator.changes()):
+                modified = True
+
+            creator.save()
+
+        if modified:
+            date = Date.objects.create(date=timezone.now())
+            archive_entry.metadata.modified.add(date)
+
+
 
 
         #print(json.dumps(entrydata_dict, indent=4 , sort_keys=True))

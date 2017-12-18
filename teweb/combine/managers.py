@@ -147,30 +147,15 @@ class ArchiveEntryManager(models.Manager):
             kwargs["format"] = entry["format"]
             kwargs["location"] = entry["location"]
 
-        return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
-
-    def update(self,*args, **kwargs):
-        archive_entry_data = {}
-        archive_entry = super(ArchiveEntryManager, self).get(id = kwargs["id"])
-        archive_entry.update(master = kwargs.get("master"))
-        archive_entry.update(format = kwargs.get("format"))
-        archive_entry.update(location = kwargs.get("location"))
-        archive_entry.update(archive = kwargs.get("archive"))
-        archive_entry.update(metadata = kwargs.get("metadata"))
-
-        return archive_entry
-
-
-
-
-
+        else:
+            return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
 
 class MetaDataManager(models.Manager):
     """ Manager for ArchiveEntryMeta. """
 
     def create(self, *args, **kwargs):
-        Creator = apps.get_model("combine", model_name="Creator")
-        Date = apps.get_model("combine", model_name="Date")
+        #Creator = apps.get_model("combine", model_name="Creator")
+        #Date = apps.get_model("combine", model_name="Date")
 
         metadata = kwargs.get("metadata")
         from pprint import pprint
@@ -195,18 +180,19 @@ class MetaDataManager(models.Manager):
                     "organisation": creator_info.get("organisation"),
                     "email": creator_info.get("email"),
                 }
-                creator, _ = Creator.objects.get_or_create(**creator_dict)
-                entry_meta.creators.add(creator)
-                creator.save()
-            entry_meta.save()
+                entry_meta.creators.create(**creator_dict)
+                #entry_meta.creators.add(creator)
+                entry_meta.save()
+                #creator.save()
 
             # add modified stamps
             for modified_date in metadata.get("modified", []):
-                modified, _ = Date.objects.get_or_create(date=modified_date)
-                entry_meta.modified.add(modified)
-                modified.save()
-            entry_meta.save()
+                #modified = Date.objects.create(date=modified_date)
+                entry_meta.modified.create(date=modified_date)
+                #modified.save()
+                entry_meta.save()
 
             return entry_meta, created_meta
 
-        return super(MetaDataManager, self).create(*args, **kwargs)
+        else:
+            return super(MetaDataManager, self).create(*args, **kwargs)
