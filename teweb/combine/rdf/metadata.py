@@ -104,13 +104,13 @@ def read_metadata(archive_path):
             (subj, pred, obj) = triple
 
             info = {}
-            for (s,p,o) in g.triples((obj, VCARD.hasEmail, None)):
+            for (s, p, o) in g.triples((obj, VCARD.hasEmail, None)):
                 info["email"] = str(o)
 
-            for (s,p,o) in g.triples((obj, VCARD["organization-name"], None)):
+            for (s, p, o) in g.triples((obj, VCARD["organization-name"], None)):
                 info["organisation"] = str(o)
 
-            for (s,p,o) in g.triples((obj, VCARD.hasName, None)):
+            for (s, p, o) in g.triples((obj, VCARD.hasName, None)):
                 for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
                     info["familyName"] = str(o2)
                 for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
@@ -126,7 +126,7 @@ def read_metadata(archive_path):
         :return:
         """
         triples = []
-        for (s,p,o) in g.triples((None, None, None)):
+        for (s, p, o) in g.triples((None, None, None)):
             triples.append((str(s), str(p), str(o)))
 
         return triples
@@ -145,7 +145,6 @@ def read_metadata(archive_path):
 
         metadata_dict[location] = metadata
 
-    # pprint(metadata_dict)
     return metadata_dict
 
 
@@ -179,7 +178,7 @@ def read_rdf_graphs(archive_path, debug=False):
                 tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
                 tmp.write(z.read(path))
 
-                g = parse_rdf(tmp.name, debug=True)
+                g = parse_rdf(tmp.name, debug=False)
 
                 tmp.close()
                 graphs.append(g)
@@ -243,16 +242,6 @@ def transitive_subgraph(g, start, gloc=None):
     return gloc
 
 
-def write_metadata(metadata, file_path):
-
-    # FIXME: remove Description for emtpy tags (modfied, created
-    # rdf: parseType = "Resource"
-    s = metadata.serialize(format='pretty-xml')
-    print("-" * 80)
-    print(s.decode("utf-8"))
-    print("-" * 80)
-
-
 ########################################################################
 if __name__ == "__main__":
 
@@ -264,4 +253,3 @@ if __name__ == "__main__":
     metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
     pprint(metadata)
 
-    # write_metadata(metadata, file_path=None)
