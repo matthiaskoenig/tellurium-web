@@ -26,7 +26,7 @@ from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, AP
 from rest_framework import status
 from django.urls import reverse
 from combine.models import Archive, Tag, hash_for_file
-from combine.comex import get_omex_file_paths
+from combine.comex import get_archive_paths
 from django.contrib.auth.models import User
 from collections import namedtuple
 from combine import comex
@@ -108,7 +108,7 @@ class ViewAPILogedInSuperUser(TestCase):
 
     def test_create_archive(self):
         url = reverse('api:archive-list')
-        omex_files = get_omex_file_paths(ARCHIVE_DIRS)
+        omex_files = get_archive_paths(ARCHIVE_DIRS)
         f = omex_files[0]
         name = os.path.basename(f)
         md5 = hash_for_file(f, hash_type='MD5')
@@ -289,7 +289,7 @@ class ViewAPILoggedIn(TestCase):
     def test_create_archive(self):
         url = reverse('api:archive-list')
         ARCHIVE_DIRS = ["../../archives"]
-        omex_files = get_omex_file_paths(ARCHIVE_DIRS)
+        omex_files = get_archive_paths(ARCHIVE_DIRS)
         f = omex_files[0]
         name = os.path.basename(f)
         md5 = hash_for_file(f, hash_type='MD5')
