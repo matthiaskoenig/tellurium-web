@@ -96,13 +96,9 @@ class ArchiveManager(models.Manager):
             omex_metadata = archive.omex_metadata()
 
             # create entries
-
-            # read the file
             with zipfile.ZipFile(path) as z:
 
                 for location, entry in archive.omex_entries().items():
-                    # print("This is the archive:", entry)
-                    # print("archive:", archive)
                     entry_dict = {
                         "entry": entry,
                         "archive": archive,
@@ -118,14 +114,14 @@ class ArchiveManager(models.Manager):
                         suffix = location.split('/')[-1]
                         tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
                         tmp.write(z.read(zip_name))
-
-                        # archive_entry.file = tmp.name
+                        tmp.seek(0)  # rewind file for reading !
 
                         with open(tmp.name, 'rb') as f:
-                            archive_entry.file.save(zip_name, File(f))
-
-                        archive_entry.save()
+                            name = "{}_{}".format(archive_entry.pk, zip_name)
+                            name = name.replace("/", '__')
+                            archive_entry.file.save(name, File(f))
                         tmp.close()
+                        archive_entry.save()
 
                     # create single metadata for every entry
                     meta_dict = omex_metadata.get(location)
@@ -169,8 +165,6 @@ class MetaDataManager(models.Manager):
         #Date = apps.get_model("combine", model_name="Date")
 
         metadata = kwargs.get("metadata")
-        from pprint import pprint
-        pprint(metadata)
 
         if metadata:
             # fields required to generate ArchiveEntryMeta

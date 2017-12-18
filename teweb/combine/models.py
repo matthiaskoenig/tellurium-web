@@ -250,7 +250,6 @@ class EntrySource(DjangoChoices):
     zip = ChoiceItem("zip")
 
 
-# TODO: store the actual file for the entry (use archive and location to store the file), use a FileField
 class ArchiveEntry(models.Model):
     """ Entry information.
     This corresponds to the content of the manifest file.
