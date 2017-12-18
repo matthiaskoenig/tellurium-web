@@ -96,6 +96,7 @@ def zip_tree_content(path, entries=None):
         'parent': "#",
         'text': '.',
         'icon': 'fa fa-fw fa-archive',
+        # 'icon': '/static/combine/images/mediatype/sbml.png',
         'state': {'opened': True, 'selected': True}
     }
 
