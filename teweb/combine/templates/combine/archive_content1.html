@@ -406,7 +406,7 @@
                         if(data.is_error){
                             $("#error_detail").empty()
                             for (var error in data.errors){
-                                $("#error_detail").append("<div class='alert-box alert radius' data-alert>"+error+":"+data.errors[error]+"</div>")
+                                $("#error_detail").append("<div class='alert alert-danger' data-alert>"+error+":"+data.errors[error]+"</div>")
                             }
                         }
                         else{
