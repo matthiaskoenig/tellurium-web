@@ -128,7 +128,7 @@ class Archive(models.Model):
     """
     name = models.CharField(max_length=MAX_TEXT_LENGTH)
     file = models.FileField(upload_to='archives', validators=[validators.validate_omex])
-    created = models.DateTimeField('date published', editable=False)
+    created = models.DateTimeField('date published', editable=False, auto_now=True)
     md5 = models.CharField(max_length=36, blank=True)
     task_id = models.CharField(max_length=100, blank=True)
     tags = models.ManyToManyField(Tag, related_name="archives")
@@ -282,3 +282,7 @@ class ArchiveEntry(models.Model):
     @property
     def base_format(self):
         return comex.base_format(self.format)
+
+    @property
+    def path(self):
+        return str(self.file.path)

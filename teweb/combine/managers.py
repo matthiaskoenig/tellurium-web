@@ -5,6 +5,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os
 import hashlib
 from six import string_types
+import zipfile
+import tempfile
 
 from django.db import models
 from django.core.files import File
@@ -49,10 +51,9 @@ class ArchiveManager(models.Manager):
     """ Manager for Archive. """
 
     def get_or_create(self, *args, **kwargs):
-        """ Function creating all the archive information from given file.
-        This is the main entry point for import of archives.
+        """ Create archive information from given archive file.
+        This is the main entry point for the import of archives in the database.
         """
-
         # get models
         Tag = apps.get_model("combine", model_name="Tag")
         ArchiveEntry = apps.get_model("combine", model_name="ArchiveEntry")
@@ -73,9 +74,6 @@ class ArchiveManager(models.Manager):
             # store combine archive as file
             with open(path, 'rb') as f:
                 archive.file.save(name, File(f))
-
-            # FIXME: unclear where to do this (in save, create?)
-            archive.created = timezone.now()
 
             # add User to Archive, User format can be string, or User object
             try:
@@ -99,39 +97,48 @@ class ArchiveManager(models.Manager):
 
             # create entries
 
-            # read the files
-            # with zipfile.ZipFile(archive_path) as z:
-            #     for name in z.namelist():
-            #         location = comex._normalize_location(name)
-            #
-            #         # extract to temporary file
-            #         suffix = location.split('/')[-1]
-            #         tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
-            #         tmp.write(z.read(name))
+            # read the file
+            with zipfile.ZipFile(path) as z:
 
-            for location, entry in archive.omex_entries().items():
-                print("This is the archive:", entry)
-                print("archive:", archive)
-                entry_dict = {
-                    "entry": entry,
-                    "archive": archive,
-                }
-                archive_entry, _ = ArchiveEntry.objects.get_or_create(**entry_dict)
-                archive_entry.save()
-
-                # create single metadata for every entry
-                meta_dict = omex_metadata.get(location)
-                if meta_dict:
-
-                    metadata_dict = {
-                        "metadata": meta_dict,
+                for location, entry in archive.omex_entries().items():
+                    # print("This is the archive:", entry)
+                    # print("archive:", archive)
+                    entry_dict = {
+                        "entry": entry,
+                        "archive": archive,
                     }
-                    metadata = MetaData.objects.create(**metadata_dict)
-                    archive_entry.metadata = metadata
+                    archive_entry, _ = ArchiveEntry.objects.get_or_create(**entry_dict)
+                    archive_entry.save()
 
-                    metadata.save()
+                    # add file to archive entry
+                    if location != ".":
+                        zip_name = location.replace("./", "")
 
-                archive_entry.save()
+                        # extract to temporary file
+                        suffix = location.split('/')[-1]
+                        tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
+                        tmp.write(z.read(zip_name))
+
+                        # archive_entry.file = tmp.name
+
+                        with open(tmp.name, 'rb') as f:
+                            archive_entry.file.save(zip_name, File(f))
+
+                        archive_entry.save()
+                        tmp.close()
+
+                    # create single metadata for every entry
+                    meta_dict = omex_metadata.get(location)
+                    if meta_dict:
+                        metadata_dict = {
+                            "metadata": meta_dict,
+                        }
+                        metadata = MetaData.objects.create(**metadata_dict)
+                        archive_entry.metadata = metadata
+
+                        metadata.save()
+
+                    archive_entry.save()
 
             return archive, created_archive
 
