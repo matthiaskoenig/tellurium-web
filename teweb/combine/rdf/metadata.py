@@ -19,13 +19,11 @@ import tempfile
 from rdflib import Graph, URIRef, BNode, Literal
 from pprint import pprint
 import warnings
+import zipfile
 
-try:
-    import libcombine
-except ImportError:
-    import tecombine as libcombine
 
 from combine.rdf.parser import parse_rdf, bind_default_namespaces
+from combine.comex import read_manifest_entries
 
 
 from rdflib.namespace import Namespace
@@ -69,7 +67,6 @@ def read_metadata(archive_path):
             result = str(obj)
 
         return result
-
 
     def read_predicate_list(g, location, predicate):
         """ Multiple entries can exist
@@ -158,47 +155,39 @@ def read_rdf_graphs(archive_path, debug=False):
     :param archive_path:
     :return:
     """
-    # FIXME: this should be done for all zip entries!
-    # Resources could be annotated but not listed in the manifest
+    # find metadata locations
+    entries_dict = read_manifest_entries(archive_path)
+    metadata_paths = []
+    for location, entry in entries_dict.items():
+        format = entry.get('format')
+        if format and format.endswith("omex-metadata"):
+            path = location
+            path = path.replace("./", "")
+            metadata_paths.append(path)
 
-    omex = libcombine.CombineArchive()
-    if omex.initializeFromArchive(archive_path) is None:
-        print("Invalid Combine Archive: {}", archive_path)
-        return None
-
-    # find metadata locations and parse the information
+    # read metadata from metadata files
     graphs = []
-    locations = []
-    for i in range(omex.getNumEntries()):
-        entry = omex.getEntry(i)
+    with zipfile.ZipFile(archive_path) as z:
+        for path in metadata_paths:
 
-        # normalize the location of the entries
-        location = entry.getLocation()
-        print(location)
-        if (len(location) > 1) and (not location.startswith(".")):
-            location = "./{}".format(location)
+            try:
+                # raise KeyError if path not in zip archive
+                zipinfo = z.getinfo(path)
 
-        if len(location) == 0:
-            location = "."
+                # extract to temporary file
+                suffix = path.split('/')[-1]
+                tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
+                tmp.write(z.read(path))
 
-        locations.append(location)
-        format = entry.getFormat()
+                g = parse_rdf(tmp.name, debug=True)
 
-        # read metadata from metadata files
-        if format.endswith("omex-metadata"):
-            print(location, entry.getLocation())
+                tmp.close()
+                graphs.append(g)
 
-            # extract to temporary file
-            suffix = location.split('/')[-1]
-            tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
-            omex.extractEntry(entry.getLocation(), tmp.name)
+            except KeyError:
+                warnings.warn("No '{}' in zip, despite listed in manifest: {}".format(path, archive_path))
 
-            g = parse_rdf(tmp.name, debug=True)
-            # close the tmp file
-            tmp.close()
-            graphs.append(g)
-
-    # graph lookup via locations
+    # graph dictionary based on locations
     graph_dict = {}
 
     if len(graphs) > 0:
@@ -216,7 +205,7 @@ def read_rdf_graphs(archive_path, debug=False):
         # Split the graphs for the different locations, i.e.,
         # single graphs for the various resources
 
-        for location in locations:
+        for location in entries_dict.keys():
             gloc = transitive_subgraph(g, start=URIRef(location))
             bind_default_namespaces(gloc)
             graph_dict[location] = gloc
@@ -229,7 +218,6 @@ def read_rdf_graphs(archive_path, debug=False):
     else:
         print("No graphs parsed.")
 
-    omex.cleanUp()
     return graph_dict
 
 

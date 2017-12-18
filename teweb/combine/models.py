@@ -45,8 +45,8 @@ class Date(models.Model):
 
 class Creator(ChangesMixin,models.Model):
     """ RDF creator of archive entry. """
-    first_name = models.CharField(max_length=MAX_TEXT_LENGTH)
-    last_name = models.CharField(max_length=MAX_TEXT_LENGTH)
+    first_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+    last_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
     organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
     email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
 

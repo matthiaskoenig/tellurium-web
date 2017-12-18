@@ -171,6 +171,9 @@ def read_manifest_entries(archive_path):
     :param path:
     :return:
     """
+    # FIXME: this should be done for all zip entries!, i.e. combined information from zip archives and the
+    # manifest information.
+
 
     entries_dict = _parse_manifest_entries(archive_path=archive_path)
 
@@ -204,10 +207,7 @@ def _parse_manifest_entries(archive_path):
 
             omex_manifest = ET.fromstring(xml_str)
             for content in omex_manifest:
-                location = content.attrib.get('location')
-                # ensure all relative paths (normalization of location)
-                if not location.startswith('.'):
-                    location = "./{}".format(location)
+                location = _normalize_location(content.attrib.get('location'))
 
                 master = content.attrib.get('master', False)
                 if master in ["T", "true"]:
@@ -225,8 +225,25 @@ def _parse_manifest_entries(archive_path):
             warnings.warn("No 'manifest.xml' in COMBINE archive: {}".format(archive_path))
             return entries_dict
 
-    pprint(entries_dict)
+    # pprint(entries_dict)
     return entries_dict
+
+
+def _normalize_location(location):
+    """ Ensure that all locations are relative paths.
+
+    :param location:
+    :return:
+    """
+    if location is None:
+        return location
+
+    if (len(location) > 1) and (not location.startswith(".")):
+        location = "./{}".format(location)
+    elif len(location) == 0:
+        location = "."
+
+    return location
 
 
 def _parse_zip_entries(path):
