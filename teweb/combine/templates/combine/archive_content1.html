@@ -402,6 +402,10 @@
                     data: {"data": frm.serializeJSON()},
                     success: function (data) {
                         console.log("success"); // another sanity check
+                        selected = $('#json_tree').jstree(true).get_selected(true);
+                        var entry_pk = selected[0].original.pk;
+                        display_entry_detail(entry_pk);
+
 
 
                     },

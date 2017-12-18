@@ -23,13 +23,13 @@ from celery.result import AsyncResult
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import ArchiveEntrySerializer, DateSerializer,CreatorSerializer, MetaDataSerializer
 
 
 
 from .tasks import execute_omex
-from .models import Archive, Tag, ArchiveEntry
-from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer
+from .models import Archive, Tag, ArchiveEntry, Creator
+from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer,DateSerializer,CreatorSerializer, MetaDataSerializer
+
 from .forms import UploadArchiveForm
 from .git import get_commit
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
@@ -120,8 +120,14 @@ def archive_view(request, archive_id):
 
         entrydata_dict = json.loads(data)
         for creator in entrydata_dict["creators"]:
-            validated_data={"id": creator["id"]}
-            creator = CreatorSerializer.get(validated_data = validated_data)
+            serializer_creator = CreatorSerializer(data = creator)
+            print(serializer_creator.is_valid())
+            print(serializer_creator.validated_data)
+            creator = Creator.objects.get(id = creator["id"])
+
+            serializer_creator.save()
+            serializer_creator.update(instance=creator,validated_data=serializer_creator.validated_data)
+
 
         #print(json.dumps(entrydata_dict, indent=4 , sort_keys=True))
         #DateSerializer.get()
