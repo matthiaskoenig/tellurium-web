@@ -83,6 +83,8 @@
                 <form id="form_detail" method="post">
                     <div id="button-div"></div>
                     <h3 id="title_entry"></h3>
+                    <div id="manifest_detail">
+                    </div>
                     <div id="item_detail"></div>
 
                 </form>
@@ -118,7 +120,6 @@
         </script>
 
         <script>
-
             $('#json_tree')
               // listen for event in json tree
               .on('changed.jstree', function (e, data) {
@@ -155,6 +156,9 @@
                     success: function (data) {
                          add_button("edit");
                          entry_title(data,edit);
+                        $("#manifest_detail").empty();
+                         add_manfifest_detail(data,edit);
+
 
 
                          if(data.metadata !== 'undefined'){
@@ -187,11 +191,10 @@
         <script>
             function entry_title(data){
 
-
-
-                title_entry = document.getElementById("title_entry");
-
+                var title_entry = document.getElementById("title_entry");
                 title_entry.innerHTML = get_title(data.location);
+
+
 
                 if (data.master){
                     title_entry.appendChild(get_master_icon(data.master));
@@ -199,6 +202,7 @@
                 format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
                 if (typeof base_format(data.format) !== 'undefined' && format_list.indexOf(base_format(data.format))>=0){
                      title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
+
                 }
             }
 
@@ -218,7 +222,7 @@
             }
 
             function get_master_icon(master){
-                master_icon = document.createElement("i");
+                var master_icon = document.createElement("i");
                 master_icon.setAttribute("class","fa fa-star fa-fw");
                 master_icon.setAttribute("title","master");
                 return master_icon
@@ -226,28 +230,102 @@
 
             function get_format_icon(data){
                 var src="{{static('combine/images/mediatype/')}}"+base_format(data.format)+".png";
-                format_icon = document.createElement("img");
+                var format_icon = document.createElement("img");
                 format_icon.setAttribute("src", src);
                 format_icon.setAttribute("height",20);
                 format_icon.setAttribute("title",data.format);
                 return format_icon
             }
 
+            function get_format_code(data){
+                var format_div = document.createElement("div");
+                var format_code = document.createElement("code");
+                format_code.setAttribute("title",data.format);
+                var format_label = document.createElement("label");
+                format_label.innerHTML = "Format";
+                format_code.innerHTML = base_format(data.format);
+                format_div.appendChild(format_label);
+                format_div.appendChild(format_code);
+
+                return format_div
+
+
+            }
+
              function base_format(format){
                 var tokens = format.split('/').pop();
                 var short = tokens.split('.')[0];
-                 return short.replace("+xml",'')
+                 var result = short.replace("+xml",'');
+                 return result
              }
 
-             function get_name(location){
-                 splitted = location.split("/");
-                 name = splitted.slice(1,splitted.length).join("/");
-                 console.log(name)
+             function add_master_checkbox(master,edit){
+                 var checkbox_div = document.createElement("div");
+                 var checkbox_label = document.createElement("label");
+                 checkbox_label.innerHTML = "Master";
+
+                 var checkbox = document.createElement("INPUT");
+                 checkbox.type = "checkbox";
+                 checkbox.id = "checkbox1";
+
+                 checkbox.setAttribute("data-toggle", "toggle");
+                 checkbox.checked= master;
+                 checkbox.disabled = !edit;
+
+
+
+
+
+                 checkbox_div.appendChild(checkbox_label);
+                 checkbox_div.appendChild(checkbox);
+
+
+
+                 return checkbox_div
+
 
              }
+
+             function add_location(location){
+                 var dl = document.createElement("dl");
+                 var dt = document.createElement("dt");
+                 var dd = document.createElement("dd");
+                 dt.innerHTML = "Location";
+                 dd.innerHTML = location;
+                 dl.appendChild(dt);
+                 dl.appendChild(dd);
+                 return dl
+            }
+
+
+             function add_manfifest_detail(data,edit){
+                 var detail_manifest = document.getElementById("manifest_detail");
+                 detail_manifest.appendChild(get_format_code(data));
+                 detail_manifest.appendChild(add_master_checkbox(data.master,edit));
+                 detail_manifest.appendChild(add_location(data.location));
+
+
+
+
+             }
+
+
 
 
         </script>
+
+        <script>
+            function add_master_input(){
+                var master_output = document.createElement("input");
+                 master_output.setAttribute("value",document.getElementById('checkbox1').checked);
+                 master_output.setAttribute("name","master");
+                 master_output.setAttribute("type","hidden");
+                 master_output.setAttribute("id", "master_output");
+                 var form = document.getElementById("form_detail");
+                 form.appendChild(master_output);
+            }
+        </script>
+
 
         <script>
             function add_button(name){
@@ -368,7 +446,6 @@
 
              function modified_content( modified){
                   content="";
-                  console.log(modified);
                    for(var i in  modified){
                      content+='<dd>' + modified[i]["date"]+ '</dd>'
                  }
@@ -392,8 +469,11 @@
         </script>
 
         <script>
+
             var frm = $('#form_detail');
+
             frm.submit(function () {
+                add_master_input();
                 $.ajax({
                     type: frm.attr('method'),
                     url: frm.attr('action'),
@@ -411,9 +491,6 @@
                         var entry_pk = selected[0].original.pk;
                         display_entry_detail(entry_pk)}
 
-
-
-
                     },
                     error: function(data) {
                         console.log(xhr.status + ": " + xhr.responseText);
@@ -421,6 +498,13 @@
                 });
                 return false;
             });
+        </script>
+        <script>
+            var checkbox = document.getElementsByClassName("checkIt");
+            checkbox.onchange = console.log("hi");
+            $("#checkbox1").on('change', function() {
+                    console.log("hi");
+                })
         </script>
 
     </div>

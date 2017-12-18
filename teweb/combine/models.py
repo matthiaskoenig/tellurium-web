@@ -64,7 +64,7 @@ class Triple(models.Model):
         return "<Triple:({}, {}, {})>".format(self.subject, self.predicate, self.object)
 
 
-class MetaData(models.Model):
+class MetaData(ChangesMixin,models.Model):
     """ MetaData information.
 
     Stores the RDF MetaData for a given object.
@@ -251,7 +251,7 @@ class EntrySource(DjangoChoices):
 
 
 # TODO: store the actual file for the entry (use archive and location to store the file), use a FileField
-class ArchiveEntry(models.Model):
+class ArchiveEntry(ChangesMixin,models.Model):
     """ Entry information.
     This corresponds to the content of the manifest file.
     """

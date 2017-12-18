@@ -118,11 +118,38 @@ def archive_view(request, archive_id):
 
 
     if request.method =='POST':
+        modified = False
         data = request.POST["data"]
         entrydata_dict = json.loads(data)
+        #print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
+
 
         archive_entry = ArchiveEntry.objects.get(id=entrydata_dict["id"])
-        modified = False
+        #archive_entry_data = {"archive": archive}
+        #archive_entry_data["master"] =  entrydata_dict["master"]
+
+        #serializer_entry = ArchiveEntrySerializer(data=archive_entry_data)
+        #print(serializer_entry.is_valid())
+        #print(serializer_entry.errors)
+        if entrydata_dict["master"]=="true":
+            entrydata_dict["master"] = True
+        elif entrydata_dict["master"]=="false":
+            entrydata_dict["master"] = False
+
+        #todo: valdidation
+        archive_entry_serializer = ArchiveEntrySerializer()
+        archive_entry_serializer.update(instance=archive_entry, validated_data=entrydata_dict )
+        if bool(archive_entry.changes()):
+            modified = True
+        archive_entry.save()
+
+        data={"description":entrydata_dict["description"]}
+        meta_data_serializer = MetaDataSerializer()
+        meta_data_serializer.update(instance = archive_entry.metadata, validated_data=data )
+        if bool(archive_entry.metadata.changes()):
+            modified = True
+        archive_entry.metadata.save()
+
 
         for creator in entrydata_dict["creators"]:
             serializer_creator = CreatorSerializer(data = creator)
@@ -150,10 +177,6 @@ def archive_view(request, archive_id):
 
 
 
-            #print(json.dumps(entrydata_dict, indent=4 , sort_keys=True))
-        #DateSerializer.get()
-        #todo validate data
-        #CreatorSerializer.get()
 
 
 

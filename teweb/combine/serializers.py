@@ -73,9 +73,9 @@ class MetaDataSerializer(serializers.HyperlinkedModelSerializer):
 
     def update(self, instance, validated_data):
         instance.description = validated_data.get("description", instance.description)
-        instance.creators = validated_data.get("creators", instance.creators)
-        instance.created = validated_data.get("created", instance.created)
-        instance.modified = validated_data.get("modified", instance.modified)
+        #instance.creators = validated_data.get("creators", instance.creators)
+        #instance.created = validated_data.get("created", instance.created)
+        #instance.modified = validated_data.get("modified", instance.modified)
 
 
 
