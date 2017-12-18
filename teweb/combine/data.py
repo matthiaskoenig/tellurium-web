@@ -20,7 +20,7 @@ def add_archives_to_database(archive_dirs):
     :return:
     """
     # list files
-    omex_files = comex.get_omex_file_paths(archive_dirs)
+    omex_files = comex.get_archive_paths(archive_dirs)
 
     for path in sorted(omex_files):
         print('-' * 80)
