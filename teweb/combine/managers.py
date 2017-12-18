@@ -149,6 +149,7 @@ class ArchiveEntryManager(models.Manager):
         else:
             return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
 
+
 class MetaDataManager(models.Manager):
     """ Manager for ArchiveEntryMeta. """
 
