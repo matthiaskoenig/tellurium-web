@@ -244,14 +244,22 @@ class Archive(models.Model):
         return self.entries.count() > 0
 
 
+class EntrySource(DjangoChoices):
+    """ Source of the entry information. """
+    manifest = ChoiceItem("manifest")
+    zip = ChoiceItem("zip")
+
+
 # TODO: store the actual file for the entry (use archive and location to store the file), use a FileField
 class ArchiveEntry(models.Model):
     """ Entry information.
     This corresponds to the content of the manifest file.
     """
     archive = models.ForeignKey(Archive, on_delete=models.CASCADE, related_name="entries")
+    file = models.FileField(upload_to='files', null=True)
     location = models.CharField(max_length=MAX_TEXT_LENGTH)
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
+    source = models.CharField(max_length=MAX_TEXT_LENGTH, choices=EntrySource.choices)
     master = models.BooleanField(default=False)
     metadata = models.ForeignKey("MetaData", on_delete=models.SET_NULL, null=True)
 

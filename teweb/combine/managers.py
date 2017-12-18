@@ -97,7 +97,18 @@ class ArchiveManager(models.Manager):
             # metadata parsed from archive (lookup via locations)
             omex_metadata = archive.omex_metadata()
 
-            # create entries for files listed in the OMEX manifest.xml
+            # create entries
+
+            # read the files
+            # with zipfile.ZipFile(archive_path) as z:
+            #     for name in z.namelist():
+            #         location = comex._normalize_location(name)
+            #
+            #         # extract to temporary file
+            #         suffix = location.split('/')[-1]
+            #         tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
+            #         tmp.write(z.read(name))
+
             for location, entry in archive.omex_entries().items():
                 print("This is the archive:", entry)
                 print("archive:", archive)
