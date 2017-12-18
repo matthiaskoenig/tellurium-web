@@ -100,11 +100,14 @@ class ArchiveManager(models.Manager):
 
             # create entries for files listed in the OMEX manifest.xml
             for location, entry in archive.omex_entries().items():
+                print("this si the archive:",entry)
+                print("archive:", archive)
                 entry_dict = {
                     "entry": entry,
                     "archive": archive,
                 }
                 archive_entry, _ = ArchiveEntry.objects.get_or_create(**entry_dict)
+                archive_entry.save()
 
                 # create single metadata for every entry
                 meta_dict = omex_metadata.get(location)
@@ -147,8 +150,8 @@ class ArchiveEntryManager(models.Manager):
             kwargs["format"] = entry["format"]
             kwargs["location"] = entry["location"]
 
-        else:
-            return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
+
+        return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
 
 class MetaDataManager(models.Manager):
     """ Manager for ArchiveEntryMeta. """
