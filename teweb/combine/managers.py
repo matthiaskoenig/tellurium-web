@@ -99,7 +99,7 @@ class ArchiveManager(models.Manager):
 
             # create entries for files listed in the OMEX manifest.xml
             for location, entry in archive.omex_entries().items():
-                print("this si the archive:",entry)
+                print("This is the archive:", entry)
                 print("archive:", archive)
                 entry_dict = {
                     "entry": entry,
@@ -110,12 +110,6 @@ class ArchiveManager(models.Manager):
 
                 # create single metadata for every entry
                 meta_dict = omex_metadata.get(location)
-                print(location)
-                if meta_dict:
-                    print(meta_dict['about'])
-                else:
-                    print("No metadata information")
-                print("\n")
                 if meta_dict:
 
                     metadata_dict = {
@@ -127,9 +121,6 @@ class ArchiveManager(models.Manager):
                     metadata.save()
 
                 archive_entry.save()
-
-            # add the additional entries from the zip content
-            # TODO: implement, see https://github.com/matthiaskoenig/tellurium-web/issues/73
 
             return archive, created_archive
 
@@ -148,7 +139,6 @@ class ArchiveEntryManager(models.Manager):
             kwargs["master"] = entry["master"]
             kwargs["format"] = entry["format"]
             kwargs["location"] = entry["location"]
-
 
         return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
 
