@@ -108,6 +108,12 @@ class ArchiveManager(models.Manager):
 
                 # create single metadata for every entry
                 meta_dict = omex_metadata.get(location)
+                print(location)
+                if meta_dict:
+                    print(meta_dict['about'])
+                else:
+                    print("No metadata information")
+                print("\n")
                 if meta_dict:
 
                     metadata_dict = {
@@ -167,6 +173,9 @@ class MetaDataManager(models.Manager):
         Date = apps.get_model("combine", model_name="Date")
 
         metadata = kwargs.get("metadata")
+        from pprint import pprint
+        pprint(metadata)
+
         if metadata:
             # fields required to generate ArchiveEntryMeta
             del kwargs["metadata"]
@@ -176,6 +185,7 @@ class MetaDataManager(models.Manager):
 
             # create initial meta entry
             entry_meta, created_meta = super(MetaDataManager, self).get_or_create(*args, **kwargs)
+            # entry_meta, created_meta = super(MetaDataManager, self).create(*args, **kwargs)
 
             # add creator information
             for creator_info in metadata.get("creators", []):

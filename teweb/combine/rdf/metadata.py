@@ -51,6 +51,33 @@ def read_metadata(archive_path):
         :param predicate:
         :return:
         """
+        result = None
+
+        for triple in g.triples((URIRef(location), predicate, None)):
+            (subj, pred, obj) = triple
+
+            # not terminal node, but linear pathway, follow the trail
+            while not isinstance(obj, Literal):
+                triples = list(g.triples((obj, None, None)))
+                if len(triples) == 0:
+                    warnings.warn("Something went wrong !")
+                    return str(obj)
+                    break
+
+                (subj, pred, obj) = triples[0]
+
+            result = str(obj)
+
+        return result
+
+
+    def read_predicate_list(g, location, predicate):
+        """ Multiple entries can exist
+
+        :param field:
+        :param predicate:
+        :return: list
+        """
         results = []
 
         for triple in g.triples((URIRef(location), predicate, None)):
@@ -67,8 +94,6 @@ def read_metadata(archive_path):
                 (subj, pred, obj) = triples[0]
 
             results.append(str(obj))
-        if len(results) == 0:
-            results.append(None)
         return results
 
     def read_creators(g, location):
@@ -98,6 +123,11 @@ def read_metadata(archive_path):
         return creators
 
     def read_triples(g):
+        """ Reads the triples in the graph.
+
+        :param g:
+        :return:
+        """
         triples = []
         for (s,p,o) in g.triples((None, None, None)):
             triples.append((str(s), str(p), str(o)))
@@ -110,9 +140,9 @@ def read_metadata(archive_path):
     for location, g in graph_dict.items():
         metadata = {}
         metadata['about'] = location
-        metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description)[0]
-        metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created)[0]
-        metadata['modified'] = read_predicate(g, location, DCTERMS.created)
+        metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description)
+        metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created)
+        metadata['modified'] = read_predicate_list(g, location, DCTERMS.modified)
         metadata['creators'] = read_creators(g, location)
         metadata['triples'] = read_triples(g)
 
@@ -122,7 +152,7 @@ def read_metadata(archive_path):
     return metadata_dict
 
 
-def read_rdf_graphs(archive_path):
+def read_rdf_graphs(archive_path, debug=False):
     """ Reads all the RDF subgraphs for the locations in the COMBINE archive.
 
     :param archive_path:
@@ -141,22 +171,29 @@ def read_rdf_graphs(archive_path):
     locations = []
     for i in range(omex.getNumEntries()):
         entry = omex.getEntry(i)
+
+        # normalize the location of the entries
         location = entry.getLocation()
-        if len(locations) > 0:
-            locations.append("./{}".format(location))
-        else:
-            locations.append(".")
+        print(location)
+        if (len(location) > 1) and (not location.startswith(".")):
+            location = "./{}".format(location)
+
+        if len(location) == 0:
+            location = "."
+
+        locations.append(location)
         format = entry.getFormat()
 
         # read metadata from metadata files
         if format.endswith("omex-metadata"):
+            print(location, entry.getLocation())
 
             # extract to temporary file
             suffix = location.split('/')[-1]
             tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
-            omex.extractEntry(location, tmp.name)
+            omex.extractEntry(entry.getLocation(), tmp.name)
 
-            g = parse_rdf(tmp.name)
+            g = parse_rdf(tmp.name, debug=True)
             # close the tmp file
             tmp.close()
             graphs.append(g)
@@ -184,11 +221,13 @@ def read_rdf_graphs(archive_path):
             bind_default_namespaces(gloc)
             graph_dict[location] = gloc
 
-            if False:
+            if debug:
                 print('-' * 80)
                 print("PARSE METADATA:", location)
                 print('-' * 80)
                 print(gloc.serialize(format='turtle').decode("utf-8"))
+    else:
+        print("No graphs parsed.")
 
     omex.cleanUp()
     return graph_dict
@@ -229,7 +268,12 @@ def write_metadata(metadata, file_path):
 ########################################################################
 if __name__ == "__main__":
 
-    omex_path = "../testdata/rdf/L1V3_vanderpol-sbml.omex"
-    metadata = read_metadata(omex_path)
-    # pprint(metadata)
+    metadata = read_metadata("../testdata/rdf/L1V3_vanderpol-sbml.omex")
+    pprint(metadata)
+
+    print("-" * 80)
+
+    metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
+    pprint(metadata)
+
     # write_metadata(metadata, file_path=None)
