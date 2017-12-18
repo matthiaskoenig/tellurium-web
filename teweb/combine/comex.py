@@ -171,11 +171,16 @@ def read_manifest_entries(archive_path):
     :param path:
     :return:
     """
-    # FIXME: this should be done for all zip entries!, i.e. combined information from zip archives and the
-    # manifest information.
-
-
+    # parse information from manifest
     entries_dict = _parse_manifest_entries(archive_path=archive_path)
+
+    # parse information from zip entries
+    zip_dict = _parse_zip_entries(archive_path=archive_path)
+
+    for location, zip_entry in zip_dict.items():
+        # add entries from zip
+        if location not in entries_dict:
+            entries_dict[location] = zip_entry
 
     # add root information
     if '.' not in entries_dict:
@@ -183,6 +188,7 @@ def read_manifest_entries(archive_path):
             'location': '.',
             'format': 'http://identifiers.org/combine.specifications/omex',
             'master': False,
+            'source': 'zip',
         }
 
     return entries_dict
@@ -219,6 +225,7 @@ def _parse_manifest_entries(archive_path):
                     'location': location,
                     'format': content.attrib.get('format'),
                     'master': master,
+                    'source': 'manifest'
                 }
 
         except KeyError:
@@ -246,10 +253,37 @@ def _normalize_location(location):
     return location
 
 
-def _parse_zip_entries(path):
+def _parse_zip_entries(archive_path):
     """ Infers the entries from the zip archive. """
-    # TODO: implement
-    pass
+
+    entries_dict = {}
+
+    with zipfile.ZipFile(archive_path) as z:
+        for name in z.namelist():
+            location = _normalize_location(name)
+
+            # skip directories
+            if name.endswith("/"):
+                continue
+
+            # guess the format
+            suffix = location.split('/')[-1]
+            tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
+            tmp.write(z.read(name))
+
+            format = libcombine.KnownFormats.guessFormat(tmp.name)
+            master = False
+            if libcombine.KnownFormats.isFormat(formatKey="sed-ml", format=format):
+                master = True
+
+            entries_dict[location] = {
+                'location': location,
+                'format': format,
+                'master': master,
+                'source': 'zip',
+            }
+
+    return entries_dict
 
 
 def short_format(format):
@@ -285,5 +319,8 @@ def base_format(format):
 
 
 if __name__ == "__main__":
-    archive_path = "./testdata/rdf/CombineArchiveShowCase.omex"
-    read_manifest_entries(archive_path)
+    # archive_path = "./testdata/rdf/CombineArchiveShowCase.omex"
+    archive_path = "./testdata/rdf/Desktop.zip"
+    entries_dict = read_manifest_entries(archive_path)
+
+    pprint(entries_dict)
