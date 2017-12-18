@@ -143,6 +143,21 @@ class ArchiveEntryManager(models.Manager):
 
         return super(ArchiveEntryManager, self).get_or_create(*args, **kwargs)
 
+    def update(self,*args, **kwargs):
+        archive_entry_data = {}
+        archive_entry = super(ArchiveEntryManager, self).get(id = kwargs["id"])
+        archive_entry.update(master = kwargs.get("master"))
+        archive_entry.update(format = kwargs.get("format"))
+        archive_entry.update(location = kwargs.get("location"))
+        archive_entry.update(archive = kwargs.get("archive"))
+        archive_entry.update(metadata = kwargs.get("metadata"))
+
+        return archive_entry
+
+
+
+
+
 
 class MetaDataManager(models.Manager):
     """ Manager for ArchiveEntryMeta. """

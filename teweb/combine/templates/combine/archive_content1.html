@@ -285,6 +285,17 @@
 
                 function addContact(creators,creator,edit){
                  if (edit==true){
+
+                     var idInuput=document.createElement("input");
+                     idInuput.setAttribute("value",creators[creator]["id"]);
+                     idInuput.setAttribute("type", "hidden");
+                     idInuput.setAttribute("name", "creators["+creator+"][id]");
+                     document.getElementById("item_detail").appendChild(idInuput);
+
+
+
+
+
                      var givenNameInput=document.createElement("input");
                      givenNameInput.setAttribute("value",creators[creator]["first_name"]);
                      givenNameInput.setAttribute("placeholder", "First Name");
@@ -326,6 +337,7 @@
                  var contact_content = '<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>";
                  $("#item_detail").append(contact_content);
 
+
              }
 
              function add_description (metadata,edit){
@@ -358,8 +370,9 @@
 
              function modified_content( modified){
                   content="";
-                   for(var date in  modified){
-                     content+='<dd>' + modified[date]+ '</dd>'
+                  console.log(modified);
+                   for(var i in  modified){
+                     content+='<dd>' + modified[i]["date"]+ '</dd>'
                  }
                  return content
              }

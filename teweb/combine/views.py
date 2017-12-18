@@ -23,7 +23,7 @@ from celery.result import AsyncResult
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import ArchiveEntrySerializer
+from .serializers import ArchiveEntrySerializer, DateSerializer,CreatorSerializer, MetaDataSerializer
 
 
 
@@ -118,9 +118,18 @@ def archive_view(request, archive_id):
         #data=request.POST.getlist('data')
         data = request.POST["data"]
 
-        json_data = json.loads(data)
+        entrydata_dict = json.loads(data)
+        for creator in entrydata_dict["creators"]:
+            validated_data={"id": creator["id"]}
+            creator = CreatorSerializer.get(validated_data = validated_data)
 
-        print(json.dumps(json_data, indent=4 , sort_keys=True))
+        #print(json.dumps(entrydata_dict, indent=4 , sort_keys=True))
+        #DateSerializer.get()
+        #todo validate data
+        #CreatorSerializer.get()
+
+
+
 
 
 
