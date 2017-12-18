@@ -402,11 +402,18 @@
                     url: frm.attr('action'),
                     data: {"data": frm.serializeJSON()},
                     success: function (data) {
-                        console.log(data);
+
+                        if(data.is_error){
+                            $("#error_detail").empty()
+                            for (var error in data.errors){
+                                $("#error_detail").append("<div class='alert-box alert radius' data-alert>"+error+":"+data.errors[error]+"</div>")
+                            }
+                        }
+                        else{
                         console.log("success"); // another sanity check
                         selected = $('#json_tree').jstree(true).get_selected(true);
                         var entry_pk = selected[0].original.pk;
-                        display_entry_detail(entry_pk);
+                        display_entry_detail(entry_pk)}
 
 
 

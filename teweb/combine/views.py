@@ -133,8 +133,10 @@ def archive_view(request, archive_id):
                 if bool(creator.changes()):
                     modified = True
                 creator.save()
+                return  JsonResponse({"errors":serializer_creator.errors, "is_error":False})
             else:
-                return JsonResponse(serializer_creator.errors)
+                response = {"errors":serializer_creator.errors,"is_error":True}
+                return JsonResponse(response)
 
         if modified:
             date = Date.objects.create(date=timezone.now())
