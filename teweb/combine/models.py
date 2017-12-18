@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from djchoices import DjangoChoices, ChoiceItem
 from celery.result import AsyncResult
+from django_model_changes import ChangesMixin
 
 try:
     import libcombine
@@ -42,7 +43,7 @@ class Date(models.Model):
         return "<Date:{}>".format(self.date)
 
 
-class Creator(models.Model):
+class Creator(ChangesMixin,models.Model):
     """ RDF creator of archive entry. """
     first_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
     last_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)

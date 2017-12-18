@@ -21,14 +21,13 @@ class CreatorSerializer(serializers.ModelSerializer):
         model = Creator
         fields = ['first_name', 'last_name', 'organisation', 'email','id']
 
-    def get(self,validated_data):
-        return Creator.objects.get(**validated_data)
-
     def update(self, instance, validated_data):
         instance.first_name = validated_data.get("first_name",instance.first_name)
         instance.last_name = validated_data.get("last_name",instance.last_name)
         instance.organisation = validated_data.get("organisation",instance.organisation)
         instance.email = validated_data.get("email",instance.email)
+        return instance
+
 
 
 
@@ -61,7 +60,7 @@ class TripleSerializer( serializers.ModelSerializer):
 
 
 class MetaDataSerializer(serializers.HyperlinkedModelSerializer):
-    creators = CreatorSerializer(many=True, )
+    creators = CreatorSerializer(many=True)
     modified = DateSerializer(many=True)
 
 
