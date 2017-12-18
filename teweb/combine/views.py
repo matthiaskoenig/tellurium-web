@@ -25,6 +25,8 @@ from celery.result import AsyncResult
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
+
 
 
 
@@ -124,18 +126,22 @@ def archive_view(request, archive_id):
 
         for creator in entrydata_dict["creators"]:
             serializer_creator = CreatorSerializer(data = creator)
-            serializer_creator.is_valid()
-            creator = Creator.objects.get(id = creator["id"])
-            serializer_creator.save()
-            serializer_creator.update(instance=creator,validated_data=serializer_creator.validated_data)
-            if bool(creator.changes()):
-                modified = True
-
-            creator.save()
+            if serializer_creator.is_valid():
+                creator = Creator.objects.get(id = creator["id"])
+                serializer_creator.save()
+                serializer_creator.update(instance=creator,validated_data=serializer_creator.validated_data)
+                if bool(creator.changes()):
+                    modified = True
+                creator.save()
+            else:
+                return JsonResponse(serializer_creator.errors)
 
         if modified:
             date = Date.objects.create(date=timezone.now())
             archive_entry.metadata.modified.add(date)
+
+
+
 
 
 

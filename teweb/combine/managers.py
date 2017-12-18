@@ -121,7 +121,7 @@ class ArchiveManager(models.Manager):
                     metadata_dict = {
                         "metadata": meta_dict,
                     }
-                    metadata, _ = MetaData.objects.create(**metadata_dict)
+                    metadata = MetaData.objects.create(**metadata_dict)
                     archive_entry.metadata = metadata
 
                     metadata.save()
@@ -171,8 +171,8 @@ class MetaDataManager(models.Manager):
             kwargs["created"] = metadata.get("created")
 
             # create initial meta entry
-            entry_meta, created_meta = super(MetaDataManager, self).get_or_create(*args, **kwargs)
-            # entry_meta, created_meta = super(MetaDataManager, self).create(*args, **kwargs)
+            #entry_meta, created_meta = super(MetaDataManager, self).get_or_create(*args, **kwargs)
+            entry_meta = super(MetaDataManager, self).create(*args, **kwargs)
 
             # add creator information
             for creator_info in metadata.get("creators", []):
@@ -191,10 +191,9 @@ class MetaDataManager(models.Manager):
             for modified_date in metadata.get("modified", []):
                 #modified = Date.objects.create(date=modified_date)
                 entry_meta.modified.create(date=modified_date)
-                #modified.save()
                 entry_meta.save()
 
-            return entry_meta, created_meta
+            return entry_meta
 
         else:
             return super(MetaDataManager, self).create(*args, **kwargs)

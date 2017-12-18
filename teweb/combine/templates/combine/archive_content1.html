@@ -83,6 +83,7 @@
                 <form id="form_detail" method="post">
                     <div id="button-div"></div>
                     <h3 id="title_entry"></h3>
+                    <div id="error_detail"></div>
                     <div id="item_detail"></div>
 
                 </form>
@@ -401,6 +402,7 @@
                     url: frm.attr('action'),
                     data: {"data": frm.serializeJSON()},
                     success: function (data) {
+                        console.log(data);
                         console.log("success"); // another sanity check
                         selected = $('#json_tree').jstree(true).get_selected(true);
                         var entry_pk = selected[0].original.pk;
@@ -408,15 +410,18 @@
 
 
 
+
                     },
                     error: function(data) {
-                        $("#item_detail").html("Something went wrong!");
+                        $("#error_detail").html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                        console.log(xhr.status + ": " + xhr.responseText);
                     }
                 });
                 return false;
             });
         </script>
-
+error
 
     </div>
 </div>
