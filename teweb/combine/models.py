@@ -218,7 +218,7 @@ class Archive(models.Model):
 
         :return: dictionary {location: entry} for all entries in the manifest.xml
         """
-        return comex.entries_dict(self.path)
+        return comex.read_manifest_entries(self.path)
 
     def omex_metadata(self):
         """ Get metadata information from archive.

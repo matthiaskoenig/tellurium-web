@@ -7,6 +7,10 @@ import os
 import json
 import zipfile
 import warnings
+import tempfile
+from pprint import pprint
+
+import xml.etree.ElementTree as ET
 
 try:
     import libcombine
@@ -150,67 +154,6 @@ def zip_tree_content(path, entries=None):
 ################################################
 # COMBINE archive
 ################################################
-"""
-Helper for reading and writing the manifest.
-"""
-
-def read_manifest_entries(archive_path):
-    """ Reads the information from the manifest.
-
-    :param path:
-    :return:
-    """
-    with zipfile.ZipFile(path) as zip:
-        for zip_info in zip.infolist():
-
-            # print(zip_info)
-            # zip_info.filename
-            # zip_info.date_time
-            # zip_info.file_size
-            node = node_from_filename(zip_info.filename)
-            nodes[node['id']] = node
-
-
-    # read combine archive contents & metadata
-    omex = libcombine.CombineArchive()
-    if omex.initializeFromArchive(archive_path) is None:
-        print("Invalid Combine Archive: {}", archive_path)
-        return None
-
-    # add entries
-    entries_dict = {}
-    for i in range(omex.getNumEntries()):
-        entry = omex.getEntry(i)
-        location = entry.getLocation()
-        # ensure all relative paths
-        if not location.startswith('.'):
-            location = "./{}".format(location)
-
-        format = entry.getFormat()
-
-        entries_dict[location] = {
-            'location': location,
-            'format': format,
-            'master': entry.getMaster(),
-        }
-
-    # add root information
-    entries_dict['.'] = {
-        'location': '.',
-        'format': 'http://identifiers.org/combine.specifications/omex',
-        'master': False,
-    }
-
-    omex.cleanUp()
-    return entries_dict
-
-
-def infer_manifest_entries(archive_path):
-    """ Reads the zip information and infers the manifest content."""
-    # TODO: implement
-    pass
-
-
 
 def create_manifest(archive):
     """ Creates the manifest information for the given archive.
@@ -222,47 +165,74 @@ def create_manifest(archive):
     pass
 
 
+def read_manifest_entries(archive_path):
+    """ Reads the information from the manifest.
 
-def entries_dict(archive_path):
-    """ Parse entry information from given COMBINE archive.
+    :param path:
+    :return:
+    """
 
-    This is the main entry function to retrieve information from COMBINE archives.
+    entries_dict = _parse_manifest_entries(archive_path=archive_path)
+
+    # add root information
+    if '.' not in entries_dict:
+        entries_dict['.'] = {
+            'location': '.',
+            'format': 'http://identifiers.org/combine.specifications/omex',
+            'master': False,
+        }
+
+    return entries_dict
+
+
+def _parse_manifest_entries(archive_path):
+    """ Parses the manifest information from given archive.
 
     :param archive_path:
     :return:
     """
-    # read combine archive contents & metadata
-    omex = libcombine.CombineArchive()
-    if omex.initializeFromArchive(archive_path) is None:
-        print("Invalid Combine Archive: {}", archive_path)
-        return None
+    MANIFEST = "manifest.xml"
 
-    # add entries
     entries_dict = {}
-    for i in range(omex.getNumEntries()):
-        entry = omex.getEntry(i)
-        location = entry.getLocation()
-        # ensure all relative paths
-        if not location.startswith('.'):
-            location = "./{}".format(location)
+    with zipfile.ZipFile(archive_path) as z:
+        try:
+            # raise KeyError if no manifest.xml
+            zipinfo = z.getinfo(MANIFEST)
 
-        format = entry.getFormat()
+            xml_str = z.read(MANIFEST)
+            # print(xml_str.decode("utf-8"))
 
-        entries_dict[location] = {
-            'location': location,
-            'format': format,
-            'master': entry.getMaster(),
-        }
+            omex_manifest = ET.fromstring(xml_str)
+            for content in omex_manifest:
+                location = content.attrib.get('location')
+                # ensure all relative paths (normalization of location)
+                if not location.startswith('.'):
+                    location = "./{}".format(location)
 
-    # add root information
-    entries_dict['.'] = {
-        'location': '.',
-        'format': 'http://identifiers.org/combine.specifications/omex',
-        'master': False,
-    }
+                master = content.attrib.get('master', False)
+                if master in ["T", "true"]:
+                    master = True
+                elif master in ["F", "false"]:
+                    master = False
 
-    omex.cleanUp()
+                entries_dict[location] = {
+                    'location': location,
+                    'format': content.attrib.get('format'),
+                    'master': master,
+                }
+
+        except KeyError:
+            warnings.warn("No 'manifest.xml' in COMBINE archive: {}".format(archive_path))
+            return entries_dict
+
+    pprint(entries_dict)
     return entries_dict
+
+
+def _parse_zip_entries(path):
+    """ Infers the entries from the zip archive. """
+    # TODO: implement
+    pass
 
 
 def short_format(format):
@@ -297,53 +267,6 @@ def base_format(format):
     return short
 
 
-# DEPRECATED, WILL BE REMOVED
-# def omex():
-#     """ Open CombineArchive for given archive.
-#
-#     Don't forget to close the omex after using it.
-#     :return:
-#     """
-#     omex = libcombine.CombineArchive()
-#     if omex.initializeFromArchive(self.path) is None:
-#         logger.error("Invalid Combine Archive: {}", self)
-#         return None
-#     return omex
-#
-#
-# def extract_entry_by_location(self, location, filename):
-#     """ Extracts entry at location to filename.
-#
-#     :param location:
-#     :param filename:
-#     :return:
-#     """
-#     omex = self.omex()
-#     entry = omex.getEntryByLocation(location)
-#     omex.extractEntry(location, filename)
-#     omex.cleanUp()
-#
-# def entry_content_by_index(self, index):
-#     """ Extracts entry content at given index.
-#
-#     :param index: index of entry
-#     :return: content
-#     """
-#     omex = self.omex()
-#     entry = omex.getEntry(index)
-#     content = omex.extractEntryToString(entry.getLocation())
-#     omex.cleanUp()
-#     return content
-#
-#
-# def entry_content_by_location(self, location):
-#     """ Extracts entry content at given location.
-#
-#     :param location: location of entry
-#     :return: content
-#     """
-#     omex = self.omex()
-#     entry = omex.getEntryByLocation(location)
-#     content = omex.extractEntryToString(entry.getLocation())
-#     omex.cleanUp()
-#     return content
+if __name__ == "__main__":
+    archive_path = "./testdata/rdf/CombineArchiveShowCase.omex"
+    read_manifest_entries(archive_path)
