@@ -28,6 +28,12 @@ class CreatorSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get("email",instance.email)
         return instance
 
+    def create(self, validated_data):
+        return Creator.objects.create(**validated_data)
+
+    def get(self,validated_data):
+        return Creator.objects.get(**validated_data)
+
 
 
 

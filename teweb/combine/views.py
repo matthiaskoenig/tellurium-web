@@ -152,17 +152,29 @@ def archive_view(request, archive_id):
 
 
         for creator in entrydata_dict["creators"]:
-            serializer_creator = CreatorSerializer(data = creator)
-            if serializer_creator.is_valid():
-                creator = Creator.objects.get(id = creator["id"])
-                serializer_creator.save()
-                serializer_creator.update(instance=creator,validated_data=serializer_creator.validated_data)
-                if bool(creator.changes()):
+            if creator["id"]== "new":
+                del creator["id"]
+                serializer_creator = CreatorSerializer(data=creator)
+                if serializer_creator.is_valid():
+                    creator = serializer_creator.create(validated_data=serializer_creator.validated_data)
+                    archive_entry.metadata.creators.add(creator)
                     modified = True
-                creator.save()
+                else:
+                    response = {"errors":serializer_creator.errors,"is_error":True}
+                    return JsonResponse(response)
             else:
-                response = {"errors":serializer_creator.errors,"is_error":True}
-                return JsonResponse(response)
+                serializer_creator = CreatorSerializer(data=creator)
+                if serializer_creator.is_valid():
+                    creator = Creator.objects.get(id = creator["id"])
+                    serializer_creator.save()
+                    serializer_creator.update(instance=creator,validated_data=serializer_creator.validated_data)
+                    if bool(creator.changes()):
+                        modified = True
+                    creator.save()
+                else:
+                    response = {"errors":serializer_creator.errors,"is_error":True}
+                    return JsonResponse(response)
+
 
         if modified:
             date = Date.objects.create(date=timezone.now())

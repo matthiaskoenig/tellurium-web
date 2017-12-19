@@ -82,7 +82,6 @@
             <div class="col-sm-6" id="entry_detail">
                 <form id="form_detail" method="post">
                     <div id="button-div"></div>
-                    <h3 id="title_entry"></h3>
                     <div id="manifest_detail">
                     </div>
                     <div id="item_detail"></div>
@@ -100,376 +99,163 @@
         </script>
         -->
 
-
-        <script>
-
-            var endpoint = './zip_tree';
-            $.ajax({
-                method: "GET",
-                url: endpoint,
-                success: function (data) {
-                    $('#json_tree').jstree({
-                        'core': {
-                            'multiple': false,
-                            'data': data
-                        }
-                    });
-                },
-                error: function (error_data) {
-                    console.log("error");
-                    console.log(error_data);
-
-                }
-            })
-
-            $('#json_tree')
-              // listen for event in json tree
-              .on('changed.jstree', function (e, data) {
-                  // get selected node
-                   selected = $('#json_tree').jstree(true).get_selected(true);
-                   var entry_pk = selected[0].original.pk;
-                   display_entry_detail(entry_pk);
-                });
-
-            $("tr#archive_content").click(function(e){     //function_td
-                var $row = $(this).closest("tr");    // Find the row
-                var location = $row.find(".location").text(); // Find the text
-
-                //display_entry_detail(pk);
-                //selected = $('#json_tree').jstree('select_node',location);
-                //var instance = $('#json_tree').jstree(true);
-                })
-
-                //console.log(instance.select_node(get_name(location)));
-        </script>
-
-        <script>
-            function display_entry_detail(entry_pk, edit=false){
-
-                var endpoint_path = "/api/archive-entries/" + entry_pk+"/";
-                var endpoint = window.location.origin+endpoint_path;
-                $.ajax({
-                    url: endpoint,
-                    type:'Get',
-                    success: function (data) {
-                         add_button("edit");
-                         entry_title(data,edit);
-                        $("#manifest_detail").empty();
-                         add_manfifest_detail(data,edit);
-
-                         if(data.metadata !== 'undefined'){
-                            $("#item_detail").empty();
-                            var meta = data.metadata;
-                            add_description(meta,edit);
-                            for (var creator in meta.creators){
-                                addContact(meta.creators,creator,edit);
-                            }
-                        }
-                    },
-                    error: function (error_data) {
-                        console.log("error");
-                        console.log(error_data);
-                    }
-                })
-            }
-        </script>
-
-        <script>
-            $(document).on('click','#editButton',function(){
-                selected = $('#json_tree').jstree(true).get_selected(true);
-                var entry_pk = selected[0].original.pk;
-                display_entry_detail(entry_pk, edit=true);
-                hidden_input_archive_entry_pk(entry_pk);
-
-            });
-        </script>
-
-        <script>
-            function entry_title(data){
-                var title_entry = document.getElementById("title_entry");
-                title_entry.innerHTML = get_title(data.location);
-
-                if (data.master){
-                    title_entry.appendChild(get_master_icon(data.master));
-                }
-                format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
-                if (typeof base_format(data.format) !== 'undefined' && format_list.indexOf(base_format(data.format))>=0){
-                     title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
-                }
-            }
-
-            function hidden_input_archive_entry_pk(pk){
-                 var archiveInput=document.createElement("input");
-                     archiveInput.setAttribute("value",pk);
-                     archiveInput.setAttribute("type", "hidden");
-                     archiveInput.setAttribute("name", "id");
-                 var form = document.getElementById("form_detail");
-                 form.appendChild(archiveInput);
-            }
-
-            function get_title(location){
-                var splited_fn = location.split("/");
-                return " " + splited_fn[splited_fn.length-1];
-            }
-
-            function get_master_icon(master){
-                var master_icon = document.createElement("i");
-                master_icon.setAttribute("class", "fa fa-star fa-fw");
-                master_icon.setAttribute("title", "master");
-                return master_icon
-            }
-
-            function get_format_icon(data){
-                var src="{{static('combine/images/mediatype/')}}"+base_format(data.format)+".png";
-                var format_icon = document.createElement("img");
-                format_icon.setAttribute("src", src);
-                format_icon.setAttribute("height",20);
-                format_icon.setAttribute("title",data.format);
-                return format_icon
-            }
-
-            function get_format_code(data){
-                var format_div = document.createElement("div");
-                var format_code = document.createElement("code");
-                format_code.setAttribute("title",data.format);
-                var format_label = document.createElement("label");
-                format_label.innerHTML = "Format";
-                format_code.innerHTML = base_format(data.format);
-                format_div.appendChild(format_label);
-                format_div.appendChild(format_code);
-
-                return format_div
-            }
-
-             function base_format(format){
-                var tokens = format.split('/').pop();
-                var short = tokens.split('.')[0];
-                 var result = short.replace("+xml",'');
-                 return result
-             }
-
-             function add_master_checkbox(master,edit){
-                 var checkbox_div = document.createElement("div");
-                 var checkbox_label = document.createElement("label");
-                 checkbox_label.innerHTML = "Master";
-
-                 var checkbox = document.createElement("INPUT");
-                 checkbox.type = "checkbox";
-                 checkbox.id = "checkbox1";
-
-                 checkbox.setAttribute("data-toggle", "toggle");
-                 checkbox.checked= master;
-                 checkbox.disabled = !edit;
-
-                 checkbox_div.appendChild(checkbox_label);
-                 checkbox_div.appendChild(checkbox);
-
-                 return checkbox_div
-             }
-
-             function add_location(location){
-                 var dl = document.createElement("dl");
-                 var dt = document.createElement("dt");
-                 var dd = document.createElement("dd");
-                 dt.innerHTML = "Location";
-                 dd.innerHTML = location;
-                 dl.appendChild(dt);
-                 dl.appendChild(dd);
-                 return dl
-             }
-
-             function add_manfifest_detail(data,edit){
-                 var detail_manifest = document.getElementById("manifest_detail");
-                 detail_manifest.appendChild(get_format_code(data));
-                 detail_manifest.appendChild(add_master_checkbox(data.master,edit));
-                 detail_manifest.appendChild(add_location(data.location));
-             }
-        </script>
-
-        <script>
-            function add_master_input(){
-                var master_output = document.createElement("input");
-                 master_output.setAttribute("value",document.getElementById('checkbox1').checked);
-                 master_output.setAttribute("name","master");
-                 master_output.setAttribute("type","hidden");
-                 master_output.setAttribute("id", "master_output");
-                 var form = document.getElementById("form_detail");
-                 form.appendChild(master_output);
-            }
-        </script>
-
-
-        <script>
-            function add_button(name){
-                 var myButton = document.createElement("span");
-                 var icon = document.createElement("i");
-                 myButton.className="btn btn-default btn-space";
-                 var edit = false;
-                 if(name=="add"){
-                     icon.className="fa fa-plus fa-fw";
-                     icon.title="create new rdf entry";
-
-                 }
-                 else if(name=="delete"){
-                     icon.className="fa fa-minus fa-fw";
-                     icon.title="create new rdf entry";
-                 }
-                 else if(name="edit"){
-                     myButton.setAttribute("id","editButton");
-                     //myButton.setAttribute("onclick","diplay_edit_detail()");
-
-                     icon.className="fa fa-pencil fa-fw";
-                     icon.title="create new rdf entry";
-
-                     }
-                 myButton.appendChild(icon);
-                 myButton.append(name);
-                 var placeHolder= document.getElementById('button-div');
-                 $('#button-div').empty();
-
-                 placeHolder.appendChild(myButton);
-
-                }
-
-                function addContact(creators,creator,edit){
-                 if (edit==true){
-
-                     var idInuput = document.createElement("input");
-                     idInuput.setAttribute("value",creators[creator]["id"]);
-                     idInuput.setAttribute("type", "hidden");
-                     idInuput.setAttribute("name", "creators["+creator+"][id]");
-                     document.getElementById("item_detail").appendChild(idInuput);
-
-
-                     var givenNameInput = document.createElement("input");
-                     givenNameInput.setAttribute("value",creators[creator]["first_name"]);
-                     givenNameInput.setAttribute("placeholder", "First Name");
-                     givenNameInput.setAttribute("name", "creators["+creator+"][first_name]");
-
-
-                     var givenName = givenNameInput.outerHTML;
-
-                     var familyNameInput = document.createElement("input");
-                     familyNameInput.setAttribute("value",creators[creator]["last_name"]);
-                     familyNameInput.setAttribute("placeholder","Family Name");
-                     familyNameInput.setAttribute("name", "creators["+creator+"][last_name]");
-
-                     var familyName = familyNameInput.outerHTML;
-
-                     var organisationInput = document.createElement("input");
-                     organisationInput.setAttribute("value",creators[creator]["organisation"]);
-                     organisationInput.setAttribute("placeholder","Organisation");
-                     organisationInput.setAttribute("name", "creators["+creator+"][organisation]");
-
-                     var organisation = organisationInput.outerHTML;
-
-                     var emailInput = document.createElement("input");
-                     emailInput.setAttribute("value",creators[creator]["email"]);
-                     emailInput.setAttribute("placeholder","Email");
-                     emailInput.setAttribute("name", "creators["+creator+"][email]");
-
-                     var email = emailInput.outerHTML;
-                 }
-                 else{
-                     var givenName = creators[creator]["first_name"];
-                     var familyName = creators[creator]["last_name"];
-                     var organisation = creators[creator]["organisation"];
-                     var email=creators[creator]["email"];
-                 }
-
-                 var contact_content = '<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>";
-                 $("#item_detail").append(contact_content);
-             }
-
-             function add_description (metadata,edit){
-                 if (edit==true){
-                     var form = document.getElementById("form_detail");
-
-                     var textArea = document.createElement("textarea");
-                     textArea.cols="50";
-                     textArea.rows="5";
-                     textArea.setAttribute("name","description");
-                     textArea.append(metadata["description"]);
-                     description =textArea.outerHTML;
-                     $("#button-div").append('<input class="btn btn-default" type="submit" value="Save">')
-
-                     // hidden Input for created and modified
-                     var createdInput=document.createElement("input");
-                     createdInput.setAttribute("value",metadata["created"]);
-                     createdInput.setAttribute("type", "hidden");
-                     createdInput.setAttribute("name", "created");
-                     form.appendChild(createdInput);
-
-                 }
-                 else {
-                     var description = metadata["description"];
-                 }
-                 $("#item_detail").append('<dl><dt>' + "Description" + '</dt><dd>' + description + '</dd></dl>');
-                 $("#item_detail").append('<dl><dt>' + "Created"+ '</dt><dd>' + metadata["created"] + '</dd></dl>');
-                 $("#item_detail").append('<dl><dt>' +"Modified"+'</dt>'+modified_content(metadata["modified"])+'</dl>');
-             }
-
-             function modified_content( modified){
-                  content="";
-                   for(var i in  modified){
-                     content+='<dd>' + modified[i]["date"]+ '</dd>'
-                 }
-                 return content
-             }
-        </script>
-
-        <script>
-            var csrftoken = Cookies.get('csrftoken');
-            function csrfSafeMethod(method) {
-                // these HTTP methods do not require CSRF protection
-                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-            }
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    }
-                }
-            });
-        </script>
-
-        <script>
-
-            var frm = $('#form_detail');
-
-            frm.submit(function () {
-                add_master_input();
-                $.ajax({
-                    type: frm.attr('method'),
-                    url: frm.attr('action'),
-                    data: {"data": frm.serializeJSON()},
-                    success: function (data) {
-
-                        if(data.is_error){
-                            for (var error in data.errors){
-                                $("#item_detail").prepend("<div class='alert alert-danger' data-alert>"+error+":"+data.errors[error]+"</div>")
-                            }
-                        }
-                        else{
-                        console.log("success"); // another sanity check
-                        selected = $('#json_tree').jstree(true).get_selected(true);
-                        var entry_pk = selected[0].original.pk;
-                        display_entry_detail(entry_pk)}
-
-                    },
-                    error: function(data) {
-                        console.log(xhr.status + ": " + xhr.responseText);
-                    }
-                });
-                return false;
-            });
-        </script>
-        <script>
-            var checkbox = document.getElementsByClassName("checkIt");
-            checkbox.onchange = console.log("hi");
-            $("#checkbox1").on('change', function() {
-                })
-        </script>
-
     </div>
 </div>
+
+
+<script>
+    // load zip tree
+    var endpoint = './zip_tree';
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function (data) {
+            $('#json_tree').jstree({
+                'core': {
+                    'multiple': false,
+                    'data': data
+                }
+
+            });
+        },
+        error: function (error_data) {
+            console.log("error");
+            console.log(error_data);
+
+        }
+    })
+</script>
+
+<script>
+    //load detail of selected entry.
+         $('#json_tree')
+      // listen for event in json tree
+      .on('select_node.jstree', function (e, data) {
+          // get selected node
+
+          var selected, entry_pk;
+          console.log("hi");
+          selected = $('#json_tree').jstree(true).get_selected(true);
+          entry_pk = selected[0].original.pk;
+          display_entry_detail(entry_pk, false);
+        });
+</script>
+
+<script>
+     // trigger on_select for selected node when tree loads
+            $("#json_tree").on("ready.jstree", function(e, data) {
+              var tree = data.instance;
+              var obj = tree.get_selected(true)[0];
+
+              // trigger the on_select handler for the tree node that is currently selected and ensure that it is opened
+              if (obj) {
+                if (obj.state.opened) {
+                  tree.trigger('select_node', { 'node' : obj, 'selected' : tree._data.core.selected, 'event' : e });
+                } else {
+                  tree.open_node(obj, function() {
+                    tree.trigger('select_node', { 'node' : obj, 'selected' : tree._data.core.selected, 'event' : e });
+                  });
+                }
+              }
+            });
+</script>
+
+<script>
+
+    $(document).on('click','#editButton',function(){
+        var selected = $('#json_tree').jstree(true).get_selected(true);
+        var entry_pk = selected[0].original.pk;
+        display_entry_detail(entry_pk, true);
+    });
+
+    $(document).on('click','#addCreator',function(){
+        var contact_content = add_empty_creator();
+        $("#item_detail").append(contact_content);
+    });
+</script>
+
+<script>
+    function display_entry_detail(entry_pk, edit ){
+        // display detail of selected entry.
+        var endpoint_path = "/api/archive-entries/" + entry_pk+"/";
+        var endpoint = window.location.origin+endpoint_path;
+
+        var manifest_detail_div_document = document.getElementById("manifest_detail");
+        var button_div_document = document.getElementById("button-div");
+        var entry_detail_div_document = document.getElementById("item_detail");
+
+        manifest_detail_div_document.innerHTML ="";
+        button_div_document.innerHTML ="";
+        entry_detail_div_document.innerHTML ="";
+
+        $.ajax({
+            url: endpoint,
+            type:'Get',
+            success: function (data) {
+                var metadata = data.metadata;
+
+                button_div_document.appendChild(create_buttons_div(edit));
+                manifest_detail_div_document.appendChild(create_entry_title(data));
+                manifest_detail_div_document.appendChild(create_manfifest_detail(entry_pk,data,edit));
+
+                if(metadata !== 'undefined'){
+                    entry_detail_div_document.append(create_meta(metadata, edit));
+                }
+            },
+            error: function (error_data) {
+                // errors if anythink goes wrong
+                console.log("error");
+                console.log(error_data);
+            }
+        })
+    }
+</script>
+
+<script>
+    var frm = $('#form_detail');
+    frm.submit(function () {
+        document.getElementById("form_detail").appendChild(create_master_input());
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: {"data": frm.serializeJSON()},
+            success: function (data) {
+
+                // if data is not valid
+                if(data.is_error){
+                    for (var error in data.errors){
+                        $("#item_detail").prepend("<div class='alert alert-danger' data-alert>"+error+":"+data.errors[error]+"</div>")
+                    }
+                }
+                // if data valid
+                else{
+                console.log("success"); // another sanity check
+                var selected = $('#json_tree').jstree(true).get_selected(true);
+                var entry_pk = selected[0].original.pk;
+                display_entry_detail(entry_pk,false)}
+
+            },
+            error: function(data) {
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+        });
+        return false;
+    });
+</script>
+
+<script>
+    var csrftoken = Cookies.get('csrftoken');
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+</script>
+
