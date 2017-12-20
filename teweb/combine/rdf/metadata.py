@@ -13,6 +13,11 @@ As part of reading the metadata, all metadata files in the archive are
 parsed in an internal representation.
 
 As part of the writing the internal metadata information is serialized to a file.
+
+Additional information:
+http://purl.org/NET/mediatypes/application/rdf+xml
+
+
 """
 
 import tempfile
@@ -177,6 +182,7 @@ def read_rdf_graphs(archive_path, debug=False):
                 suffix = path.split('/')[-1]
                 tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
                 tmp.write(z.read(path))
+                tmp.seek(0)
 
                 g = parse_rdf(tmp.name, debug=False)
 
@@ -245,11 +251,17 @@ def transitive_subgraph(g, start, gloc=None):
 ########################################################################
 if __name__ == "__main__":
 
-    metadata = read_metadata("../testdata/rdf/L1V3_vanderpol-sbml.omex")
-    pprint(metadata)
+    # metadata = read_metadata("../testdata/rdf/L1V3_vanderpol-sbml.omex")
+    # pprint(metadata)
 
     print("-" * 80)
 
-    metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
+    # metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
+    # pprint(metadata)
+
+
+
+    metadata = read_metadata("/home/mkoenig/git/Annotations/nonstandardized/SBML/BIOMD0000000176.omex")
     pprint(metadata)
+
 
