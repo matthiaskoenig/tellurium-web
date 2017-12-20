@@ -11,7 +11,12 @@ import magic
 import json
 import rdflib
 import os
+import tempfile
+import shutil
+
 from django.utils import timezone
+from django.core.files.base import ContentFile
+
 
 
 from rest_framework.reverse import reverse
@@ -271,6 +276,7 @@ def archive_entry(request, archive_id, entry_index):
     archive = get_object_or_404(Archive, pk=archive_id)
 
     with NamedTemporaryFile(mode='w+b') as f:
+
         archive.extract_entry_by_index(entry_index, f.name)
 
         # get content_type with magic
@@ -296,11 +302,18 @@ def upload(request):
     if request.method == 'POST':
         form = UploadArchiveForm(request.POST, request.FILES)
         if form.is_valid():
-            name = request.FILES['file']
-            new_archive = Archive(name=name, file=request.FILES['file'])
-            new_archive.md5 = 'None'
-            # new_archive.full_clean()
-            new_archive.save()
+
+            file_name = request.FILES['file'].name
+            file_obj = request.FILES['file']
+            file_obj2 = ContentFile(file_obj.read())
+            dirpath = tempfile.mkdtemp()
+            file_path = os.path.join(dirpath,file_name)
+            with open(file_path, 'wb+') as destination:
+                destination.write(file_obj2.read())
+                new_archive, _ = Archive.objects.get_or_create(archive_path=file_path)
+            shutil.rmtree(dirpath)
+
+
             return archive_view(request, new_archive.id)
         else:
             logging.warning('Form is invalid')
