@@ -13,15 +13,10 @@ from djchoices import DjangoChoices, ChoiceItem
 from celery.result import AsyncResult
 from django_model_changes import ChangesMixin
 
-try:
-    import libcombine
-except ImportError:
-    import tecombine as libcombine
 
-from . import comex, validators
+from . import comex, validators, managers
 from .rdf.metadata import read_metadata
 
-from combine.managers import ArchiveManager, ArchiveEntryManager, MetaDataManager, hash_for_file
 logger = logging.getLogger(__name__)
 
 # ===============================================================================
@@ -31,7 +26,7 @@ MAX_TEXT_LENGTH = 500
 
 
 # ===============================================================================
-# Meta Data
+# MetaData
 # ===============================================================================
 class Date(models.Model):
     """ Helper class for dates.
@@ -40,7 +35,7 @@ class Date(models.Model):
     date = models.DateTimeField()
 
     def __str__(self):
-        return "<Date:{}>".format(self.date)
+        return self.date
 
 
 class Creator(ChangesMixin,models.Model):
@@ -51,7 +46,7 @@ class Creator(ChangesMixin,models.Model):
     email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
 
     def __str__(self):
-        return "<Creator:{} {}>".format(self.first_name, self.last_name)
+        return "{} {}".format(self.first_name, self.last_name)
 
 
 class Triple(models.Model):
@@ -61,7 +56,7 @@ class Triple(models.Model):
     object = models.TextField()
 
     def __str__(self):
-        return "<Triple:({}, {}, {})>".format(self.subject, self.predicate, self.object)
+        return "({}, {}, {})".format(self.subject, self.predicate, self.object)
 
     def is_bq(self):
         """ Triple with biomodels qualifer predictate. """
@@ -83,7 +78,7 @@ class MetaData(ChangesMixin,models.Model):
     modified = models.ManyToManyField(Date)
     triples = models.ManyToManyField(Triple)
 
-    objects = MetaDataManager()
+    objects = managers.MetaDataManager()
 
     def get_triples(self):
         """ This get the subset of triples which are displayed.
@@ -128,7 +123,7 @@ class Tag(models.Model):
                             editable=False)
 
     def __str__(self):
-        return "<Tag:{}>".format(self.name)
+        return self.name
 
     class Meta:
         unique_together = ('category', 'name')
@@ -154,10 +149,10 @@ class Archive(models.Model):
         default=uuid_lib.uuid4,
         editable=False)
 
-    objects = ArchiveManager()
+    objects = managers.ArchiveManager()
 
     def __str__(self):
-        return "<Archive:{}>".format(self.name)
+        return "{}".format(self.name)
 
     def save(self, *args, **kwargs):
         """ On save, update timestamps. """
@@ -165,7 +160,7 @@ class Archive(models.Model):
             self.created = timezone.now()
 
         if not self.md5:
-            self.md5 = hash_for_file(self.file, hash_type='MD5')
+            self.md5 = managers.hash_for_file(self.file, hash_type='MD5')
 
         return super(Archive, self).save(*args, **kwargs)
 
@@ -220,15 +215,9 @@ class Archive(models.Model):
             pass
         return metadata
 
-    @property
-    def archive_entry(self):
-        """ Get metadata from the metadata of top level entry."""
-        metadata = ""
-        try:
-            entry = self.entries.get(location=".")
-        except ObjectDoesNotExist:
-            pass
-        return entry
+    def has_entries(self):
+        """ Check if ArchiveEntries exist for archive. """
+        return self.entries.count() > 0
 
     def omex_entries(self):
         """ Get entry information from manifest.
@@ -244,9 +233,6 @@ class Archive(models.Model):
         """
         return read_metadata(self.path)
 
-    def zip_entries(self):
-        pass
-
     def tree_json(self):
         """ Gets the zip tree as JSON for the archive.
 
@@ -255,10 +241,6 @@ class Archive(models.Model):
         entries = self.entries.all()
         return comex.zip_tree_content(self.path, entries)
 
-    def has_entries(self):
-        """ Check if ArchiveEntries exist for archive. """
-        return self.entries.count() > 0
-
 
 class EntrySource(DjangoChoices):
     """ Source of the entry information. """
@@ -266,7 +248,7 @@ class EntrySource(DjangoChoices):
     zip = ChoiceItem("zip")
 
 
-class ArchiveEntry(ChangesMixin,models.Model):
+class ArchiveEntry(ChangesMixin, models.Model):
 
     """ Entry information.
     This corresponds to the content of the manifest file.
@@ -279,10 +261,10 @@ class ArchiveEntry(ChangesMixin,models.Model):
     master = models.BooleanField(default=False)
     metadata = models.OneToOneField("MetaData", on_delete=models.SET_NULL, null=True, related_name="entry")
 
-    objects = ArchiveEntryManager()
+    objects = managers.ArchiveEntryManager()
 
     def __str__(self):
-        return "<ArchiveEntry: {}|{}>".format(self.archive, self.location)
+        return "{}:{}".format(self.archive, self.location)
 
     class Meta:
         verbose_name_plural = "archive entries"

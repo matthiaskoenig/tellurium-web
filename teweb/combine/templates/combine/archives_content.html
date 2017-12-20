@@ -11,27 +11,21 @@
                 <thead>
                 <tr>
                     <th></th>
-                    <th></th>
                     <th>name</th>
-                    <!-- <th>description</th> -->
                     <th>user</th>
                     <th>tags</th>
                     <th>action</th>
                     <th>status</th>
                     <th>results</th>
+                    <th>description</th>
                     <th></th>
-                    <th class="hidden">created</th>
                 </tr>
                 </thead>
                 {% for archive in archives %}
                     <tr>
-                        <td><a href="{{ url('combine:archive', args=[archive.id]) }}">
-                            <span class="badge">{{ archive.id }}</span></a>
-                        </td>
-                        <td><a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
-                            <i class="fa fa-download fa-lg black"></i></a></td>
+                        <td>{{ macros.archive_download(archive) }}</td>
                         <td>{{ macros.archive_html(archive) }}</td>
-                        <!--<td>{{ archive.description }}</td>-->
+
                         <td>{{ macros.user(archive.user) }}</td>
                         <td>
                             {% for tag in archive.tags.all() %}
@@ -41,22 +35,17 @@
                         <td>{{ macros.archive_action(archive) }}</td>
                         <td>{{ macros.archive_status(archive) }}</td>
                         <td>{{ macros.archive_results(archive) }}</td>
-                        <td>
-                            <!-- delete archive -->
-                            {% if request.user.is_authenticated %}
-                                    <a href="{{ url('combine:delete_archive', args=[archive.id]) }}" title="Delete archive {{ archive.id }}: {{ archive.name }}"><span class="btn-xs btn-danger"
-                                                                                                              onclick="return confirm('Are you sure you want to delete: {{ archive }}?')">
-                                    <i class="fa fa-trash fa-fw"></i></span></a>
+                        <td>{{ archive.description }}</td>
+                        <td>{% if request.user.is_authenticated %}
+                            {{ macros.archive_delete(archive) }}
                             {% endif %}
                         </td>
-                        <td class="hidden">{{ archive.created }}</td>
-
                     </tr>
                 {% endfor %}
 
             </table>
         {% else %}
-            <p>No archives available. Upload archive below.</p>
+            <p>No archives available.</p>
         {% endif %}
     </div>
 </div>

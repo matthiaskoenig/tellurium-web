@@ -1,59 +1,49 @@
 {% import 'combine/macros.html' as macros %}
 
 <div class="panel panel-default">
-   <!-- navigate archives -->
-    <a href="{{ url('combine:archive_previous', args=[archive.id]) }}"
-       title="Previous archive"><span class="btn-xs btn-primary"><i
-            class="fa fa-arrow-circle-o-left fa-fw"></i></span></a>
-    <a href="{{ url('combine:archive_next', args=[archive.id]) }}"
-       title="Next archive"><span class="btn-xs btn-primary"><i
-            class="fa fa-arrow-circle-o-right fa-fw"></i></span></a>
     <div class="panel-heading">
 
-        <h2 class="panel-title">
-            <a href="{{ url('combine:archive', args=[archive.id]) }}">
-                {{ macros.archive_html(archive) }}
-            <a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive"><i
-                    class="fa fa-download fa-fw"></i></a>
+        <h2 class="panel-title">{{ macros.archive_download(archive) }} {{ archive.name }}
 
             <span class="pull-right">
+
+                <!-- navigate archives -->
+                <!--
+                <a href="{{ url('combine:archive_previous', args=[archive.id]) }}" title="Previous archive">
+                    <span class="btn-xs btn-primary"><i class="fa fa-arrow-circle-o-left fa-fw"></i></span></a>
+                <a href="{{ url('combine:archive_next', args=[archive.id]) }}" title="Next archive">
+                    <span class="btn-xs btn-primary"><i
+                        class="fa fa-arrow-circle-o-right fa-fw"></i></span></a>
+                -->
+
                 <!-- delete archive -->
                 {% if request.user.is_authenticated %}
-                <a href="{{ url('combine:delete_archive', args=[archive.id]) }}" title="Delete archive {{ archive.id }}: {{ archive.name }}"><span class="btn-xs btn-danger"
-                                                                                                              onclick="return confirm('Are you sure you want to delete: {{ archive }}?')">
-                    <i class="fa fa-trash fa-fw"></i></span></a>
+                            {{ macros.archive_delete(archive) }}
                 {% endif %}
             </span>
         </h2>
     </div>
 
-
     <div class="panel-body">
-        <span class="label label-primary" title="ZIP Content"></span>
+        <!-- Archive tree -->
         <div class="row">
-            <!-- The zip tree -->
-            <div class="col-sm-6" id="json_tree"></div>
-
-            <!-- the entry detail -->
-            <div class="col-sm-6" id="entry_detail">
-                <form id="form_detail" method="post">
-                    <div id="button-div"></div>
-                    <div id="manifest_detail">
-                    </div>
-                    <div id="item_detail"></div>
-                </form>
+            <div class="col-xs-6">
+                <div class="well">
+                    <div id="json_tree"></div>
+                </div>
             </div>
-            
-        </div>
 
-        <!-- idea dump
-        <div id="include"><iframe name="FileFrame" scrolling="yes" width="600" height="600"></iframe></div>
-        <script type="text/javascript">
-            $("#link").click(function(){
-                frames['FileFrame'].location.href="https://www.test.de"
-            });
-        </script>
-        -->
+            <div class="col-xs-6">
+                <!-- Entry detail -->
+                <div id="entry_detail">
+                    <form id="form_detail" method="post">
+                        <div id="button-div"></div>
+                        <div id="manifest_detail"></div>
+                        <div id="item_detail"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -83,41 +73,40 @@
 </script>
 
 <script>
-    //load detail of selected entry.
-         $('#json_tree')
-      // listen for event in json tree
-      .on('select_node.jstree', function (e, data) {
-          // get selected node
+  //load detail of selected entry.
+     $('#json_tree')
+  // listen for event in json tree
+  .on('select_node.jstree', function (e, data) {
+      // get selected node
 
-          var selected, entry_pk;
-          console.log("hi");
-          selected = $('#json_tree').jstree(true).get_selected(true);
-          entry_pk = selected[0].original.pk;
-          display_entry_detail(entry_pk, false);
-        });
+      var selected, entry_pk;
+      console.log("hi");
+      selected = $('#json_tree').jstree(true).get_selected(true);
+      entry_pk = selected[0].original.pk;
+      display_entry_detail(entry_pk, false);
+    });
 </script>
 
 <script>
-     // trigger on_select for selected node when tree loads
-            $("#json_tree").on("ready.jstree", function(e, data) {
-              var tree = data.instance;
-              var obj = tree.get_selected(true)[0];
+    // trigger on_select for selected node when tree loads
+    $("#json_tree").on("ready.jstree", function(e, data) {
+      var tree = data.instance;
+      var obj = tree.get_selected(true)[0];
 
-              // trigger the on_select handler for the tree node that is currently selected and ensure that it is opened
-              if (obj) {
-                if (obj.state.opened) {
-                  tree.trigger('select_node', { 'node' : obj, 'selected' : tree._data.core.selected, 'event' : e });
-                } else {
-                  tree.open_node(obj, function() {
-                    tree.trigger('select_node', { 'node' : obj, 'selected' : tree._data.core.selected, 'event' : e });
-                  });
-                }
-              }
-            });
+      // trigger the on_select handler for the tree node that is currently selected and ensure that it is opened
+      if (obj) {
+        if (obj.state.opened) {
+          tree.trigger('select_node', { 'node' : obj, 'selected' : tree._data.core.selected, 'event' : e });
+        } else {
+          tree.open_node(obj, function() {
+            tree.trigger('select_node', { 'node' : obj, 'selected' : tree._data.core.selected, 'event' : e });
+          });
+        }
+      }
+    });
 </script>
 
 <script>
-
     $(document).on('click','#editButton',function(){
         var selected = $('#json_tree').jstree(true).get_selected(true);
         var entry_pk = selected[0].original.pk;
@@ -134,8 +123,6 @@
          delete_contact(this.parentNode.id,creatorId,this.parentNode.parentNode);
          this.parentNode.parentNode = this.parentNode.parentNode.removeChild(this.parentNode)
     });
-
-
 </script>
 
 <script>
@@ -222,4 +209,3 @@
         }
     });
 </script>
-
