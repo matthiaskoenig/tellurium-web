@@ -81,9 +81,12 @@ class MetaData(ChangesMixin,models.Model):
 
     objects = MetaDataManager()
 
-
     class Meta:
         verbose_name_plural = "meta data"
+
+    @property
+    def triple_count(self):
+        return self.triples.count()
 
 # ===============================================================================
 # COMBINE Archives

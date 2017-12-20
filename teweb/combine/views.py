@@ -261,29 +261,19 @@ def delete_archive(request, archive_id):
     return redirect('combine:index')
 
 
-def archive_entry(request, archive_id, entry_index):
-    """ Display an entry in the archive.
+def archive_entry(request, entry_id):
+    """ Display an Archive Entry.
 
     :param request:
     :param archive_id:
     :param entry_id:
     :return:
     """
-    # FIXME: this is currently not working (requires refactoring and the storage of the
-    # files in the ArchiveEntry
-
-    entry_index = int(entry_index)
-    archive = get_object_or_404(Archive, pk=archive_id)
-
-    with NamedTemporaryFile(mode='w+b') as f:
-
-        archive.extract_entry_by_index(entry_index, f.name)
-
-        # get content_type with magic
-        content_type = magic.from_file(f.name)
-        response = FileResponse(open(f.name, 'rb'), content_type=content_type)
-
-    return response
+    entry = get_object_or_404(ArchiveEntry, pk=entry_id)
+    context = {
+        'entry': entry
+    }
+    return render(request, 'combine/entry.html', context)
 
 
 def upload_view(request, form):
