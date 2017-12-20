@@ -1,6 +1,3 @@
-/**
- * Created by janekg89 on 19/12/17.
- */
 
 function create_entry_title(data){
     "use strict";
@@ -412,7 +409,7 @@ function addTriple(triples,triple,edit){
         delete_button= "";
     }
 
-    triple_div.innerHTML =delete_button+'<dl><dd>'+subject+'</dd><dd>'+predicate+"</dd><dd>"+object+"</dd></dl>"+id;
+    triple_div.innerHTML =delete_button+' '+subject+' '+predicate+' <a href="'+object+'" target="_blank">'+object+"</a><br />"+id;
 
     return triple_div;
 }

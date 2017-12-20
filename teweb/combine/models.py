@@ -63,6 +63,10 @@ class Triple(models.Model):
     def __str__(self):
         return "<Triple:({}, {}, {})>".format(self.subject, self.predicate, self.object)
 
+    def is_bq(self):
+        """ Triple with biomodels qualifer predictate. """
+        return self.predicate.startswith("http://biomodels.net/")
+
 
 class MetaData(ChangesMixin,models.Model):
     """ MetaData information.
@@ -82,8 +86,13 @@ class MetaData(ChangesMixin,models.Model):
     objects = MetaDataManager()
 
     def get_triples(self):
-        return self.triples.filter(subject=self.entry.location)
+        """ This get the subset of triples which are displayed.
 
+        :return:
+        """
+        # triples = self.triples.filter(subject__startswith=self.entry.location)
+        bq_triples = [t for t in self.triples.all() if t.is_bq()]
+        return bq_triples
 
     class Meta:
         verbose_name_plural = "meta data"
