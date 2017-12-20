@@ -243,6 +243,8 @@ function create_save_button(){
     saveButton.setAttribute("id","saveButton");
     saveButton.setAttribute("type","submit");
     saveButton.setAttribute("value","save");
+    saveButton.setAttribute("name","save_entry_details");
+
     return saveButton;
 }
 

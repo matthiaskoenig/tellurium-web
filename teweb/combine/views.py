@@ -117,7 +117,8 @@ def archive_view(request, archive_id):
     context = archive_context(archive)
 
 
-    if request.method =='POST':
+    if request.method =='POST' and "save_entry_details" in request.POST:
+
         modified = False
         data = request.POST["data"]
         entrydata_dict = json.loads(data)
