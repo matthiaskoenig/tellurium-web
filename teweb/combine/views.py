@@ -510,6 +510,7 @@ def results(request, archive_id):
     outputs = []
 
     dgs_json = task.result["dgs"]
+
     for sedml_path, dgs_dict in dgs_json.items():
         sedml_location = comex._normalize_location(sedml_path)
 
@@ -557,6 +558,14 @@ def results(request, archive_id):
 
         # FIXME: Only processes the first file, than breaks
         break
+
+    # no SED-ML files in archive
+    if len(dgs_json) == 0:
+        sed_doc = None
+        reports = []
+        plot2Ds = []
+        plot3Ds = []
+
 
     # add results context
     context.update({

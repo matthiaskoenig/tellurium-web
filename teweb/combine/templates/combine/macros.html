@@ -10,7 +10,7 @@ Definition of reusable macro function in templates
 
 <!-- Archives -->
 {% macro archive_html(archive) %}
-<a href="{{ url('combine:archive', args=[archive.id]) }}"><b>{{ archive.name }}</b></a>
+<a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a>
 {% endmacro %}
 
 {% macro archive_download(archive) %}
