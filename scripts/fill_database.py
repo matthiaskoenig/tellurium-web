@@ -22,6 +22,7 @@ PROJECT_DIR = os.path.join(FILE_DIR, "../teweb/")
 # directories with OMEX archives
 ARCHIVE_DIRS = [
     os.path.join(FILE_DIR, "../archives"),
+    # os.path.join(FILE_DIR, "../archives/annotation"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/biomodels"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/jws"),

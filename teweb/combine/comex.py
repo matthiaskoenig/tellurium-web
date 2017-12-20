@@ -21,6 +21,8 @@ except ImportError:
 def get_archive_paths(archive_dirs):
     """ Returns list of given combine archive paths from given list of directories.
 
+    This includes all archives in subdirectories.
+
     Helper function used for instance for the bulk import of COMBINE archives in the
     database.
 
