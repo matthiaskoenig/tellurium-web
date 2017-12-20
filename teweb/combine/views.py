@@ -308,9 +308,15 @@ def upload(request):
             file_obj2 = ContentFile(file_obj.read())
             dirpath = tempfile.mkdtemp()
             file_path = os.path.join(dirpath,file_name)
+
+            create_dic = {}
+            if request.user.is_authenticated:
+                create_dic["user"] = request.user
+
             with open(file_path, 'wb+') as destination:
                 destination.write(file_obj2.read())
-                new_archive, _ = Archive.objects.get_or_create(archive_path=file_path, user=request.user)
+
+                new_archive, _ = Archive.objects.get_or_create(archive_path=file_path, **create_dic)
             shutil.rmtree(dirpath)
 
 
