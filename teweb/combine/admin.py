@@ -35,7 +35,7 @@ class DateAdmin(admin.ModelAdmin):
 
 @admin.register(Triple)
 class TripleAdmin(admin.ModelAdmin):
-    list_display = ('subject', 'predicate', 'object')
+    list_display = ('pk', 'subject', 'predicate', 'object')
     list_filter = ('predicate',)
     fields = ('subject', 'predicate', 'object')
 
@@ -49,5 +49,5 @@ class CreatorAdmin(admin.ModelAdmin):
 
 @admin.register(MetaData)
 class MetaDataAdmin(admin.ModelAdmin):
-    list_display = ('description', 'created')
-    fields = ('description', 'creators')
+    list_display = ('pk', 'description', 'triple_count', 'created')
+    fields = ('description', 'creators', 'triples')
