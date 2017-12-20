@@ -66,7 +66,7 @@ class ArchiveManager(models.Manager):
             # get or create the archive (uniqueness based on hash)
             md5 = hash_for_file(path, hash_type='MD5')
             if not "user" in kwargs:
-                kwargs["user"] = User.objects.get(username="global")
+                kwargs["user__isnull"] = True
 
             archive, created_archive = super(ArchiveManager, self).get_or_create(md5=md5, *args, **kwargs)
 
