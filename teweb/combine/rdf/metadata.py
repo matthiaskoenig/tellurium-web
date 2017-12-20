@@ -109,17 +109,20 @@ def read_metadata(archive_path):
             (subj, pred, obj) = triple
 
             info = {}
-            for (s, p, o) in g.triples((obj, VCARD.hasEmail, None)):
+            # email
+            for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))):
                 info["email"] = str(o)
 
             for (s, p, o) in g.triples((obj, VCARD["organization-name"], None)):
                 info["organisation"] = str(o)
 
-            for (s, p, o) in g.triples((obj, VCARD.hasName, None)):
+            for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))):
                 for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
                     info["familyName"] = str(o2)
                 for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
                     info["givenName"] = str(o2)
+
+
             creators.append(info)
 
         return creators
