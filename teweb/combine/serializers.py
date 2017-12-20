@@ -5,6 +5,7 @@ Model serialization used in the django-rest-framework.
 from rest_framework import serializers
 from .models import Tag, Archive, ArchiveEntry, MetaData, Creator, Date, Triple
 from django.contrib.auth.models import User
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -35,6 +36,24 @@ class CreatorSerializer(serializers.ModelSerializer):
         return Creator.objects.get(**validated_data)
 
 
+class TripleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Triple
+        fields = ['subject', 'predicate', 'object']
+
+    def update(self, instance, validated_data):
+        instance.subject = validated_data.get("subject",instance.subject)
+        instance.object = validated_data.get("object",instance.object)
+        instance.predicate = validated_data.get("predicate",instance.predicate)
+        return instance
+
+    def create(self, validated_data):
+        return Triple.objects.create(**validated_data)
+
+    def get(self,validated_data):
+        return Triple.objects.get(**validated_data)
+
 
 
 
@@ -57,22 +76,21 @@ class DateSerializer(serializers.ModelSerializer):
         fields = ['date','id']
 
 
-class TripleSerializer( serializers.ModelSerializer):
-
-    class Meta:
-        model = Triple
-        fields = ['subject', 'predicate', 'object']
 
 
 
 class MetaDataSerializer(serializers.HyperlinkedModelSerializer):
     creators = CreatorSerializer(many=True)
+    triples = TripleSerializer(source='get_triples', many=True)
     modified = DateSerializer(many=True)
+
+
 
 
     class Meta:
         model = MetaData
-        fields = ['description', 'creators', 'created', 'modified']
+        fields = ['description', 'creators', 'triples', 'created', 'modified']
+
 
     def get(self,validated_data):
         return MetaData.objects.get(**validated_data)
@@ -102,12 +120,17 @@ class ArchiveSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ArchiveEntrySerializer(serializers.HyperlinkedModelSerializer):
+    queryset = ArchiveEntry.objects.all()
     archive = serializers.HyperlinkedRelatedField(view_name='api:archive-detail', queryset=Archive.objects.all(), lookup_field='uuid')
     metadata = MetaDataSerializer()
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('location')
 
 
     def get(self,validated_data):
         return ArchiveEntry.objects.get(**validated_data)
+
+
 
 
 

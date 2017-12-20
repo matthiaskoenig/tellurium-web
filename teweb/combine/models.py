@@ -81,6 +81,10 @@ class MetaData(ChangesMixin,models.Model):
 
     objects = MetaDataManager()
 
+    def get_triples(self):
+        return self.triples.filter(subject=self.entry.location)
+
+
     class Meta:
         verbose_name_plural = "meta data"
 
@@ -264,7 +268,7 @@ class ArchiveEntry(ChangesMixin,models.Model):
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
     source = models.CharField(max_length=MAX_TEXT_LENGTH, choices=EntrySource.choices)
     master = models.BooleanField(default=False)
-    metadata = models.ForeignKey("MetaData", on_delete=models.SET_NULL, null=True)
+    metadata = models.OneToOneField("MetaData", on_delete=models.SET_NULL, null=True, related_name="entry")
 
     objects = ArchiveEntryManager()
 
