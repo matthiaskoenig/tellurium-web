@@ -134,7 +134,7 @@ function addContact(creators,creator,edit){
         idInput.setAttribute("value",creators[creator].id);
         idInput.setAttribute("type", "hidden");
         idInput.setAttribute("name", "creators["+creator+"][id]");
-        idInput.setAttribute("class", "creatorId");
+        idInput.setAttribute("class", "Id");
 
         id = idInput.outerHTML;
 
@@ -167,7 +167,7 @@ function addContact(creators,creator,edit){
         var deleteButton = document.createElement("input");
         deleteButton.setAttribute("class" , "btn btn-default btn-space");
         deleteButton.setAttribute("value","delete");
-        deleteButton.setAttribute("id","deleteCreator");
+        deleteButton.setAttribute("id","delete");
         deleteButton.setAttribute("type","button");
 
 
@@ -346,7 +346,74 @@ function create_meta(metadata, edit){
         meta_div.appendChild(contact_div);
     }}
 
+    for (var triple in metadata.triples){
+         if(metadata.triples.hasOwnProperty(triple)){
+             var triple_div = addTriple(metadata.triples,triple,edit);
+        meta_div.appendChild(triple_div);
+    }}
+
     return meta_div;
 
+}
+
+function addTriple(triples,triple,edit){
+ "use strict";
+    var triple_div , subject,predicate,object, id, delete_button;
+    triple_div = document.createElement("div");
+    triple_div.setAttribute("id", triple);
+
+    if (edit===true){
+        var idInput;
+        idInput = document.createElement("input");
+        idInput.setAttribute("value",triples[triple].id);
+        idInput.setAttribute("type", "hidden");
+        idInput.setAttribute("name", "triples["+triple+"][id]");
+        idInput.setAttribute("class", "Id");
+        id = idInput.outerHTML;
+
+        var subjectInput = document.createElement("input");
+        subjectInput.setAttribute("value",triples[triple].subject);
+        subjectInput.setAttribute("placeholder", "Subject");
+        subjectInput.setAttribute("name", "triples["+triple+"][first_name]");
+
+
+        subject = subjectInput.outerHTML;
+
+        var predicateInput = document.createElement("input");
+        predicateInput.setAttribute("value",triples[triple].predicate);
+        predicateInput.setAttribute("placeholder","Predicate");
+        predicateInput.setAttribute("name", "triples["+triple+"][last_name]");
+        predicate = predicateInput.outerHTML;
+
+
+
+        var objectInput = document.createElement("input");
+        objectInput.setAttribute("value",triples[triple].object);
+        objectInput.setAttribute("placeholder","Object");
+        objectInput.setAttribute("name", "triples["+triple+"][object]");
+        object = objectInput.outerHTML;
+
+        var deleteButton = document.createElement("input");
+        deleteButton.setAttribute("class" , "btn btn-default btn-space");
+        deleteButton.setAttribute("value","delete");
+        deleteButton.setAttribute("id","delete");
+        deleteButton.setAttribute("type","button");
+
+
+        delete_button = deleteButton.outerHTML;
+
+
+    }
+    else {
+        subject = triples[triple].subject;
+        predicate = triples[triple].predicate;
+        object = triples[triple].object;
+        id = "";
+        delete_button= "";
+    }
+
+    triple_div.innerHTML =delete_button+'<dl><dd>'+subject+'</dd><dd>'+predicate+"</dd><dd>"+object+"</dd></dl>"+id;
+
+    return triple_div;
 }
 
