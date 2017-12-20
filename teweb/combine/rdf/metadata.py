@@ -264,10 +264,10 @@ if __name__ == "__main__":
 
     print("-" * 80)
 
-    # metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
-    # pprint(metadata)
-
-    metadata = read_metadata("../testdata/rdf/BIOMD0000000176.omex")
+    metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
     pprint(metadata)
+
+    # metadata = read_metadata("../testdata/rdf/BIOMD0000000176.omex")
+    # pprint(metadata)
 
 
