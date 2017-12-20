@@ -310,7 +310,7 @@ def upload(request):
             file_path = os.path.join(dirpath,file_name)
             with open(file_path, 'wb+') as destination:
                 destination.write(file_obj2.read())
-                new_archive, _ = Archive.objects.get_or_create(archive_path=file_path)
+                new_archive, _ = Archive.objects.get_or_create(archive_path=file_path, user=request.user)
             shutil.rmtree(dirpath)
 
 
