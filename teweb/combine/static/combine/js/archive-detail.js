@@ -256,7 +256,6 @@ function create_buttons_div(edit){
     if ( edit ){
         buttons_div.appendChild(create_add_creator_button());
         buttons_div.appendChild(create_add_annotation_button());
-
         buttons_div.appendChild(create_save_button());
     }
     return buttons_div;

@@ -7,7 +7,7 @@ import hashlib
 from six import string_types
 import zipfile
 import tempfile
-
+from pprint import pprint
 from django.db import models
 from django.core.files import File
 from django.apps import apps
@@ -65,6 +65,9 @@ class ArchiveManager(models.Manager):
 
             # get or create the archive (uniqueness based on hash)
             md5 = hash_for_file(path, hash_type='MD5')
+            if not "user" in kwargs:
+                kwargs["user__isnull"] = True
+
             archive, created_archive = super(ArchiveManager, self).get_or_create(md5=md5, *args, **kwargs)
 
             # get name without extension
@@ -83,6 +86,7 @@ class ArchiveManager(models.Manager):
                     user = kwargs["user"]
             except KeyError:
                 user = User.objects.get(username="global")
+
             archive.user = user
             archive.save()
 
@@ -161,8 +165,6 @@ class MetaDataManager(models.Manager):
     """ Manager for ArchiveEntryMeta. """
 
     def create(self, *args, **kwargs):
-        #Creator = apps.get_model("combine", model_name="Creator")
-        #Date = apps.get_model("combine", model_name="Date")
 
         metadata = kwargs.get("metadata")
 
@@ -174,7 +176,6 @@ class MetaDataManager(models.Manager):
             kwargs["created"] = metadata.get("created")
 
             # create initial meta entry
-            #entry_meta, created_meta = super(MetaDataManager, self).get_or_create(*args, **kwargs)
             entry_meta = super(MetaDataManager, self).create(*args, **kwargs)
 
             # add creator information
@@ -186,14 +187,16 @@ class MetaDataManager(models.Manager):
                     "email": creator_info.get("email"),
                 }
                 entry_meta.creators.create(**creator_dict)
-                #entry_meta.creators.add(creator)
                 entry_meta.save()
-                #creator.save()
 
             # add modified stamps
             for modified_date in metadata.get("modified", []):
-                #modified = Date.objects.create(date=modified_date)
                 entry_meta.modified.create(date=modified_date)
+                entry_meta.save()
+
+
+            for s,p,o in metadata["triples"]:
+                entry_meta.triples.create(subject=s,predicate=p,object=o)
                 entry_meta.save()
 
             return entry_meta
