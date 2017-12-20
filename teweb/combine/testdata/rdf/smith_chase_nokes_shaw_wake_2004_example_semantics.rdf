@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+  
+  <rdf:Description rdf:about="./smith_chase_nokes_shaw_wake_2004.cellml#left_ventricle_P_lv">
+   <bqbiol:isVersionOf rdf:resource="http://identifiers.org/opb/OPB_00509" />
+   <bqbiol:isPropertyOf rdf:resource="#entity_0"/>
+   <dcterms:description>Left ventricular blood pressure</dcterms:description>
+   <!--
+        This annotation indicates that the model element with metaid left_ventricle_P_lv, which is a CellML variable, represents the pressure of blood in the left ventricule.
+   -->
+  </rdf:Description>
+
+  <rdf:Description rdf:about="#entity_0">
+    <bqbiol:isPartOf  rdf:resource="#entity_1"/>
+    <bqbiol:is rdf:resource="http://identifiers.org/fma/FMA:9670" />
+  </rdf:Description>
+
+  <rdf:Description rdf:about="#entity_1">
+    <bqbiol:is rdf:resource="http://identifiers.org/fma/FMA:9466" />
+  </rdf:Description>
+
+</rdf:RDF>

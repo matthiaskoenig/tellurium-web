@@ -36,3 +36,5 @@ docs/images/icons/
 
 # jupyter checkpoints
 api/.ipynb_checkpoints/
+teweb/combine.sqlite3-journal
+

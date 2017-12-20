@@ -26,15 +26,10 @@ from pprint import pprint
 import warnings
 import zipfile
 
-
-from combine.rdf.parser import parse_rdf, bind_default_namespaces
 from combine.comex import read_manifest_entries
 
-
-from rdflib.namespace import Namespace
-VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
-DCTERMS = Namespace('http://purl.org/dc/terms/')
-BQMODEL = Namespace('http://biomodels.net/model-qualifiers/')
+from combine.rdf.parser import VCARD, DCTERMS, BQMODEL, BQBIOL
+from combine.rdf.parser import parse_rdf, bind_default_namespaces
 
 
 ##############################################################
@@ -109,17 +104,20 @@ def read_metadata(archive_path):
             (subj, pred, obj) = triple
 
             info = {}
-            for (s, p, o) in g.triples((obj, VCARD.hasEmail, None)):
+            # email
+            for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))):
                 info["email"] = str(o)
 
             for (s, p, o) in g.triples((obj, VCARD["organization-name"], None)):
                 info["organisation"] = str(o)
 
-            for (s, p, o) in g.triples((obj, VCARD.hasName, None)):
+            for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))):
                 for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
                     info["familyName"] = str(o2)
                 for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
                     info["givenName"] = str(o2)
+
+
             creators.append(info)
 
         return creators
@@ -209,7 +207,6 @@ def read_rdf_graphs(archive_path, debug=False):
 
         # Split the graphs for the different locations, i.e.,
         # single graphs for the various resources
-
         for location in entries_dict.keys():
             gloc = transitive_subgraph(g, start=URIRef(location))
             bind_default_namespaces(gloc)
@@ -234,12 +231,23 @@ def transitive_subgraph(g, start, gloc=None):
     :param gloc: resulting transitive subgraph
     :return:
     """
+    created = False
     if gloc is None:
         gloc = Graph()
+        created = True
 
     # Search next edges & add to graph
-    triples = list(g.triples((start, None, None)))
-    gloc += triples
+    # triples where the subject starts with location
+    if created and str(start) != ".":
+        triples = []
+        for (s, p, o) in g:
+            if s.startswith(start):
+                gloc.add((s, p, o))
+                triples.append((s, p, o))
+    # identity
+    else:
+        triples = list(g.triples((start, None, None)))
+        gloc += triples
 
     # recursive adding of triples (starting now from object)
     for (subj, pred, obj) in triples:
@@ -259,9 +267,7 @@ if __name__ == "__main__":
     # metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
     # pprint(metadata)
 
-
-
-    metadata = read_metadata("/home/mkoenig/git/Annotations/nonstandardized/SBML/BIOMD0000000176.omex")
+    metadata = read_metadata("../testdata/rdf/BIOMD0000000176.omex")
     pprint(metadata)
 
 

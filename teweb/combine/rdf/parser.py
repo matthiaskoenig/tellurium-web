@@ -26,7 +26,7 @@ from rdflib.namespace import Namespace
 VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
 DCTERMS = Namespace('http://purl.org/dc/terms/')
 BQMODEL = Namespace('http://biomodels.net/model-qualifiers/')
-
+BQBIOL = Namespace('http://biomodels.net/biology-qualifiers/')
 
 def bind_default_namespaces(g):
     """ Bind the namespace prefixes in graph
@@ -37,6 +37,7 @@ def bind_default_namespaces(g):
     g.bind(prefix="vCard", namespace=URIRef("http://www.w3.org/2006/vcard/ns#"))
     g.bind(prefix="dcterms", namespace=URIRef("http://purl.org/dc/terms/"))
     g.bind(prefix="bqmodel", namespace=URIRef("http://biomodels.net/model-qualifiers/"))
+    g.bind(prefix="bqbiol", namespace=URIRef("http://biomodels.net/biology-qualifiers/"))
 
 
 def fix_path_prefix(el, prefix):
@@ -124,7 +125,7 @@ def parse_rdf(path, debug=False):
 if __name__ == "__main__":
     f1 = "../testdata/rdf/metadata1.rdf"
     f2 = "../testdata/rdf/metadata2.rdf"
-    f3 = "../testdata/rdf/BIOMD0000000176_example_semantics.rdf"
+    f3 = "../testdata/rdf/smith_chase_nokes_shaw_wake_2004_example_semantics.rdf"
 
     parse_rdf(f3)
     # parse_rdf(f1)
