@@ -129,8 +129,8 @@
         $("#item_detail").append(contact_content);
     });
 
-    $(document).on('click','#deleteCreator',function(){
-         var creatorId = this.parentNode.getElementsByClassName("creatorId")[0].value;
+    $(document).on('click','#delete',function(){
+         var creatorId = this.parentNode.getElementsByClassName("Id")[0].value;
          delete_contact(this.parentNode.id,creatorId,this.parentNode.parentNode);
          this.parentNode.parentNode = this.parentNode.parentNode.removeChild(this.parentNode)
     });
