@@ -217,7 +217,16 @@ function create_edit_button(){
     return myButton;
 }
 
-function create_creator_button(){
+function create_add_annotation_button(){
+    "use strict";
+    var creatorButton = document.createElement("input");
+    creatorButton.setAttribute("class","btn btn-default");
+    creatorButton.setAttribute("id","addAnnotation");
+    creatorButton.setAttribute("type","button");
+    creatorButton.setAttribute("value","add Annotation");
+    return creatorButton;
+}
+function create_add_creator_button(){
     "use strict";
     var creatorButton = document.createElement("input");
     creatorButton.setAttribute("class","btn btn-default");
@@ -243,7 +252,9 @@ function create_buttons_div(edit){
     var buttons_div = document.createElement("div");
     buttons_div.appendChild(create_edit_button());
     if ( edit ){
-        buttons_div.appendChild(create_creator_button());
+        buttons_div.appendChild(create_add_creator_button());
+        buttons_div.appendChild(create_add_annotation_button());
+
         buttons_div.appendChild(create_save_button());
     }
     return buttons_div;
