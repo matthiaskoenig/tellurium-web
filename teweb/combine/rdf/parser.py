@@ -125,7 +125,7 @@ def parse_rdf(path, debug=False):
 if __name__ == "__main__":
     f1 = "../testdata/rdf/metadata1.rdf"
     f2 = "../testdata/rdf/metadata2.rdf"
-    f3 = "../testdata/rdf/BIOMD0000000176_example_semantics.rdf"
+    f3 = "../testdata/rdf/smith_chase_nokes_shaw_wake_2004_example_semantics.rdf"
 
     parse_rdf(f3)
     # parse_rdf(f1)

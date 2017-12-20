@@ -238,7 +238,7 @@ def transitive_subgraph(g, start, gloc=None):
 
     # Search next edges & add to graph
     # triples where the subject starts with location
-    if created:
+    if created and str(start) != ".":
         triples = []
         for (s, p, o) in g:
             if s.startswith(start):
