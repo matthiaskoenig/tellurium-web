@@ -172,6 +172,14 @@
         var contact_content = add_empty_creator();
         $("#item_detail").append(contact_content);
     });
+
+     $(document).on('click','#deleteCreator',function(){
+         var creatorId = this.parentNode.getElementsByClassName("creatorId")[0].value;
+         delete_contact(this.parentNode.id,creatorId,this.parentNode.parentNode);
+         this.parentNode.parentNode = this.parentNode.parentNode.removeChild(this.parentNode)
+    });
+
+
 </script>
 
 <script>

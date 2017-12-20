@@ -125,12 +125,7 @@ def archive_view(request, archive_id):
 
 
         archive_entry = ArchiveEntry.objects.get(id=entrydata_dict["id"])
-        #archive_entry_data = {"archive": archive}
-        #archive_entry_data["master"] =  entrydata_dict["master"]
 
-        #serializer_entry = ArchiveEntrySerializer(data=archive_entry_data)
-        #print(serializer_entry.is_valid())
-        #print(serializer_entry.errors)
         if entrydata_dict["master"]=="true":
             entrydata_dict["master"] = True
         elif entrydata_dict["master"]=="false":
@@ -152,7 +147,11 @@ def archive_view(request, archive_id):
 
 
         for creator in entrydata_dict["creators"]:
-            if creator["id"]== "new":
+            if "delete" in creator:
+                creator = Creator.objects.get(id=creator["delete"])
+                creator.delete()
+
+            elif creator["id"]== "new":
                 del creator["id"]
                 serializer_creator = CreatorSerializer(data=creator)
                 if serializer_creator.is_valid():

@@ -124,8 +124,9 @@ function add_empty_creator(){
 
 function addContact(creators,creator,edit){
     "use strict";
-    var contact_div , familyName,givenName,email,organisation, id;
+    var contact_div , familyName,givenName,email,organisation, id, delete_button;
     contact_div = document.createElement("div");
+    contact_div.setAttribute("id", creator);
 
     if (edit===true){
         var idInput;
@@ -133,12 +134,16 @@ function addContact(creators,creator,edit){
         idInput.setAttribute("value",creators[creator].id);
         idInput.setAttribute("type", "hidden");
         idInput.setAttribute("name", "creators["+creator+"][id]");
+        idInput.setAttribute("class", "creatorId");
+
         id = idInput.outerHTML;
 
         var givenNameInput = document.createElement("input");
         givenNameInput.setAttribute("value",creators[creator].first_name);
         givenNameInput.setAttribute("placeholder", "First Name");
         givenNameInput.setAttribute("name", "creators["+creator+"][first_name]");
+
+
         givenName = givenNameInput.outerHTML;
 
         var familyNameInput = document.createElement("input");
@@ -158,18 +163,45 @@ function addContact(creators,creator,edit){
         emailInput.setAttribute("placeholder","Email");
         emailInput.setAttribute("name", "creators["+creator+"][email]");
         email = emailInput.outerHTML;
-    }
 
+        var deleteButton = document.createElement("input");
+        deleteButton.setAttribute("class" , "btn btn-default btn-space");
+        deleteButton.setAttribute("value","delete");
+        deleteButton.setAttribute("id","deleteCreator");
+        deleteButton.setAttribute("type","button");
+
+
+        delete_button = deleteButton.outerHTML;
+
+
+    }
     else {
         givenName = creators[creator].first_name;
         familyName = creators[creator].last_name;
         organisation = creators[creator].organisation;
         email = creators[creator].email;
         id = "";
+        delete_button= "";
     }
-    contact_div.innerHTML = '<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>"+id;
+
+    contact_div.innerHTML =delete_button+'<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>"+id;
 
     return contact_div;
+}
+
+function create_delete_contact(creator, creator_id){
+    "use strict";
+    var deleteInput = document.createElement("input");
+    deleteInput.setAttribute("value",creator_id);
+    deleteInput.setAttribute("type", "hidden");
+    deleteInput.setAttribute("name", "creators["+creator+"][delete]");
+    return deleteInput;
+}
+
+function delete_contact(creator, creator_id, contact_div){
+    "use strict";
+    contact_div.parentNode.appendChild(create_delete_contact(creator,creator_id));
+
 }
 
 function create_edit_button(){
