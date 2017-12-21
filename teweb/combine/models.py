@@ -48,6 +48,15 @@ class Creator(ChangesMixin,models.Model):
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
 
+    @property
+    def html(self):
+        """
+
+        :return: HTML representation for rendering of triple
+        """
+        html = '{} {} {}'.format(self.first_name, self.last_name, self.organisation, self.email)
+        return '<dl><dt>{} {}</dt><dd>{}</dd><dd>{}</dd></dl>'.format(self.first_name, self.last_name, self.organisation, self.email)
+
 
 class Triple(models.Model):
     """ RDF triple store."""
