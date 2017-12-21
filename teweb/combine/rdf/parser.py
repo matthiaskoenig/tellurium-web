@@ -23,6 +23,7 @@ from rdflib import Graph  # rdf graph
 from rdflib import URIRef, BNode, Literal  # node types
 
 from rdflib.namespace import Namespace
+from rdflib.namespace import RDF
 VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
 DCTERMS = Namespace('http://purl.org/dc/terms/')
 BQMODEL = Namespace('http://biomodels.net/model-qualifiers/')
@@ -62,8 +63,13 @@ def fix_path_prefix(el, prefix):
     return el
 
 
-def parse_rdf(path, debug=False):
-    """ Parses the rdf in graph. """
+def parse_rdf(debug=False, **kwargs):
+    """ Parses the rdf in graph.
+
+    location: file_path
+    data: string data
+    """
+    path = kwargs['location']
 
     # file prefix to replace for relative paths
     prefix = "file://{}/".format(os.path.abspath(os.path.dirname(path)))
@@ -71,7 +77,7 @@ def parse_rdf(path, debug=False):
     # parse RDF graph
     g = rdflib.Graph()
     format = guess_format(path)
-    g.parse(path, format=format)
+    g.parse(format=format, **kwargs)
 
     if debug:
         print("-" * 80)

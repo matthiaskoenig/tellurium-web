@@ -28,7 +28,7 @@ import zipfile
 
 from combine.comex import read_manifest_entries
 
-from combine.rdf.parser import VCARD, DCTERMS, BQMODEL, BQBIOL
+from combine.rdf.parser import VCARD, DCTERMS, BQMODEL, BQBIOL, RDF
 from combine.rdf.parser import parse_rdf, bind_default_namespaces
 
 
@@ -93,30 +93,57 @@ def read_metadata(archive_path):
             results.append(str(obj))
         return results
 
-    def read_creators(g, location):
+
+    def _objects_in_bag(triple):
+        """ Check if object sits in Bag.
+
+        :param triple:
+        :return:
         """
+        (subj, pred, obj) = triple
+
+        # outgoing edges
+        triples = list(g.triples((obj, None, None)))
+        is_bag = len([(s, p, o) for (s, p, o) in triples if p == RDF.type]) > 0
+
+        if is_bag:
+            # return list entries
+            return [(s, p, o) for (s, p, o) in triples if p != RDF.type]
+        else:
+            return [(subj, pred, obj)]
+
+
+    def read_creators(g, location):
+        """ Read the creators from given graph
 
         :param g:
         :return:
         """
         creators = []
         for triple in g.triples((URIRef(location), DCTERMS.creator, None)):
-            (subj, pred, obj) = triple
+
+            # get the object in the bag (if not in bag triple is returned)
+            (subj, pred, obj) = _objects_in_bag(triple)[0]
+
+            # print("*" * 80)
+            # print((subj, pred, obj))
 
             info = {}
+
             # email
             for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))):
                 info["email"] = str(o)
 
+            # organization
             for (s, p, o) in g.triples((obj, VCARD["organization-name"], None)):
                 info["organisation"] = str(o)
 
+            # names
             for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))):
                 for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
                     info["familyName"] = str(o2)
                 for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
                     info["givenName"] = str(o2)
-
 
             creators.append(info)
 
@@ -182,7 +209,7 @@ def read_rdf_graphs(archive_path, debug=False):
                 tmp.write(z.read(path))
                 tmp.seek(0)
 
-                g = parse_rdf(tmp.name, debug=False)
+                g = parse_rdf(location=tmp.name, debug=False)
 
                 tmp.close()
                 graphs.append(g)
@@ -265,7 +292,7 @@ if __name__ == "__main__":
     print("-" * 80)
 
     metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
-    pprint(metadata)
+    # pprint(metadata)
 
     # metadata = read_metadata("../testdata/rdf/BIOMD0000000176.omex")
     # pprint(metadata)
