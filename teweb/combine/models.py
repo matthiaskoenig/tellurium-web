@@ -16,6 +16,7 @@ from django_model_changes import ChangesMixin
 
 from . import comex, validators, managers
 from .rdf.metadata import read_metadata
+from .utils import input_template, html_creator
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +55,21 @@ class Creator(ChangesMixin,models.Model):
 
         :return: HTML representation for rendering of triple
         """
-        html = '{} {} {}'.format(self.first_name, self.last_name, self.organisation, self.email)
-        return '<dl><dt>{} {}</dt><dd>{}</dd><dd>{}</dd></dl>'.format(self.first_name, self.last_name, self.organisation, self.email)
+        return html_creator(self.first_name, self.last_name, self.organisation, self.email)
+
+    @property
+    def html_edit(self):
+        """
+
+        :return: HTML representation for rendering of editable triple
+        """
+        first_name_input = input_template(name="creators[][first_name]",placeholder="First Name", value=self.first_name)
+        last_name_input = input_template(name="creators[][last_name]",placeholder="Family Name", value=self.last_name)
+        organisation_input = input_template(name="creators[][organisation]",placeholder="Organisation", value=self.organisation)
+        email_input = input_template(name="creators[][email]",placeholder="Email", value=self.email)
+
+
+        return html_creator(first_name_input, last_name_input, organisation_input, email_input)
 
 
 class Triple(models.Model):
