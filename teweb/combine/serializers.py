@@ -40,7 +40,7 @@ class TripleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Triple
-        fields = ['subject', 'predicate', 'object', 'id']
+        fields = ['subject', 'predicate', 'object', 'id', 'html']
 
     def update(self, instance, validated_data):
         instance.subject = validated_data.get("subject",instance.subject)

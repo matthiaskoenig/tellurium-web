@@ -3,9 +3,6 @@ Basic tests.
 """
 import os
 import sys
-import coreapi
-import json
-import pandas as pd
 
 FILE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 # project directory
@@ -21,15 +18,8 @@ django.setup()
 
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
-
-from django.core.files import File
-from django.urls import reverse
-
-from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
-from rest_framework import status
 from .forms import UploadArchiveForm
-from .models import hash_for_file
-from . import comex
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OMEX_SHOWCASE_PATH = os.path.join(BASE_DIR, '../../archives/CombineArchiveShowCase.omex')

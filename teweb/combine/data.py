@@ -7,7 +7,8 @@ from collections import namedtuple
 
 from django.contrib.auth.models import User
 
-from combine.models import Archive, Tag, hash_for_file
+from combine.models import Archive, Tag
+from combine.managers import hash_for_file
 from combine import comex
 
 UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
