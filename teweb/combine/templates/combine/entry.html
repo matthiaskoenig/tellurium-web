@@ -1,6 +1,45 @@
 {% extends "combine/base.html" %}
 
 {% block content %}
-<h1>Archive Entry</h1>
-    {{ entry }}
+<h1>Archive Entry: {{ entry.id }}</h1>
+
+    <table class="table table-striped table-condensed table-hover">
+    <tbody>
+    <tr><th>archive</th><td>{{ entry.archive }}</td></tr>
+    <tr><th>file</th><td>{{ entry.file.url }}</td></tr>
+    <tr><th>location</th><td>{{ entry.location }}</td></tr>
+    <tr><th>source</th><td>{{ entry.source }}</td></tr>
+    <tr><th>master</th><td>{{ entry.master }}</td></tr>
+    </tbody>
+    </table>
+
+    <h2>MetaData</h2>
+    {% with metadata=entry.metadata %}
+    <table class="table table-striped table-condensed table-hover">
+    <tbody>
+    <tr><th>description</th><td>{{ metadata.description }}</td></tr>
+    <tr><th>creators</th>
+        <td>{% for c in metadata.creators.all() %}
+            {{ c }}<br />
+            {% endfor %}
+        </td></tr>
+    <tr><th>created</th><td>{{ metadata.created }}</td></tr>
+    <tr><th>modified</th>
+        <td>{% for mod in metadata.modified.all() %}
+            {{ mod }}<br />
+            {% endfor %}
+        </td></tr>
+        <tr><th>bq triples</th>
+        <td>{% for t in metadata.get_triples() %}
+            {{ t }}<br />
+            {% endfor %}
+        </td></tr>
+    <tr><th>triples</th>
+        <td>{% for t in metadata.triples.all() %}
+            {{ t }}<br />
+            {% endfor %}
+        </td></tr>
+    </tbody>
+    </table>
+    {% endwith %}
 {%  endblock %}
