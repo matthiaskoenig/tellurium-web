@@ -169,7 +169,7 @@
         $.ajax({
             type: frm.attr('method'),
             url: frm.attr('action'),
-            data: {"data": frm.serializeJSON()},
+            data: {"data": frm.serializeJSON({useIntKeysAsArrayIndex:false})},
             success: function (data) {
 
                 // if data is not valid
@@ -187,7 +187,7 @@
 
             },
             error: function(data) {
-                console.log(xhr.status + ": " + xhr.responseText);
+                console.log(data.status + ": " + data.responseText);
             }
         });
         return false;

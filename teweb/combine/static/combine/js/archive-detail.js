@@ -121,16 +121,17 @@ function add_empty_creator(){
 
 function addContact(creators,creator,edit){
     "use strict";
-    var contact_div , familyName,givenName,email,organisation, id, delete_button;
+    var contact_div , familyName,givenName,email,organisation, id, delete_button, id_creator;
     contact_div = document.createElement("div");
-    contact_div.setAttribute("id", creator);
+    id_creator =  creators[creator].id
+    contact_div.setAttribute("id", id_creator);
 
     if (edit===true){
         var idInput;
         idInput = document.createElement("input");
-        idInput.setAttribute("value",creators[creator].id);
+        idInput.setAttribute("value",id_creator);
         idInput.setAttribute("type", "hidden");
-        idInput.setAttribute("name", "creators["+creator+"][id]");
+        idInput.setAttribute("name", "creators[][id]");
         idInput.setAttribute("class", "Id");
 
         id = idInput.outerHTML;
@@ -138,7 +139,7 @@ function addContact(creators,creator,edit){
         var givenNameInput = document.createElement("input");
         givenNameInput.setAttribute("value",creators[creator].first_name);
         givenNameInput.setAttribute("placeholder", "First Name");
-        givenNameInput.setAttribute("name", "creators["+creator+"][first_name]");
+        givenNameInput.setAttribute("name", "creators[][first_name]");
 
 
         givenName = givenNameInput.outerHTML;
@@ -146,19 +147,19 @@ function addContact(creators,creator,edit){
         var familyNameInput = document.createElement("input");
         familyNameInput.setAttribute("value",creators[creator].last_name);
         familyNameInput.setAttribute("placeholder","Family Name");
-        familyNameInput.setAttribute("name", "creators["+creator+"][last_name]");
+        familyNameInput.setAttribute("name", "creators[][last_name]");
         familyName = familyNameInput.outerHTML;
 
         var organisationInput = document.createElement("input");
         organisationInput.setAttribute("value",creators[creator].organisation);
         organisationInput.setAttribute("placeholder","Organisation");
-        organisationInput.setAttribute("name", "creators["+creator+"][organisation]");
+        organisationInput.setAttribute("name", "creators[][organisation]");
         organisation = organisationInput.outerHTML;
 
         var emailInput = document.createElement("input");
         emailInput.setAttribute("value",creators[creator].email);
         emailInput.setAttribute("placeholder","Email");
-        emailInput.setAttribute("name", "creators["+creator+"][email]");
+        emailInput.setAttribute("name", "creators[][email]");
         email = emailInput.outerHTML;
 
         var deleteButton = document.createElement("input");
@@ -170,18 +171,13 @@ function addContact(creators,creator,edit){
 
         delete_button = deleteButton.outerHTML;
 
+        contact_div.innerHTML =delete_button+'<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>"+id;
 
     }
     else {
-        givenName = creators[creator].first_name;
-        familyName = creators[creator].last_name;
-        organisation = creators[creator].organisation;
-        email = creators[creator].email;
-        id = "";
-        delete_button= "";
+            contact_div.innerHTML = creators[creator].html
     }
 
-    contact_div.innerHTML =delete_button+'<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>"+id;
 
     return contact_div;
 }
@@ -191,7 +187,7 @@ function create_delete_contact(creator, creator_id){
     var deleteInput = document.createElement("input");
     deleteInput.setAttribute("value",creator_id);
     deleteInput.setAttribute("type", "hidden");
-    deleteInput.setAttribute("name", "creators["+creator+"][delete]");
+    deleteInput.setAttribute("name", "creators[][delete]");
     return deleteInput;
 }
 

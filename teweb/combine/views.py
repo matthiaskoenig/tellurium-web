@@ -122,12 +122,12 @@ def archive_view(request, archive_id):
     context = archive_context(archive)
 
 
-    if request.method =='POST' and "save_entry_details" in request.POST:
+    if request.method =='POST':
 
         modified = False
         data = request.POST["data"]
         entrydata_dict = json.loads(data)
-        #print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
+        print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
 
 
         archive_entry = ArchiveEntry.objects.get(id=entrydata_dict["id"])
