@@ -49,9 +49,13 @@ def fix_path_prefix(el, prefix):
     if el_str.startswith(prefix):
 
         # print("replacing prefix:", prefix)
-        el_str = el_str.replace(prefix, './')
-        if el_str == "./":
+        el_str = el_str.replace(prefix, '')
+        if el_str == "":
             el_str = "."
+        elif el_str.startswith("#"):
+            pass
+        else:
+            el_str = "./" + el_str
         # create correct node type
         if isinstance(el, BNode):
             el = BNode(el_str)
@@ -72,7 +76,8 @@ def parse_rdf(debug=False, **kwargs):
     path = kwargs['location']
 
     # file prefix to replace for relative paths
-    prefix = "file://{}/".format(os.path.abspath(os.path.dirname(path)))
+    prefixes = ["file://{}/".format(os.path.abspath(os.path.dirname(path))),  # absolute file prefix
+                "./{}".format(os.path.basename(path))]  # relative prefixes in combined annotations
 
     # parse RDF graph
     g = rdflib.Graph()
@@ -90,7 +95,9 @@ def parse_rdf(debug=False, **kwargs):
     def fix_email(obj):
         """ Fixing wrong parsing of emails. """
         # remove email prefix
-        obj_str = str(obj).replace(prefix, '')
+        obj_str = str(obj)
+        for prefix in prefixes:
+            obj_str = obj_str.replace(prefix, '')
         # fix node type
         return Literal(obj_str)
 
@@ -105,9 +112,10 @@ def parse_rdf(debug=False, **kwargs):
             obj = fix_email(obj)
 
         # fix prefixes
-        subj = fix_path_prefix(subj, prefix)
-        pred = fix_path_prefix(pred, prefix)
-        obj = fix_path_prefix(obj, prefix)
+        for prefix in prefixes:
+            subj = fix_path_prefix(subj, prefix)
+            pred = fix_path_prefix(pred, prefix)
+            obj = fix_path_prefix(obj, prefix)
 
         # add fixed triples
         g2.add((subj, pred, obj))

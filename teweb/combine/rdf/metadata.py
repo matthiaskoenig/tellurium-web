@@ -286,12 +286,12 @@ def transitive_subgraph(g, start, gloc=None):
 ########################################################################
 if __name__ == "__main__":
 
-    # metadata = read_metadata("../testdata/rdf/L1V3_vanderpol-sbml.omex")
-    # pprint(metadata)
+    metadata = read_metadata("../testdata/rdf/smith_chase_nokes_shaw_wake_2004.omex")
+    pprint(metadata['./smith_chase_nokes_shaw_wake_2004.cellml'])
 
     print("-" * 80)
 
-    metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
+    # metadata = read_metadata("../testdata/rdf/CombineArchiveShowCase.omex")
     # pprint(metadata)
 
     # metadata = read_metadata("../testdata/rdf/BIOMD0000000176.omex")

@@ -124,8 +124,6 @@ class Triple(models.Model):
 
             raise NotImplementedError
 
-
-
     def is_bq(self):
         """ Triple with biomodels qualifer predictate.
 
@@ -152,7 +150,7 @@ class MetaData(ChangesMixin,models.Model):
     objects = managers.MetaDataManager()
 
     def get_triples(self):
-        """ This get the subset of triples which are displayed.
+        """ This get the subset of annotation triples which are displayed.
 
         :return:
         """
