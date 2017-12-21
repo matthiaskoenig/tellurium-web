@@ -36,7 +36,7 @@ class Date(models.Model):
     date = models.DateTimeField()
 
     def __str__(self):
-        return self.date
+        return str(self.date)
 
 
 class Creator(ChangesMixin,models.Model):

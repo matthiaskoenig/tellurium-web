@@ -6,6 +6,7 @@
             <table id="entries" class="table table-striped table-condensed table-hover">
                 <thead>
                 <tr>
+                    <th>id</th>
                     <th>master</th>
                     <th>icon</th>
                     <th>format</th>
@@ -16,6 +17,7 @@
                 </thead>
                 {% for entry in archive.entries.all()  %}
                     <tr id="archive_content">
+                        <td><a href="{{ url('combine:archive_entry', args=[entry.id]) }}" target="_blank">{{ entry.id }}</a></td>
                         <td>{% if entry.master %}
                             <i class="fa fa-star fa-fw" title="master"></i>
                         {% endif %}
