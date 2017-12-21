@@ -73,10 +73,11 @@ class Creator(ChangesMixin,models.Model):
         #id_dict = {"class":"Id","value":"delete","id":"delete","type":"button"}
         id_input = input_template(name="creators[][id]", value="new", type="hidden")
         delete_dict = {"class":"btn btn-default btn-space","value":"delete","id":"delete","type":"button"}
+        delete_input = input_template(name="creators[][delete]", value="false", type="hidden")
         delete_button = input_template(**delete_dict)
 
 
-        return delete_button + html_creator(first_name_input, last_name_input, organisation_input, email_input)+id_input
+        return delete_button + html_creator(first_name_input, last_name_input, organisation_input, email_input)+id_input+ delete_input
 
     @property
     def html_edit(self):
@@ -88,6 +89,8 @@ class Creator(ChangesMixin,models.Model):
         last_name_input = input_template(name="creators[][last_name]",placeholder="Family Name", value=self.last_name)
         organisation_input = input_template(name="creators[][organisation]",placeholder="Organisation", value=self.organisation)
         email_input = input_template(name="creators[][email]",placeholder="Email", value=self.email)
+
+
 
 
         return html_creator(first_name_input, last_name_input, organisation_input, email_input)

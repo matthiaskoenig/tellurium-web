@@ -133,7 +133,7 @@ function add_empty_creator(){
 
 function addContact(creators,creator,edit){
     "use strict";
-    var contact_div , familyName,givenName,email,organisation, id, delete_button, id_creator;
+    var contact_div , familyName,givenName,email,organisation, id, delete_creator, delete_button, id_creator;
     contact_div = document.createElement("div");
     id_creator =  creators[creator].id;
     contact_div.setAttribute("id", id_creator);
@@ -148,6 +148,15 @@ function addContact(creators,creator,edit){
 
         id = idInput.outerHTML;
 
+        var deleteInput;
+        deleteInput = document.createElement("input");
+        deleteInput.setAttribute("value","false");
+        deleteInput.setAttribute("type", "hidden");
+        deleteInput.setAttribute("name", "creators[][delete]");
+
+        delete_creator =  deleteInput.outerHTML;
+
+
 
         var deleteButton = document.createElement("input");
         deleteButton.setAttribute("class" , "btn btn-default btn-space");
@@ -158,7 +167,7 @@ function addContact(creators,creator,edit){
 
         delete_button = deleteButton.outerHTML;
 
-        contact_div.innerHTML =delete_button+id+creators[creator].html_edit;
+        contact_div.innerHTML =delete_button+id+creators[creator].html_edit+delete_creator;
 
     }
     else {

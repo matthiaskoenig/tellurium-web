@@ -153,9 +153,13 @@ def archive_view(request, archive_id):
 
 
         for creator in entrydata_dict["creators"]:
-            if "delete" in creator:
-                creator = Creator.objects.get(id=creator["delete"])
-                creator.delete()
+            if creator["delete"] not in  ["false",""]:
+                    creator = Creator.objects.get(id=creator["delete"])
+                    creator.delete()
+
+            elif  creator["delete"] == "":
+                # tries to delete a cerator, which was not even created
+                pass
 
             elif creator["id"]== "new":
                 del creator["id"]
