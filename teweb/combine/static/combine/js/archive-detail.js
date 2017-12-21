@@ -136,31 +136,6 @@ function addContact(creators,creator,edit){
 
         id = idInput.outerHTML;
 
-        var givenNameInput = document.createElement("input");
-        givenNameInput.setAttribute("value",creators[creator].first_name);
-        givenNameInput.setAttribute("placeholder", "First Name");
-        givenNameInput.setAttribute("name", "creators[][first_name]");
-
-
-        givenName = givenNameInput.outerHTML;
-
-        var familyNameInput = document.createElement("input");
-        familyNameInput.setAttribute("value",creators[creator].last_name);
-        familyNameInput.setAttribute("placeholder","Family Name");
-        familyNameInput.setAttribute("name", "creators[][last_name]");
-        familyName = familyNameInput.outerHTML;
-
-        var organisationInput = document.createElement("input");
-        organisationInput.setAttribute("value",creators[creator].organisation);
-        organisationInput.setAttribute("placeholder","Organisation");
-        organisationInput.setAttribute("name", "creators[][organisation]");
-        organisation = organisationInput.outerHTML;
-
-        var emailInput = document.createElement("input");
-        emailInput.setAttribute("value",creators[creator].email);
-        emailInput.setAttribute("placeholder","Email");
-        emailInput.setAttribute("name", "creators[][email]");
-        email = emailInput.outerHTML;
 
         var deleteButton = document.createElement("input");
         deleteButton.setAttribute("class" , "btn btn-default btn-space");
@@ -171,11 +146,11 @@ function addContact(creators,creator,edit){
 
         delete_button = deleteButton.outerHTML;
 
-        contact_div.innerHTML =delete_button+'<dl><dt>'+givenName+' '+familyName+'</dt><dd>'+organisation+"</dd><dd>"+email+"</dd></dl>"+id;
+        contact_div.innerHTML =delete_button+id+creators[creator].html_edit;
 
     }
     else {
-            contact_div.innerHTML = creators[creator].html
+            contact_div.innerHTML = creators[creator].html;
     }
 
 

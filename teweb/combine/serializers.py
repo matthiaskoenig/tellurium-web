@@ -20,7 +20,7 @@ class CreatorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Creator
-        fields = ['first_name', 'last_name', 'organisation', 'email','id', 'html']
+        fields = ['first_name', 'last_name', 'organisation', 'email','id', 'html', 'html_edit']
 
     def update(self, instance, validated_data):
         instance.first_name = validated_data.get("first_name",instance.first_name)
@@ -53,6 +53,8 @@ class TripleSerializer(serializers.ModelSerializer):
 
     def get(self,validated_data):
         return Triple.objects.get(**validated_data)
+
+
 
 
 
