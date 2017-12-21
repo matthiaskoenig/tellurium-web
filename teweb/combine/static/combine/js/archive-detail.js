@@ -107,6 +107,16 @@ function modified_content( modified){
     return content;
 }
 
+function add_empty_contact(){
+    "use strict";
+    var contact_div = document.createElement("div");
+    contact_div.setAttribute("id", "new");
+    contact_div.innerHTML = "<div>"+empty_creator+"</div>";
+    return contact_div
+
+
+}
+
 function add_empty_creator(){
     "use strict";
      var empty_creators= [{
@@ -119,11 +129,13 @@ function add_empty_creator(){
      return addContact(empty_creators,0,true);
 }
 
+
+
 function addContact(creators,creator,edit){
     "use strict";
     var contact_div , familyName,givenName,email,organisation, id, delete_button, id_creator;
     contact_div = document.createElement("div");
-    id_creator =  creators[creator].id
+    id_creator =  creators[creator].id;
     contact_div.setAttribute("id", id_creator);
 
     if (edit===true){
@@ -157,7 +169,12 @@ function addContact(creators,creator,edit){
     return contact_div;
 }
 
-function create_delete_contact(creator, creator_id){
+
+
+
+
+
+function create_delete_contact(creator_id){
     "use strict";
     var deleteInput = document.createElement("input");
     deleteInput.setAttribute("value",creator_id);
@@ -166,9 +183,9 @@ function create_delete_contact(creator, creator_id){
     return deleteInput;
 }
 
-function delete_contact(creator, creator_id, contact_div){
+function delete_contact(creator_id, contact_div){
     "use strict";
-    contact_div.parentNode.appendChild(create_delete_contact(creator,creator_id));
+    contact_div.parentNode.appendChild(create_delete_contact(creator_id));
 
 }
 

@@ -220,6 +220,7 @@ def archive_context(archive):
             task_result = task_result[0]
 
     context = {
+        'Creator': Creator,
         'archive': archive,
         'task': task,
         'task_result': task_result,

@@ -57,6 +57,27 @@ class Creator(ChangesMixin,models.Model):
         """
         return html_creator(self.first_name, self.last_name, self.organisation, self.email)
 
+    @staticmethod
+    def html_empty():
+        """
+
+        :return: HTML representation for rendering of triple
+        """
+        first_name_input = input_template(name="creators[][first_name]", placeholder="First Name",
+                                          value="")
+        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value="")
+        organisation_input = input_template(name="creators[][organisation]", placeholder="Organisation",
+                                            value="")
+        email_input = input_template(name="creators[][email]", placeholder="Email", value="")
+
+        #id_dict = {"class":"Id","value":"delete","id":"delete","type":"button"}
+        id_input = input_template(name="creators[][id]", value="new", type="hidden")
+        delete_dict = {"class":"btn btn-default btn-space","value":"delete","id":"delete","type":"button"}
+        delete_button = input_template(**delete_dict)
+
+
+        return delete_button + html_creator(first_name_input, last_name_input, organisation_input, email_input)+id_input
+
     @property
     def html_edit(self):
         """
