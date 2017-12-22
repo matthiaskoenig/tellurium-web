@@ -26,7 +26,7 @@ from pprint import pprint
 import warnings
 import zipfile
 
-from combine.comex import read_manifest_entries
+from combine.utils import comex
 
 from combine.rdf.parser import VCARD, DCTERMS, BQMODEL, BQBIOL, RDF
 from combine.rdf.parser import parse_rdf, bind_default_namespaces
@@ -185,7 +185,7 @@ def read_rdf_graphs(archive_path, debug=False):
     :return:
     """
     # find metadata locations
-    entries_dict = read_manifest_entries(archive_path)
+    entries_dict = comex.read_manifest_entries(archive_path)
     metadata_paths = []
     for location, entry in entries_dict.items():
         format = entry.get('format')

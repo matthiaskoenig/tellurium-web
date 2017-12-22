@@ -1,34 +1,23 @@
+"""
+Testing the API.
+"""
+
 import os
-import sys
-import coreapi
-import json
-import pandas as pd
-
-
-FILE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-# project directory
-PROJECT_DIR = os.path.join(FILE_DIR, "../teweb/")
-os.chdir(PROJECT_DIR)
-# This is so Django knows where to find stuff.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "teweb.settings")
-sys.path.append(PROJECT_DIR)
-# django setup
-import django
-django.setup()
-
-from combine.models import hash_for_file, Archive
-from django.test import TestCase
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.files import File
-
+from collections import namedtuple
 
 from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
 from rest_framework import status
+
 from django.urls import reverse
-from combine.models import Archive, Tag, hash_for_file
-from combine.comex import get_archive_paths
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files import File
 from django.contrib.auth.models import User
-from collections import namedtuple
+from django.test import TestCase
+
+from combine.models import Archive, Tag
+from combine.managers import hash_for_file
+from combine.comex import get_archive_paths
+
 from combine import comex
 
 
@@ -348,5 +337,3 @@ class ViewAPILoggedIn(TestCase):
         self.client.login(username='testuser', password=os.environ['DJANGO_ADMIN_PASSWORD'])
         response = self.client.delete(url_detail)
         self.assertEquals(response.status_code, 204)
-
-

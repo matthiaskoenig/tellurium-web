@@ -7,9 +7,7 @@ import logging
 
 import pandas
 import numpy as np
-import magic
 import json
-import rdflib
 import os
 import tempfile
 import shutil
@@ -17,55 +15,36 @@ import shutil
 from django.utils import timezone
 from django.core.files.base import ContentFile
 
-
-
-from rest_framework.reverse import reverse
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, FileResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.files.temp import NamedTemporaryFile
 from django_celery_results.models import TaskResult
+from django_filters import rest_framework as filters
 from celery.result import AsyncResult
+
+from rest_framework import viewsets, status
+from rest_framework.reverse import reverse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-
-from combine import comex
-
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.request import Request
+import rest_framework.filters as filters_rest
 
 from .tasks import execute_omex
 from .models import Archive, Tag, ArchiveEntry, Creator, Date
 from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer,DateSerializer,CreatorSerializer, MetaDataSerializer
-
 from .forms import UploadArchiveForm
-from .git import get_commit
-from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView)
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
-from rest_framework.request import Request
-
 from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, IsOwnerOrGlobalOrAdminReadOnly
-from rest_framework import viewsets
-from django_filters import rest_framework as filters
-import rest_framework.filters as filters_rest
 
-
-import tellurium
+from .utils import comex, git
 
 try:
     import libsedml
 except ImportError:
     import tesedml as libsedml
-
-try:
-    import libcombine
-except ImportError:
-    import tecombine as libcombine
-
-import importlib
-importlib.reload(libcombine)
-
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +62,7 @@ def test_view(request):
 def about(request):
     """ About page. """
     context = {
-        'commit': get_commit()
+        'commit': git.get_commit()
     }
     return render(request, 'combine/about.html', context)
 

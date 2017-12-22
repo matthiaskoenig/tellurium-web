@@ -1,3 +1,9 @@
+"""
+Utilities to work with HTML.
+
+Template creation.
+"""
+
 def input_template(**kwargs):
     input_string = ""
     for key in kwargs:

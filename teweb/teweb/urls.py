@@ -29,7 +29,7 @@ urlpatterns = [
     # url(r'^$', RedirectView.as_view(pattern_name='combine:index', permanent=False)),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),
-    url(r'^api/', include('combine.api_urls', namespace='api')),
+    url(r'^api/', include('combine.urls_api', namespace='api')),
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
 
 ]

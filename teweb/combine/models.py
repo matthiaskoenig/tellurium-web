@@ -10,13 +10,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.contrib.auth.models import User
 from djchoices import DjangoChoices, ChoiceItem
-from celery.result import AsyncResult
 from django_model_changes import ChangesMixin
+from celery.result import AsyncResult
 
-
-from . import comex, validators, managers
+from . import validators, managers
 from .rdf.metadata import read_metadata
-from .utils import input_template, html_creator
+from .utils import comex
+from .utils.html import input_template, html_creator
 
 logger = logging.getLogger(__name__)
 

@@ -7,14 +7,13 @@ import hashlib
 from six import string_types
 import zipfile
 import tempfile
-from pprint import pprint
+
 from django.db import models
 from django.core.files import File
 from django.apps import apps
-from django.utils import timezone
 from django.contrib.auth.models import User
 
-from .tags import create_tags_for_archive
+from .utils.tags import create_tags_for_archive
 
 
 # ===============================================================================
