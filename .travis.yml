@@ -19,8 +19,8 @@ install:
 
 script:
     # functional test with running database server
-    cd teweb && python manage.py test
-
+    # cd teweb && python manage.py test
+    cd teweb && pytest
     # - python tests/tests.py
     # - coverage run tests/tests.py
 

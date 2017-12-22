@@ -16,8 +16,15 @@ http://eli.thegreenplace.net/2014/02/15/programmatically-populating-a-django-dat
 import os
 import sys
 
+# add combine directory for imports
 FILE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)))
 PROJECT_DIR = os.path.join(FILE_DIR, "../teweb/")
+sys.path.append(PROJECT_DIR)
+
+# setup django
+from combine.utils import django_setup
+
+from combine.utils.data import UserDef, create_users, add_archives_to_database
 
 # directories with OMEX archives
 ARCHIVE_DIRS = [
@@ -29,18 +36,6 @@ ARCHIVE_DIRS = [
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/specification/"),
     # os.path.join(FILE_DIR, "../../sed-ml/specification/level-1-version-3/examples/__omex__"),
 ]
-
-# This is so my local_settings.py gets loaded.
-os.chdir(PROJECT_DIR)
-# This is so Django knows where to find stuff.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "teweb.settings")
-sys.path.append(PROJECT_DIR)
-
-# django setup
-import django
-django.setup()
-
-from combine.data import UserDef, create_users, add_archives_to_database
 
 # user definitions for database
 user_definitions = [
