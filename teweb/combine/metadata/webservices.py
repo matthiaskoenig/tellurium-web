@@ -16,7 +16,6 @@ import warnings
 import requests
 from pprint import pprint
 
-
 OLS_BASE_URL = "http://www.ebi.ac.uk/ols/api/"
 MIRIAM_BASE_URL = "http://www.ebi.ac.uk/miriamws/main/rest/"
 IDENTIFIERS_BASE_URL = "http://identifiers.org/rest/"
@@ -81,76 +80,10 @@ def json_term_for_uri(uri):
     return json
 
 
-################################################################
-
-def test_json_providers_for_uri():
-
-    test_data_success = [
-        "http://identifiers.org/fma/FMA:9670",
-        "http://identifiers.org/chebi/CHEBI:4167",
-        "http://identifiers.org/go/GO:0005829",
-        # alternative but not valid
-        "http://identifiers.org/obo.chebi/CHEBI:4167",
-        "http://identifiers.org/obo.go/GO:0005829",
-    ]
-
-    test_data_empty = [
-        "http://identifiers.org/kegg.compound/C00031",  # FIXME: This should work, bug on identifiers.org
-        "./tmpx6u6q7ofsmith_chase_nokes_shaw_wake_2004_example_semantics.rdf#entity_1",
-    ]
-    for uri in test_data_empty:
-        json = json_providers_for_uri(uri)
-        pprint(json)
-        assert json is not None
-
-        if len(json) > 0:
-            assert "message" in json
-
-    for uri in test_data_success:
-        json = json_providers_for_uri(uri)
-        pprint(json)
-        assert json is not None
-        assert len(json) > 0
-        for provider in json:
-            assert "id" in provider
-
-
-
-def test_json_term_for_uri():
-    """ Testing retrieval of terms from OLS
-
-    :return:
-    """
-
-    test_data_success = [
-        "http://identifiers.org/fma/FMA:9670",
-        "http://identifiers.org/chebi/CHEBI:4167",
-        "http://identifiers.org/go/GO:0005829",
-        # alternative but not valid
-        "http://identifiers.org/obo.chebi/CHEBI:4167",
-        "http://identifiers.org/obo.go/GO:0005829",
-    ]
-
-    test_data_empty = [
-        "http://identifiers.org/kegg.compound/C00031",
-        "./tmpx6u6q7ofsmith_chase_nokes_shaw_wake_2004_example_semantics.rdf#entity_1",
-    ]
-
-    for uri in test_data_empty:
-        json = json_term_for_uri(uri)
-        # pprint(json)
-        assert json is not None
-        assert len(json) == 0
-
-    for uri in test_data_success:
-        json = json_term_for_uri(uri)
-        # pprint(json)
-        assert json is not None
-        assert len(json) > 0
-        assert "iri" in json
-
-################################################################
-
 if __name__ == "__main__":
-    test_json_term_for_uri()
-    test_json_providers_for_uri()
+    uri = "http://identifiers.org/chebi/CHEBI:4167"
+    json_term = json_term_for_uri(uri)
+    pprint(json_term)
+    json_providers = json_providers_for_uri(uri)
+    pprint(json_providers)
+

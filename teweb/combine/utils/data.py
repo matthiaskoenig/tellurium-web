@@ -13,7 +13,7 @@ from . import comex
 UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
 
 
-def add_archives_to_database(archive_dirs):
+def add_archives_to_database(archive_dirs, debug=False):
     """ Add archives to database from given directories.
 
     :param archive_dirs:
@@ -23,15 +23,15 @@ def add_archives_to_database(archive_dirs):
     omex_files = comex.get_archive_paths(archive_dirs)
 
     for path in sorted(omex_files):
-        print('-' * 80)
-        print(path)
+        if debug:
+            print(path)
         # default user is "global" but can be changed by adding user= < User Object >, user = User.username( string)
         _, created = Archive.objects.get_or_create(archive_path=path)
         if not created:
             print("Archive already exists, not recreated: {}".format(path))
 
 
-def create_users(user_defs, delete_all=True):
+def create_users(user_defs, delete_all=True, debug=False):
     """ Create users in database from user definitions.
 
     :param delete_all: deletes all existing users
@@ -57,5 +57,6 @@ def create_users(user_defs, delete_all=True):
         user.save()
 
     # display users
-    for user in User.objects.all():
-        print('\t', user.username, user.email, user.password)
+    if debug:
+        for user in User.objects.all():
+            print('\t', user.username, user.email, user.password)

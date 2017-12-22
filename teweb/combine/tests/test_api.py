@@ -3,40 +3,31 @@ Testing the API.
 """
 
 import os
-from collections import namedtuple
 
+# setup of django
 from ..utils import django_setup
 
-from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.files import File
-from django.contrib.auth.models import User
 from django.test import TestCase
+from django.urls import reverse
+from django.core.files import File
 
-from rest_framework.test import APIClient, RequestsClient, APIRequestFactory, APITestCase
-from rest_framework import status
-
-from ..models import Archive, Tag
+from ..models import Archive
 from ..managers import hash_for_file
 from ..utils.comex import get_archive_paths
-from ..utils.data import UserDef, create_users, add_archives_to_database
+from ..utils.data import create_users, add_archives_to_database
 
-from .utils import OMEX_SHOWCASE_PATH, ARCHIVE_DIRS
+# testdata
+from .utils import ARCHIVE_DIRS
+from ..fixtures.users import user_defs
 
-print(os.path.abspath(ARCHIVE_DIRS[0]))
-
-BASE_URL = '/'
-
-user_defs = [
-    UserDef("janekg89", "Jan", "Grzegorzewski", "janekg89@hotmail.de", True),
-    UserDef("mkoenig", "Matthias", "König", "konigmatt@googlemail.com", True),
-    UserDef("testuser", False, False, False, False),
-    UserDef("global", False, False, False, False)]
-
-# set environment variables for the test
+# environment variables for tests
 os.environ["DJANGO_ADMIN_PASSWORD"] = "test"
 
-class ViewAPILogedInSuperUser(TestCase):
+# base url for tests
+BASE_URL = '/'
+
+
+class ViewAPILoggedInSuperUser(TestCase):
     """Test suite for the api views."""
 
     @classmethod
@@ -283,7 +274,6 @@ class ViewAPILoggedIn(TestCase):
 
         url_archive_global = reverse('combine:archive', kwargs={'archive_id': archive_global.id})
         url_tree_global = url_archive_global + "zip_tree"
-
 
         # check if zip tree is accessable for the user who created
         response_tree = self.client.get(url_tree_testuser)
