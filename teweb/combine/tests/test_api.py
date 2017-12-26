@@ -50,14 +50,14 @@ class ViewAPILoggedInSuperUser(TestCase):
 
     def test_create_user(self):
         url = reverse('api:user-list')
-        post = {"username":"user1","password":"test1"}
-        response = self.client.post(url,post)
+        post = {"username": "user1", "password": "test1"}
+        response = self.client.post(url, post)
         self.assertEquals(response.status_code, 201)
         response = self.client.get(url)
         self.assertContains(response, 'user1')
 
     def test_detail_user(self):
-        url = reverse('api:user-detail', kwargs={'pk':'2'})
+        url = reverse('api:user-detail', kwargs={'pk': '2'})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
 
