@@ -6,10 +6,8 @@ function create_entry_title(data){
     var title_text = document.createTextNode(get_title(data.location));
     title_entry.appendChild(title_text);
 
-
     if (typeof base_format(data.format) !== 'undefined' && format_list.indexOf(base_format(data.format))>=0){
-            title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
-
+        title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
     }
 
     if (data.master){
@@ -20,7 +18,6 @@ function create_entry_title(data){
 }
 
 
-
 function get_master_icon(master){
     "use strict";
     var master_icon = document.createElement("i");
@@ -28,7 +25,6 @@ function get_master_icon(master){
     master_icon.setAttribute("title", "master");
     return master_icon;
 }
-
 
 
 function get_title(location){
