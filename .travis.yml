@@ -10,11 +10,6 @@ python:
 env:
   - DJANGO_ADMIN_PASSWORD=test
 
-branches:
-  only:
-    - master
-    - develop
-
 install:
   - pip install -r requirements.txt
   - pip install mock
@@ -25,8 +20,8 @@ install:
 script:
     # functional test with running database server
     cd teweb && python manage.py test
-
-    # - python tests/tests.py
+    # cd teweb && pytest
+    # python tests/tests.py
     # - coverage run tests/tests.py
 
 # after_success:

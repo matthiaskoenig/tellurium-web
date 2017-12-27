@@ -2,60 +2,177 @@
 Models definitions.
 """
 import uuid as uuid_lib
-
 import logging
-import hashlib
+import os
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from djchoices import DjangoChoices, ChoiceItem
 from django.contrib.auth.models import User
-
+from djchoices import DjangoChoices, ChoiceItem
+from django_model_changes import ChangesMixin
 from celery.result import AsyncResult
 
-try:
-    import libcombine
-except ImportError:
-    import tecombine as libcombine
-from celery.result import AsyncResult
-from . import comex, validators
+from . import validators, managers
+from .metadata.rdf import read_metadata
+from .utils import comex
+from .utils.html import input_template, html_creator
 
 logger = logging.getLogger(__name__)
 
+# ===============================================================================
+# Settings
+# ===============================================================================
+MAX_TEXT_LENGTH = 500
+
 
 # ===============================================================================
-# Utility functions for models
+# MetaData
 # ===============================================================================
-
-def hash_for_file(file, hash_type='MD5', blocksize=65536):
-    """ Calculate the md5_hash for a file.
-
-        Calculating a hash for a file is always useful when you need to check if two files
-        are identical, or to make sure that the contents of a file were not changed, and to
-        check the integrity of a file when it is transmitted over a network.
-        he most used algorithms to hash a file are MD5 and SHA-1. They are used because they
-        are fast and they provide a good way to identify different files.
-        [http://www.pythoncentral.io/hashing-files-with-python/]
+class Date(models.Model):
+    """ Helper class for dates.
+    Used to manage the created and modified dates.
     """
-    hasher = None
-    if hash_type == 'MD5':
-        hasher = hashlib.md5()
-    elif hash_type == 'SHA1':
-        hasher = hashlib.sha1()
+    date = models.DateTimeField()
 
-    with open(file, 'rb') as f:
-        buf = f.read(blocksize)
-        while len(buf) > 0:
-            hasher.update(buf)
-            buf = f.read(blocksize)
-    return hasher.hexdigest()
+    def __str__(self):
+        return str(self.date)
 
+
+class Creator(ChangesMixin,models.Model):
+    """ RDF creator of archive entry. """
+    first_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+    last_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+    organisation = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+    email = models.EmailField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
+
+    def __str__(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    @property
+    def html(self):
+        """
+
+        :return: HTML representation for rendering of triple
+        """
+        return html_creator(self.first_name, self.last_name, self.organisation, self.email)
+
+    @staticmethod
+    def html_empty():
+        """
+
+        :return: HTML representation for rendering of triple
+        """
+        first_name_input = input_template(name="creators[][first_name]", placeholder="First Name",
+                                          value="")
+        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value="")
+        organisation_input = input_template(name="creators[][organisation]", placeholder="Organisation",
+                                            value="")
+        email_input = input_template(name="creators[][email]", placeholder="Email", value="")
+
+        #id_dict = {"class":"Id","value":"delete","id":"delete","type":"button"}
+        id_input = input_template(name="creators[][id]", value="new", type="hidden")
+        delete_dict = {"class":"btn btn-default btn-space","value":"delete","id":"delete","type":"button"}
+        delete_input = input_template(name="creators[][delete]", value="false", type="hidden")
+        delete_button = input_template(**delete_dict)
+
+
+        return delete_button + html_creator(first_name_input, last_name_input, organisation_input, email_input)+id_input+ delete_input
+
+    @property
+    def html_edit(self):
+        """
+
+        :return: HTML representation for rendering of editable triple
+        """
+        first_name_input = input_template(name="creators[][first_name]",placeholder="First Name", value=self.first_name)
+        last_name_input = input_template(name="creators[][last_name]",placeholder="Family Name", value=self.last_name)
+        organisation_input = input_template(name="creators[][organisation]",placeholder="Organisation", value=self.organisation)
+        email_input = input_template(name="creators[][email]",placeholder="Email", value=self.email)
+
+
+
+
+        return html_creator(first_name_input, last_name_input, organisation_input, email_input)
+
+
+class Triple(models.Model):
+    """ RDF triple store."""
+    subject = models.TextField()
+    predicate = models.TextField()
+    object = models.TextField()
+
+    def __str__(self):
+        return "({}, {}, {})".format(self.subject, self.predicate, self.object)
+
+    @property
+    def html(self):
+        """
+
+        :return: HTML representation for rendering of triple
+        """
+        html = '{} {} <a href="{}" target="_blank">{}</a>'.format(self.subject, self.predicate,
+                                                                  self.object, self.object)
+        return html
+
+    def get_ols_data(self):
+        """ Looks up the ontology lookup service data for triples.
+
+        :return:
+        """
+        if not self.is_bq:
+            return None
+        else:
+            from combine.rdf import ols
+
+            raise NotImplementedError
+
+    def is_bq(self):
+        """ Triple with biomodels qualifer predictate.
+
+        Returns if this is biological relevant triple.
+        """
+        return self.predicate.startswith("http://biomodels.net/")
+
+
+class MetaData(ChangesMixin,models.Model):
+    """ MetaData information.
+
+    Stores the RDF MetaData for a given object.
+    This consists of general information like descriptions, creators, created and modified dates
+    and additional set of triples for the object.
+
+    The information consists of general VCard information and additional RDF.
+     """
+    description = models.TextField(null=True, blank=True)
+    creators = models.ManyToManyField(Creator)
+    created = models.DateTimeField(editable=False,null=True, blank=True)
+    modified = models.ManyToManyField(Date)
+    triples = models.ManyToManyField(Triple)
+
+    objects = managers.MetaDataManager()
+
+    def get_triples(self):
+        """ This get the subset of annotation triples which are displayed.
+
+        :return:
+        """
+        # triples = self.triples.filter(subject__startswith=self.entry.location)
+        bq_triples = [t for t in self.triples.all() if t.is_bq()]
+        return bq_triples
+
+    class Meta:
+        verbose_name_plural = "meta data"
+
+    @property
+    def triple_count(self):
+        return self.triples.count()
 
 # ===============================================================================
-# Models
+# COMBINE Archives
 # ===============================================================================
-
 class TagCategory(DjangoChoices):
+    """ Categories for the tags. """
     format = ChoiceItem("format")
     source = ChoiceItem("source")
     simulation = ChoiceItem("sim")
@@ -65,10 +182,13 @@ class TagCategory(DjangoChoices):
 
 
 class Tag(models.Model):
-    """ Tag class to describe content of files or archives. """
+    """ Tag class to describe content of archives.
 
-    name = models.CharField(max_length=300)
-    category = models.CharField(max_length=20, choices=TagCategory.choices)
+    Archives can have associated tags describing the general content of the archive
+    and key files in the archive, e.g., content of SBML or SED-ML files.
+    """
+    name = models.CharField(max_length=MAX_TEXT_LENGTH)
+    category = models.CharField(max_length=MAX_TEXT_LENGTH, choices=TagCategory.choices)
     uuid = models.UUIDField(  # Used by the API to look up the record
                             db_index=True,
                             default=uuid_lib.uuid4,
@@ -77,22 +197,21 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
-    #@property
-    #def uuid(self):
-    #    return "-".join([self.category, self.name])
-
     class Meta:
         unique_together = ('category', 'name')
 
 
 class Archive(models.Model):
-    """ Combine Archive class.
+    """ COMBINE Archive class.
 
-    Stores the combine archives.
+    The individual file entries are stored in the ArchiveEntries, the MetaData in the associated MetaData.
+
+    self.file: stores the original uploaded archive without any modifications.
+        All modifications are stored in the additional models like ArchiveEntry and ArchiveEntryMeta.
     """
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=MAX_TEXT_LENGTH)
     file = models.FileField(upload_to='archives', validators=[validators.validate_omex])
-    created = models.DateTimeField('date published', editable=False)
+    created = models.DateTimeField('date published', editable=False, auto_now=True)
     md5 = models.CharField(max_length=36, blank=True)
     task_id = models.CharField(max_length=100, blank=True)
     tags = models.ManyToManyField(Tag, related_name="archives")
@@ -102,8 +221,10 @@ class Archive(models.Model):
         default=uuid_lib.uuid4,
         editable=False)
 
+    objects = managers.ArchiveManager()
+
     def __str__(self):
-        return self.name
+        return "{}".format(self.name)
 
     def save(self, *args, **kwargs):
         """ On save, update timestamps. """
@@ -111,7 +232,7 @@ class Archive(models.Model):
             self.created = timezone.now()
 
         if not self.md5:
-            self.md5 = hash_for_file(self.file, hash_type='MD5')
+            self.md5 = managers.hash_for_file(self.file, hash_type='MD5')
 
         return super(Archive, self).save(*args, **kwargs)
 
@@ -142,77 +263,96 @@ class Archive(models.Model):
             task = AsyncResult(self.task_id)
         return task
 
+    @property
+    def description(self):
+        """ Get description from the metadata of top level entry."""
+        description = ""
+        try:
+            entry = self.entries.get(location=".")
+            metadata = entry.metadata
+            if metadata and metadata.description:
+                description = metadata.description
+        except ObjectDoesNotExist:
+            pass
+        return description
 
-    def omex(self):
-        """ Open CombineArchive for given archive.
+    @property
+    def metadata(self):
+        """ Get metadata from the metadata of top level entry."""
+        metadata = ""
+        try:
+            entry = self.entries.get(location=".")
+            metadata = entry.metadata
+        except ObjectDoesNotExist:
+            pass
+        return metadata
 
-        Don't forget to close the omex after using it.
-        :return:
+    def has_entries(self):
+        """ Check if ArchiveEntries exist for archive. """
+        return self.entries.count() > 0
+
+    def omex_entries(self):
+        """ Get entry information from manifest.
+
+        :return: dictionary {location: entry} for all entries in the manifest.xml
         """
-        omex = libcombine.CombineArchive()
-        if omex.initializeFromArchive(self.path) is None:
-            logger.error("Invalid Combine Archive: {}", self)
-            return None
-        return omex
+        return comex.read_manifest_entries(self.path)
 
-    def entries(self):
-        """ Get entries and omex object from given archive.
+    def omex_metadata(self):
+        """ Get metadata information from archive.
 
-        :return: entries in the combine archive (managed via manifest)
+        :return: dictionary {location: metadata}
         """
-        return comex.entries_info(self.path)
+        return read_metadata(self.path)
 
-    def extract_entry_by_index(self, index, filename):
-        """ Extracts entry at index to filename.
+    def tree_json(self):
+        """ Gets the zip tree as JSON for the archive.
 
-        :param index:
-        :param filename:
-        :return:
+        The entry information is added to the tree.
         """
-        omex = self.omex()
-        entry = omex.getEntry(index)
-        omex.extractEntry(entry.getLocation(), filename)
-        omex.cleanUp()
+        entries = self.entries.all()
+        return comex.zip_tree_content(self.path, entries)
 
-    def extract_entry_by_location(self, location, filename):
-        """ Extracts entry at location to filename.
 
-        :param location:
-        :param filename:
-        :return:
-        """
-        omex = self.omex()
-        entry = omex.getEntryByLocation(location)
-        omex.extractEntry(location, filename)
-        omex.cleanUp()
+class EntrySource(DjangoChoices):
+    """ Source of the entry information. """
+    manifest = ChoiceItem("manifest")
+    zip = ChoiceItem("zip")
 
-    def entry_content_by_index(self, index):
-        """ Extracts entry content at given index.
 
-        :param index: index of entry
-        :return: content
-        """
-        omex = self.omex()
-        entry = omex.getEntry(index)
-        content = omex.extractEntryToString(entry.getLocation())
-        omex.cleanUp()
-        return content
+class ArchiveEntry(ChangesMixin, models.Model):
 
-    def entry_content_by_location(self, location):
-        """ Extracts entry content at given location.
+    """ Entry information.
+    This corresponds to the content of the manifest file.
+    """
+    archive = models.ForeignKey(Archive, on_delete=models.CASCADE, related_name="entries")
+    file = models.FileField(upload_to='files', null=True)
+    location = models.CharField(max_length=MAX_TEXT_LENGTH)
+    format = models.CharField(max_length=MAX_TEXT_LENGTH)
+    source = models.CharField(max_length=MAX_TEXT_LENGTH, choices=EntrySource.choices)
+    master = models.BooleanField(default=False)
+    metadata = models.OneToOneField("MetaData", on_delete=models.SET_NULL, null=True, related_name="entry")
 
-        :param location: location of entry
-        :return: content
-        """
-        omex = self.omex()
-        entry = omex.getEntryByLocation(location)
-        content = omex.extractEntryToString(entry.getLocation())
-        omex.cleanUp()
-        return content
+    objects = managers.ArchiveEntryManager()
 
-    def zip_entries(self):
-        """ Returns the entries of the combine archive zip file.
+    def __str__(self):
+        return "{}:{}".format(self.archive, self.location)
 
-        :return: entries of the zip file
-        """
-        return comex.zip_tree_content(self.path)
+    class Meta:
+        verbose_name_plural = "archive entries"
+
+    @property
+    def name(self):
+        return os.path.splitext(self.location)[0]
+
+    @property
+    def short_format(self):
+        return comex.short_format(self.format)
+
+    @property
+    def base_format(self):
+        return comex.base_format(self.format)
+
+    @property
+    def path(self):
+        return str(self.file.path)

@@ -10,7 +10,18 @@ Definition of reusable macro function in templates
 
 <!-- Archives -->
 {% macro archive_html(archive) %}
-<a href="{{ url('combine:archive', args=[archive.id]) }}"><span class="btn btn-primary btn-xs"><i class="fa fa-fw fa-archive"></i> {{ archive.name }}</span></a>
+<a href="{{ url('combine:archive', args=[archive.id]) }}">{{ archive.name }}</a>
+{% endmacro %}
+
+{% macro archive_download(archive) %}
+<a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download COMBINE archive: '{{ archive.name }}'">
+                <span class="btn-xs btn-success"><i class="fa fa-download fa-fw"></i></span></a>
+{% endmacro %}
+
+{% macro archive_delete(archive) %}
+    <a href="{{ url('combine:delete_archive', args=[archive.id]) }}" title="Delete archive {{ archive.id }}: {{ archive.name }}"><span class="btn-xs btn-danger"
+                                                                              onclick="return confirm('Are you sure you want to delete: {{ archive }}?')">
+    <i class="fa fa-trash fa-fw"></i></span></a>
 {% endmacro %}
 
 
@@ -84,7 +95,7 @@ Definition of reusable macro function in templates
 <!-- User -->
 {% macro user(user) %}
 {% if user %}
-<i class="fa fa-fw fa-user"></i> {{ user.first_name }} {{ user.last_name }}<br />
+<i class="fa fa-fw fa-user"></i> {{ user }}
 {% else %}
 <i class="fa fa-fw fa-ban"></i>
 {% endif %}

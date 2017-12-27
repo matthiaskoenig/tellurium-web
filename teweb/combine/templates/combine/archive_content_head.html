@@ -3,4 +3,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
 
     <script src="{{ static('combine/js/jstree-3.3.4.min.js') }}"></script>
+    <script src="{{ static('combine/js/jquery.serialize-object.min.js') }}"></script>
+    <script src="{{ static('combine/js/js.cookie.js') }}"></script>
+    <script>
+        var url_mediatype = "{{static('combine/images/mediatype/')}}";
+        var empty_creator = "{{Creator.html_empty()| safe}}";
+    </script>
+    <script src="{{ static('combine/js/archive-detail.js') }}"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>

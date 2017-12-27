@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'django_filters',
-    # 'debug_toolbar'
+    'django_model_changes',
+    # 'debug_toolbar',
+
 ]
 
 MIDDLEWARE = [
@@ -90,12 +92,12 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
 
     ],
-    'DEFAULT_FILTER_BACKENDS': ( 'rest_framework.filters.SearchFilter',
-                                 'django_filters.rest_framework.DjangoFilterBackend',
-                                )
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20
 
 }
 # Database
