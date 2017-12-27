@@ -22,6 +22,6 @@ router.register(r'archive-entries', teweb_views.ArchiveEntryViewSet, base_name='
 
 app_name = 'combine'
 urlpatterns = [
-    url(r'^$', schema_view),
+    url(r'^$', schema_view, name="api"),
     ]
 urlpatterns += router.urls

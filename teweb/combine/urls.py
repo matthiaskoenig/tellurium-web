@@ -28,7 +28,7 @@ urlpatterns = [
 
     # ex: /combine/about
     url(r'^about$', views.about, name='about'),
-    url(r'^webservices$', views.webservices, name='webservices'),
+
 
     url(r'^test$', views.test_view, name='test_view'),
 
