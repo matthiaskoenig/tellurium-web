@@ -30,14 +30,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
-from rest_framework.request import Request
 import rest_framework.filters as filters_rest
 
 from .tasks import execute_omex
 from .models import Archive, Tag, ArchiveEntry, Creator, Date
-from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer,DateSerializer,CreatorSerializer, MetaDataSerializer
+from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer, DateSerializer, \
+    CreatorSerializer, MetaDataSerializer
 from .forms import UploadArchiveForm
-from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, IsOwnerOrGlobalOrAdminReadOnly
+from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, \
+    IsOwnerOrGlobalOrAdminReadOnly
 
 from .utils import comex, git
 
@@ -100,47 +101,44 @@ def archive_view(request, archive_id):
     archive = get_object_or_404(Archive, pk=archive_id)
     context = archive_context(archive)
 
-
-    if request.method =='POST':
+    if request.method == 'POST':
 
         modified = False
         data = request.POST["data"]
         entrydata_dict = json.loads(data)
         print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
 
-
         archive_entry = ArchiveEntry.objects.get(id=entrydata_dict["id"])
 
-        if entrydata_dict["master"]=="true":
+        if entrydata_dict["master"] == "true":
             entrydata_dict["master"] = True
-        elif entrydata_dict["master"]=="false":
+        elif entrydata_dict["master"] == "false":
             entrydata_dict["master"] = False
 
-        #todo: valdidation
+        # todo: valdidation
         archive_entry_serializer = ArchiveEntrySerializer()
-        archive_entry_serializer.update(instance=archive_entry, validated_data=entrydata_dict )
+        archive_entry_serializer.update(instance=archive_entry, validated_data=entrydata_dict)
         if bool(archive_entry.changes()):
             modified = True
         archive_entry.save()
 
-        data={"description":entrydata_dict["description"]}
+        data = {"description": entrydata_dict["description"]}
         meta_data_serializer = MetaDataSerializer()
-        meta_data_serializer.update(instance = archive_entry.metadata, validated_data=data )
+        meta_data_serializer.update(instance=archive_entry.metadata, validated_data=data)
         if bool(archive_entry.metadata.changes()):
             modified = True
         archive_entry.metadata.save()
 
-
         for creator in entrydata_dict["creators"]:
-            if creator["delete"] not in  ["false",""]:
-                    creator = Creator.objects.get(id=creator["delete"])
-                    creator.delete()
+            if creator["delete"] not in ["false", ""]:
+                creator = Creator.objects.get(id=creator["delete"])
+                creator.delete()
 
-            elif  creator["delete"] == "":
+            elif creator["delete"] == "":
                 # tries to delete a cerator, which was not even created
                 pass
 
-            elif creator["id"]== "new":
+            elif creator["id"] == "new":
                 del creator["id"]
                 serializer_creator = CreatorSerializer(data=creator)
                 if serializer_creator.is_valid():
@@ -148,42 +146,26 @@ def archive_view(request, archive_id):
                     archive_entry.metadata.creators.add(creator)
                     modified = True
                 else:
-                    response = {"errors":serializer_creator.errors,"is_error":True}
+                    response = {"errors": serializer_creator.errors, "is_error": True}
                     return JsonResponse(response)
             else:
                 serializer_creator = CreatorSerializer(data=creator)
                 if serializer_creator.is_valid():
-                    creator = Creator.objects.get(id = creator["id"])
+                    creator = Creator.objects.get(id=creator["id"])
                     serializer_creator.save()
-                    serializer_creator.update(instance=creator,validated_data=serializer_creator.validated_data)
+                    serializer_creator.update(instance=creator, validated_data=serializer_creator.validated_data)
                     if bool(creator.changes()):
                         modified = True
                     creator.save()
                 else:
-                    response = {"errors":serializer_creator.errors,"is_error":True}
+                    response = {"errors": serializer_creator.errors, "is_error": True}
                     return JsonResponse(response)
-
 
         if modified:
             date = Date.objects.create(date=timezone.now())
             archive_entry.metadata.modified.add(date)
 
         return JsonResponse({"is_error": False})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     return render(request, 'combine/archive.html', context)
 
@@ -281,7 +263,7 @@ def upload(request):
             file_obj = request.FILES['file']
             file_obj2 = ContentFile(file_obj.read())
             dirpath = tempfile.mkdtemp()
-            file_path = os.path.join(dirpath,file_name)
+            file_path = os.path.join(dirpath, file_name)
 
             create_dic = {}
             if request.user.is_authenticated:
@@ -292,7 +274,6 @@ def upload(request):
 
                 new_archive, _ = Archive.objects.get_or_create(archive_path=file_path, **create_dic)
             shutil.rmtree(dirpath)
-
 
             return archive_view(request, new_archive.id)
         else:
@@ -434,7 +415,6 @@ def runall(request, status=None):
     """
     # TODO: implement allow filtering by status
 
-
     all_archives = Archive.objects.all().order_by('-created')
     for archive in all_archives:
         result = execute_omex.delay(archive_id=archive.id)
@@ -523,7 +503,8 @@ def results(request, archive_id):
             if typeCode == libsedml.SEDML_OUTPUT_REPORT:
                 df = create_report(sed_doc, output, dgs_dict)
                 html = df.to_html()
-                html = html.replace('<table border="1" class="dataframe">', '<table class="table table-striped table-condensed table-hover">')
+                html = html.replace('<table border="1" class="dataframe">',
+                                    '<table class="table table-striped table-condensed table-hover">')
                 info["html"] = html
                 reports.append(info)
 
@@ -549,7 +530,6 @@ def results(request, archive_id):
         reports = []
         plot2Ds = []
         plot3Ds = []
-
 
     # add results context
     context.update({
@@ -600,14 +580,14 @@ def create_plot2D(sed_doc, output, dgs_dict):
 
     # General settings
     colors = [
-          'rgba(1.0, 0, 0, 1)',  # r
-          'rgba(0, 0, 1.0, 1)',  # b
-          'rgba(0, 0.5, 0, 1)',  # g
-          'rgba(0.75, 0, 0.75, 1)',  # m
-          'rgba(0, 0.75, 0.75, 1)',  # c
-          'rgba(0.75, 0.75, 0, 1)',  # y
-          'rgba(0, 0, 0, 1)',  # k
-          ]
+        'rgba(1.0, 0, 0, 1)',  # r
+        'rgba(0, 0, 1.0, 1)',  # b
+        'rgba(0, 0.5, 0, 1)',  # g
+        'rgba(0.75, 0, 0.75, 1)',  # m
+        'rgba(0, 0.75, 0.75, 1)',  # c
+        'rgba(0.75, 0.75, 0, 1)',  # y
+        'rgba(0, 0, 0, 1)',  # k
+    ]
 
     facecolor = 'w',
     edgecolor = 'k',
@@ -797,17 +777,17 @@ class ArchiveViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def list(self, request):
-         global_user = User.objects.get(username="global")
+        global_user = User.objects.get(username="global")
 
-         if request.user.is_authenticated:
-            queryset = Archive.objects.filter(user__in=[global_user,request.user])
-         else:
-             queryset = Archive.objects.filter(user=global_user)
-         serializer_context = {
-             'request': Request(request),
-         }
-         serializer = ArchiveSerializer(queryset, many=True, context=serializer_context)
-         return Response(serializer.data)
+        if request.user.is_authenticated:
+            queryset = Archive.objects.filter(user__in=[global_user, request.user])
+        else:
+            queryset = Archive.objects.filter(user=global_user)
+        context = {
+            'request': request,
+        }
+        serializer = ArchiveSerializer(queryset, many=True, context=context)
+        return Response(serializer.data)
 
 
 class ArchiveEntryViewSet(viewsets.ModelViewSet):
@@ -827,7 +807,7 @@ class TagViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = TagSerializer
     lookup_field = 'uuid'
-    filter_backends = (filters.DjangoFilterBackend,filters_rest.SearchFilter)
+    filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
     filter_fields = ('category', 'name')
     search_fields = ('category', 'name')
 
@@ -844,27 +824,19 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('is_staff', 'username', "email")
 
 
-
 class ZipTreeView(APIView):
     queryset = Archive.objects.all()
     permission_classes = (IsOwnerOrGlobalOrAdminReadOnly,)
 
-
-    def get(self, request,*args, **kwargs):
-       
+    def get(self, request, *args, **kwargs):
         archive_id = kwargs.get('archive_id')
         archive = self.get_object(request)
         parsed = archive.tree_json()
         parsed = json.loads(parsed)
         return Response(parsed)
 
-
-    def get_object(self,request):
+    def get_object(self, request):
         archive = self.queryset.get(pk=self.kwargs.get('archive_id'))
-        self.user =archive.user
-        self.check_object_permissions(request,obj=archive)
+        self.user = archive.user
+        self.check_object_permissions(request, obj=archive)
         return archive
-
-
-
-
