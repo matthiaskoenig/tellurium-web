@@ -461,7 +461,7 @@ def results(request, archive_id):
     dgs_json = task.result["dgs"]
 
     for sedml_path, dgs_dict in dgs_json.items():
-        sedml_location = comex._normalize_location(sedml_path)
+        sedml_location = comex.EntryParser._normalize_location(sedml_path)
 
         print("SEDML location:", sedml_location)
         archive_entries = ArchiveEntry.objects.filter(archive=archive.pk, location=sedml_location)

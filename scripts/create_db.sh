@@ -16,6 +16,7 @@ rm -rf combine/migrations/*
 # clean setup
 python manage.py makemigrations
 python manage.py makemigrations combine
+
 python manage.py migrate
 
 
