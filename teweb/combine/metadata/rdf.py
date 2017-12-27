@@ -307,7 +307,8 @@ def read_rdf_graphs(archive_path, debug=False):
     :return:
     """
     # find metadata locations
-    entries_dict = comex.read_manifest_entries(archive_path)
+    # FIXME: here a second time the archive entries are parsed ! Reuse
+    entries_dict = comex.EntryParser.read_manifest_entries(archive_path)
     metadata_paths = []
     for location, entry in entries_dict.items():
         format = entry.get('format')

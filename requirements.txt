@@ -9,14 +9,15 @@ django-celery-beat>=1.1.0
 django-filter>=1.1.0
 djangorestframework>=3.7.3
 django-rest-swagger>=2.1.2
+django-model-changes-py3>=0.14.1
 
 coreapi>=2.3.3
 markdown>=2.6.9
 jinja2>=2.10
-python-magic>=0.4.13
+python-magic>=0.4.15
 psycopg2>=2.7.3.2
 gunicorn>=19.7.1
 rdflib>=4.2.2
 tellurium>=2.0.12
-django-model-changes-py3>=0.14.1
+
 # -e git+https://github.com/sys-bio/tellurium.git@master#egg=tellurium

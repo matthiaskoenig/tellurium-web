@@ -6,16 +6,6 @@
         <h2 class="panel-title">{{ macros.archive_download(archive) }}&nbsp;&nbsp;&nbsp;{{ macros.archive_html(archive) }}
 
             <span class="pull-right">
-
-                <!-- navigate archives -->
-                <!--
-                <a href="{{ url('combine:archive_previous', args=[archive.id]) }}" title="Previous archive">
-                    <span class="btn-xs btn-primary"><i class="fa fa-arrow-circle-o-left fa-fw"></i></span></a>
-                <a href="{{ url('combine:archive_next', args=[archive.id]) }}" title="Next archive">
-                    <span class="btn-xs btn-primary"><i
-                        class="fa fa-arrow-circle-o-right fa-fw"></i></span></a>
-                -->
-
                 <!-- delete archive -->
                 {% if request.user.is_authenticated %}
                             {{ macros.archive_delete(archive) }}
