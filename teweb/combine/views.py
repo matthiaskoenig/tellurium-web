@@ -79,7 +79,8 @@ def archive_view(request, archive_id):
     archive = get_object_or_404(Archive, pk=archive_id)
     context = archive_context(archive)
 
-    if request.method == 'POST':
+    # Check if a POST via the UI, i.e., changes to the archive, not new upload
+    if request.method == 'POST' and "data" in request.POST:
 
         modified = False
         data = request.POST["data"]
@@ -93,7 +94,7 @@ def archive_view(request, archive_id):
         elif entrydata_dict["master"] == "false":
             entrydata_dict["master"] = False
 
-        # todo: valdidation
+        # TODO: validation
         archive_entry_serializer = ArchiveEntrySerializer()
         archive_entry_serializer.update(instance=archive_entry, validated_data=entrydata_dict)
         if bool(archive_entry.changes()):
@@ -174,7 +175,12 @@ def upload(request):
                 new_archive, _ = Archive.objects.get_or_create(archive_path=file_path, **create_dic)
             shutil.rmtree(dirpath)
 
-            return archive_view(request, new_archive.id)
+            # Everything uploaded, now display the entry
+            return redirect('combine:archive', archive_id=new_archive.id)
+            # return archive_view(request, new_archive.id)
+
+
+
         else:
             logging.warning('Form is invalid')
     else:

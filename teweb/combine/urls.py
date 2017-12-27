@@ -6,12 +6,12 @@ app_name = 'combine'
 urlpatterns = [
 
     url(r'^$', views.archives, name='index'),
-    url(r'^(?P<archive_id>[0-9]+)/$', views.archive_view, name='archive'),
-    url(r'^(?P<archive_id>[0-9]+)/results$', views.results, name='results'),
-    url(r'^(?P<archive_id>[0-9]+)/run$', views.run_archive, name='run_archive'),
-    url(r'^(?P<archive_id>[0-9]+)/delete$', views.delete_archive, name='delete_archive'),
-    url(r'^(?P<archive_id>[0-9]+)/download$', views.download_archive, name='download_archive'),
-    url(r'^(?P<archive_id>[0-9]+)/zip_tree$', views_api.ZipTreeView.as_view(), name='zip_data'),
+    url(r'^archive/(?P<archive_id>[0-9]+)/$', views.archive_view, name='archive'),
+    url(r'^archive/(?P<archive_id>[0-9]+)/results$', views.results, name='results'),
+    url(r'^archive/(?P<archive_id>[0-9]+)/run$', views.run_archive, name='run_archive'),
+    url(r'^archive/(?P<archive_id>[0-9]+)/delete$', views.delete_archive, name='delete_archive'),
+    url(r'^archive/(?P<archive_id>[0-9]+)/download$', views.download_archive, name='download_archive'),
+    url(r'^archive/(?P<archive_id>[0-9]+)/zip_tree$', views_api.ZipTreeView.as_view(), name='zip_data'),
 
     url(r'^entry/(?P<entry_id>[0-9]+)$', views.archive_entry, name='archive_entry'),
     # url(r'^(?P<archive_id>[0-9]+)/previous$', views.archive_previous, name='archive_previous'),
