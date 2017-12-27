@@ -4,6 +4,7 @@ Data and helper functions for filling the database.
 
 import os
 from collections import namedtuple
+import time
 
 from django.contrib.auth.models import User
 
@@ -24,11 +25,17 @@ def add_archives_to_database(archive_dirs, debug=False):
 
     for path in sorted(omex_files):
         if debug:
-            print(path)
+            print(os.path.relpath(path, os.getcwd()))
+
+        start_time = time.time()
+
         # default user is "global" but can be changed by adding user= < User Object >, user = User.username( string)
         _, created = Archive.objects.get_or_create(archive_path=path)
         if not created:
             print("Archive already exists, not recreated: {}".format(path))
+
+        if debug:
+            print("\t{:2.2f} [s]".format(time.time() - start_time))
 
 
 def create_users(user_defs, delete_all=True, debug=False):

@@ -120,8 +120,8 @@ class ArchiveManager(models.Manager):
                         tmp.seek(0)  # rewind file for reading !
 
                         with open(tmp.name, 'rb') as f:
-                            name = "{}_{}".format(archive_entry.pk, zip_name)
-                            name = name.replace("/", '__')
+                            name = zip_name
+                            # name = name.replace("/", '__')
                             archive_entry.file.save(name, File(f))
                         tmp.close()
                         archive_entry.save()

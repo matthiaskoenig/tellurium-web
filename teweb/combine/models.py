@@ -320,13 +320,23 @@ class EntrySource(DjangoChoices):
     zip = ChoiceItem("zip")
 
 
+def get_entry_upload_path(instance, filename):
+    """ Path for upload of file for ArchiveEntry.
+
+    :param instance:
+    :param filename:
+    :return:
+    """
+    return os.path.join("entries", instance.archive.name, filename)
+
+
 class ArchiveEntry(ChangesMixin, models.Model):
 
     """ Entry information.
     This corresponds to the content of the manifest file.
     """
     archive = models.ForeignKey(Archive, on_delete=models.CASCADE, related_name="entries")
-    file = models.FileField(upload_to='files', null=True)
+    file = models.FileField(upload_to=get_entry_upload_path, null=True)
     location = models.CharField(max_length=MAX_TEXT_LENGTH)
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
     source = models.CharField(max_length=MAX_TEXT_LENGTH, choices=EntrySource.choices)
@@ -356,3 +366,5 @@ class ArchiveEntry(ChangesMixin, models.Model):
     @property
     def path(self):
         return str(self.file.path)
+
+
