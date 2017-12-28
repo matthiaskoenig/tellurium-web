@@ -41,20 +41,8 @@ function get_format_icon(format){
     format_icon.setAttribute("height","20");
     format_icon.setAttribute("title",format);
     return format_icon;
-}
 
-function get_format_code(data){
-    "use strict";
-    var format_div = document.createElement("div");
-    var format_code = document.createElement("code");
-    var format_label = document.createElement("label");
-    format_code.setAttribute("title",data.format);
-    format_label.innerHTML = "Format";
-    format_code.innerHTML = base_format(data.format);
-    format_div.appendChild(format_label);
-    format_div.appendChild(format_code);
 
-    return format_div;
 }
 function base_format(format){
     "use strict";
@@ -63,33 +51,9 @@ function base_format(format){
  return short.replace("+xml",'');
 }
 
-function add_master_checkbox(master,edit){
-    "use strict";
-    var checkbox_div = document.createElement("div");
-    var checkbox_label = document.createElement("label");
-    var checkbox = document.createElement("INPUT");
-    checkbox_label.innerHTML = "Master";
-    checkbox.type = "checkbox";
-    checkbox.id = "checkbox1";
-    checkbox.setAttribute("data-toggle", "toggle");
-    checkbox.checked= master;
-    checkbox.disabled = !edit;
-    checkbox_div.appendChild(checkbox_label);
-    checkbox_div.appendChild(checkbox);
-    return checkbox_div;
-}
 
-function add_location(location){
-    "use strict";
-    var dl = document.createElement("dl");
-    var dt = document.createElement("dt");
-    var dd = document.createElement("dd");
-    dt.innerHTML = "Location";
-    dd.innerHTML = location;
-    dl.appendChild(dt);
-    dl.appendChild(dd);
-    return dl;
-}
+
+
 
 function modified_content( modified){
     "use strict";
@@ -206,12 +170,49 @@ function create_buttons_div(edit){
 }
 
 
+function add_master_checkbox(master,edit){
+    "use strict";
+    var checkbox_div = document.createElement("div");
+    var checkbox_label = document.createElement("label");
+    var checkbox = document.createElement("INPUT");
+    checkbox_label.innerHTML = "Master ";
+    checkbox.type = "checkbox";
+    checkbox.id = "checkbox1";
+    checkbox.setAttribute("data-toggle", "toggle");
+    checkbox.checked= master;
+    checkbox.disabled = !edit;
+    checkbox_div.appendChild(checkbox_label);
+    checkbox_div.innerHTML += " ";
+    checkbox_div.appendChild(checkbox);
+    return checkbox_div;
+}
+
+function add_location(location){
+    "use strict";
+    var dl = document.createElement("dl");
+    var dt = document.createElement("dt");
+    var dd = document.createElement("dd");
+    dt.innerHTML = "Location";
+    dd.innerHTML = location;
+    dl.appendChild(dt);
+    dl.appendChild(dd);
+    return dl;
+}
+
 function create_manfifest_detail(entry_pk,data,edit){
     "use strict";
     var detailManifest = document.createElement("div");
-    detailManifest.appendChild(get_format_code(data));
+    detailManifest.innerHTML += "<div><label> Format </label> <code title='"+data.format +"'>" + base_format(data.format) +" </code></div>"
     detailManifest.appendChild(add_master_checkbox(data.master,edit));
-    detailManifest.appendChild(add_location(data.location));
+    if (data.file !== null && typeof data.file !== 'undefined'){
+        detailManifest.innerHTML += "<div><label> Location </label>"+ " "+"<a href='"+data.file+"'>"+ data.location + "</a></div>";
+    }
+    else{
+         detailManifest.innerHTML += "<div><label> Location </label>"+ " "+ data.location + "</div>";
+    }
+
+    //detailManifest.appendChild(add_location(data.location));
+
     detailManifest.appendChild(hidden_input_entry_pk(entry_pk));
     return detailManifest;
 }

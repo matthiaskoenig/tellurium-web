@@ -147,7 +147,7 @@ class ArchiveEntrySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ArchiveEntry
-        fields = ['archive', 'location', 'format', 'master', 'metadata']
+        fields = ['archive', 'location', 'format', 'master', 'metadata', 'file']
 
 
 
