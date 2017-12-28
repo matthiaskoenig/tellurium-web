@@ -277,7 +277,8 @@ class Archive(models.Model):
 
     def has_sedml(self):
         """ Check if any SED-ML file in the archive."""
-        sedml_entries = self.entries.filter(format__endswith="sedml")
+        sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/sed-ml")
+        return len(sedml_entries) > 0
 
 
 

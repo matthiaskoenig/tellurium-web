@@ -10,16 +10,19 @@
     {% include "combine/archive_content.html" %}
     </div>
 
+    {% if archive.has_sedml() %}
     <div class="col-xs-3">
         {% include "combine/task_content.html" %}
     </div>
+    {% endif %}
 </div>
+
+
 <div class="row">
     <div class="col-xs-9">
     {% include "combine/archive_content_table.html" %}
     </div>
 </div>
-
 
 {% endblock %}
 
