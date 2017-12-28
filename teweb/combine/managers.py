@@ -7,13 +7,14 @@ import hashlib
 from six import string_types
 import zipfile
 import tempfile
+from pprint import pprint
 
 from django.db import models
 from django.core.files import File
 from django.apps import apps
 from django.contrib.auth.models import User
 
-from .utils.tags import create_tags_for_archive
+from .utils.tags import create_tags_for_entry
 
 
 # ===============================================================================
@@ -59,6 +60,10 @@ class ArchiveManager(models.Manager):
         MetaData = apps.get_model("combine", model_name="MetaData")
 
         if "archive_path" in kwargs:
+
+            # ----------------------------
+            # Create archive
+            # ----------------------------
             path = kwargs["archive_path"]
             del kwargs["archive_path"]
 
@@ -89,17 +94,18 @@ class ArchiveManager(models.Manager):
             archive.user = user
             archive.save()
 
-            # create tags for archive
-            tags_info = create_tags_for_archive(path)
-            for tag_info in tags_info:
-                tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
-                archive.tags.add(tag)
-
+            # ----------------------------
+            # Parse metadata
+            # ----------------------------
             # metadata parsed from archive (lookup via locations)
             omex_metadata = archive.omex_metadata()
 
-            # create entries
+            # ----------------------------
+            # Create ArchiveEntries
+            # ----------------------------
             with zipfile.ZipFile(path) as z:
+
+                tags = []
 
                 for location, entry in archive.omex_entries().items():
                     entry_dict = {
@@ -107,7 +113,6 @@ class ArchiveManager(models.Manager):
                         "archive": archive,
                     }
                     archive_entry, _ = ArchiveEntry.objects.get_or_create(**entry_dict)
-                    archive_entry.save()
 
                     # add file to archive entry
                     if location != ".":
@@ -124,9 +129,8 @@ class ArchiveManager(models.Manager):
                             # name = name.replace("/", '__')
                             archive_entry.file.save(name, File(f))
                         tmp.close()
-                        archive_entry.save()
 
-                    # create single metadata for every entry
+                    # create metadata for entry
                     meta_dict = omex_metadata.get(location)
                     if meta_dict:
                         metadata_dict = {
@@ -135,9 +139,19 @@ class ArchiveManager(models.Manager):
                         metadata = MetaData.objects.create(**metadata_dict)
                         archive_entry.metadata = metadata
 
-                        metadata.save()
-
                     archive_entry.save()
+
+                    # Tags from given entry
+                    # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
+                    tags_info = create_tags_for_entry(archive_entry)
+                    pprint(tags_info)
+                    for tag_info in tags_info:
+                        tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
+                        tags.append(tag)
+
+                # add all tags at once
+                archive.tags.add(*tags)
+                archive.save()
 
             return archive, created_archive
 
@@ -165,6 +179,10 @@ class MetaDataManager(models.Manager):
 
     def create(self, *args, **kwargs):
 
+        Date = apps.get_model("combine", model_name="Date")
+        Creator = apps.get_model("combine", model_name="Creator")
+        Triple = apps.get_model("combine", model_name="Triple")
+
         metadata = kwargs.get("metadata")
 
         if metadata:
@@ -177,7 +195,8 @@ class MetaDataManager(models.Manager):
             # create initial meta entry
             entry_meta = super(MetaDataManager, self).create(*args, **kwargs)
 
-            # add creator information
+            # add creators
+            creators = []
             for creator_info in metadata.get("creators", []):
                 creator_dict = {
                     "first_name": creator_info.get("givenName"),
@@ -185,18 +204,28 @@ class MetaDataManager(models.Manager):
                     "organisation": creator_info.get("organisation"),
                     "email": creator_info.get("email"),
                 }
-                entry_meta.creators.create(**creator_dict)
-                entry_meta.save()
+                creators.append(
+                    Creator.objects.create(**creator_dict)
+                )
+            entry_meta.creators.add(*creators)
 
-            # add modified stamps
+            # add modified time stamps
+            modified = []
             for modified_date in metadata.get("modified", []):
-                entry_meta.modified.create(date=modified_date)
-                entry_meta.save()
+                modified.append(
+                    Date.objects.create(date=modified_date)
+                )
+            entry_meta.modified.add(*modified)
 
+            # add triples
+            triples = []
+            for s, p, o in metadata["triples"]:
+                triple = Triple.objects.create(subject=s, predicate=p, object=o)
+                triples.append(triple)
+            entry_meta.triples.add(*triples)
 
-            for s,p,o in metadata["triples"]:
-                entry_meta.triples.create(subject=s,predicate=p,object=o)
-                entry_meta.save()
+            # save the entry
+            entry_meta.save()
 
             return entry_meta
 

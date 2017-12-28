@@ -11,10 +11,10 @@
     <!-- CSS -->
     <link rel="stylesheet" href="{{ static('combine/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ static('combine/js/datatables.min.css') }}"/>
-    <link rel="stylesheet" type="text/css" href="{{ static('combine/font-awesome-4.7.0/css/font-awesome.min.css') }}"/>
     <link rel="stylesheet" type="text/css" href="{{ static('combine/css/combine.css') }}"/>
 
     <!-- scripts -->
+    <script defer src="{{ static('combine/fontawesome-5.0.2/fontawesome-all.js') }}"></script>
     <script src="{{ static('combine/js/jquery-3.2.1.min.js') }}"></script>
     <script src="{{ static('combine/js/tether-1.4.0.min.js') }}"></script>
     <script src="{{ static('combine/js/bootstrap-3.3.7.min.js') }}"></script>
@@ -83,12 +83,12 @@
                         <ul class="dropdown-menu" role="menu">
 
                             <li><a href="{{ url('logout') }}?next={{ request.path }}"> <i
-                                    class="fa fa-sign-out fa-fw"> </i> Logout</a></li>
+                                    class="fa fa-sign-out-alt fa-fw"> </i> Logout</a></li>
                         </ul>
                     </li>
                 {% else %}
                     <li><a href="{{ url('login') }}?next={{ request.path }}"><i
-                            class="fa fa-sign-in fa-fw"></i> Login</a></li>
+                            class="fa fa-sign-in-alt fa-fw"></i> Login</a></li>
                 {% endif %}
                 <li><a href="{{ url('webservices') }}" title="REST Web Services" target="_blank">
                     <i class="fa fa-cube fa-fw"></i> API</a>
@@ -99,7 +99,7 @@
                 </li>
                 <li><a href="https://github.com/matthiaskoenig/tellurium-web" title="Source code on github"
                        target="_blank">
-                    <i class="fa fa-github fa-fw"></i> Github</a></li>
+                    <i class="fab fa-github fa-fw"></i> Github</a></li>
 
             </ul>
         </div><!--/.nav-collapse -->
