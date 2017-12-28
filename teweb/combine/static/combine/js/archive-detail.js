@@ -240,6 +240,8 @@ function create_master_input(){
 function create_meta(metadata, edit){
     "use strict";
     var meta_div = document.createElement("div");
+    var creators_div = document.createElement("div");
+    creators_div.setAttribute("id","creators_div")
     var dl_desc = document.createElement("dl");
     var dt_desc = document.createElement("dt");
     var dd_desc = document.createElement("dd");
@@ -275,6 +277,9 @@ function create_meta(metadata, edit){
     dl_desc.appendChild(dt_desc);
     dl_desc.appendChild(dd_desc);
 
+
+
+
     dl_created.appendChild(dt_created);
     dl_created.appendChild(dd_created);
 
@@ -282,14 +287,19 @@ function create_meta(metadata, edit){
     dl_modified.appendChild(dd_modified);
 
     meta_div.appendChild(dl_desc);
+
+     for (var creator in metadata.creators){
+         if(metadata.creators.hasOwnProperty(creator)){
+        var contact_div = addContact(metadata.creators,creator,edit);
+        creators_div.appendChild(contact_div);
+    }}
+
+    meta_div.appendChild(creators_div);
+    meta_div.innerHTML += "<br>";
+
     meta_div.appendChild(dl_created);
     meta_div.appendChild(dl_modified);
 
-    for (var creator in metadata.creators){
-         if(metadata.creators.hasOwnProperty(creator)){
-        var contact_div = addContact(metadata.creators,creator,edit);
-        meta_div.appendChild(contact_div);
-    }}
 
     for (var triple in metadata.triples){
          if(metadata.triples.hasOwnProperty(triple)){
