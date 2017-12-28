@@ -9,6 +9,8 @@ import json
 import os
 import tempfile
 import shutil
+import zipfile
+import io
 
 from django.utils import timezone
 from django.core.files.base import ContentFile
@@ -217,8 +219,8 @@ def archive_context(archive):
     return context
 
 
-def download_archive(request, archive_id):
-    """ Download archive.
+def download_archive_initial(request, archive_id):
+    """ Download the originally uploaded archive.
 
     :param request:
     :param archive_id:
@@ -230,11 +232,67 @@ def download_archive(request, archive_id):
     response = HttpResponse(archive.file, content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
 
-    # no redirecting, but breaks on archives
-    # url = reverse('combine:archive', args=(archive_id,))
-    # response['Refresh'] = "0;url={}".format(url)
+    return response
+
+
+def download_archive(request, archive_id):
+    """ Download the latest archive.
+
+    The archive is created dynamically, i.e., everything is packed in a zip archive.
+    Manifest and metadata files are created from database content.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    archive = get_object_or_404(Archive, pk=archive_id)
+    filename = archive.file.name.split('/')[-1]
+
+    # Open StringIO to grab in-memory ZIP contents
+    s = io.StringIO()
+
+    print('-' * 80)
+    print("Create zip:", filename)
+    print('-' * 80)
+
+    # The zip compressor
+    zf = zipfile.ZipFile(s, "w")
+    entries = archive.entries.all()
+    locations = [entry.location for entry in entries]
+
+    # The following files should be written
+    # - entries
+    # - manifest.xml
+    # - metadata.rdf
+    content = {}
+    for entry in entries:
+        location = entry.location
+        if locations == ".":
+            continue
+        content[location] = entry.file
+
+    for location, fpath in content.items():
+        print(location)
+
+        # Calculate path for file in zip
+        # fdir, fname = os.path.split(fpath)
+        # zip_path = os.path.join(zip_subdir, fname)
+
+        zip_path = location
+
+        # Add file, at correct path
+        zf.write(fpath, zip_path)
+
+    # Must close zip for all contents to be written
+    zf.close()
+
+    # Grab ZIP file from in-memory, make response with correct content type
+    response = HttpResponse(s.getvalue(), content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
 
     return response
+
+
 
 
 @login_required
