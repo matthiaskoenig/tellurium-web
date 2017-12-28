@@ -309,6 +309,30 @@ class Archive(models.Model):
         entries = self.entries.all()
         return comex.zip_tree_content(self.path, entries)
 
+    def update_manifest_entry(self):
+        """ Updates the manifest entry of this archive based on the latest information.
+        This function must be called if any content of the archive entries change, i.e,
+        - adding entries
+        - removing entries
+        - changing formats
+
+        :return:
+        """
+
+        # TODO: implement
+        pass
+
+    def update_metadata_entry(self):
+        """ Updates the metadata files in the archive.
+
+        Must be called after changes to the metadata.
+        """
+        # TODO: implement
+
+
+
+
+
 
 class EntrySource(DjangoChoices):
     """ Source of the entry information. """
