@@ -36,7 +36,6 @@ class Annotation(object):
         self.label = json.get("label", None)
         self.obo_id = json.get("obo_id", None)
         self.ontology_name = json.get("ontology_name", None)
-
         self.providers = json_providers_for_uri(self.uri)
 
     def __str__(self):
@@ -70,12 +69,14 @@ class Annotation(object):
 
         # find official provider
         official_provider = None
+        ols_provider = None
         for provider in self.providers:
             if not official_provider:
                 official_provider = provider
-                continue
             if provider["official"] == True:
                 official_provider = provider
+            if provider["resourcePrefix"] == "ols":
+                ols_provider = provider
 
         official_url = Annotation._url_from_provider(official_provider, self.obo_id)
         official_info = official_provider["info"]
@@ -85,8 +86,16 @@ class Annotation(object):
         identifier_html = '<a href="{}" target="_blank"><span class="identifier" title="Resource identifier. Click to open primary resource.">{}</span></a><br />\n'.format(official_url, self.obo_id)
         html += qualifier_html + collection_html + identifier_html
 
-        # TODO: ontology information
-        html += "<b>{}</b><br />".format(self.label)
+        # ontology information
+        if ols_provider:
+            html += '<a href="{}" target="_blank"><span class="ontology" title="Ontology">OLS</span></a> <b>{}</b> <a href="{}" target="_blank" class="text-muted">{}</a><br />\n'.format(
+                Annotation._url_from_provider(ols_provider, self.obo_id),
+                self.label,
+                self.iri,
+                self.iri
+            )
+        else:
+            html += "<b>{}</b><br />".format(self.label)
 
         # description
         if self.description:
@@ -104,7 +113,6 @@ class Annotation(object):
             for synonym in self.obo_synonyms:
                 html += synonym.get("name") + "; "
             html += "<br />\n"
-
 
         # resources
         pprint(self.providers)
