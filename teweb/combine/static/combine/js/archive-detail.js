@@ -35,7 +35,7 @@ function get_title(location){
 
 function get_format_icon(data){
     "use strict";
-    var src=url_mediatype+base_format(data.format)+".png";
+    var src=url_mediatype + base_format(data.format)+".png";
     var format_icon = document.createElement("img");
     format_icon.setAttribute("src", src);
     format_icon.setAttribute("height","20");
