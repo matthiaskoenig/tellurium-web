@@ -104,9 +104,9 @@ def zip_tree_content(path, entries=None):
         'id': '.',
         'parent': "#",
         'text': '.',
-        #'icon': 'fa fa-fw fa-archive',
-         'icon': '/static/combine/images/mediatype/thumbnails/omex.png',
-        'type':"omex",
+        'icon': 'fa fa-fw fa-archive fa-4x ',
+         #'icon': "get_format_icon({})".,
+        #'type':"sbml-icon",
         'state': {'opened': True, 'selected': True}
     }
 
@@ -158,6 +158,8 @@ def zip_tree_content(path, entries=None):
 
                 if entry.short_format in format_list:
                     node["icon"] = '/static/combine/images/mediatype/thumbnails/'+entry.short_format+'.png'
+                    #node["icon"] = entry.format
+                    pass
 
 
 

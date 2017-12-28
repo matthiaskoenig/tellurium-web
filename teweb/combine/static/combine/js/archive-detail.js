@@ -7,7 +7,7 @@ function create_entry_title(data){
     title_entry.appendChild(title_text);
 
     if (typeof base_format(data.format) !== 'undefined'){
-        title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
+        title_entry.insertBefore(get_format_icon(data.format),title_entry.childNodes[0]);
     }
 
     if (data.master){
@@ -33,13 +33,13 @@ function get_title(location){
     return " " + splited_fn[splited_fn.length-1];
 }
 
-function get_format_icon(data){
+function get_format_icon(format){
     "use strict";
-    var src=url_mediatype + base_format(data.format)+".png";
+    var src=url_mediatype + base_format(format)+".png";
     var format_icon = document.createElement("img");
     format_icon.setAttribute("src", src);
     format_icon.setAttribute("height","20");
-    format_icon.setAttribute("title",data.format);
+    format_icon.setAttribute("title",format);
     return format_icon;
 }
 
