@@ -30,7 +30,8 @@ def html_creator(first_name, last_name, organisation, email):
         email_str = '<a href="mailto:{}" target="_blank" title="{}"><i class="fa fa-fw fa-envelope"></i></a>'.format(email, email)
 
     html = '<i class="fa fa-fw fa-user"></i> {} {} {} {}'.format(first_name, last_name, email_str, organisation_str)
-    html = '{}{} {} ({})'.format(first_name, last_name, email, organisation)
+
+    # html = '{}{} {} ({})'.format(first_name, last_name, email, organisation)
     print(html)
     # return ''
     return html

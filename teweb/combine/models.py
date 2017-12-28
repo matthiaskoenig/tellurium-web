@@ -112,7 +112,7 @@ class Triple(models.Model):
         """
         # from .metadata import annotation
         # if self.is_bq():
-        #     a = annotation.Annotation(subject=self.subject, qualifier=self.predicate, uri=self.object)
+        #      a = annotation.Annotation(subject=self.subject, qualifier=self.predicate, uri=self.object)
 
 
         html = '{} {} <a href="{}" target="_blank">{}</a>'.format(self.subject, self.predicate,

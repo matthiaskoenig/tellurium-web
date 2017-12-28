@@ -89,18 +89,20 @@
 </script>
 
 <script>
-    function display_entry_detail(entry_pk, edit ){
-        // display detail of selected entry.
+    function display_entry_detail(entry_pk, edit){
+        /** Main function for displaying archive entry detail after selection. */
+
         var endpoint_path = "/api/archive-entries/" + entry_pk+"/";
-        var endpoint = window.location.origin+endpoint_path;
+        var endpoint = window.location.origin + endpoint_path;
 
-        var manifest_detail_div_document = document.getElementById("manifest_detail");
-        var button_div_document = document.getElementById("button-div");
-        var entry_detail_div_document = document.getElementById("item_detail");
+        var manifest_detail_div = document.getElementById("manifest_detail");
+        var button_div = document.getElementById("button-div");
+        var entry_detail_div = document.getElementById("item_detail");
 
-        manifest_detail_div_document.innerHTML ="";
-        button_div_document.innerHTML ="";
-        entry_detail_div_document.innerHTML ="";
+        // empty content
+        manifest_detail_div.innerHTML = "";
+        button_div.innerHTML = "";
+        entry_detail_div.innerHTML = "";
 
         $.ajax({
             url: endpoint,
@@ -108,16 +110,16 @@
             success: function (data) {
                 var metadata = data.metadata;
 
-                button_div_document.appendChild(create_buttons_div(edit));
-                manifest_detail_div_document.appendChild(create_entry_title(data));
-                manifest_detail_div_document.appendChild(create_manfifest_detail(entry_pk,data,edit));
+                button_div.appendChild(create_buttons_div(edit));
+                manifest_detail_div.appendChild(create_entry_title(data));
+                manifest_detail_div.appendChild(create_manfifest_detail(entry_pk, data, edit));
 
                 if(metadata !== 'undefined'){
-                    entry_detail_div_document.append(create_meta(metadata, edit));
+                    entry_detail_div.append(create_meta(metadata, edit));
                 }
             },
             error: function (error_data) {
-                // errors if anythink goes wrong
+                // errors if anything goes wrong
                 console.log("error");
                 console.log(error_data);
             }

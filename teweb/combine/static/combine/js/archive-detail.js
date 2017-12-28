@@ -175,10 +175,6 @@ function addContact(creators,creator,edit){
 }
 
 
-
-
-
-
 function create_delete_contact(creator_id){
     "use strict";
     var deleteInput = document.createElement("input");
@@ -240,11 +236,14 @@ function create_save_button(){
 
 
 function create_buttons_div(edit){
+    /** Button HTML */
     "use strict";
     var buttons_div = document.createElement("div");
     buttons_div.appendChild(create_edit_button());
     if ( edit ){
-        buttons_div.appendChild(create_add_creator_button());
+        buttons_div.innerHTML = '<span class="btn btn-default"><i class="fa fa-fw fa-users"></i> <input id="creator" value="Add Creator"/></span>';
+
+        // buttons_div.appendChild(create_add_creator_button());
         buttons_div.appendChild(create_add_annotation_button());
         buttons_div.appendChild(create_save_button());
     }
