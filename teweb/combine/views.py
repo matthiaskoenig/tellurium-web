@@ -248,17 +248,16 @@ def download_archive(request, archive_id):
     archive = get_object_or_404(Archive, pk=archive_id)
     filename = archive.file.name.split('/')[-1]
 
-    # Open StringIO to grab in-memory ZIP contents
-    s = io.StringIO()
+    # updated manifest and metadata information
+    archive.update_manifest_entry()
+    archive.update_metadata_entry()
 
-    print('-' * 80)
-    print("Create zip:", filename)
-    print('-' * 80)
+    # Open StringIO to grab in-memory ZIP contents
+    s = io.BytesIO()
 
     # The zip compressor
     zf = zipfile.ZipFile(s, "w")
     entries = archive.entries.all()
-    locations = [entry.location for entry in entries]
 
     # The following files should be written
     # - entries
@@ -267,21 +266,21 @@ def download_archive(request, archive_id):
     content = {}
     for entry in entries:
         location = entry.location
-        if locations == ".":
+        if location in ["."]:
             continue
-        content[location] = entry.file
+
+        content[location] = entry.path
+
+    # FIXME: set timestamps of files to last modified time
 
     for location, fpath in content.items():
         print(location)
 
-        # Calculate path for file in zip
-        # fdir, fname = os.path.split(fpath)
-        # zip_path = os.path.join(zip_subdir, fname)
-
-        zip_path = location
+        zip_path = location.replace("./", "")
 
         # Add file, at correct path
-        zf.write(fpath, zip_path)
+        print(fpath, type(fpath), "->", zip_path, type(zip_path))
+        zf.write(str(fpath), str(zip_path))
 
     # Must close zip for all contents to be written
     zf.close()
@@ -291,8 +290,6 @@ def download_archive(request, archive_id):
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
 
     return response
-
-
 
 
 @login_required
