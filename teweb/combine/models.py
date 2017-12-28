@@ -275,6 +275,13 @@ class Archive(models.Model):
             pass
         return metadata
 
+    def has_sedml(self):
+        """ Check if any SED-ML file in the archive."""
+        sedml_entries = self.entries.filter(format__endswith="sedml")
+
+
+
+
     def has_entries(self):
         """ Check if ArchiveEntries exist for archive. """
         return self.entries.count() > 0
