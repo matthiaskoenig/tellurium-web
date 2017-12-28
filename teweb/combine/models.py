@@ -110,14 +110,9 @@ class Triple(models.Model):
 
         :return: HTML representation for rendering of triple
         """
-        # from .metadata import annotation
-        # if self.is_bq():
-        #      a = annotation.Annotation(subject=self.subject, qualifier=self.predicate, uri=self.object)
-
-
-        html = '{} {} <a href="{}" target="_blank">{}</a>'.format(self.subject, self.predicate,
-                                                                  self.object, self.object)
-        return html
+        from .metadata import annotation
+        a = annotation.Annotation(subject=self.subject, qualifier=self.predicate, uri=self.object)
+        return a.html()
 
 
     def is_bq(self):

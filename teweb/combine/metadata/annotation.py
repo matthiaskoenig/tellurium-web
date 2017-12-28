@@ -19,23 +19,9 @@ class Annotation(object):
         self.qualifier = qualifier
         self.uri = uri
         self.qualifier = qualifier
-        self.parse_uri_info()
 
-    def parse_uri_info(self):
-        """ Retrieves JSON.
-
-        :param uri:
-        :return:
-        """
-        json = json_term_for_uri(self.uri)
-        pprint(json)
-        self.description = json.get("description", None)
-        self.synonyms = json.get("synonyms", None)
-        self.obo_synonyms = json.get("obo_synonym", None)
-        self.iri = json.get("iri", None)
-        self.label = json.get("label", None)
-        self.obo_id = json.get("obo_id", None)
-        self.ontology_name = json.get("ontology_name", None)
+        # query the ols term
+        self.term = json_term_for_uri(self.uri)
         self.providers = json_providers_for_uri(self.uri)
 
     def __str__(self):
@@ -43,7 +29,7 @@ class Annotation(object):
 
     @staticmethod
     def _url_from_provider(provider, obo_id):
-        """ Creates tha actual url for given provider.
+        """ Creates the actual url for given provider.
             'accessURL': 'http://www.ebi.ac.uk/ols/ontologies/chebi/terms?obo_id={$id}'
 
         :param provider:
@@ -53,19 +39,47 @@ class Annotation(object):
         url = provider["accessURL"]
         return url.replace("{$id}", obo_id)
 
+
     def html(self):
+        html = '<p class="cvterm"><small>\n'
+        html += '<span class="subject">{}</span>'.format(self.subject)
 
-        html = '<p class="cvterm">\n'
+        if self.qualifier.startswith("http://biomodels.net/"):
+            if "biology-qualifiers" in self.qualifier:
+                qualifier_type = "BQB"
+            elif "model-qualifiers" in self.qualifier:
+                qualifier_type = "BQM"
+            else:
+                qualifier_type = ""
 
-        if "biology-qualifiers" in self.qualifier:
-            qualifier_type = "BQB"
-        elif "model-qualifiers" in self.qualifier:
-            qualifier_type ="BQM"
+            qualifier_short = qualifier_type + "_" + self.qualifier.split("/")[-1]
+            qualifier_html = '<a href="{}" target="_blank"><span class="qualifier" title="{}">{}</span></a>\n'.format(
+                "http://co.mbine.org/standards/qualifiers", self.qualifier, qualifier_short.upper())
         else:
-            qualifier_type = ""
+            qualifier_html = '<span class="qualifier">{}</span></a>\n'.format(self.qualifier)
 
-        qualifier_short = qualifier_type + "_" + self.qualifier.split("/")[-1]
-        qualifier_html = '<a href="{}" target="_blank"><span class="qualifier" title="{}">{}</span></a>\n'.format("http://co.mbine.org/standards/qualifiers", self.qualifier, qualifier_short.upper())
+        html += qualifier_html
+
+        if len(self.term) > 0:
+            html += self._html_for_term()
+        else:
+            html += '<a href="{}" target="_blank"><span class="identifier" title="Resource identifier. Click to open primary resource.">{}</span></a>'.format(self.uri, self.uri)
+
+        html += '</small></p>\n'
+        return html
+
+
+    def _html_for_term(self):
+        """ Creates html if term via OLS could be retrieved.
+
+        :return:
+        """
+        html = ""
+        # general values
+        iri = self.term.get("iri", None)
+        label = self.term.get("label", None)
+        obo_id = self.term.get("obo_id", None)
+        ontology_name = self.term.get("ontology_name", None)
 
         # find official provider
         official_provider = None
@@ -78,46 +92,51 @@ class Annotation(object):
             if provider["resourcePrefix"] == "ols":
                 ols_provider = provider
 
-        official_url = Annotation._url_from_provider(official_provider, self.obo_id)
+        official_url = Annotation._url_from_provider(official_provider, obo_id)
         official_info = official_provider["info"]
-        collection_url = 'http://identifiers.org/' + self.ontology_name
+        collection_url = 'http://identifiers.org/' + ontology_name
 
         collection_html = '<a href="{}" target="_blank"><span class="collection" title="MIRIAM data collection. Click to open on MIRIAM registry.">{}</span></a>\n'.format(collection_url, official_info)
-        identifier_html = '<a href="{}" target="_blank"><span class="identifier" title="Resource identifier. Click to open primary resource.">{}</span></a><br />\n'.format(official_url, self.obo_id)
-        html += qualifier_html + collection_html + identifier_html
+        identifier_html = '<a href="{}" target="_blank"><span class="identifier" title="Resource identifier. Click to open primary resource.">{}</span></a><br />\n'.format(official_url, obo_id)
+        html += collection_html + identifier_html
 
         # ontology information
         if ols_provider:
             html += '<a href="{}" target="_blank"><span class="ontology" title="Ontology">OLS</span></a> <b>{}</b> <a href="{}" target="_blank" class="text-muted">{}</a><br />\n'.format(
-                Annotation._url_from_provider(ols_provider, self.obo_id),
-                self.label,
-                self.iri,
-                self.iri
+                Annotation._url_from_provider(ols_provider, obo_id),
+                label,
+                iri,
+                iri
             )
         else:
-            html += "<b>{}</b><br />".format(self.label)
+            html += "<b>{}</b><br />".format(label)
 
         # description
-        if self.description:
-            for item in self.description:
+        description = self.term.get("description", None)
+        if description:
+            for item in description:
                 html += '<span class="text-success">{}</span><br />\n'.format(item)
 
         # synonyms
-        if self.synonyms and len(self.synonyms)>0:
+        synonyms = self.term.get("synonyms", None)
+        if synonyms and len(synonyms)>0:
             html += '<span class="comment">Synonyms</span> '
-            for synonym in self.synonyms:
+            for synonym in synonyms:
                 html += synonym + "; "
             html += "<br />\n"
-        if self.obo_synonyms and len(self.obo_synonyms)>0:
+
+        # obo synonyms
+        obo_synonyms = self.term.get("obo_synonym", None)
+        if obo_synonyms and len(obo_synonyms)>0:
             html += '<span class="comment">OBO Synonyms</span> '
-            for synonym in self.obo_synonyms:
+            for synonym in obo_synonyms:
                 html += synonym.get("name") + "; "
             html += "<br />\n"
 
         # resources
         pprint(self.providers)
         for provider in self.providers:
-            url = Annotation._url_from_provider(provider, self.obo_id)
+            url = Annotation._url_from_provider(provider, obo_id)
 
             info = provider["info"]
             official = provider["official"]
@@ -128,11 +147,7 @@ class Annotation(object):
 
             html += '\t{} <a href="{}" target="_blank"> {}</a><br />\n'.format(icon, url, info)
 
-        html += '</p>'
-
         return html
-
-
 
 
 if __name__ == "__main__":
