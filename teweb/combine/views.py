@@ -12,6 +12,9 @@ import shutil
 import zipfile
 import io
 
+import datetime
+from django.utils.timezone import utc
+
 from django.utils import timezone
 from django.core.files.base import ContentFile
 
@@ -198,7 +201,6 @@ def upload_view(request, form):
     return render(request, 'combine/archive_upload.html', context)
 
 
-
 def archive_context(archive):
     """ Context required to render archive_content. """
 
@@ -249,8 +251,19 @@ def download_archive(request, archive_id):
     filename = archive.file.name.split('/')[-1]
 
     # updated manifest and metadata information
+    # TODO: implement
     archive.update_manifest_entry()
+    # TODO: implement
     archive.update_metadata_entry()
+
+    # All entries are written including the updated manifest.xml and metadata.rdf
+    content = {}
+    for entry in entries:
+        location = entry.location
+        if location in ["."]:
+            continue
+
+        content[location] = entry
 
     # Open StringIO to grab in-memory ZIP contents
     s = io.BytesIO()
@@ -259,28 +272,25 @@ def download_archive(request, archive_id):
     zf = zipfile.ZipFile(s, "w")
     entries = archive.entries.all()
 
-    # The following files should be written
-    # - entries
-    # - manifest.xml
-    # - metadata.rdf
-    content = {}
-    for entry in entries:
-        location = entry.location
-        if location in ["."]:
-            continue
-
-        content[location] = entry.path
-
-    # FIXME: set timestamps of files to last modified time
-
-    for location, fpath in content.items():
+    # write all entries
+    for location, entry in content.items():
         print(location)
+        fpath = entry.path
 
         zip_path = location.replace("./", "")
 
-        # Add file, at correct path
-        print(fpath, type(fpath), "->", zip_path, type(zip_path))
-        zf.write(str(fpath), str(zip_path))
+        # Add file, at correct path, with last_modified time
+        modified_date = entry.metadata.last_modified
+        if modified_date:
+            date_time = modified_date.date
+        else:
+            # get current date time with server timezone
+            date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
+
+        zip_info = zipfile.ZipInfo(zip_path, date_time=date_time.timetuple())
+        with open(fpath, "rb") as f:
+            zf.writestr(zip_info, f.read())
+        # zf.write(fpath, zip_path)
 
     # Must close zip for all contents to be written
     zf.close()

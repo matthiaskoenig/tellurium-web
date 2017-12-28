@@ -138,7 +138,7 @@ class MetaData(ChangesMixin,models.Model):
      """
     description = models.TextField(null=True, blank=True)
     creators = models.ManyToManyField(Creator)
-    created = models.DateTimeField(editable=False,null=True, blank=True)
+    created = models.DateTimeField(editable=False, null=True, blank=True)
     modified = models.ManyToManyField(Date)
     triples = models.ManyToManyField(Triple)
 
@@ -158,7 +158,22 @@ class MetaData(ChangesMixin,models.Model):
 
     @property
     def triple_count(self):
+        """ Returns number of triples
+        :return:
+        """
+
         return self.triples.count()
+
+    @property
+    def last_modified(self):
+        """ Gets the last modified Date.
+
+        :return: date instance or None if no modified dates.
+        """
+        try:
+            return self.modified.filter(date__isnull=False).latest('date')
+        except ObjectDoesNotExist:
+            return None
 
 # ===============================================================================
 # COMBINE Archives
