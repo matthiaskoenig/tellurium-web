@@ -58,6 +58,7 @@ class TripleSerializer(serializers.ModelSerializer):
 
 class DateSerializer(serializers.ModelSerializer):
 
+
     def get(self,validated_data):
         return Date.objects.get(**validated_data)
 

@@ -38,6 +38,10 @@ class Date(models.Model):
     def __str__(self):
         return str(self.date)
 
+    class Meta:
+        ordering = ['date']
+
+
 
 class Creator(ChangesMixin,models.Model):
     """ RDF creator of archive entry. """
