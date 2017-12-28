@@ -3,6 +3,10 @@ Utilities to work with HTML.
 
 Template creation.
 """
+import json
+from django.utils import safestring
+from html import unescape, escape
+
 
 
 def input_template(**kwargs):
@@ -12,7 +16,7 @@ def input_template(**kwargs):
             value = ""
         input_string += " " + key + "='" + value + "' "
 
-    return "<input"+input_string +"/>"
+    return unescape("<input"+input_string +"/>")
 
 
 def html_creator(first_name, last_name, organisation, email):
@@ -32,7 +36,6 @@ def html_creator(first_name, last_name, organisation, email):
     html = '<i class="fa fa-fw fa-user"></i> {} {} {} {}'.format(first_name, last_name, email_str, organisation_str)
 
     # html = '{}{} {} ({})'.format(first_name, last_name, email, organisation)
-    print(html)
-    # return ''
-    return html
+    return unescape(html)
+    #return safestring.mark_safe(html)
 
