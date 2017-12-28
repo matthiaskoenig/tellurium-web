@@ -270,13 +270,13 @@ def download_archive(request, archive_id):
 
     # The zip compressor
     zf = zipfile.ZipFile(s, "w")
-    entries = archive.entries.all()
 
     # write all entries
     for location, entry in content.items():
         print(location)
         fpath = entry.path
 
+        # fix paths for writing in zip file
         zip_path = location.replace("./", "")
 
         # Add file, at correct path, with last_modified time

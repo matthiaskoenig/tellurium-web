@@ -7,12 +7,15 @@ import hashlib
 from six import string_types
 import zipfile
 import tempfile
+import datetime
+
 from pprint import pprint
 
 from django.db import models
 from django.core.files import File
 from django.apps import apps
 from django.contrib.auth.models import User
+from django.utils.timezone import utc
 
 from .utils.tags import create_tags_for_entry
 
@@ -132,12 +135,17 @@ class ArchiveManager(models.Manager):
 
                     # create metadata for entry
                     meta_dict = omex_metadata.get(location)
-                    if meta_dict:
-                        metadata_dict = {
-                            "metadata": meta_dict,
-                        }
-                        metadata = MetaData.objects.create(**metadata_dict)
-                        archive_entry.metadata = metadata
+                    if meta_dict.get("created") is None:
+                        # dummy created timestamp
+                        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+                        meta_dict['created'] = now
+                        meta_dict['modified'].append(now)
+
+                    metadata_dict = {
+                        "metadata": meta_dict,
+                    }
+                    metadata = MetaData.objects.create(**metadata_dict)
+                    archive_entry.metadata = metadata
 
                     archive_entry.save()
 
