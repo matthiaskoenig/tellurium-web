@@ -6,7 +6,7 @@ function create_entry_title(data){
     var title_text = document.createTextNode(get_title(data.location));
     title_entry.appendChild(title_text);
 
-    if (typeof base_format(data.format) !== 'undefined' && format_list.indexOf(base_format(data.format))>=0){
+    if (typeof base_format(data.format) !== 'undefined'){
         title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
     }
 
@@ -35,7 +35,7 @@ function get_title(location){
 
 function get_format_icon(data){
     "use strict";
-    var src=url_mediatype+base_format(data.format)+".png";
+    var src=url_mediatype + base_format(data.format)+".png";
     var format_icon = document.createElement("img");
     format_icon.setAttribute("src", src);
     format_icon.setAttribute("height","20");

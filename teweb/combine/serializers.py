@@ -6,6 +6,7 @@ from rest_framework import serializers
 from .models import Tag, Archive, ArchiveEntry, MetaData, Creator, Date, Triple
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
+import json
 
 
 class TagSerializer(serializers.ModelSerializer):
