@@ -19,6 +19,29 @@ except ImportError:
 TagInfo = namedtuple("TagInfo", "category name")
 
 
+def create_tags_for_entry(entry):
+    """ Creates tag info for given entry.
+
+    :param entry:
+    :return:
+    """
+    info = []
+
+
+    format_id = base_format(entry.format)
+    if format_id in ['sbml', 'cellml', 'sed-ml', 'sedml', 'sbgn', 'sbol']:
+        info.append(
+            TagInfo(category='format', name=format_id)
+        )
+    if format_id == 'sbml':
+        tags.extend(sbml_entries.append(entry)
+    if format_id in ['sedml', 'sed-ml']:
+        sedml_entries.append(entry)
+
+
+def create_
+
+
 def create_tags_for_archive(archive_path):
     """ Creates the tags information for a given archive_path.
 

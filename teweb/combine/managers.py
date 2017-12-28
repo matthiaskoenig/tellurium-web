@@ -89,12 +89,6 @@ class ArchiveManager(models.Manager):
             archive.user = user
             archive.save()
 
-            # create tags for archive
-            tags_info = create_tags_for_archive(path)
-            for tag_info in tags_info:
-                tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
-                archive.tags.add(tag)
-
             # metadata parsed from archive (lookup via locations)
             omex_metadata = archive.omex_metadata()
 
@@ -138,6 +132,14 @@ class ArchiveManager(models.Manager):
                         metadata.save()
 
                     archive_entry.save()
+
+                    # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
+                    tags_info = create_tags_for_entry(archive_entry)
+                    for tag_info in tags_info:
+                        tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
+                        archive.tags.add(tag)
+
+                    archive.save()
 
             return archive, created_archive
 
