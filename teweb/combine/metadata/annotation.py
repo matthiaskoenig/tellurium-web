@@ -39,7 +39,6 @@ class Annotation(object):
         url = provider["accessURL"]
         return url.replace("{$id}", obo_id)
 
-
     def html(self):
         html = '<p class="cvterm"><small>\n'
         html += '<span class="subject">{}</span>'.format(self.subject)
@@ -67,7 +66,6 @@ class Annotation(object):
 
         html += '</small></p>\n'
         return html
-
 
     def _html_for_term(self):
         """ Creates html if term via OLS could be retrieved.
@@ -134,7 +132,7 @@ class Annotation(object):
             html += "<br />\n"
 
         # resources
-        pprint(self.providers)
+        # pprint(self.providers)
         for provider in self.providers:
             url = Annotation._url_from_provider(provider, obo_id)
 
