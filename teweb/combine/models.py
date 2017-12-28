@@ -103,27 +103,22 @@ class Triple(models.Model):
     def __str__(self):
         return "({}, {}, {})".format(self.subject, self.predicate, self.object)
 
+
     @property
     def html(self):
         """
 
         :return: HTML representation for rendering of triple
         """
+        from .metadata import annotation
+        if self.is_bq():
+            a = annotation.Annotation(subject=self.subject, qualifier=self.predicate, uri=self.object)
+
+
         html = '{} {} <a href="{}" target="_blank">{}</a>'.format(self.subject, self.predicate,
                                                                   self.object, self.object)
         return html
 
-    def get_ols_data(self):
-        """ Looks up the ontology lookup service data for triples.
-
-        :return:
-        """
-        if not self.is_bq:
-            return None
-        else:
-            from combine.rdf import ols
-
-            raise NotImplementedError
 
     def is_bq(self):
         """ Triple with biomodels qualifer predictate.
