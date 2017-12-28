@@ -16,7 +16,7 @@ from celery.result import AsyncResult
 from . import validators, managers
 from .metadata.rdf import read_metadata
 from .utils import comex
-from .utils.html import input_template, html_creator
+from .utils.html import input_template, html_creator, html_creator_edit
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ class Creator(ChangesMixin,models.Model):
         delete_input = input_template(name="creators[][delete]", value="false", type="hidden")
         delete_button = input_template(**delete_dict)
 
-        return delete_button + html_creator(first_name_input, last_name_input, organisation_input, email_input)\
+        return delete_button + html_creator_edit(first_name_input, last_name_input, organisation_input, email_input)\
                 + id_input + delete_input
 
     @property
@@ -91,7 +91,7 @@ class Creator(ChangesMixin,models.Model):
         organisation_input = input_template(name="creators[][organisation]", placeholder="Organisation", value=self.organisation)
         email_input = input_template(name="creators[][email]", placeholder="Email", value=self.email)
 
-        return html_creator(first_name_input, last_name_input, organisation_input, email_input)
+        return html_creator_edit(first_name_input, last_name_input, organisation_input, email_input)
 
 
 class Triple(models.Model):

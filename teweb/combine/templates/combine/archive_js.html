@@ -89,6 +89,17 @@
          delete_contact(creatorId,this.parentNode.parentNode);
          this.parentNode.parentNode = this.parentNode.parentNode.removeChild(this.parentNode)
     });
+    $(document).on('click','#saveButton',function(){
+        var frm = $('#form_detail');
+        frm.submit(submit_form());
+    });
+
+    $(document).on('click','#cancelButton',function(){
+       var selected = $('#json_tree').jstree(true).get_selected(true);
+        var entry_pk = selected[0].original.pk;
+        display_entry_detail(entry_pk, false);
+    });
+
 </script>
 
 <script>
@@ -131,9 +142,9 @@
 </script>
 
 <script>
-    var frm = $('#form_detail');
-    frm.submit(function () {
+    function submit_form(){
         document.getElementById("form_detail").appendChild(create_master_input());
+        var frm = $('#form_detail');
         $.ajax({
             type: frm.attr('method'),
             url: frm.attr('action'),
@@ -159,7 +170,11 @@
             }
         });
         return false;
-    });
+    }
+</script>
+
+<script>
+
 </script>
 
 <script>
