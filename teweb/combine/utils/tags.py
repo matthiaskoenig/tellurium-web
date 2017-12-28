@@ -27,70 +27,49 @@ def create_tags_for_entry(entry):
     """
     info = []
 
-
     format_id = base_format(entry.format)
     if format_id in ['sbml', 'cellml', 'sed-ml', 'sedml', 'sbgn', 'sbol']:
         info.append(
             TagInfo(category='format', name=format_id)
         )
     if format_id == 'sbml':
-        tags.extend(sbml_entries.append(entry)
+        info.extend(_create_tags_sbml(entry))
     if format_id in ['sedml', 'sed-ml']:
-        sedml_entries.append(entry)
+        info.extend(_create_tags_sedml(entry))
+
+    return info
 
 
-def create_
+def _create_tags_sbml(entry):
+    """ Additional SBML tags.
 
-
-def create_tags_for_archive(archive_path):
-    """ Creates the tags information for a given archive_path.
-
-    :param archive_path: path to archive.
-    :return: list of TagInfo
+    :param entry:
+    :return:
     """
-    tags_info = []
+    info = []
 
-    # add the file formats from omex
-    omex = libcombine.CombineArchive()
-    if omex.initializeFromArchive(archive_path) is None:
-        print("Invalid Combine Archive: {}", archive_path)
-        return None
+    return info
 
-    sedml_entries = []
-    sbml_entries = []
-    for i in range(omex.getNumEntries()):
-        entry = omex.getEntry(i)
-        format = entry.getFormat()
-        location = entry.getLocation()
-        format_id = base_format(format)
 
-        if format_id in ['sbml', 'cellml', 'sed-ml', 'sedml', 'sbgn', 'sbol']:
-            tags_info.append(
-                TagInfo(category='format', name=format_id)
-            )
-        if format_id == 'sbml':
-            sbml_entries.append(entry)
-        if format_id in ['sedml', 'sed-ml']:
-            sedml_entries.append(entry)
+def _create_tags_sedml(entry):
+    """ Additional SED-ML tags.
 
-    # add the SBML contents
-    # add the SED-ML contents
-    for entry in sedml_entries:
-        content = omex.extractEntryToString(entry.getLocation())
-        doc = libsedml.readSedMLFromString(content)  # type: libsedml.SedDocument
+    :param entry:
+    :return:
+    """
+    info = []
+    doc = libsedml.readSedMLFromFile(entry.path)  # type: libsedml.SedDocument
 
-        for model in doc.getListOfModels():
-            language = model.getLanguage()
-            if language:
-                name = language.split(':')[-1]
-                tags_info.append(
-                    TagInfo(category='sedml', name='model:{}'.format(name))
-                )
-
-        if len(doc.getListOfDataDescriptions()) > 0:
-            tags_info.append(
-                TagInfo(category='sedml', name='DataDescription')
+    for model in doc.getListOfModels():
+        language = model.getLanguage()
+        if language:
+            name = language.split(':')[-1]
+            info.append(
+                TagInfo(category='sedml', name='model:{}'.format(name))
             )
 
-    omex.cleanUp()
-    return tags_info
+    if len(doc.getListOfDataDescriptions()) > 0:
+        info.append(
+            TagInfo(category='sedml', name='DataDescription')
+        )
+    return info
