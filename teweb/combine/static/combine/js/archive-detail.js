@@ -193,10 +193,13 @@ function create_buttons_div(edit){
     /** Button HTML */
     "use strict";
     var buttons_div = document.createElement("div");
-     buttons_div.innerHTML = '<span class="btn btn-default btn-space" id="editButton"> <i class="fa fa-pencil fa-fw" title="create new rdf entry"></i> edit </span>';
     if ( edit ){
-         buttons_div.innerHTML += '<span class="btn btn-default" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';
-         buttons_div.innerHTML += '<input class="btn btn-default" id="saveButton" type="submit" value="save" name="save_entry_details"></input>';
+         buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';
+         buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="saveButton"><i class="far fa-save"></i> Save </span>';
+         buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';
+    }
+    else {
+        buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="editButton"> <i class="fas fa-edit fa-fw"></i> edit </span>';
     }
 
     return buttons_div;
