@@ -169,8 +169,6 @@ function addContact(creators,creator,edit){
     else {
             contact_div.innerHTML = creators[creator].html;
     }
-
-
     return contact_div;
 }
 
@@ -186,67 +184,21 @@ function create_delete_contact(creator_id){
 
 function delete_contact(creator_id, contact_div){
     "use strict";
+    //contact_div.parentNode.innerHTML += "<input value='" + creator_id + "' type='hidden' name='creators[][delete]'/>";
     contact_div.parentNode.appendChild(create_delete_contact(creator_id));
 
 }
-
-function create_edit_button(){
-    "use strict";
-    var myButton = document.createElement("span");
-    var icon = document.createElement("i");
-    myButton.className="btn btn-default btn-space";
-    myButton.setAttribute("id","editButton");
-    icon.className="fa fa-pencil fa-fw";
-    icon.title="create new rdf entry";
-    myButton.appendChild(icon);
-    myButton.append("edit");
-    return myButton;
-}
-
-function create_add_annotation_button(){
-    "use strict";
-    var creatorButton = document.createElement("input");
-    creatorButton.setAttribute("class","btn btn-default");
-    creatorButton.setAttribute("id","addAnnotation");
-    creatorButton.setAttribute("type","button");
-    creatorButton.setAttribute("value","add Annotation");
-    return creatorButton;
-}
-function create_add_creator_button(){
-    "use strict";
-    var creatorButton = document.createElement("input");
-    creatorButton.setAttribute("class","btn btn-default");
-    creatorButton.setAttribute("id","addCreator");
-    creatorButton.setAttribute("type","button");
-    creatorButton.setAttribute("value","add Creator");
-    return creatorButton;
-}
-
-function create_save_button(){
-    "use strict";
-    var saveButton = document.createElement("input");
-    saveButton.setAttribute("class","btn btn-default");
-    saveButton.setAttribute("id","saveButton");
-    saveButton.setAttribute("type","submit");
-    saveButton.setAttribute("value","save");
-    saveButton.setAttribute("name","save_entry_details");
-
-    return saveButton;
-}
-
 
 function create_buttons_div(edit){
     /** Button HTML */
     "use strict";
     var buttons_div = document.createElement("div");
-    buttons_div.appendChild(create_edit_button());
+     buttons_div.innerHTML = '<span class="btn btn-default btn-space" id="editButton"> <i class="fa fa-pencil fa-fw" title="create new rdf entry"></i> edit </span>';
     if ( edit ){
-        buttons_div.innerHTML = '<span class="btn btn-default"><i class="fa fa-fw fa-users"></i> <input id="creator" value="Add Creator"/></span>';
-
-        // buttons_div.appendChild(create_add_creator_button());
-        buttons_div.appendChild(create_add_annotation_button());
-        buttons_div.appendChild(create_save_button());
+         buttons_div.innerHTML += '<span class="btn btn-default" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';
+         buttons_div.innerHTML += '<input class="btn btn-default" id="saveButton" type="submit" value="save" name="save_entry_details"></input>';
     }
+
     return buttons_div;
 }
 
@@ -353,21 +305,3 @@ function addTriple(triples,triple,edit){
     return triple_div;
 }
 
-function addTriple_old(triples,triple,edit){
- "use strict";
-    var triple_div , subject,predicate,object, id, delete_button;
-    triple_div = document.createElement("div");
-    triple_div.setAttribute("id", triple);
-
-
-        subject = triples[triple].subject;
-        predicate = triples[triple].predicate;
-        object = triples[triple].object;
-        id = "";
-        delete_button= "";
-
-
-    triple_div.innerHTML =delete_button+' '+subject+' '+predicate+' <a href="'+object+'" target="_blank">'+object+"</a><br />"+id;
-
-    return triple_div;
-}

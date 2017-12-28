@@ -26,7 +26,6 @@
                     <tr>
                         <td>{{ macros.archive_download(archive) }}</td>
                         <td>{{ macros.archive_html(archive) }}</td>
-
                         <td>{{ macros.user(archive.user) }}</td>
                         <td>
                             {% for tag in archive.tags.all() %}

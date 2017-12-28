@@ -37,5 +37,22 @@ def html_creator(first_name, last_name, organisation, email):
 
     # html = '{}{} {} ({})'.format(first_name, last_name, email, organisation)
     return unescape(html)
-    #return safestring.mark_safe(html)
+
+def html_creator_edit(first_name, last_name, organisation, email):
+    if first_name is None:
+        first_name = ""
+    if last_name is None:
+        last_name = ""
+    if organisation is None or len(organisation) == 0:
+        organisation = ""
+
+    if email is None:
+        email = ""
+
+    html = "<i class='fa fa-fw fa-user'></i> {} {} {} {}".format(first_name, last_name, email, organisation )
+
+    return unescape(html)
+
+
+
 

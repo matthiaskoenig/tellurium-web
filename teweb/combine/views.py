@@ -107,38 +107,38 @@ def archive_view(request, archive_id):
         if bool(archive_entry.metadata.changes()):
             modified = True
         archive_entry.metadata.save()
+        if "creators" in entrydata_dict:
+            for creator in entrydata_dict["creators"]:
+                if creator["delete"] not in ["false", ""]:
+                    creator = Creator.objects.get(id=creator["delete"])
+                    creator.delete()
 
-        for creator in entrydata_dict["creators"]:
-            if creator["delete"] not in ["false", ""]:
-                creator = Creator.objects.get(id=creator["delete"])
-                creator.delete()
+                elif creator["delete"] == "":
+                    # tries to delete a cerator, which was not even created
+                    pass
 
-            elif creator["delete"] == "":
-                # tries to delete a cerator, which was not even created
-                pass
-
-            elif creator["id"] == "new":
-                del creator["id"]
-                serializer_creator = CreatorSerializer(data=creator)
-                if serializer_creator.is_valid():
-                    creator = serializer_creator.create(validated_data=serializer_creator.validated_data)
-                    archive_entry.metadata.creators.add(creator)
-                    modified = True
-                else:
-                    response = {"errors": serializer_creator.errors, "is_error": True}
-                    return JsonResponse(response)
-            else:
-                serializer_creator = CreatorSerializer(data=creator)
-                if serializer_creator.is_valid():
-                    creator = Creator.objects.get(id=creator["id"])
-                    serializer_creator.save()
-                    serializer_creator.update(instance=creator, validated_data=serializer_creator.validated_data)
-                    if bool(creator.changes()):
+                elif creator["id"] == "new":
+                    del creator["id"]
+                    serializer_creator = CreatorSerializer(data=creator)
+                    if serializer_creator.is_valid():
+                        creator = serializer_creator.create(validated_data=serializer_creator.validated_data)
+                        archive_entry.metadata.creators.add(creator)
                         modified = True
-                    creator.save()
+                    else:
+                        response = {"errors": serializer_creator.errors, "is_error": True}
+                        return JsonResponse(response)
                 else:
-                    response = {"errors": serializer_creator.errors, "is_error": True}
-                    return JsonResponse(response)
+                    serializer_creator = CreatorSerializer(data=creator)
+                    if serializer_creator.is_valid():
+                        creator = Creator.objects.get(id=creator["id"])
+                        serializer_creator.save()
+                        serializer_creator.update(instance=creator, validated_data=serializer_creator.validated_data)
+                        if bool(creator.changes()):
+                            modified = True
+                        creator.save()
+                    else:
+                        response = {"errors": serializer_creator.errors, "is_error": True}
+                        return JsonResponse(response)
 
         if modified:
             date = Date.objects.create(date=timezone.now())
