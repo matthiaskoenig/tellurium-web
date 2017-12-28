@@ -64,6 +64,8 @@ def zip_tree_content(path, entries=None):
     :param path:
     :return:
     """
+    format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
+
     def find_parent(filename):
         if filename.endswith('/'):
             filename = filename[:-1]
@@ -92,14 +94,19 @@ def zip_tree_content(path, entries=None):
         }
         return node
 
+
+
+
+
     # Add the root node
     nodes = {}
     nodes['.'] = {
         'id': '.',
         'parent': "#",
         'text': '.',
-        'icon': 'fa fa-fw fa-archive',
-        # 'icon': '/static/combine/images/mediatype/sbml.png',
+        #'icon': 'fa fa-fw fa-archive',
+         'icon': '/static/combine/images/mediatype/thumbnails/omex.png',
+        'type':"omex",
         'state': {'opened': True, 'selected': True}
     }
 
@@ -147,6 +154,13 @@ def zip_tree_content(path, entries=None):
                 node['format'] = entry.format
                 node['master'] = entry.master
                 node['location'] = entry.location
+                node['type'] = entry.short_format
+
+                if entry.short_format in format_list:
+                    node["icon"] = '/static/combine/images/mediatype/thumbnails/'+entry.short_format+'.png'
+
+
+
             else:
                 raise ValueError("All entries must be part of the zip file.")
 
