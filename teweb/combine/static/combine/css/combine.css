@@ -13,6 +13,17 @@ body {
     vertical-align: middle;
 }
 
+.ontology{
+    background-color: #5FBDCE;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
 .collection{
     background-color: #000000;
     padding:2px;
@@ -33,6 +44,10 @@ body {
     display: inline-block;
     margin-right: 4px;
     vertical-align: middle;
+}
+
+.purl{
+    color: grey;
 }
 
 
