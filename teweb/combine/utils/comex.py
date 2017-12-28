@@ -64,7 +64,7 @@ def zip_tree_content(path, entries=None):
     :param path:
     :return:
     """
-    format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
+    format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata']
 
     def find_parent(filename):
         if filename.endswith('/'):
@@ -81,9 +81,9 @@ def zip_tree_content(path, entries=None):
         return splited_file[-1]
 
     def node_from_filename(filename):
-        icon = "fa fa-file-o fa-fw"
+        icon = "far fa-file fa-fw fa-xs"
         if filename.endswith('/'):
-            icon = "fa fa-folder fa-fw"
+            icon = "fa fa-folder fa-fw fa-xs"
 
         node = {
             'id': filename,
@@ -93,10 +93,6 @@ def zip_tree_content(path, entries=None):
             'state': {'opened': True}
         }
         return node
-
-
-
-
 
     # Add the root node
     nodes = {}

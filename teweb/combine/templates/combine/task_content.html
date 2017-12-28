@@ -3,7 +3,7 @@
 
     <div class="panel-heading">
         <h2 class="panel-title">
-            <i class="fa fa-industry fa-fw"></i> Task
+            <i class="fas fa-industry fa-fw"></i> Task
         </h2>
     </div>
 
@@ -31,7 +31,7 @@
         <!-- results -->
         {% if task.status == 'SUCCESS' %}
             <a href="{{ url('combine:results', args=[archive.id]) }}" title="View the outputs (plots & reports)">
-                <span class="btn btn-primary btn-xs"><i class="fa fa-line-chart fa-fw"></i> RESULTS</span></a>
+                <span class="btn btn-primary btn-xs"><i class="fas fa-chart-line fa-fw"></i> RESULTS</span></a>
         {% endif %}
 
         <!-- traceback -->
