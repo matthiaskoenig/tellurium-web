@@ -189,6 +189,7 @@ class EntryParser(object):
     """ Helper class to parse the entries from a COMBINE archive. """
 
     FORMAT_PREFIX = "http://purl.org/NET/mediatypes/"
+    FORMAT_COMBINE_PREFIX = "http://identifiers.org/combine.specifications"
 
     @staticmethod
     def read_manifest_entries(archive_path):
@@ -338,7 +339,7 @@ class EntryParser(object):
             if len(lookup) > 0:
                 format = lookup
             else:
-                if not format.startswith(EntryParser.FORMAT_PREFIX):
+                if not format.startswith(EntryParser.FORMAT_PREFIX) and not format.startswith(EntryParser.FORMAT_COMBINE_PREFIX):
                     format = EntryParser.FORMAT_PREFIX + format
 
         return format
