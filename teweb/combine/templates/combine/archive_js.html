@@ -85,9 +85,9 @@
     });
 
     $(document).on('click','#delete',function(){
-         var creatorId = this.parentNode.id;
-         delete_contact(creatorId,this.parentNode.parentNode);
-         this.parentNode.parentNode = this.parentNode.parentNode.removeChild(this.parentNode)
+         var creatorId = this.parentNode.parentNode.parentNode.id;
+         delete_contact(creatorId,this.parentNode.parentNode.parentNode.parentNode);
+         this.parentNode.parentNode.parentNode = this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)
     });
     $(document).on('click','#saveButton',function(){
         var frm = $('#form_detail');

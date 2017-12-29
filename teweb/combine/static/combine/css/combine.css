@@ -279,24 +279,32 @@ dl.inline-flex {
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
-  width: 300px;      /* set the container width*/
+  width: 100%;      /* set the container width*/
   overflow: visible;
 }
 dl.inline-flex dt {
-  flex: 0 0 50%;
+  flex: 0 0 20%;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 dl.inline-flex dd {
-  flex:0 0 50%;
+  flex:0 0 80%;
   margin-left: auto;
   text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.btn-space {
-    margin-right: 5px;
+
+
+.entry_buttons{
+    float:right;
+    display:block;
+    margin-right:5px;
+    clear:left;
 }
 
-
+.textArea {
+    width:100%;
+    min-height: 150px;
+}

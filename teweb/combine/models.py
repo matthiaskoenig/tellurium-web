@@ -78,11 +78,11 @@ class Creator(ChangesMixin,models.Model):
         :return: html string
         """
         first_name_input = input_template(name="creators[][first_name]", placeholder="First Name",
-                                          value="")
-        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value="")
+                                          value="", size="10")
+        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value="",size="10")
         organisation_input = input_template(name="creators[][organisation]", placeholder="Organisation",
-                                            value="")
-        email_input = input_template(name="creators[][email]", placeholder="Email", value="")
+                                            value="", size="10")
+        email_input = input_template(name="creators[][email]", placeholder="Email", value="", size="10")
 
         # id_dict = {"class":"Id","value":"delete","id":"delete","type":"button"}
         id_input = input_template(name="creators[][id]", value="new", type="hidden")
@@ -91,8 +91,8 @@ class Creator(ChangesMixin,models.Model):
         delete_input = input_template(name="creators[][delete]", value="false", type="hidden")
         delete_button = input_template(**delete_dict)
 
-        return delete_button + html_creator_edit(first_name_input, last_name_input, organisation_input, email_input)\
-                + id_input + delete_input
+        return "<dl class = 'inline-flex'> <dt>"+delete_button +"</dt>"+html_creator_edit(first_name_input, last_name_input, organisation_input, email_input)\
+                +"</dl>"+ id_input + delete_input
 
     @property
     def html_edit(self):
@@ -100,10 +100,10 @@ class Creator(ChangesMixin,models.Model):
 
         :return: HTML representation for rendering of editable triple
         """
-        first_name_input = input_template(name="creators[][first_name]", placeholder="First Name", value=self.first_name)
-        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value=self.last_name)
-        organisation_input = input_template(name="creators[][organisation]", placeholder="Organisation", value=self.organisation)
-        email_input = input_template(name="creators[][email]", placeholder="Email", value=self.email)
+        first_name_input = input_template(name="creators[][first_name]", placeholder="First Name", value=self.first_name,size="10")
+        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value=self.last_name,size="10")
+        organisation_input = input_template(name="creators[][organisation]", placeholder="Organisation", value=self.organisation, size="10")
+        email_input = input_template(name="creators[][email]", placeholder="Email", value=self.email, size="10")
 
         return html_creator_edit(first_name_input, last_name_input, organisation_input, email_input)
 

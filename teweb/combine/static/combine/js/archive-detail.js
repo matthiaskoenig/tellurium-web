@@ -127,11 +127,11 @@ function addContact(creators,creator,edit){
 
         delete_button = deleteButton.outerHTML;
 
-        contact_div.innerHTML =delete_button+id+creators[creator].html_edit+delete_creator;
+        contact_div.innerHTML ="<dl class = 'inline-flex'> <dt>" +delete_button+"</dt>"+creators[creator].html_edit+"</dl>"+id+delete_creator;
 
     }
     else {
-            contact_div.innerHTML = creators[creator].html;
+            contact_div.innerHTML ="<dl class = 'inline-flex'>" + creators[creator].html+ "</dl>";
     }
     return contact_div;
 }
@@ -158,11 +158,11 @@ function create_buttons_div(edit){
     "use strict";
     var buttons_div = document.createElement("div");
     if ( edit ){
-         buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="saveButton"><i class="far fa-save"></i> Save </span>';
-         buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';
+         buttons_div.innerHTML += '<span class="btn btn-default entry_buttons " id="saveButton"><i class="far fa-save"></i> Save </span>';
+         buttons_div.innerHTML += '<span class="btn btn-default entry_buttons " id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';
     }
     else {
-        buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="editButton"> <i class="fas fa-edit fa-fw"></i> edit </span>';
+        buttons_div.innerHTML += '<span class="btn btn-default  entry_buttons" id="editButton"> <i class="fas fa-edit fa-fw"></i> edit </span>';
     }
 
     return buttons_div;
@@ -172,25 +172,31 @@ function create_buttons_div(edit){
 function add_master_checkbox(master,edit){
     "use strict";
     var checkbox_div = document.createElement("div");
-    var checkbox_label = document.createElement("label");
+    var dl = document.createElement("dl");
+    dl.setAttribute("class","inline-flex");
+    var dt = document.createElement("dt");
+    dt.innerHTML = "Master ";
+    var dd = document.createElement("dd");
+    checkbox_div.appendChild(dl);
+    dl.appendChild(dt);
+
+    dl.appendChild(dd);
+
     var checkbox = document.createElement("input");
-    checkbox_label.innerHTML = "Master ";
     checkbox.type = "checkbox";
     checkbox.id = "checkbox1";
     //checkbox.setAttribute("data-toggle", "toggle");
     checkbox.defaultChecked = master;
     checkbox.checked = master;
     checkbox.disabled = !edit;
-    console.log(checkbox);
-    checkbox_div.appendChild(checkbox_label);
-    checkbox_div.innerHTML += " ";
-    checkbox_div.appendChild(checkbox);
+    dd.appendChild(checkbox);
     return checkbox_div;
 }
 
 function add_location(location){
     "use strict";
     var dl = document.createElement("dl");
+    dl.setAttribute("class","inline-flex");
     var dt = document.createElement("dt");
     var dd = document.createElement("dd");
     dt.innerHTML = "Location";
@@ -203,13 +209,13 @@ function add_location(location){
 function create_manfifest_detail(entry_pk,data,edit){
     "use strict";
     var detailManifest = document.createElement("div");
-    detailManifest.innerHTML += "<div><label> Format </label> <code title='"+data.format +"'>" + base_format(data.format) +" </code></div>"
+    detailManifest.innerHTML += "<div><dl class = inline-flex><dt> Format </dt><dd><code title='"+data.format +"'>" + base_format(data.format) +" </code></dd></dl> </div>"
     detailManifest.appendChild(add_master_checkbox(data.master,edit));
     if (data.file !== null && typeof data.file !== 'undefined'){
-        detailManifest.innerHTML += "<div><label> Location </label>"+ " "+"<a  target='_blank' href='"+data.file+"'>"+ data.location + "</a></div>";
+        detailManifest.innerHTML += "<div><dl class = inline-flex><dt> Location </dt> <dd><a  target='_blank' href='"+data.file+"'>"+ data.location + "</a> </dd></div>";
     }
     else{
-         detailManifest.innerHTML += "<div><label> Location </label>"+ " "+ data.location + "</div>";
+         detailManifest.innerHTML += "<div><dl class = inline-flex><dt> Location </dt><dd>"+ data.location + "</dd></div>";
     }
 
     //detailManifest.appendChild(add_location(data.location));
@@ -243,20 +249,27 @@ function create_meta(metadata, edit){
     var meta_div = document.createElement("div");
     var creators_div = document.createElement("div");
     creators_div.setAttribute("id","creators_div");
+
     var creator_button;
-    if (edit ){creator_button = '<span class="btn btn-default btn-space" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';}
+    if (edit ){creator_button = '<span class="btn btn-default btn-space entry_buttons" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';}
     else {creator_button = '';}
-    creators_div.innerHTML += '<h3> Creators '+creator_button+'</h3>';
+    creators_div.innerHTML += '<dl class="inline-flex"> <dt>Creators</dt><dd>'+ creator_button +'</dd></dl>';
 
     var dl_desc = document.createElement("dl");
+    dl_desc.setAttribute("class", "inline-flex");
+
     var dt_desc = document.createElement("dt");
     var dd_desc = document.createElement("dd");
 
     var dl_created = document.createElement("dl");
+    dl_created.setAttribute("class", "inline-flex");
+
     var dt_created = document.createElement("dt");
     var dd_created = document.createElement("dd");
 
     var dl_modified = document.createElement("dl");
+    dl_modified.setAttribute("class", "inline-flex");
+
     var dt_modified = document.createElement("dt");
     var dd_modified = document.createElement("dd");
 
@@ -270,8 +283,7 @@ function create_meta(metadata, edit){
     if (edit===true) {
 
         var textArea = document.createElement("textarea");
-        textArea.cols = "50";
-        textArea.rows = "5";
+        textArea.setAttribute("class", "textArea");
         textArea.setAttribute("name", "description");
         textArea.append(metadata.description);
         dd_desc.appendChild(textArea);
