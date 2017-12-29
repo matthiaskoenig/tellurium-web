@@ -249,12 +249,12 @@ function show_modified(dd_modified, modified){
     if (modified.length > 3){
         var show_modifed_button = document.createElement("button");
         show_modifed_button.setAttribute("class", "btn btn-default");
-        show_modifed_button.innerHTML = "show all dates";
+        show_modifed_button.innerHTML = '<i class="fas fa-arrow-down"></i> show all dates';
         show_modifed_button.onclick = function(){
             dd_modified.innerHTML = modified_content(modified);
             var close_modifed_button = document.createElement("button");
             close_modifed_button.setAttribute("class", "btn btn-default");
-            close_modifed_button.innerHTML = "close all dates";
+            close_modifed_button.innerHTML = '<i class="fas fa-arrow-up"></i> close all dates';
             close_modifed_button.onclick = function(){
                 show_modified(dd_modified, modified);
             };
