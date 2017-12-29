@@ -418,6 +418,7 @@ class Archive(models.Model):
 
         # create latest metadata.rdf
         metadata = rdf.create_metadata(archive=self)
+
         suffix = MANIFEST_LOCATION.split('/')[-1]
         tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
         tmp.write(metadata)
