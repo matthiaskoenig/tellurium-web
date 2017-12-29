@@ -110,9 +110,9 @@ class Creator(ChangesMixin, models.Model):
 
 class TripleElementType(DjangoChoices):
     """ Categories for the element types. """
-    uri = ChoiceItem("rdflib.term.URIRef")
-    literal = ChoiceItem("rdflib.term.Literal")
-    bnode = ChoiceItem("rdflib.term.Literal")
+    uri = ChoiceItem("<class 'rdflib.term.URIRef'>")
+    literal = ChoiceItem("<class 'rdflib.term.Literal'>")
+    bnode = ChoiceItem("<class 'rdflib.term.BNode'>")
 
 
 class Triple(models.Model):
@@ -203,6 +203,25 @@ class MetaData(ChangesMixin,models.Model):
         """
         date = Date.objects.create(date=timezone.now())
         self.modified.add(date)
+
+    def update_triples(self):
+        """  """
+        # TODO: implement
+
+        # Creators
+        # TODO
+
+        # Created
+        # TODO
+
+        # Modified
+        # TODO
+
+        # Description
+        # TODO
+
+        pass
+
 
 # ===============================================================================
 # COMBINE Archives
@@ -414,6 +433,10 @@ class Archive(models.Model):
                                                          location=METADATA_LOCATION,
                                                          format=METADATA_FORMAT)
             metadata_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
+
+        # TODO: update triples
+
+
 
         # create latest metadata.rdf
         metadata = rdf.create_metadata(archive=self)

@@ -92,7 +92,7 @@ def archive_view(request, archive_id):
 
         data = request.POST["data"]
         entrydata_dict = json.loads(data)
-        print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
+        # print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
 
         archive_entry = ArchiveEntry.objects.get(id=entrydata_dict["id"])
 
@@ -111,19 +111,31 @@ def archive_view(request, archive_id):
         data = {"description": entrydata_dict["description"]}
         meta_data_serializer = MetaDataSerializer()
         meta_data_serializer.update(instance=archive_entry.metadata, validated_data=data)
+
         if bool(archive_entry.metadata.changes()):
+            # Checks if description changed
             modified_metadata = True
+            # FIXME: update triples
+
+        print(archive_entry.metadata.changes())
+
+
         archive_entry.metadata.save()
         if "creators" in entrydata_dict:
             for creator in entrydata_dict["creators"]:
+
+                # Delete creator
                 if creator["delete"] not in ["false", ""]:
                     creator = Creator.objects.get(id=creator["delete"])
                     creator.delete()
+                    modified_metadata = True
+                    # FIXME: update triples
 
                 elif creator["delete"] == "":
-                    # tries to delete a cerator, which was not even created
+                    # tries to delete a creator, which was not even created
                     pass
 
+                # Create new creator
                 elif creator["id"] == "new":
                     del creator["id"]
                     serializer_creator = CreatorSerializer(data=creator)
@@ -131,9 +143,11 @@ def archive_view(request, archive_id):
                         creator = serializer_creator.create(validated_data=serializer_creator.validated_data)
                         archive_entry.metadata.creators.add(creator)
                         modified_metadata = True
+                        # FIXME: update triples
                     else:
                         response = {"errors": serializer_creator.errors, "is_error": True}
                         return JsonResponse(response)
+                # Update creator
                 else:
                     serializer_creator = CreatorSerializer(data=creator)
                     if serializer_creator.is_valid():
@@ -141,7 +155,10 @@ def archive_view(request, archive_id):
                         serializer_creator.save()
                         serializer_creator.update(instance=creator, validated_data=serializer_creator.validated_data)
                         if bool(creator.changes()):
+                            # checks what changed on creator
+                            print(creator.changes())
                             modified_metadata = True
+                            # FIXME: update triples
                         creator.save()
                     else:
                         response = {"errors": serializer_creator.errors, "is_error": True}
@@ -158,6 +175,8 @@ def archive_view(request, archive_id):
         # update metadata file if metadata changed
         if modified_metadata:
             archive.update_metadata_entry()
+
+
 
         return JsonResponse({"is_error": False})
 
