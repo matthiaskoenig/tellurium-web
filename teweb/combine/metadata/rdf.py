@@ -40,7 +40,7 @@ from rdflib import URIRef, BNode, Literal
 from rdflib.util import guess_format
 from rdflib.namespace import Namespace, RDF
 
-from ..utils import comex
+from combine.utils import comex
 
 ##########################################################################
 VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
@@ -107,7 +107,7 @@ def parse_rdf(debug=False, **kwargs):
 
     if debug:
         print("-" * 80)
-        print("File prefix:", prefix)
+        print("File prefix:", prefixes)
         print("Format:", format)
         print("Statements: %s" % len(g))
         print("-" * 80)
@@ -154,8 +154,40 @@ def parse_rdf(debug=False, **kwargs):
 
     return g2
 
-##############################################################
 
+##############################################################
+# WRITE METADATA
+##############################################################
+def create_metadata(archive, debug=True):
+    """ Creates the metadata for the current archive.
+
+    This takes all the metadata from all archive entries and serializes
+    it.
+    """
+    g = Graph()
+    bind_default_namespaces(g)
+
+    for entry in archive.entries.order_by('location'):
+        metadata = entry.metadata
+        # TODO: implement
+
+
+        # All annotation triples
+
+
+    # info = g.serialize(format='turtle').decode("utf-8"))
+    info_str = g.serialize(format='xml').decode("utf-8")
+    if debug:
+        print("-" * 80)
+        print(info_str)
+        print("-" * 80)
+
+    return info_str
+
+
+##############################################################
+# READ METADATA
+##############################################################
 def read_metadata(archive_path):
     """ Reads and parses all the metadata information from given COMBINE archive.
 
@@ -409,7 +441,7 @@ def _transitive_subgraph(g, start, gloc=None):
 ########################################################################
 if __name__ == "__main__":
 
-    metadata = read_metadata("../testdata/rdf/smith_chase_nokes_shaw_wake_2004.omex")
+    metadata = read_metadata("../tests/testdata/archives/smith_chase_nokes_shaw_wake_2004.omex")
     pprint(metadata['./smith_chase_nokes_shaw_wake_2004.cellml'])
 
     print("-" * 80)
@@ -421,9 +453,8 @@ if __name__ == "__main__":
     # pprint(metadata)
 
 
-    f1 = "../testdata/rdf/metadata1.rdf"
-    f2 = "../testdata/rdf/metadata2.rdf"
-    f3 = "../testdata/rdf/smith_chase_nokes_shaw_wake_2004_example_semantics.rdf"
+    f1 = "../tests/testdata/rdf/metadata1.rdf"
+    f2 = "../tests/testdata/rdf/metadata2.rdf"
 
-    parse_rdf(f3)
+    parse_rdf(f1)
     # parse_rdf(f1)

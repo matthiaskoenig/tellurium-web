@@ -22,6 +22,7 @@ from celery.result import AsyncResult
 from . import validators, managers
 from .metadata.rdf import read_metadata
 from .utils import comex
+from .metadata import rdf
 from .utils.html import input_template, html_creator, html_creator_edit
 
 logger = logging.getLogger(__name__)
@@ -343,7 +344,7 @@ class Archive(models.Model):
         entries = self.entries.all()
         return comex.zip_tree_content(self.path, entries)
 
-    def update_manifest_entry(self, save=True):
+    def update_manifest_entry(self):
         """ Updates the manifest entry of this archive based on the latest information.
         This function must be called if any content of the archive entries change, i.e,
         - adding entries
@@ -353,9 +354,8 @@ class Archive(models.Model):
         ! This functions only should be called if something changed in any of the entries.
           This adds new modified timestamps without checking for changes !
 
-        :return:
+        :return: None
         """
-
         try:
             manifest_entry = self.entries.filter(location=MANIFEST_LOCATION).first()
             # update modified timestamp
@@ -391,11 +391,35 @@ class Archive(models.Model):
 
         Must be called after changes to the metadata.
         """
-        # TODO: implement
+        try:
+            metadata_entry = self.entries.filter(location=METADATA_LOCATION).first()
+            # update modified timestamp
+            metadata_entry.add_modified()
 
+        except ObjectDoesNotExist:
+            # no metadata in the archive, creating new entry
+            metadata_entry = ArchiveEntry.objects.create(archive=self,
+                                                         source=EntrySource.zip,
+                                                         master=False,
+                                                         location=METADATA_LOCATION,
+                                                         format=METADATA_FORMAT)
+            metadata_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
 
+        # create latest metadata.rdf
+        metadata = rdf.create_metadata(archive=self)
+        suffix = MANIFEST_LOCATION.split('/')[-1]
+        tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
+        tmp.write(metadata)
+        tmp.seek(0)  # rewind file for reading !
 
+        # add/update file to manifest entry
+        name = METADATA_LOCATION.replace("./", "")
+        with open(tmp.name, 'rb') as f:
+            metadata_entry.file.save(name, File(f))
+        tmp.close()
 
+        metadata_entry.save()
+        self.save()
 
 
 class EntrySource(DjangoChoices):

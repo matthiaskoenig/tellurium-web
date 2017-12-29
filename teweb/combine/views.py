@@ -157,7 +157,6 @@ def archive_view(request, archive_id):
 
         # update metadata file if metadata changed
         if modified_metadata:
-            # TODO: implement
             archive.update_metadata_entry()
 
         return JsonResponse({"is_error": False})
@@ -194,8 +193,6 @@ def upload(request):
             # Everything uploaded, now display the entry
             return redirect('combine:archive', archive_id=new_archive.id)
             # return archive_view(request, new_archive.id)
-
-
 
         else:
             logging.warning('Form is invalid')
@@ -260,6 +257,9 @@ def download_archive(request, archive_id):
     """
     archive = get_object_or_404(Archive, pk=archive_id)
     filename = archive.file.name.split('/')[-1]
+
+    # FIXME: remove, only for testing
+    archive.update_metadata_entry()
 
     # All entries are written including the updated manifest.xml and metadata.rdf
     content = {}
