@@ -52,8 +52,7 @@ class Date(models.Model):
         ordering = ['date']
 
 
-
-class Creator(ChangesMixin,models.Model):
+class Creator(ChangesMixin, models.Model):
     """ RDF creator of archive entry. """
     first_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
     last_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
@@ -185,12 +184,14 @@ class MetaData(ChangesMixin,models.Model):
         except ObjectDoesNotExist:
             return None
 
-    def add_modified(self, date_time=None):
-        """ Adds a modified timestamp to the metadata."""
-        if date_time is None:
-            date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
-        self.modified.add(Date.objects.create(date=date_time))
-        self.save()
+    def _add_modified(self):
+        """ Adds a modified timestamp to the metadata.
+
+        ! This should never be called directly, but only via
+            entry.add_modified()
+        """
+        date = Date.objects.create(date=timezone.now())
+        self.modified.add(date)
 
 # ===============================================================================
 # COMBINE Archives
@@ -316,9 +317,6 @@ class Archive(models.Model):
         sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/sed-ml")
         return len(sedml_entries) > 0
 
-
-
-
     def has_entries(self):
         """ Check if ArchiveEntries exist for archive. """
         return self.entries.count() > 0
@@ -352,17 +350,16 @@ class Archive(models.Model):
         - removing entries
         - changing formats
 
+        ! This functions only should be called if something changed in any of the entries.
+          This adds new modified timestamps without checking for changes !
+
         :return:
         """
 
         try:
             manifest_entry = self.entries.filter(location=MANIFEST_LOCATION).first()
-
             # update modified timestamp
-            # FIXME: This adds unnecessary modified timestamps (every time this function is called)
-            #   necessary to check if there were changes, or limit the call of this function
-            metadata = manifest_entry.metadata
-            metadata.add_modified()
+            manifest_entry.add_modified()
 
         except ObjectDoesNotExist:
             # no manifest in the archive, creating new entry
@@ -388,8 +385,6 @@ class Archive(models.Model):
 
         manifest_entry.save()
         self.save()
-
-
 
     def update_metadata_entry(self):
         """ Updates the metadata files in the archive.
@@ -455,6 +450,9 @@ class ArchiveEntry(ChangesMixin, models.Model):
     @property
     def path(self):
         return str(self.file.path)
+
+    def add_modified(self):
+        self.metadata._add_modified()
 
     def set_new_metadata(self, description=None, save=True):
         """ Sets new minimal metadata on entry.

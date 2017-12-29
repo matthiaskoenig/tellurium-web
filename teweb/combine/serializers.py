@@ -151,10 +151,6 @@ class ArchiveEntrySerializer(serializers.HyperlinkedModelSerializer):
         fields = ['archive', 'location', 'format', 'master', 'metadata', 'file']
 
 
-
-
-
-
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializing all Users. """
     url = serializers.HyperlinkedIdentityField(view_name='api:user-detail')
