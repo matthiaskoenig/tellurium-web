@@ -108,11 +108,21 @@ class Creator(ChangesMixin, models.Model):
         return html_creator_edit(first_name_input, last_name_input, organisation_input, email_input)
 
 
+class TripleElementType(DjangoChoices):
+    """ Categories for the element types. """
+    uri = ChoiceItem("rdflib.term.URIRef")
+    literal = ChoiceItem("rdflib.term.Literal")
+    bnode = ChoiceItem("rdflib.term.Literal")
+
+
 class Triple(models.Model):
     """ RDF triple store."""
     subject = models.TextField()
+    subject_type = models.TextField(choices=TripleElementType.choices)
     predicate = models.TextField()
+    predicate_type = models.TextField(choices=TripleElementType.choices)
     object = models.TextField()
+    object_type = models.TextField(choices=TripleElementType.choices)
 
     def __str__(self):
         return "({}, {}, {})".format(self.subject, self.predicate, self.object)
