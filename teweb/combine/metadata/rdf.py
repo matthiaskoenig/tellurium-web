@@ -319,36 +319,37 @@ def read_creators(g, location, delete=True):
     for triple in g.triples((URIRef(location), DCTERMS.creator, None)):
         deleted_triples.append(triple)
         # get the object in the bag (if not in bag triple is returned)
-        (subj, pred, obj) = _objects_in_bag(g, triple, deleted_triples=deleted_triples)[0]
-        info = {}
+        for (subj, pred, obj) in _objects_in_bag(g, triple, deleted_triples=deleted_triples):
+            # (subj, pred, obj) = _objects_in_bag(g, triple, deleted_triples=deleted_triples)[0]
+            info = {}
 
-        # email
-        for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))):
-            info["email"] = str(o)
-            deleted_triples.append((s, p, o))
+            # email
+            for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))):
+                info["email"] = str(o)
+                deleted_triples.append((s, p, o))
 
-        # organization
-        for (s, p, o) in g.triples((obj, VCARD["organization-name"], None)):
-            info["organisation"] = str(o)
-            deleted_triples.append((s, p, o))
+            # organization
+            for (s, p, o) in g.triples((obj, VCARD["organization-name"], None)):
+                info["organisation"] = str(o)
+                deleted_triples.append((s, p, o))
 
-        for (s, p, o) in list(g.triples((obj, VCARD.org, None))):
-            deleted_triples.append((s, p, o))
-            for (s2, p2, o2) in g.triples((o, VCARD["organization-name"], None)):
-                info["organization"] = str(o2)
-                deleted_triples.append((s2, p2, o2))
+            for (s, p, o) in list(g.triples((obj, VCARD.org, None))):
+                deleted_triples.append((s, p, o))
+                for (s2, p2, o2) in g.triples((o, VCARD["organization-name"], None)):
+                    info["organization"] = str(o2)
+                    deleted_triples.append((s2, p2, o2))
 
-        # names
-        for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))):
-            deleted_triples.append((s, p, o))
-            for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
-                info["familyName"] = str(o2)
-                deleted_triples.append((s2, p2, o2))
-            for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
-                info["givenName"] = str(o2)
-                deleted_triples.append((s2, p2, o2))
+            # names
+            for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))):
+                deleted_triples.append((s, p, o))
+                for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
+                    info["familyName"] = str(o2)
+                    deleted_triples.append((s2, p2, o2))
+                for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
+                    info["givenName"] = str(o2)
+                    deleted_triples.append((s2, p2, o2))
 
-        creators.append(info)
+            creators.append(info)
 
     # delete triples
     for triple in deleted_triples:
