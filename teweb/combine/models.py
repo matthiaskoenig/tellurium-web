@@ -5,6 +5,7 @@ import uuid as uuid_lib
 import logging
 import os
 import datetime
+import tempfile
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
@@ -184,6 +185,13 @@ class MetaData(ChangesMixin,models.Model):
         except ObjectDoesNotExist:
             return None
 
+    def add_modified(self, date_time=None):
+        """ Adds a modified timestamp to the metadata."""
+        if date_time is None:
+            date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
+        self.modified.add(Date.objects.create(date=date_time))
+        self.save()
+
 # ===============================================================================
 # COMBINE Archives
 # ===============================================================================
@@ -353,8 +361,8 @@ class Archive(models.Model):
             # update modified timestamp
             # FIXME: This adds unnecessary modified timestamps (every time this function is called)
             #   necessary to check if there were changes, or limit the call of this function
-            now = datetime.datetime.utcnow().replace(tzinfo=utc)
-            manifest_entry.modified.add(Date.objects.create(date=now))
+            metadata = manifest_entry.metadata
+            metadata.add_modified()
 
         except ObjectDoesNotExist:
             # no manifest in the archive, creating new entry
@@ -363,14 +371,13 @@ class Archive(models.Model):
                                                          master=False,
                                                          location=MANIFEST_LOCATION,
                                                          format=MANIFEST_FORMAT)
-            manifest_entry.set_new_metadata(description="Manifest file describing COMBINE archive content", save=False)
-
+            manifest_entry.set_new_metadata(description="Manifest file describing COMBINE archive content", save=True)
 
         # create latest manifest.xml
-        # TODO: implement
-        suffix = location.split('/')[-1]
-        tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
-        tmp.write(z.read(zip_name))
+        manifest = comex.create_manifest(archive=self)
+        suffix = MANIFEST_LOCATION.split('/')[-1]
+        tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
+        tmp.write(manifest)
         tmp.seek(0)  # rewind file for reading !
 
         # add/update file to manifest entry

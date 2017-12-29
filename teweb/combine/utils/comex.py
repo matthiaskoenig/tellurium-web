@@ -156,9 +156,6 @@ def zip_tree_content(path, entries=None):
                     node["icon"] = '/static/combine/images/mediatype/thumbnails/'+entry.short_format+'.png'
                     #node["icon"] = entry.format
                     pass
-
-
-
             else:
                 raise ValueError("All entries must be part of the zip file.")
 
@@ -174,11 +171,31 @@ def zip_tree_content(path, entries=None):
 def create_manifest(archive):
     """ Creates the manifest information for the given archive.
 
+    <?xml version="1.0" encoding="UTF-8"?>
+    <omexManifest xmlns="http://identifiers.org/combine.specifications/omex-manifest">
+        <content location="." format="http://identifiers.org/combine.specifications/omex" />
+        ...
+    </omexManifest>
+
+
     :param archive:
     :return:
     """
+    from xml.etree.ElementTree import Element, SubElement, Comment
+    from xml.dom import minidom
 
-    pass
+    def prettify(elem):
+        """Return a pretty-printed XML string for the Element.
+        """
+        rough_string = ET.tostring(elem, 'utf-8')
+        reparsed = minidom.parseString(rough_string)
+        return reparsed.toprettyxml(indent="  ")
+
+    n_omexManifest = Element('omexManifest')
+    for entry in archive.entries.all():
+        n_content = SubElement(n_omexManifest, 'content')
+
+    return prettify(n_omexManifest)
 
 
 class EntryParser(object):
