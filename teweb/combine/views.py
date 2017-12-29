@@ -258,7 +258,7 @@ def download_archive(request, archive_id):
 
     # All entries are written including the updated manifest.xml and metadata.rdf
     content = {}
-    for entry in entries:
+    for entry in archive.entries.all():
         location = entry.location
         if location in ["."]:
             continue

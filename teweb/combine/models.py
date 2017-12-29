@@ -4,6 +4,8 @@ Models definitions.
 import uuid as uuid_lib
 import logging
 import os
+import datetime
+import tempfile
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,7 +13,11 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from djchoices import DjangoChoices, ChoiceItem
 from django_model_changes import ChangesMixin
+from django.utils.timezone import utc
+from django.core.files import File
+
 from celery.result import AsyncResult
+
 
 from . import validators, managers
 from .metadata.rdf import read_metadata
@@ -24,6 +30,10 @@ logger = logging.getLogger(__name__)
 # Settings
 # ===============================================================================
 MAX_TEXT_LENGTH = 500
+MANIFEST_LOCATION = "./manifest.xml"
+MANIFEST_FORMAT = "http://identifiers.org/combine.specifications/omex-manifest"
+METADATA_LOCATION = "./metadata.rdf"
+METADATA_FORMAT = "http://identifiers.org/combine.specifications/omex-metadata"
 
 
 # ===============================================================================
@@ -174,6 +184,13 @@ class MetaData(ChangesMixin,models.Model):
             return self.modified.filter(date__isnull=False).latest('date')
         except ObjectDoesNotExist:
             return None
+
+    def add_modified(self, date_time=None):
+        """ Adds a modified timestamp to the metadata."""
+        if date_time is None:
+            date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
+        self.modified.add(Date.objects.create(date=date_time))
+        self.save()
 
 # ===============================================================================
 # COMBINE Archives
@@ -338,8 +355,39 @@ class Archive(models.Model):
         :return:
         """
 
-        # TODO: implement
-        pass
+        try:
+            manifest_entry = self.entries.filter(location=MANIFEST_LOCATION).first()
+
+            # update modified timestamp
+            # FIXME: This adds unnecessary modified timestamps (every time this function is called)
+            #   necessary to check if there were changes, or limit the call of this function
+            metadata = manifest_entry.metadata
+            metadata.add_modified()
+
+        except ObjectDoesNotExist:
+            # no manifest in the archive, creating new entry
+            manifest_entry = ArchiveEntry.objects.create(archive=self,
+                                                         source=EntrySource.zip,
+                                                         master=False,
+                                                         location=MANIFEST_LOCATION,
+                                                         format=MANIFEST_FORMAT)
+            manifest_entry.set_new_metadata(description="Manifest file describing COMBINE archive content", save=True)
+
+        # create latest manifest.xml
+        manifest = comex.create_manifest(archive=self)
+        suffix = MANIFEST_LOCATION.split('/')[-1]
+        tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
+        tmp.write(manifest)
+        tmp.seek(0)  # rewind file for reading !
+
+        # add/update file to manifest entry
+        name = MANIFEST_LOCATION.replace("./", "")
+        with open(tmp.name, 'rb') as f:
+            manifest_entry.file.save(name, File(f))
+        tmp.close()
+
+        manifest_entry.save()
+
 
     def update_metadata_entry(self):
         """ Updates the metadata files in the archive.
@@ -406,9 +454,24 @@ class ArchiveEntry(ChangesMixin, models.Model):
     def path(self):
         return str(self.file.path)
 
+    def set_new_metadata(self, description=None, save=True):
+        """ Sets new minimal metadata on entry.
 
-
-
-
-
-
+        Used for all entries which do not have metadata associated.
+        """
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        meta_dict = {
+            'about': None,
+            'description': description,
+            'created': now,
+            'modified': (now,),
+            'creators': [],
+            'triples': [],
+        }
+        metadata_dict = {
+            "metadata": meta_dict,
+        }
+        metadata = MetaData.objects.create(**metadata_dict)
+        self.metadata = metadata
+        if save:
+            self.save()
