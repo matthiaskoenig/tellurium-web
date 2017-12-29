@@ -158,7 +158,6 @@ function create_buttons_div(edit){
     "use strict";
     var buttons_div = document.createElement("div");
     if ( edit ){
-         buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';
          buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="saveButton"><i class="far fa-save"></i> Save </span>';
          buttons_div.innerHTML += '<span class="btn btn-default btn-space" id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';
     }
@@ -174,13 +173,15 @@ function add_master_checkbox(master,edit){
     "use strict";
     var checkbox_div = document.createElement("div");
     var checkbox_label = document.createElement("label");
-    var checkbox = document.createElement("INPUT");
+    var checkbox = document.createElement("input");
     checkbox_label.innerHTML = "Master ";
     checkbox.type = "checkbox";
     checkbox.id = "checkbox1";
-    checkbox.setAttribute("data-toggle", "toggle");
-    checkbox.checked= master;
+    //checkbox.setAttribute("data-toggle", "toggle");
+    checkbox.defaultChecked = master;
+    checkbox.checked = master;
     checkbox.disabled = !edit;
+    console.log(checkbox);
     checkbox_div.appendChild(checkbox_label);
     checkbox_div.innerHTML += " ";
     checkbox_div.appendChild(checkbox);
@@ -205,7 +206,7 @@ function create_manfifest_detail(entry_pk,data,edit){
     detailManifest.innerHTML += "<div><label> Format </label> <code title='"+data.format +"'>" + base_format(data.format) +" </code></div>"
     detailManifest.appendChild(add_master_checkbox(data.master,edit));
     if (data.file !== null && typeof data.file !== 'undefined'){
-        detailManifest.innerHTML += "<div><label> Location </label>"+ " "+"<a href='"+data.file+"'>"+ data.location + "</a></div>";
+        detailManifest.innerHTML += "<div><label> Location </label>"+ " "+"<a  target='_blank' href='"+data.file+"'>"+ data.location + "</a></div>";
     }
     else{
          detailManifest.innerHTML += "<div><label> Location </label>"+ " "+ data.location + "</div>";
@@ -241,7 +242,12 @@ function create_meta(metadata, edit){
     "use strict";
     var meta_div = document.createElement("div");
     var creators_div = document.createElement("div");
-    creators_div.setAttribute("id","creators_div")
+    creators_div.setAttribute("id","creators_div");
+    var creator_button;
+    if (edit ){creator_button = '<span class="btn btn-default btn-space" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';}
+    else {creator_button = '';}
+    creators_div.innerHTML += '<h3> Creators'+creator_button+'</h3>';
+
     var dl_desc = document.createElement("dl");
     var dt_desc = document.createElement("dt");
     var dd_desc = document.createElement("dd");
