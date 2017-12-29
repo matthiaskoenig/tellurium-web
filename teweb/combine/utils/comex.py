@@ -50,7 +50,7 @@ def get_archive_paths(archive_dirs):
 # COMBINE archive
 ################################################
 
-def create_manifest(archive, debug=True):
+def create_manifest(archive, debug=False):
     """ Creates the manifest information for the given archive.
 
     <?xml version="1.0" encoding="UTF-8"?>

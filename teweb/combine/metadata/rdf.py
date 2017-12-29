@@ -158,7 +158,7 @@ def parse_rdf(debug=False, **kwargs):
 ##############################################################
 # WRITE METADATA
 ##############################################################
-def create_metadata(archive, rdf_format, debug=True):
+def create_metadata(archive, rdf_format, debug=False):
     """ Creates the metadata for the current archive.
 
     This takes all the metadata from all archive entries and serializes
@@ -218,6 +218,8 @@ class MetaDataRDFSerializer(object):
         bind_default_namespaces(self.g)
         self._add_created_rdf_triples()
         self._add_modified_rdf_triples()
+        self._add_description_rdf_triples()
+        self._add_creators_rdf_triples()
 
         return self.g
 
@@ -256,7 +258,7 @@ class MetaDataRDFSerializer(object):
         if description:
             self.g.add((URIRef(self.location), DCTERMS.description, Literal(description)))
 
-    def _get_creator_rdf_triples(self, creator):
+    def _add_creators_rdf_triples(self):
         """ Gets triples for creator.
 
         <dcterms:creator rdf:parseType="Resource">
@@ -267,7 +269,16 @@ class MetaDataRDFSerializer(object):
             <vCard:organization-name>Caltech</vCard:organization-name>
         </dcterms:creator>
         """
-        # TODO: implement
+        for creator in self.metadata.creators.all():
+            bnode1 = BNode()
+
+            self.g.add( (URIRef(self.location), DCTERMS.creator, bnode1) )
+            self.g.add( (bnode1, DCTERMS['organization-name'], Literal(creator.organisation)) )
+            self.g.add( (bnode1, DCTERMS.hasEmail, Literal(creator.email)) )
+            bnode2 = BNode()
+            self.g.add( (bnode1, DCTERMS.hasName, bnode2) )
+            self.g.add( (bnode2, DCTERMS['family-name'], Literal(creator.last_name)))
+            self.g.add((bnode2, DCTERMS['given-name'], Literal(creator.first_name)))
 
 
 ##############################################################
