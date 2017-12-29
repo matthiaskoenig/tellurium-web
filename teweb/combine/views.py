@@ -172,8 +172,6 @@ def archive_view(request, archive_id):
         if modified_metadata:
             archive.update_metadata_entry()
 
-
-
         return JsonResponse({"is_error": False})
 
     return render(request, 'combine/archive.html', context)
@@ -272,9 +270,6 @@ def download_archive(request, archive_id):
     """
     archive = get_object_or_404(Archive, pk=archive_id)
     filename = archive.file.name.split('/')[-1]
-
-    # FIXME: remove, only for testing
-    archive.update_metadata_entry()
 
     # All entries are written including the updated manifest.xml and metadata.rdf
     content = {}

@@ -145,11 +145,31 @@ class ArchiveManager(models.Manager):
                         "metadata": meta_dict,
                     }
                     metadata = MetaData.objects.create(**metadata_dict)
-                    archive_entry.metadata = metadata
 
+                    archive_entry.metadata = metadata
                     archive_entry.save()
 
-                    # Tags from given entry
+                    # add some standard descriptions
+                    if (metadata.description is None) or (len(metadata.description) == 0):
+                        base_format = archive_entry.base_format
+                        if base_format in ["sed-ml", 'sedml']:
+                            metadata.description = "SED-ML simulation experiment"
+                            metadata.save()
+                        elif base_format == "sbml":
+                            metadata.description = "SBML model"
+                            metadata.save()
+                        elif base_format == "cellml":
+                            metadata.description = "CellML model"
+                            metadata.save()
+                        location = archive_entry.location
+                        if location == "./manifest.xml":
+                            metadata.description = "COMBINE archive manifest"
+                            metadata.save()
+                        if location == "./metadata.rdf":
+                            metadata.description = "COMBINE archive metadata"
+                            metadata.save()
+
+                # Tags from given entry
                     # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
                     tags_info = create_tags_for_entry(archive_entry)
                     pprint(tags_info)
@@ -163,6 +183,9 @@ class ArchiveManager(models.Manager):
 
                 # update the manifest
                 archive.update_manifest_entry()
+
+                # update the metadata
+                archive.update_metadata_entry()
 
             return archive, created_archive
 

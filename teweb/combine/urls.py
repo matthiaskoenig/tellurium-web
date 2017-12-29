@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^archive/(?P<archive_id>[0-9]+)/results$', views.results, name='results'),
     url(r'^archive/(?P<archive_id>[0-9]+)/run$', views.run_archive, name='run_archive'),
     url(r'^archive/(?P<archive_id>[0-9]+)/delete$', views.delete_archive, name='delete_archive'),
-    url(r'^archive/(?P<archive_id>[0-9]+)/download_initial$', views.download_archive, name='download_archive_initial'),
+    url(r'^archive/(?P<archive_id>[0-9]+)/download_initial$', views.download_archive_initial, name='download_archive_initial'),
     url(r'^archive/(?P<archive_id>[0-9]+)/download$', views.download_archive, name='download_archive'),
     url(r'^archive/(?P<archive_id>[0-9]+)/zip_tree$', views_api.ZipTreeView.as_view(), name='zip_data'),
 
