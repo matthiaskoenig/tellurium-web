@@ -174,13 +174,15 @@ function add_master_checkbox(master,edit){
     "use strict";
     var checkbox_div = document.createElement("div");
     var checkbox_label = document.createElement("label");
-    var checkbox = document.createElement("INPUT");
+    var checkbox = document.createElement("input");
     checkbox_label.innerHTML = "Master ";
     checkbox.type = "checkbox";
     checkbox.id = "checkbox1";
-    checkbox.setAttribute("data-toggle", "toggle");
-    checkbox.checked= master;
+    //checkbox.setAttribute("data-toggle", "toggle");
+    checkbox.defaultChecked = master;
+    checkbox.checked = master;
     checkbox.disabled = !edit;
+    console.log(checkbox);
     checkbox_div.appendChild(checkbox_label);
     checkbox_div.innerHTML += " ";
     checkbox_div.appendChild(checkbox);
@@ -241,7 +243,7 @@ function create_meta(metadata, edit){
     "use strict";
     var meta_div = document.createElement("div");
     var creators_div = document.createElement("div");
-    creators_div.setAttribute("id","creators_div")
+    creators_div.setAttribute("id","creators_div");
     var dl_desc = document.createElement("dl");
     var dt_desc = document.createElement("dt");
     var dd_desc = document.createElement("dd");
