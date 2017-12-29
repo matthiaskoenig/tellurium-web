@@ -80,14 +80,16 @@ def archive_view(request, archive_id):
     :param archive_id:
     :return:
     """
-
     archive = get_object_or_404(Archive, pk=archive_id)
     context = archive_context(archive)
 
     # Check if a POST via the UI, i.e., changes to the archive, not new upload
     if request.method == 'POST' and "data" in request.POST:
 
-        modified = False
+        # keep track of modifications
+        modified_metadata = False  # something changed in metadata
+        modified_entry = False     # something changed in entry, i.e., format, master, location
+
         data = request.POST["data"]
         entrydata_dict = json.loads(data)
         print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
@@ -103,14 +105,14 @@ def archive_view(request, archive_id):
         archive_entry_serializer = ArchiveEntrySerializer()
         archive_entry_serializer.update(instance=archive_entry, validated_data=entrydata_dict)
         if bool(archive_entry.changes()):
-            modified = True
+            modified_entry = True
         archive_entry.save()
 
         data = {"description": entrydata_dict["description"]}
         meta_data_serializer = MetaDataSerializer()
         meta_data_serializer.update(instance=archive_entry.metadata, validated_data=data)
         if bool(archive_entry.metadata.changes()):
-            modified = True
+            modified_metadata = True
         archive_entry.metadata.save()
         if "creators" in entrydata_dict:
             for creator in entrydata_dict["creators"]:
@@ -128,7 +130,7 @@ def archive_view(request, archive_id):
                     if serializer_creator.is_valid():
                         creator = serializer_creator.create(validated_data=serializer_creator.validated_data)
                         archive_entry.metadata.creators.add(creator)
-                        modified = True
+                        modified_metadata = True
                     else:
                         response = {"errors": serializer_creator.errors, "is_error": True}
                         return JsonResponse(response)
@@ -139,15 +141,24 @@ def archive_view(request, archive_id):
                         serializer_creator.save()
                         serializer_creator.update(instance=creator, validated_data=serializer_creator.validated_data)
                         if bool(creator.changes()):
-                            modified = True
+                            modified_metadata = True
                         creator.save()
                     else:
                         response = {"errors": serializer_creator.errors, "is_error": True}
                         return JsonResponse(response)
 
-        if modified:
-            date = Date.objects.create(date=timezone.now())
-            archive_entry.metadata.modified.add(date)
+        # add modified timestamp
+        if modified_metadata or modified_entry:
+            archive_entry.add_modified()
+
+        # update manifest if entry information changed
+        if modified_entry:
+            archive.update_manifest_entry()
+
+        # update metadata file if metadata changed
+        if modified_metadata:
+            # TODO: implement
+            archive.update_metadata_entry()
 
         return JsonResponse({"is_error": False})
 
@@ -250,12 +261,6 @@ def download_archive(request, archive_id):
     archive = get_object_or_404(Archive, pk=archive_id)
     filename = archive.file.name.split('/')[-1]
 
-    # updated manifest and metadata information
-    # TODO: implement
-    archive.update_manifest_entry()
-    # TODO: implement
-    archive.update_metadata_entry()
-
     # All entries are written including the updated manifest.xml and metadata.rdf
     content = {}
     for entry in archive.entries.all():
@@ -314,54 +319,6 @@ def delete_archive(request, archive_id):
     archive.delete()
 
     return redirect('combine:index')
-
-
-# THIS WILL BE DEPRECATED
-# def archive_next(request, archive_id):
-#     """ Returns single archive view of next archive.
-#     Displays the content of the archive.
-#
-#     :param request:
-#     :param archive_id:
-#     :return:
-#     """
-#     return archive_adjacent(request, archive_id, order='pk')
-#
-#
-# def archive_previous(request, archive_id):
-#     """ Returns single archive view of previous archive.
-#     Displays the content of the archive.
-#
-#     :param request:
-#     :param archive_id:
-#     :return:
-#     """
-#     return archive_adjacent(request, archive_id, order='-pk')
-#
-#
-# def archive_adjacent(request, archive_id, order):
-#     """ Returns adjacent archive view.
-#
-#     :param request:
-#     :param archive_id:
-#     :param order: order parameter to decide adjacent
-#     :return:
-#     """
-#     if order.startswith("-"):
-#         adj_archive = Archive.objects.filter(pk__lt=archive_id).order_by(order)[0:1]
-#     else:
-#         adj_archive = Archive.objects.filter(pk__gt=archive_id).order_by(order)[0:1]
-#     if len(adj_archive) == 1:
-#         pk = adj_archive[0].pk
-#     else:
-#         pk = archive_id
-#
-#     referer = request.META.get('HTTP_REFERER')
-#     if referer.endswith('results'):
-#         return redirect('combine:results', pk)
-#     else:
-#         return redirect('combine:archive', pk)
-
 
 ######################
 # ARCHIVE ENTRY
