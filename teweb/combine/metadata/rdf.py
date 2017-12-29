@@ -143,7 +143,7 @@ def parse_rdf(debug=False, **kwargs):
             print((subj, pred, obj))
 
     # Serializing the graph
-    if False:
+    if debug:
         s2 = g2.serialize(format='pretty-xml')
         print(s2.decode("utf-8"))
 
@@ -158,7 +158,7 @@ def parse_rdf(debug=False, **kwargs):
 ##############################################################
 # WRITE METADATA
 ##############################################################
-def create_metadata(archive, debug=False):
+def create_metadata(archive, rdf_format, debug=True):
     """ Creates the metadata for the current archive.
 
     This takes all the metadata from all archive entries and serializes
@@ -188,27 +188,17 @@ def create_metadata(archive, debug=False):
             g.add((s, p, o))
 
         # Add the metadata triples
-        md_serializer = MetaDataRDFSerializer(entry.metadata)
-        
-
-        for (s, p, o) in md_serializer.get_rdf_triples():
+        md_serializer = MetaDataRDFSerializer(location=entry.location, metadata=entry.metadata)
+        g_meta = md_serializer.get_rdf_triples()
+        for (s, p, o) in g_meta:
             g.add((s, p, o))
 
-
-    # info = g.serialize(format='turtle').decode("utf-8"))
-    info_str = g.serialize(format='pretty-xml').decode("utf-8")
     if debug:
         print("-" * 80)
-        print(info_str)
+        print(g.serialize(format='turtle').decode("utf-8"))
         print("-" * 80)
 
-    info_str = g.serialize(format='turtle').decode("utf-8")
-    if debug:
-        print("-" * 80)
-        print(info_str)
-        print("-" * 80)
-
-    return info_str
+    return g.serialize(format=rdf_format).decode("utf-8")
 
 
 class MetaDataRDFSerializer(object):
@@ -220,18 +210,18 @@ class MetaDataRDFSerializer(object):
     def __init__(self, location, metadata):
         self.location = location
         self.metadata = metadata
-        self.g = Graph()
-        bind_default_namespaces(g)
-
-
+        self.g = None
 
     def get_rdf_triples(self):
         """ Get all the triples for the metadata information. """
-        self._add_created_rdf_triples(g)
+        self.g = Graph()
+        bind_default_namespaces(self.g)
+        self._add_created_rdf_triples()
+        self._add_modified_rdf_triples()
 
-        return g
+        return self.g
 
-    def _add_created_rdf_triples(self, g):
+    def _add_created_rdf_triples(self):
         """ Gets triple for a new created tag.
 
         <dcterms:created rdf:parseType="Resource">
@@ -239,28 +229,32 @@ class MetaDataRDFSerializer(object):
         </dcterms:created>
         """
         created = self.metadata.created
-        bnode = BNode()
-        g.add((URIRef(self.location), DCTERMS.created, bnode))
-        g.add((bnode, DCTERMS.W3CDTF, Literal(created)))
+        if created:
+            bnode = BNode()
+            self.g.add((URIRef(self.location), DCTERMS.created, bnode))
+            self.g.add((bnode, DCTERMS.W3CDTF, Literal(created)))
 
-
-    def _get_modified_rdf_triples(self, date):
+    def _add_modified_rdf_triples(self):
         """ Gets triple for a modified timestamp.
 
         <dcterms:modified rdf:parseType="Resource">
             <dcterms:W3CDTF>2017-12-28T16:23:43Z</dcterms:W3CDTF>
         </dcterms:modified>
         """
-        # TODO: implement
-        pass
+        for modified in self.metadata.modified.all():
+            bnode = BNode()
+            self.g.add((URIRef(self.location), DCTERMS.modified, bnode))
+            self.g.add((bnode, DCTERMS.W3CDTF, Literal(modified)))
 
-    def _get_description_rdf_triples(self, description):
+
+    def _add_description_rdf_triples(self):
         """ Gets triple for description.
 
         <dcterms:description>Information to create archive metadata</dcterms:description>
         """
-        # TODO: implement
-        pass
+        description = self.metadata.description
+        if description:
+            self.g.add((URIRef(self.location), DCTERMS.description, Literal(description)))
 
     def _get_creator_rdf_triples(self, creator):
         """ Gets triples for creator.
@@ -279,149 +273,154 @@ class MetaDataRDFSerializer(object):
 ##############################################################
 # READ METADATA
 ##############################################################
+
 def read_metadata(archive_path):
     """ Reads and parses all the metadata information from given COMBINE archive.
 
     :param archive_path:
     :return: metadata_dict
     """
-
-    def read_predicate(g, location, predicate):
-        """ Only a single entry should exist in the graph directly
-        connected to the location.
-
-        :param field:
-        :param predicate:
-        :return:
-        """
-        result = None
-
-        for triple in g.triples((URIRef(location), predicate, None)):
-            (subj, pred, obj) = triple
-
-            # not terminal node, but linear pathway, follow the trail
-            while not isinstance(obj, Literal):
-                triples = list(g.triples((obj, None, None)))
-                if len(triples) == 0:
-                    warnings.warn("Something went wrong !")
-                    return str(obj)
-                    break
-
-                (subj, pred, obj) = triples[0]
-
-            result = str(obj)
-
-        return result
-
-    def read_predicate_list(g, location, predicate):
-        """ Multiple entries can exist
-
-        :param field:
-        :param predicate:
-        :return: list
-        """
-        results = []
-
-        for triple in g.triples((URIRef(location), predicate, None)):
-            (subj, pred, obj) = triple
-
-            # not terminal node, but linear pathway, follow the trail
-            while not isinstance(obj, Literal):
-                triples = list(g.triples((obj, None, None)))
-                if len(triples) == 0:
-                    warnings.warn("Something went wrong !")
-                    return str(obj)
-                    break
-
-                (subj, pred, obj) = triples[0]
-
-            results.append(str(obj))
-        return results
-
-
-    def _objects_in_bag(triple):
-        """ Check if object sits in Bag.
-
-        :param triple:
-        :return:
-        """
-        (subj, pred, obj) = triple
-
-        # outgoing edges
-        triples = list(g.triples((obj, None, None)))
-        is_bag = len([(s, p, o) for (s, p, o) in triples if p == RDF.type]) > 0
-
-        if is_bag:
-            # return list entries
-            return [(s, p, o) for (s, p, o) in triples if p != RDF.type]
-        else:
-            return [(subj, pred, obj)]
-
-
-    def read_creators(g, location):
-        """ Read the creators from given graph
-
-        :param g:
-        :return:
-        """
-        creators = []
-        for triple in g.triples((URIRef(location), DCTERMS.creator, None)):
-
-            # get the object in the bag (if not in bag triple is returned)
-            (subj, pred, obj) = _objects_in_bag(triple)[0]
-
-            # print("*" * 80)
-            # print((subj, pred, obj))
-
-            info = {}
-
-            # email
-            for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))):
-                info["email"] = str(o)
-
-            # organization
-            for (s, p, o) in g.triples((obj, VCARD["organization-name"], None)):
-                info["organisation"] = str(o)
-
-            # names
-            for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))):
-                for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
-                    info["familyName"] = str(o2)
-                for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
-                    info["givenName"] = str(o2)
-
-            creators.append(info)
-
-        return creators
-
-    def read_triples(g):
-        """ Reads the triples in the graph.
-
-        :param g:
-        :return:
-        """
-        triples = []
-        for (s, p, o) in g.triples((None, None, None)):
-            triple_info = [str(el) for el in (s, type(s), p, type(p), o, type(o)) ]
-            triples.append(triple_info)
-
-        return triples
-
     metadata_dict = {}
     graph_dict = read_rdf_graphs(archive_path=archive_path)
 
     for location, g in graph_dict.items():
         metadata = {}
         metadata['about'] = location
-        metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description)
-        metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created)
-        metadata['modified'] = read_predicate_list(g, location, DCTERMS.modified)
+        metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description, multiple=False)
+        metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created, multiple=False)
+        metadata['modified'] = read_predicate(g, location, predicate=DCTERMS.modified, multiple=True)
         metadata['creators'] = read_creators(g, location)
-        metadata['triples'] = read_triples(g)
+        metadata['triples'] = django_triples_from_graph(g)
 
         metadata_dict[location] = metadata
 
     return metadata_dict
+
+
+def read_creators(g, location, delete=True):
+    """ Read the creators from given graph
+
+    :param g:
+    :return:
+    """
+    creators = []
+    deleted_triples = []
+    for triple in g.triples((URIRef(location), DCTERMS.creator, None)):
+        deleted_triples.append(triple)
+        # get the object in the bag (if not in bag triple is returned)
+        (subj, pred, obj) = _objects_in_bag(g, triple, deleted_triples=deleted_triples)[0]
+        info = {}
+
+        # email
+        for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))):
+            info["email"] = str(o)
+            deleted_triples.append((s, p, o))
+
+        # organization
+        for (s, p, o) in g.triples((obj, VCARD["organization-name"], None)):
+            info["organisation"] = str(o)
+            deleted_triples.append((s, p, o))
+
+        for (s, p, o) in list(g.triples((obj, VCARD.org, None))):
+            deleted_triples.append((s, p, o))
+            for (s2, p2, o2) in g.triples((o, VCARD["organization-name"], None)):
+                info["organization"] = str(o2)
+                deleted_triples.append((s2, p2, o2))
+
+        # names
+        for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))):
+            deleted_triples.append((s, p, o))
+            for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
+                info["familyName"] = str(o2)
+                deleted_triples.append((s2, p2, o2))
+            for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
+                info["givenName"] = str(o2)
+                deleted_triples.append((s2, p2, o2))
+
+        creators.append(info)
+
+    # delete triples
+    for triple in deleted_triples:
+        g.remove(triple)
+
+    return creators
+
+
+def read_predicate(g, location, predicate, multiple=True, delete=True):
+    """ Multiple entries can exist
+
+    :param field:
+    :param predicate:
+    :return: list
+    """
+    results = []
+    deleted_triples = []
+
+    for triple in g.triples((URIRef(location), predicate, None)):
+        (subj, pred, obj) = triple
+        deleted_triples.append(triple)
+
+        # not terminal node, but linear pathway, follow the trail
+        while not isinstance(obj, Literal):
+            triples = list(g.triples((obj, None, None)))
+            deleted_triples.extend(triples)
+            if len(triples) == 0:
+                warnings.warn("Something went wrong !")
+                return str(obj)
+                break
+
+            (subj, pred, obj) = triples[0]
+
+        results.append(str(obj))
+
+    # delete triples
+    for triple in deleted_triples:
+        g.remove(triple)
+
+    if multiple:
+        # list of entries returned
+        return results
+    else:
+        # single entry or None returned
+        if len(results)>0:
+            return results[0]
+        else:
+            return None
+
+
+def django_triples_from_graph(g):
+    """ Reads the django triples from the given graph.
+
+    :param g:
+    :return:
+    """
+    triples = []
+    for (s, p, o) in g.triples((None, None, None)):
+        triple_info = [str(el) for el in (s, type(s), p, type(p), o, type(o)) ]
+        triples.append(triple_info)
+
+    return triples
+
+
+def _objects_in_bag(g, triple, deleted_triples=None):
+    """ Check if object sits in Bag.
+
+    :param triple:
+    :return:
+    """
+    (subj, pred, obj) = triple
+
+    # outgoing edges
+    triples = list(g.triples((obj, None, None)))
+    if deleted_triples is not None:
+        deleted_triples.extend(triples)
+    is_bag = len([(s, p, o) for (s, p, o) in triples if p == RDF.type]) > 0
+
+    if is_bag:
+        # return list entries
+        return [(s, p, o) for (s, p, o) in triples if p != RDF.type]
+    else:
+        return [(subj, pred, obj)]
 
 
 def read_rdf_graphs(archive_path, debug=False):
@@ -533,8 +532,9 @@ def _transitive_subgraph(g, start, gloc=None):
 ########################################################################
 if __name__ == "__main__":
 
+    metadata = read_metadata("../tests/testdata/metadata/metadata_minimal.omex")
     # metadata = read_metadata("../tests/testdata/archives/smith_chase_nokes_shaw_wake_2004.omex")
-    # pprint(metadata['./smith_chase_nokes_shaw_wake_2004.cellml'])
+    pprint(metadata['.'])
 
     print("-" * 80)
 
@@ -549,5 +549,5 @@ if __name__ == "__main__":
     f2 = "../tests/testdata/metadata/metadata2.rdf"
     f3 = "../tests/testdata/metadata/metadata_minimal.rdf"
 
-    parse_rdf(location=f3, debug=True)
-    # parse_rdf(f1)
+    # parse_rdf(location=f3, debug=True)
+

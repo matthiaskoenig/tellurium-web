@@ -4,12 +4,12 @@
 		<dcterms:description>Test description.</dcterms:description>
 		<dcterms:creator rdf:parseType="Resource">
             <vCard:n rdf:parseType="Resource">
-                <vCard:family-name>Scharm</vCard:family-name>
-                <vCard:given-name>Martin</vCard:given-name>
+                <vCard:family-name>König</vCard:family-name>
+                <vCard:given-name>Matthias</vCard:given-name>
             </vCard:n>
-            <vCard:email>martin.scharm@uni-rostock.de</vCard:email>
+            <vCard:email>konigmatt@googlemail.de</vCard:email>
             <vCard:org rdf:parseType="Resource">
-                <vCard:organization-name>University of Rostock</vCard:organization-name>
+                <vCard:organization-name>Humboldt University Berlin</vCard:organization-name>
             </vCard:org>
 		</dcterms:creator>
 		<dcterms:created rdf:parseType="Resource">
