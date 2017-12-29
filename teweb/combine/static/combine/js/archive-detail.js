@@ -246,7 +246,7 @@ function create_meta(metadata, edit){
     var creator_button;
     if (edit ){creator_button = '<span class="btn btn-default btn-space" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';}
     else {creator_button = '';}
-    creators_div.innerHTML += '<h3> Creators'+creator_button+'</h3>';
+    creators_div.innerHTML += '<h3> Creators '+creator_button+'</h3>';
 
     var dl_desc = document.createElement("dl");
     var dt_desc = document.createElement("dt");
