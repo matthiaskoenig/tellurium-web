@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 import json
 
+DATEFORMAT = "%Y-%m-%d    %H:%M"
+
 
 class TagSerializer(serializers.ModelSerializer):
     """ Serializing all Tags. """
@@ -57,7 +59,7 @@ class TripleSerializer(serializers.ModelSerializer):
 
 
 class DateSerializer(serializers.ModelSerializer):
-
+    date = serializers.DateTimeField(format=DATEFORMAT)
 
     def get(self,validated_data):
         return Date.objects.get(**validated_data)
@@ -81,6 +83,8 @@ class MetaDataSerializer(serializers.HyperlinkedModelSerializer):
     creators = CreatorSerializer(many=True)
     triples = TripleSerializer(source='get_triples', many=True)
     modified = DateSerializer(many=True)
+    created = serializers.DateTimeField(format=DATEFORMAT)
+
 
 
 
@@ -110,6 +114,7 @@ class ArchiveSerializer(serializers.HyperlinkedModelSerializer):
     tags = serializers.HyperlinkedRelatedField(many=True, view_name='api:tag-detail', queryset=Tag.objects.all(), lookup_field='uuid')
     user = serializers.HyperlinkedRelatedField(view_name='api:user-detail', read_only=True)
     entries = serializers.HyperlinkedRelatedField(many=True, view_name='api:archive-entry-detail', queryset=ArchiveEntry.objects.all())
+    created = serializers.DateTimeField(format=DATEFORMAT)
 
 
     class Meta:

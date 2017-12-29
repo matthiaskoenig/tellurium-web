@@ -243,6 +243,27 @@ function create_master_input(){
     return master_output;
 }
 
+function show_modified(dd_modified, modified){
+    "use strict";
+    dd_modified.innerHTML = modified_content(modified.slice(0, 3));
+    if (modified.length > 3){
+        var show_modifed_button = document.createElement("button");
+        show_modifed_button.setAttribute("class", "btn btn-default");
+        show_modifed_button.innerHTML = '<i class="fas fa-arrow-down"></i> show all dates';
+        show_modifed_button.onclick = function(){
+            dd_modified.innerHTML = modified_content(modified);
+            var close_modifed_button = document.createElement("button");
+            close_modifed_button.setAttribute("class", "btn btn-default");
+            close_modifed_button.innerHTML = '<i class="fas fa-arrow-up"></i> close all dates';
+            close_modifed_button.onclick = function(){
+                show_modified(dd_modified, modified);
+            };
+            dd_modified.appendChild(close_modifed_button);
+        };
+        dd_modified.appendChild(show_modifed_button);
+    }
+}
+
 
 function create_meta(metadata, edit){
     "use strict";
@@ -272,13 +293,18 @@ function create_meta(metadata, edit){
 
     var dt_modified = document.createElement("dt");
     var dd_modified = document.createElement("dd");
+    show_modified(dd_modified,metadata.modified);
+
+
+
 
     dt_desc.appendChild(document.createTextNode("Description"));
     dt_created.appendChild(document.createTextNode("Created"));
     dt_modified.appendChild(document.createTextNode("Modified"));
 
     dd_created.appendChild(document.createTextNode(metadata.created));
-    dd_modified.innerHTML = modified_content(metadata.modified);
+
+
 
     if (edit===true) {
 

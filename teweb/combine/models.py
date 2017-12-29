@@ -50,7 +50,7 @@ class Date(models.Model):
         return str(self.date)
 
     class Meta:
-        ordering = ['date']
+        ordering = ['-date']
 
 
 class Creator(ChangesMixin, models.Model):
