@@ -180,12 +180,20 @@ def create_metadata(archive, debug=False):
     for entry in archive.entries.order_by('location'):
         metadata = entry.metadata
 
-        # Write all triples
+        # Write all annotation triples
         for triple in metadata.triples.all():
             s = get_element(triple.subject, triple.subject_type)
             p = get_element(triple.predicate, triple.predicate_type)
             o = get_element(triple.object, triple.object_type)
             g.add((s, p, o))
+
+        # Add the metadata triples
+        md_serializer = MetaDataRDFSerializer(entry.metadata)
+        
+
+        for (s, p, o) in md_serializer.get_rdf_triples():
+            g.add((s, p, o))
+
 
     # info = g.serialize(format='turtle').decode("utf-8"))
     info_str = g.serialize(format='pretty-xml').decode("utf-8")
@@ -201,6 +209,71 @@ def create_metadata(archive, debug=False):
         print("-" * 80)
 
     return info_str
+
+
+class MetaDataRDFSerializer(object):
+    """
+    RDF serialization of the metadata information.
+    This creates the triples and adds them to graph.
+    """
+
+    def __init__(self, location, metadata):
+        self.location = location
+        self.metadata = metadata
+        self.g = Graph()
+        bind_default_namespaces(g)
+
+
+
+    def get_rdf_triples(self):
+        """ Get all the triples for the metadata information. """
+        self._add_created_rdf_triples(g)
+
+        return g
+
+    def _add_created_rdf_triples(self, g):
+        """ Gets triple for a new created tag.
+
+        <dcterms:created rdf:parseType="Resource">
+            <dcterms:W3CDTF>2017-12-28T16:23:43Z</dcterms:W3CDTF>
+        </dcterms:created>
+        """
+        created = self.metadata.created
+        bnode = BNode()
+        g.add((URIRef(self.location), DCTERMS.created, bnode))
+        g.add((bnode, DCTERMS.W3CDTF, Literal(created)))
+
+
+    def _get_modified_rdf_triples(self, date):
+        """ Gets triple for a modified timestamp.
+
+        <dcterms:modified rdf:parseType="Resource">
+            <dcterms:W3CDTF>2017-12-28T16:23:43Z</dcterms:W3CDTF>
+        </dcterms:modified>
+        """
+        # TODO: implement
+        pass
+
+    def _get_description_rdf_triples(self, description):
+        """ Gets triple for description.
+
+        <dcterms:description>Information to create archive metadata</dcterms:description>
+        """
+        # TODO: implement
+        pass
+
+    def _get_creator_rdf_triples(self, creator):
+        """ Gets triples for creator.
+
+        <dcterms:creator rdf:parseType="Resource">
+            <vCard:hasName rdf:parseType="Resource">
+                <vCard:family-name>Bergmann</vCard:family-name>
+                <vCard:given-name>Frank</vCard:given-name>
+            </vCard:hasName><vCard:hasEmail rdf:resource="fbergmann@caltech.edu"/>
+            <vCard:organization-name>Caltech</vCard:organization-name>
+        </dcterms:creator>
+        """
+        # TODO: implement
 
 
 ##############################################################
@@ -330,7 +403,6 @@ def read_metadata(archive_path):
         triples = []
         for (s, p, o) in g.triples((None, None, None)):
             triple_info = [str(el) for el in (s, type(s), p, type(p), o, type(o)) ]
-            print(triple_info)
             triples.append(triple_info)
 
         return triples
@@ -461,8 +533,8 @@ def _transitive_subgraph(g, start, gloc=None):
 ########################################################################
 if __name__ == "__main__":
 
-    metadata = read_metadata("../tests/testdata/archives/smith_chase_nokes_shaw_wake_2004.omex")
-    pprint(metadata['./smith_chase_nokes_shaw_wake_2004.cellml'])
+    # metadata = read_metadata("../tests/testdata/archives/smith_chase_nokes_shaw_wake_2004.omex")
+    # pprint(metadata['./smith_chase_nokes_shaw_wake_2004.cellml'])
 
     print("-" * 80)
 
@@ -473,8 +545,9 @@ if __name__ == "__main__":
     # pprint(metadata)
 
 
-    f1 = "../tests/testdata/rdf/metadata1.rdf"
-    f2 = "../tests/testdata/rdf/metadata2.rdf"
+    f1 = "../tests/testdata/metadata/metadata1.rdf"
+    f2 = "../tests/testdata/metadata/metadata2.rdf"
+    f3 = "../tests/testdata/metadata/metadata_minimal.rdf"
 
-    parse_rdf(f1)
+    parse_rdf(location=f3, debug=True)
     # parse_rdf(f1)

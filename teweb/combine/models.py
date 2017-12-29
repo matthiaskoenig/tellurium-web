@@ -204,24 +204,6 @@ class MetaData(ChangesMixin,models.Model):
         date = Date.objects.create(date=timezone.now())
         self.modified.add(date)
 
-    def update_triples(self):
-        """  """
-        # TODO: implement
-
-        # Creators
-        # TODO
-
-        # Created
-        # TODO
-
-        # Modified
-        # TODO
-
-        # Description
-        # TODO
-
-        pass
-
 
 # ===============================================================================
 # COMBINE Archives
@@ -434,10 +416,6 @@ class Archive(models.Model):
                                                          format=METADATA_FORMAT)
             metadata_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
 
-        # TODO: update triples
-
-
-
         # create latest metadata.rdf
         metadata = rdf.create_metadata(archive=self)
         suffix = MANIFEST_LOCATION.split('/')[-1]
@@ -529,6 +507,9 @@ class ArchiveEntry(ChangesMixin, models.Model):
             "metadata": meta_dict,
         }
         metadata = MetaData.objects.create(**metadata_dict)
+
+        # FIXME: update triples
+
         self.metadata = metadata
         if save:
             self.save()
