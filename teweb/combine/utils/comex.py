@@ -101,7 +101,7 @@ def zip_tree_content(path, entries=None):
         'id': '.',
         'parent': "#",
         'text': '.',
-        'icon': 'fa fa-fw fa-archive fa-4x ',
+        #'icon': 'fa fa-fw fa-archive fa-4x ',
          #'icon': "get_format_icon({})".,
         #'type':"sbml-icon",
         'state': {'opened': True, 'selected': True}
@@ -151,10 +151,10 @@ def zip_tree_content(path, entries=None):
                 node['format'] = entry.format
                 node['master'] =     entry.master
                 node['location'] = entry.location
-                node['type'] = entry.short_format
+                node['type'] = entry.base_format
 
-                if entry.short_format in format_list:
-                    node["icon"] = '/static/combine/images/mediatype/thumbnails/'+entry.short_format+'.png'
+                if entry.base_format in format_list:
+                    node["icon"] = '/static/combine/images/mediatype/thumbnails/'+entry.base_format+'.png'
                     #node["icon"] = entry.format
                     pass
             else:
