@@ -4,6 +4,7 @@ Models definitions.
 import uuid as uuid_lib
 import logging
 import os
+import datetime
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,7 +12,11 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from djchoices import DjangoChoices, ChoiceItem
 from django_model_changes import ChangesMixin
+from django.utils.timezone import utc
+from django.core.files import File
+
 from celery.result import AsyncResult
+
 
 from . import validators, managers
 from .metadata.rdf import read_metadata
@@ -24,6 +29,10 @@ logger = logging.getLogger(__name__)
 # Settings
 # ===============================================================================
 MAX_TEXT_LENGTH = 500
+MANIFEST_LOCATION = "./manifest.xml"
+MANIFEST_FORMAT = "http://identifiers.org/combine.specifications/omex-manifest"
+METADATA_LOCATION = "./metadata.rdf"
+METADATA_FORMAT = "http://identifiers.org/combine.specifications/omex-metadata"
 
 
 # ===============================================================================
@@ -338,8 +347,40 @@ class Archive(models.Model):
         :return:
         """
 
+        try:
+            manifest_entry = self.entries.filter(location=MANIFEST_LOCATION).first()
+
+            # update modified timestamp
+            # FIXME: This adds unnecessary modified timestamps (every time this function is called)
+            #   necessary to check if there were changes, or limit the call of this function
+            now = datetime.datetime.utcnow().replace(tzinfo=utc)
+            manifest_entry.modified.add(Date.objects.create(date=now))
+
+        except ObjectDoesNotExist:
+            # no manifest in the archive, creating new entry
+            manifest_entry = ArchiveEntry.objects.create(archive=self,
+                                                         source=EntrySource.zip,
+                                                         master=False,
+                                                         location=MANIFEST_LOCATION,
+                                                         format=MANIFEST_FORMAT)
+            manifest_entry.set_new_metadata(description="Manifest file describing COMBINE archive content", save=False)
+
+
+        # create latest manifest.xml
         # TODO: implement
-        pass
+        suffix = location.split('/')[-1]
+        tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
+        tmp.write(z.read(zip_name))
+        tmp.seek(0)  # rewind file for reading !
+
+        # add/update file to manifest entry
+        name = MANIFEST_LOCATION.replace("./", "")
+        with open(tmp.name, 'rb') as f:
+            manifest_entry.file.save(name, File(f))
+        tmp.close()
+
+        manifest_entry.save()
+
 
     def update_metadata_entry(self):
         """ Updates the metadata files in the archive.
@@ -406,9 +447,24 @@ class ArchiveEntry(ChangesMixin, models.Model):
     def path(self):
         return str(self.file.path)
 
+    def set_new_metadata(self, description=None, save=True):
+        """ Sets new minimal metadata on entry.
 
-
-
-
-
-
+        Used for all entries which do not have metadata associated.
+        """
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        meta_dict = {
+            'about': None,
+            'description': description,
+            'created': now,
+            'modified': (now,),
+            'creators': [],
+            'triples': [],
+        }
+        metadata_dict = {
+            "metadata": meta_dict,
+        }
+        metadata = MetaData.objects.create(**metadata_dict)
+        self.metadata = metadata
+        if save:
+            self.save()
