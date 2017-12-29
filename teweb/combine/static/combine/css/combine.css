@@ -295,8 +295,6 @@ dl.inline-flex dd {
   overflow: hidden;
 }
 
-
-
 .entry_buttons{
     float:right;
     display:block;
@@ -312,7 +310,6 @@ dl.inline-flex dd {
     clear:left;
 }
 
-
 .textArea {
     width:100%;
     min-height: 150px;
@@ -327,5 +324,11 @@ dl.inline-flex dd {
   margin: 20px;
   flex-grow: 1;
 
+}
+
+.btn-compact{
+    height: 25px;
+    text-align: center;
+    padding-top:3px;
 }
 

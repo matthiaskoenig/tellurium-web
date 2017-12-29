@@ -2,7 +2,6 @@
 function create_entry_title(data){
     "use strict";
     var title_entry = document.createElement("h3");
-    var format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
     var title_text = document.createTextNode(get_title(data.location));
     title_entry.appendChild(title_text);
 
@@ -119,9 +118,9 @@ function addContact(creators,creator,edit){
 
 
         var deleteButton = document.createElement("input");
-        deleteButton.setAttribute("class" , "btn btn-default btn-space");
+        deleteButton.setAttribute("class" , "btn btn-danger btn-compact");
         deleteButton.setAttribute("value","delete");
-        deleteButton.setAttribute("id","delete");
+        deleteButton.setAttribute("id","Belete");
         deleteButton.setAttribute("type","button");
 
 
@@ -158,7 +157,7 @@ function create_buttons_div(edit){
     "use strict";
     var buttons_div = document.createElement("div");
     if ( edit ){
-         buttons_div.innerHTML += '<span class="btn btn-default entry_buttons " id="saveButton"><i class="far fa-save"></i> Save </span>';
+         buttons_div.innerHTML += '<span class="btn btn-success entry_buttons " id="saveButton"><i class="far fa-save"></i> Save </span>';
          buttons_div.innerHTML += '<span class="btn btn-default entry_buttons " id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';
     }
     else {
@@ -342,12 +341,6 @@ function create_meta(metadata, edit){
     meta_div.appendChild(dl_created);
     meta_div.appendChild(dl_modified);
 
-
-    for (var triple in metadata.triples){
-         if(metadata.triples.hasOwnProperty(triple)){
-             var triple_div = addTriple(metadata.triples,triple,edit);
-        meta_div.appendChild(triple_div);
-    }}
 
     return meta_div;
 
