@@ -278,12 +278,11 @@ def download_archive(request, archive_id):
 
     # write all entries
     for location, entry in content.items():
-        print(location)
-        fpath = entry.path
+        file_path = entry.path
 
         # fix paths for writing in zip file
         zip_path = location.replace("./", "")
-
+        
         # Add file, at correct path, with last_modified time
         modified_date = entry.metadata.last_modified
         if modified_date:
@@ -292,9 +291,13 @@ def download_archive(request, archive_id):
             # get current date time with server timezone
             date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
 
-        zip_info = zipfile.ZipInfo(zip_path, date_time=date_time.timetuple())
-        with open(fpath, "rb") as f:
+        zip_info = zipfile.ZipInfo(filename=zip_path)
+        zip_info.date_time = date_time.timetuple()  # set modification date
+        zip_info.external_attr = 0o777 << 16  # give full access to included file
+
+        with open(file_path, "rb") as f:
             zf.writestr(zip_info, f.read())
+
         # zf.write(fpath, zip_path)
 
     # Must close zip for all contents to be written
