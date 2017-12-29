@@ -35,6 +35,8 @@ MANIFEST_LOCATION = "./manifest.xml"
 MANIFEST_FORMAT = "http://identifiers.org/combine.specifications/omex-manifest"
 METADATA_LOCATION = "./metadata.rdf"
 METADATA_FORMAT = "http://identifiers.org/combine.specifications/omex-metadata"
+METADATA_LOCATION_TURTLE = "./metadata.ttl"
+METADATA_FORMAT_TURTLE = "http://purl.org/NET/mediatypes/text/turtle"
 
 
 # ===============================================================================
@@ -367,13 +369,12 @@ class Archive(models.Model):
 
         :return: None
         """
-        try:
-            manifest_entry = self.entries.filter(location=MANIFEST_LOCATION).first()
+        manifest_entry = self.entries.filter(location=MANIFEST_LOCATION).first()
+        if manifest_entry:
             # update modified timestamp
             manifest_entry.add_modified()
-
-        except ObjectDoesNotExist:
-            # no manifest in the archive, creating new entry
+        else:
+            # create new entry
             manifest_entry = ArchiveEntry.objects.create(archive=self,
                                                          source=EntrySource.zip,
                                                          master=False,
@@ -402,13 +403,15 @@ class Archive(models.Model):
 
         Must be called after changes to the metadata.
         """
-        try:
-            metadata_entry = self.entries.filter(location=METADATA_LOCATION).first()
+        # ------------------
+        # XML serialization
+        # ------------------
+        metadata_entry = self.entries.filter(location=METADATA_LOCATION).first()
+        if metadata_entry:
             # update modified timestamp
             metadata_entry.add_modified()
-
-        except ObjectDoesNotExist:
-            # no metadata in the archive, creating new entry
+        else:
+            # create new entry
             metadata_entry = ArchiveEntry.objects.create(archive=self,
                                                          source=EntrySource.zip,
                                                          master=False,
@@ -416,11 +419,9 @@ class Archive(models.Model):
                                                          format=METADATA_FORMAT)
             metadata_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
 
-        # create latest metadata.rdf
-        metadata = rdf.create_metadata(archive=self)
-
-        suffix = MANIFEST_LOCATION.split('/')[-1]
-        tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
+        # create metadata
+        metadata = rdf.create_metadata(archive=self, rdf_format="pretty-xml")
+        tmp = tempfile.NamedTemporaryFile("w")
         tmp.write(metadata)
         tmp.seek(0)  # rewind file for reading !
 
@@ -431,6 +432,37 @@ class Archive(models.Model):
         tmp.close()
 
         metadata_entry.save()
+        self.save()
+
+        # -----------------------
+        # TURTLE serialization
+        # -----------------------
+        turtle_entry = self.entries.filter(location=METADATA_LOCATION_TURTLE).first()
+        if turtle_entry:
+            turtle_entry.add_modified()
+        else:
+            # create new entry
+            turtle_entry = ArchiveEntry.objects.create(archive=self,
+                                                         source=EntrySource.zip,
+                                                         master=False,
+                                                         location=METADATA_LOCATION_TURTLE,
+                                                         format=METADATA_FORMAT_TURTLE)
+            turtle_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
+
+        # create metadata
+        metadata = rdf.create_metadata(archive=self, rdf_format="turtle")
+
+        tmp = tempfile.NamedTemporaryFile("w")
+        tmp.write(metadata)
+        tmp.seek(0)  # rewind file for reading !
+
+        # add/update file to manifest entry
+        name = METADATA_LOCATION_TURTLE.replace("./", "")
+        with open(tmp.name, 'rb') as f:
+            turtle_entry.file.save(name, File(f))
+        tmp.close()
+
+        turtle_entry.save()
         self.save()
 
 

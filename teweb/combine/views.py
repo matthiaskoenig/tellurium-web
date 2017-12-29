@@ -115,7 +115,6 @@ def archive_view(request, archive_id):
         if bool(archive_entry.metadata.changes()):
             # Checks if description changed
             modified_metadata = True
-            # FIXME: update triples
 
         print(archive_entry.metadata.changes())
 
@@ -129,7 +128,6 @@ def archive_view(request, archive_id):
                     creator = Creator.objects.get(id=creator["delete"])
                     creator.delete()
                     modified_metadata = True
-                    # FIXME: update triples
 
                 elif creator["delete"] == "":
                     # tries to delete a creator, which was not even created
@@ -143,7 +141,6 @@ def archive_view(request, archive_id):
                         creator = serializer_creator.create(validated_data=serializer_creator.validated_data)
                         archive_entry.metadata.creators.add(creator)
                         modified_metadata = True
-                        # FIXME: update triples
                     else:
                         response = {"errors": serializer_creator.errors, "is_error": True}
                         return JsonResponse(response)
@@ -158,7 +155,6 @@ def archive_view(request, archive_id):
                             # checks what changed on creator
                             print(creator.changes())
                             modified_metadata = True
-                            # FIXME: update triples
                         creator.save()
                     else:
                         response = {"errors": serializer_creator.errors, "is_error": True}

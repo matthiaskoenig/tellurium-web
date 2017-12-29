@@ -158,7 +158,7 @@ def parse_rdf(debug=False, **kwargs):
 ##############################################################
 # WRITE METADATA
 ##############################################################
-def create_metadata(archive, debug=True):
+def create_metadata(archive, rdf_format, debug=True):
     """ Creates the metadata for the current archive.
 
     This takes all the metadata from all archive entries and serializes
@@ -193,20 +193,12 @@ def create_metadata(archive, debug=True):
         for (s, p, o) in g_meta:
             g.add((s, p, o))
 
-    info_str = g.serialize(format='turtle').decode("utf-8")
     if debug:
         print("-" * 80)
-        print(info_str)
+        print(g.serialize(format='turtle').decode("utf-8"))
         print("-" * 80)
 
-    # info = g.serialize(format='turtle').decode("utf-8"))
-    info_str = g.serialize(format='pretty-xml').decode("utf-8")
-    if debug:
-        print("-" * 80)
-        print(info_str)
-        print("-" * 80)
-
-    return info_str
+    return g.serialize(format=rdf_format).decode("utf-8")
 
 
 class MetaDataRDFSerializer(object):
