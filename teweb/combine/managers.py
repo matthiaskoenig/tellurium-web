@@ -161,6 +161,9 @@ class ArchiveManager(models.Manager):
                 archive.tags.add(*tags)
                 archive.save()
 
+                # update the manifest
+                archive.update_manifest_entry()
+
             return archive, created_archive
 
         else:
