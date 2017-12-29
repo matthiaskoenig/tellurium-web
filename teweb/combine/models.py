@@ -349,14 +349,6 @@ class Archive(models.Model):
         """
         return read_metadata(self.path)
 
-    def tree_json(self):
-        """ Gets the zip tree as JSON for the archive.
-
-        The entry information is added to the tree.
-        """
-        entries = self.entries.all()
-        return comex.zip_tree_content(self.path, entries)
-
     def update_manifest_entry(self):
         """ Updates the manifest entry of this archive based on the latest information.
         This function must be called if any content of the archive entries change, i.e,

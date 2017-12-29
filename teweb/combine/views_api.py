@@ -25,6 +25,8 @@ from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, Archi
 from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, \
     IsOwnerOrGlobalOrAdminReadOnly
 
+from .utils import tree
+
 
 ###################################
 # REST API
@@ -108,9 +110,8 @@ class ZipTreeView(APIView):
     permission_classes = (IsOwnerOrGlobalOrAdminReadOnly,)
 
     def get(self, request, *args, **kwargs):
-        archive_id = kwargs.get('archive_id')
         archive = self.get_object(request)
-        parsed = archive.tree_json()
+        parsed = tree.json_tree(archive)
         parsed = json.loads(parsed)
         return Response(parsed)
 

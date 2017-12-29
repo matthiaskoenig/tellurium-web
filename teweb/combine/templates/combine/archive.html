@@ -6,26 +6,18 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-xs-9">
+    <div class="col-xs-12">
     {% include "combine/archive_content.html" %}
     </div>
-
+</div>
+<div class="row">
     {% if archive.has_sedml() %}
-    <div class="col-xs-3">
+    <div class="col-xs-12">
         {% include "combine/task_content.html" %}
     </div>
     {% endif %}
 </div>
-
-
-<div class="row">
-    <div class="col-xs-9">
-    {% include "combine/archive_content_table.html" %}
-    </div>
-</div>
-
 {% endblock %}
-
 
 {% block javascript %}
     {%  include "combine/archive_js.html" %}
