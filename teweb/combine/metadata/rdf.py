@@ -311,7 +311,7 @@ def read_metadata(archive_path):
         """
         triples = []
         for (s, p, o) in g.triples((None, None, None)):
-            triples.append((str(s), str(p), str(o)))
+            triples.append((str(s), type(s), str(p), type(p), str(o), type(o)))
 
         return triples
 

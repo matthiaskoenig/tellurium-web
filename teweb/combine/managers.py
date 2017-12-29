@@ -230,8 +230,10 @@ class MetaDataManager(models.Manager):
 
             # add triples
             triples = []
-            for s, p, o in metadata["triples"]:
-                triple = Triple.objects.create(subject=s, predicate=p, object=o)
+            for (s, s_type, p, p_type, o, o_type) in metadata["triples"]:
+                triple = Triple.objects.create(subject=s, subject_type=s_type,
+                                               predicate=p, predicate_type=p_type,
+                                               object=o, object_type=o_type)
                 triples.append(triple)
             entry_meta.triples.add(*triples)
 
