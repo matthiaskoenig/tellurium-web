@@ -107,6 +107,7 @@ def zip_tree_content(path, entries=None):
         'state': {'opened': True, 'selected': True}
     }
 
+    # FIXME: This should not use the uploaded zip file, but run on the current zip file
     with zipfile.ZipFile(path) as zip:
         for zip_info in zip.infolist():
 
