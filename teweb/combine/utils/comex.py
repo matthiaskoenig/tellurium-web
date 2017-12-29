@@ -4,6 +4,7 @@ Helper functions to work with combine archives and zip files.
 Getting information out of the files.
 """
 import os
+import io
 import json
 import zipfile
 import warnings
@@ -148,7 +149,7 @@ def zip_tree_content(path, entries=None):
             if node:
                 node['pk'] = entry.id
                 node['format'] = entry.format
-                node['master'] = entry.master
+                node['master'] =     entry.master
                 node['location'] = entry.location
                 node['type'] = entry.short_format
 
@@ -168,7 +169,7 @@ def zip_tree_content(path, entries=None):
 # COMBINE archive
 ################################################
 
-def create_manifest(archive):
+def create_manifest(archive, debug=True):
     """ Creates the manifest information for the given archive.
 
     <?xml version="1.0" encoding="UTF-8"?>
@@ -184,18 +185,28 @@ def create_manifest(archive):
     from xml.etree.ElementTree import Element, SubElement, Comment
     from xml.dom import minidom
 
-    def prettify(elem):
+    def prettify(element):
         """Return a pretty-printed XML string for the Element.
         """
-        rough_string = ET.tostring(elem, 'utf-8')
-        reparsed = minidom.parseString(rough_string)
+        xml_str = ET.tostring(element, 'utf-8')
+        reparsed = minidom.parseString(xml_str)
         return reparsed.toprettyxml(indent="  ")
 
     n_omexManifest = Element('omexManifest')
-    for entry in archive.entries.all():
+    n_omexManifest.set('xmlns', 'http://identifiers.org/combine.specifications/omex-manifest')
+    for entry in archive.entries.order_by('location'):
         n_content = SubElement(n_omexManifest, 'content')
+        n_content.set('location', entry.location)
+        n_content.set('format', entry.format)
+        if entry.master is True:
+            n_content.set('master', "true")
 
-    return prettify(n_omexManifest)
+    xml_str = prettify(n_omexManifest)
+    if debug:
+        print('-' * 80)
+        print(xml_str)
+        print('-' * 80)
+    return xml_str
 
 
 class EntryParser(object):

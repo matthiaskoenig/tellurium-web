@@ -345,7 +345,7 @@ class Archive(models.Model):
         entries = self.entries.all()
         return comex.zip_tree_content(self.path, entries)
 
-    def update_manifest_entry(self):
+    def update_manifest_entry(self, save=True):
         """ Updates the manifest entry of this archive based on the latest information.
         This function must be called if any content of the archive entries change, i.e,
         - adding entries
@@ -387,6 +387,8 @@ class Archive(models.Model):
         tmp.close()
 
         manifest_entry.save()
+        self.save()
+
 
 
     def update_metadata_entry(self):
