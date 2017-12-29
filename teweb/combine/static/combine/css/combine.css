@@ -300,11 +300,32 @@ dl.inline-flex dd {
 .entry_buttons{
     float:right;
     display:block;
-    margin-right:5px;
+    margin-right:20px;
+    margin-top:20px;
+    margin-bottom:20px;
     clear:left;
 }
+
+.add_contact_button{
+    float:right;
+    display:block;
+    clear:left;
+}
+
 
 .textArea {
     width:100%;
     min-height: 150px;
 }
+
+.flex-container {
+  display: flex;
+
+}
+
+.flex-container>div {
+  margin: 20px;
+  flex-grow: 1;
+
+}
+

@@ -249,12 +249,12 @@ function show_modified(dd_modified, modified){
     if (modified.length > 3){
         var show_modifed_button = document.createElement("button");
         show_modifed_button.setAttribute("class", "btn btn-default");
-        show_modifed_button.innerHTML = '<i class="fas fa-arrow-down"></i> show all dates';
+        show_modifed_button.innerHTML = '<i class="fas fa-arrow-down"></i> All Dates';
         show_modifed_button.onclick = function(){
             dd_modified.innerHTML = modified_content(modified);
             var close_modifed_button = document.createElement("button");
             close_modifed_button.setAttribute("class", "btn btn-default");
-            close_modifed_button.innerHTML = '<i class="fas fa-arrow-up"></i> close all dates';
+            close_modifed_button.innerHTML = '<i class="fas fa-arrow-up"></i> Last dates';
             close_modifed_button.onclick = function(){
                 show_modified(dd_modified, modified);
             };
@@ -271,10 +271,8 @@ function create_meta(metadata, edit){
     var creators_div = document.createElement("div");
     creators_div.setAttribute("id","creators_div");
 
-    var creator_button;
-    if (edit ){creator_button = '<span class="btn btn-default btn-space entry_buttons" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </span>';}
-    else {creator_button = '';}
-    creators_div.innerHTML += '<dl class="inline-flex"> <dt>Creators</dt><dd>'+ creator_button +'</dd></dl>';
+
+    creators_div.innerHTML += '<dl class="inline-flex"> <dt>Creators</dt><dd></dd></dl>';
 
     var dl_desc = document.createElement("dl");
     dl_desc.setAttribute("class", "inline-flex");

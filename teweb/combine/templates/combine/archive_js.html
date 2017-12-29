@@ -115,11 +115,14 @@
         var manifest_detail_div = document.getElementById("manifest_detail");
         var button_div = document.getElementById("button-div");
         var entry_detail_div = document.getElementById("item_detail");
+        var button_div_meta = document.getElementById("button-meta-div");
+
 
         // empty content
         manifest_detail_div.innerHTML = "";
         button_div.innerHTML = "";
         entry_detail_div.innerHTML = "";
+        button_div_meta.innerHTML = "";
 
         $.ajax({
             url: endpoint,
@@ -132,7 +135,11 @@
                 manifest_detail_div.appendChild(create_manfifest_detail(entry_pk, data, edit));
 
                 if(metadata !== 'undefined'){
+                    if (edit){
+                        button_div_meta.innerHTML = '<button class="btn btn-default entry_buttons" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </button>';
+                    }
                     entry_detail_div.append(create_meta(metadata, edit));
+
                 }
             },
             error: function (error_data) {
