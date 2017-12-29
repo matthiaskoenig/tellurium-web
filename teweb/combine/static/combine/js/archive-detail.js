@@ -118,9 +118,9 @@ function addContact(creators,creator,edit){
 
 
         var deleteButton = document.createElement("input");
-        deleteButton.setAttribute("class" , "btn btn-danger btn-compact");
-        deleteButton.setAttribute("value","delete");
-        deleteButton.setAttribute("id","Belete");
+        deleteButton.setAttribute("class" , "btn btn-xs btn-danger");
+        deleteButton.setAttribute("value","Delete");
+        deleteButton.setAttribute("id","delete");
         deleteButton.setAttribute("type","button");
 
 
@@ -156,6 +156,7 @@ function create_buttons_div(edit){
     /** Button HTML */
     "use strict";
     var buttons_div = document.createElement("div");
+
     if ( edit ){
          buttons_div.innerHTML += '<span class="btn btn-success entry_buttons " id="saveButton"><i class="far fa-save"></i> Save </span>';
          buttons_div.innerHTML += '<span class="btn btn-default entry_buttons " id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';

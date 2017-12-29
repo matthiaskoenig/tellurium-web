@@ -87,7 +87,7 @@ class Creator(ChangesMixin, models.Model):
         # id_dict = {"class":"Id","value":"delete","id":"delete","type":"button"}
         id_input = input_template(name="creators[][id]", value="new", type="hidden")
 
-        delete_dict = {"class": "btn btn-default btn-space", "value": "delete", "id": "delete", "type": "button"}
+        delete_dict = {"class": "btn btn-xs btn-danger", "value": "Delete", "id": "delete", "type": "button"}
         delete_input = input_template(name="creators[][delete]", value="false", type="hidden")
         delete_button = input_template(**delete_dict)
 

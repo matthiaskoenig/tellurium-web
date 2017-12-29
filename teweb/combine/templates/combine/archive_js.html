@@ -105,9 +105,11 @@
 
 </script>
 
+
 <script>
     function display_entry_detail(entry_pk, edit){
         /** Main function for displaying archive entry detail after selection. */
+
 
         var endpoint_path = "/api/archive-entries/" + entry_pk+"/";
         var endpoint = window.location.origin + endpoint_path;
@@ -120,6 +122,8 @@
 
 
 
+
+
         // empty content
         manifest_detail_div.innerHTML = "";
         button_div.innerHTML = "";
@@ -128,10 +132,32 @@
         div_tripples.innerHTML = "";
 
 
+
+
         $.ajax({
             url: endpoint,
             type:'Get',
             success: function (data) {
+
+                if ('{{request.user.is_superuser}}'=='True' && data.file){
+                    var archive_entry_button = document.createElement("input");
+                    archive_entry_button.setAttribute("type","button");
+                    archive_entry_button.setAttribute("value","Archive Entry");
+                    archive_entry_button.setAttribute("class","btn btn-default entry_buttons");
+                    archive_entry_button.addEventListener("click",function () {window.open('/entry/'+entry_pk);}, false);
+                    button_div.appendChild(archive_entry_button);
+
+
+                    var archive_entry_api_button = document.createElement("input");
+                    archive_entry_api_button.setAttribute("type","button");
+                    archive_entry_api_button.setAttribute("value","Archive Entry API");
+                    archive_entry_api_button.setAttribute("class","btn btn-default entry_buttons");
+                    archive_entry_api_button.addEventListener("click",function () {window.open('/api/archive-entries/'+entry_pk);}, false);
+                    button_div.appendChild(archive_entry_api_button);
+
+                }
+
+
                 var metadata = data.metadata;
 
                 button_div.appendChild(create_buttons_div(edit));
@@ -140,7 +166,7 @@
 
                 if(metadata !== 'undefined'){
                     if (edit){
-                        button_div_meta.innerHTML = '<button class="btn btn-default entry_buttons" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </button>';
+                        button_div_meta.innerHTML = '<button class="btn btn-default entry_buttons" type="button" id="addCreator"><i class="fa fa-fw fa-users"></i> Add Creator </button>';
                     }
                     entry_detail_div.append(create_meta(metadata, edit));
                     for (var triple in metadata.triples){

@@ -332,3 +332,6 @@ dl.inline-flex dd {
     padding-top:3px;
 }
 
+div:empty {
+   display: none;
+}
