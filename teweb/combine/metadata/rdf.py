@@ -158,7 +158,7 @@ def parse_rdf(debug=False, **kwargs):
 ##############################################################
 # WRITE METADATA
 ##############################################################
-def create_metadata(archive, debug=True):
+def create_metadata(archive, debug=False):
     """ Creates the metadata for the current archive.
 
     This takes all the metadata from all archive entries and serializes
@@ -167,16 +167,34 @@ def create_metadata(archive, debug=True):
     g = Graph()
     bind_default_namespaces(g)
 
+    def get_element(info_str, type_str):
+        if type_str == "<class 'rdflib.term.URIRef'>":
+            return URIRef(info_str)
+        elif type_str == "<class 'rdflib.term.BNode'>":
+            return BNode(info_str)
+        elif type_str == "<class 'rdflib.term.Literal'>":
+            return Literal(info_str)
+        else:
+            raise ValueError
+
     for entry in archive.entries.order_by('location'):
         metadata = entry.metadata
-        # TODO: implement
 
-
-        # All annotation triples
-
+        # Write all triples
+        for triple in metadata.triples.all():
+            s = get_element(triple.subject, triple.subject_type)
+            p = get_element(triple.predicate, triple.predicate_type)
+            o = get_element(triple.object, triple.object_type)
+            g.add((s, p, o))
 
     # info = g.serialize(format='turtle').decode("utf-8"))
-    info_str = g.serialize(format='xml').decode("utf-8")
+    info_str = g.serialize(format='pretty-xml').decode("utf-8")
+    if debug:
+        print("-" * 80)
+        print(info_str)
+        print("-" * 80)
+
+    info_str = g.serialize(format='turtle').decode("utf-8")
     if debug:
         print("-" * 80)
         print(info_str)
@@ -311,7 +329,9 @@ def read_metadata(archive_path):
         """
         triples = []
         for (s, p, o) in g.triples((None, None, None)):
-            triples.append((str(s), type(s), str(p), type(p), str(o), type(o)))
+            triple_info = [str(el) for el in (s, type(s), p, type(p), o, type(o)) ]
+            print(triple_info)
+            triples.append(triple_info)
 
         return triples
 
