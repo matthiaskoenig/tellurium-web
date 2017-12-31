@@ -148,7 +148,7 @@ STATIC_ROOT = BASE_DIR + "/static/"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# CELERY STUFF
+# Task queue and results backend
 BROKER_URL = 'redis://localhost:6379'
 # CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'django-db'
@@ -157,6 +157,19 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+# Channels settings
+CHANNEL_LAYERS = {
+   "default": {
+       "BACKEND": "asgi_redis.RedisChannelLayer",  # use redis backend
+       # "BACKEND": "asgiref.inmemory.ChannelLayer",
+       "CONFIG": {
+           "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],  # set redis address
+       },
+       "ROUTING": "teweb.routing.channel_routing",  # load routing from our routing.py file
+   },
+}
+
 
 LOGIN_URL = 'rest_framework:login'
 LOGOUT_URL = 'rest_framework:logout'

@@ -11,6 +11,9 @@ djangorestframework>=3.7.3
 django-rest-swagger>=2.1.2
 django-model-changes-py3>=0.14.1
 
+channels
+asgi_redis
+
 coreapi>=2.3.3
 markdown>=2.6.9
 jinja2>=2.10
