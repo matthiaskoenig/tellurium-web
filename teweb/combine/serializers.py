@@ -87,7 +87,7 @@ class MetaDataSerializer(serializers.HyperlinkedModelSerializer):
         model = MetaData
         fields = ['description', 'creators', 'triples', 'created', 'modified']
 
-    def get(self,validated_data):
+    def get(self, validated_data):
         return MetaData.objects.get(**validated_data)
 
     def update(self, instance, validated_data):
