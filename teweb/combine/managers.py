@@ -172,7 +172,7 @@ class ArchiveManager(models.Manager):
                 # Tags from given entry
                     # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
                     tags_info = create_tags_for_entry(archive_entry)
-                    pprint(tags_info)
+                    # pprint(tags_info)
                     for tag_info in tags_info:
                         tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
                         tags.append(tag)
