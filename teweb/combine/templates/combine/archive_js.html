@@ -46,6 +46,8 @@
        var data = JSON.parse(message.data);
        // if action is started, add new item to table
        if (data.action == "started") {
+
+
            var task_status = $("#task_status");
            var ele = $('<tr></tr>');
            ele.attr("id", data.job_id);
@@ -59,23 +61,38 @@
            item_status.append(span);
            ele.append(item_status);
            task_status.append(ele);
+           var content = "Job started: " + data.action + " " + data.task_id + " " + data.task_status
+           $("#task-status").append(content);
        }
        // if action is completed, just update the status
        else if (data.action == "completed"){
            var item = $('#item-status-' + data.job_id + ' span');
            item.attr("class", "label label-success");
            item.text(data.job_status);
+
+           // update icon
+           var content = '<i class="fas fa-fw fa-check fa-5x"></i> Finished';
+           $("#task-status").html(content);
        }
    };
-   $("#taskform").on("submit", function(event) {
+
+   // archive action
+   $(".archive-action").on("click", function(event) {
        var message = {
-           action: "start_sec3",
-           job_name: $('#task_name').val()
+           action: "run_archive",
+           archive_id: {{ archive.id }}
        };
        socket.send(JSON.stringify(message));
        $("#task_name").val('').focus();
+
+       // update icon
+       var content = '<i class="fas fa-fw fa-cog fa-5x fa-spin"></i> Executing Task';
+       $("#task-status").html(content);
+
        return false;
    });
+
+
 });
 
 </script>

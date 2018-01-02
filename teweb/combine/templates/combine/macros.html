@@ -67,31 +67,36 @@ Definition of reusable macro function in templates
 
 
 {%  macro archive_action(archive) %}
+    <span class="archive-action">
 {% if archive.task_id %}
+
     {% with task = archive.task %}
-        <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
+        <!--<a href="{{ url('combine:run_archive', args=[archive.id]) }}">-->
             {% if task %}
                 {% if task.status == 'SUCCESS' %}
-                    <span class="btn btn-default btn-xs">
+                    <span id="action_{{ archive.id }}" class="btn-xs btn-default">
                     <i class="fas fa-forward fa-fw" title="RERUN"></i> RERUN
                 {% elif task.status == 'FAILURE' %}
-                    <span class="btn btn-danger btn-xs">
-                    <i class="fas fa-refresh fa-fw" title="RETRY"></i> RETRY
+                    <span id="action_{{ archive.id }}" class="btn-xs btn-danger">
+                    <i id="action_{{ archive.id }}" class="fas fa-sync-alt fa-fw" title="RETRY"></i> RETRY
                 {% else %}
-                    <span class="btn btn-info btn-xs">
+                    <span id="action_{{ archive.id }}" class="btn-xs btn-info">
                     <i class="fas fa-cog fa-spin fa-fw" title="EXECUTING"></i> EXECUTING
                 {% endif %}
             {% endif %}
             </span>
-        </a>
+        <!--</a>-->
     {% endwith %}
 {% else %}
     {% if archive.has_sedml() %}
-    <a href="{{ url('combine:run_archive', args=[archive.id]) }}">
-    <span class="btn btn-success btn-xs">
+    <!--<a href="{{ url('combine:run_archive', args=[archive.id]) }}">-->
+    <span id="action_{{ archive.id }}" class="btn-xs btn-success btn-xs">
     <i class="fas fa-play-circle fa-fw" title="RUN"></i> RUN</span></a>
+    <!--</a>-->
     {% endif %}
+
 {% endif %}
+    </span>
 {% endmacro %}
 
 <!-- User -->

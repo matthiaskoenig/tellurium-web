@@ -46,30 +46,8 @@
         <!-- run archive action -->
         {{ macros.archive_action(archive) }}
 
-        <div id="task_runner_div" style="margin-top:50px;">
-            <h2>Task Runner</h2>
-            <form id="taskform">
-                <input id="task_name" type="text" placeholder="Task Name">
-                <button type="submit" id="go" class="btn btn-info">Run 3 sec task</button>
-            </form>
-        </div>
+        <div id="task-status"></div>
 
-        <div id="task_status_div" style="margin-top:100px;">
-            <h2>Task Status</h2>
-            <table id="task_status" class="table">
-                <thead>
-                    <tr>
-                        <th>Task ID</th>
-                        <th>Task Name</th>
-                        <th>Task Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-            </table>
-
-</div>
 
 
     </div>
