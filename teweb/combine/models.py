@@ -540,6 +540,11 @@ class ArchiveEntry(ChangesMixin, models.Model):
             self.save()
 
 
+############################
+# Channels
+############################
+# Testing channels
+
 class Job(models.Model):
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=255, null=True, blank=True)

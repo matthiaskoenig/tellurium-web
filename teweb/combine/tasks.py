@@ -25,9 +25,19 @@ import shutil
 import matplotlib
 from tellurium.sedml import tesedml
 
-
 from .models import Archive
 from celery import shared_task, task
+
+import time
+import json
+import logging
+
+from teweb.celery import app
+from .models import Job
+from channels import Channel
+
+
+log = logging.getLogger(__name__)
 
 @task(name="execute omex")
 def execute_omex(archive_id, debug=False):
@@ -75,17 +85,6 @@ def execute_omex(archive_id, debug=False):
     return results
 
 
-import time
-import json
-import logging
-
-from teweb.celery import app
-from .models import Job
-from channels import Channel
-
-
-log = logging.getLogger(__name__)
-
 @app.task
 def sec3(job_id, reply_channel):
     # time sleep represent some long running process
@@ -100,7 +99,7 @@ def sec3(job_id, reply_channel):
     # Send status update back to browser client
     if reply_channel is not None:
         Channel(reply_channel).send({
-            "text": json.dumps ({
+            "text": json.dumps({
                 "action": "completed",
                 "job_id": job.id,
                 "job_name": job.name,
