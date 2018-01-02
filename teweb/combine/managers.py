@@ -61,20 +61,28 @@ class ArchiveManager(models.Manager):
 
         kwargs["created"] = datetime.datetime.now()
         file= kwargs["file"]
-        kwargs["file"] = File(kwargs["file"])
+        #kwargs["file"] = File(kwargs["file"])
+        del kwargs["file"]
         hasher = hashlib.md5()
         buf = file.read(65536)
         while len(buf) > 0:
             hasher.update(buf)
             buf = file.read(65536)
         kwargs["md5"] = hasher.hexdigest()
-        kwargs["name"] =  file.name
-
-        del kwargs["tags"]
-        del kwargs["entries"]
-
-
+        kwargs["name"] =  os.path.basename(file.name)
         archive = super(ArchiveManager, self).create(*args, **kwargs)
+
+        archive.file.save(kwargs["name"],File(file))
+
+        try:
+            if isinstance(kwargs['user'], string_types):
+                archive.user = User.objects.get(username=kwargs["user"])
+            elif isinstance(kwargs['user'], User):
+                archive.user = kwargs["user"]
+        except KeyError:
+            archive.user = User.objects.get(username="global")
+
+        archive.save()
 
         with zipfile.ZipFile(file) as z:
 

@@ -200,7 +200,7 @@ def upload(request):
             with open(file_path, 'wb+') as destination:
                 destination.write(file_obj2.read())
 
-                new_archive, _ = Archive.objects.get_or_create(archive_path=file_path, **create_dic)
+                new_archive = Archive.objects.create(file=file_obj, **create_dic)
             shutil.rmtree(dirpath)
 
             # Everything uploaded, now display the entry

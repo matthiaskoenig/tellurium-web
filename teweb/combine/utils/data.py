@@ -30,7 +30,11 @@ def add_archives_to_database(archive_dirs, debug=False):
         start_time = time.time()
 
         # default user is "global" but can be changed by adding user= < User Object >, user = User.username( string)
+
+        #Archive.objects.create(file=open(path, 'rb'))
+
         _, created = Archive.objects.get_or_create(archive_path=path)
+
         if not created:
             print("Archive already exists, not recreated: {}".format(path))
 
