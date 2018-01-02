@@ -17,6 +17,7 @@ from django.utils.timezone import utc
 from django.core.files import File
 
 from celery.result import AsyncResult
+from django_celery_results.models import TaskResult
 
 
 from . import validators, managers
@@ -348,6 +349,15 @@ class Archive(models.Model):
         :return: dictionary {location: metadata}
         """
         return read_metadata(self.path)
+
+    def reset_task(self):
+        """ Resets the task, and removes corresponding task results. """
+        if self.task_id:
+            task_result = TaskResult.objects.get(task_id=self.task_id)
+            task_result.delete()
+            self.task_id = ''  # set blank
+            self.save()
+
 
     def update_manifest_entry(self):
         """ Updates the manifest entry of this archive based on the latest information.
