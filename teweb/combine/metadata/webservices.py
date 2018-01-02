@@ -80,6 +80,8 @@ def json_term_for_uri(uri):
     return json
 
 
+
+
 if __name__ == "__main__":
     uri = "http://identifiers.org/chebi/CHEBI:4167"
     json_term = json_term_for_uri(uri)

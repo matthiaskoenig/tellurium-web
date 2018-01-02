@@ -3,6 +3,7 @@ Testing the API.
 """
 
 import os
+import datetime
 
 # setup of django
 from ..utils import django_setup
@@ -91,8 +92,9 @@ class ViewAPILoggedInSuperUser(TestCase):
         name = os.path.basename(f)
         md5 = hash_for_file(f, hash_type='MD5')
         django_file = File(open(f, 'rb'))
-        archive_data = {'name': name+"test", 'file': django_file, 'tags': [], 'md5': md5}
+        archive_data = {'name': name+"test", 'file': django_file, 'tags': [], 'md5': md5, 'created': datetime.datetime.now()}
         response = self.client.post(url, archive_data)
+        # print(response.content)
         self.assertEquals(response.status_code, 201)
         response = self.client.get(url)
         self.assertContains(response, name+"test")
@@ -261,7 +263,8 @@ class ViewAPILoggedIn(TestCase):
         name = os.path.basename(f)
         md5 = hash_for_file(f, hash_type='MD5')
         django_file = File(open(f, 'rb'))
-        archive_data = {'name': name+"test", 'file': django_file, 'tags': [], 'md5': md5}
+        archive_data = {'name': name+"test", 'file': django_file, 'tags': [], 'md5': md5,
+                        'created': datetime.datetime.now()}
         response = self.client.post(url, archive_data)
         self.assertEquals(response.status_code, 201)
 

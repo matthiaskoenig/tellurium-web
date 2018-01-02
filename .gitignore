@@ -25,7 +25,7 @@ tests/functional/__pycache__/
 .cache
 
 # deploy settings
-teweb/teweb/deploy_settings.py
+teweb/deploy_settings.py
 
 # latex files
 docs/manuscript/main.aux

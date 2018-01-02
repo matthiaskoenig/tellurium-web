@@ -14,7 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "0.2.0"
+VERSION = "0.2.0a1"
 INTERNAL_IPS = ['127.0.0.1']
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +26,7 @@ SECRET_KEY = 'mi4#6w7)^@$x5=0=t9=8vb7+4*hlf%iqxpt$6o@_k4al0!w&xn'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'systemscience.de', 'www.systemscience.de','testserver']
+ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'systemscience.de', 'www.systemscience.de', 'testserver']
 
 
 # Application definition
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_filters',
     'django_model_changes',
     # 'debug_toolbar',
+    'channels'
 
 ]
 
@@ -148,7 +149,7 @@ STATIC_ROOT = BASE_DIR + "/static/"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# CELERY STUFF
+# Task queue and results backend
 BROKER_URL = 'redis://localhost:6379'
 # CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'django-db'
@@ -157,6 +158,19 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+# Channels settings
+CHANNEL_LAYERS = {
+   "default": {
+       "BACKEND": "asgi_redis.RedisChannelLayer",  # use redis backend
+       # "BACKEND": "asgiref.inmemory.ChannelLayer",
+       "CONFIG": {
+           "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],  # set redis address
+       },
+       "ROUTING": "teweb.routing.channel_routing",  # load routing from our routing.py file
+   },
+}
+
 
 LOGIN_URL = 'rest_framework:login'
 LOGOUT_URL = 'rest_framework:logout'

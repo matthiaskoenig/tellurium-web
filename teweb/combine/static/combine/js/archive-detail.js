@@ -2,14 +2,11 @@
 function create_entry_title(data){
     "use strict";
     var title_entry = document.createElement("h3");
-    var format_list = ['cellml', 'sed-ml', 'sbml', 'numl', 'csv', 'sbgn', 'omex', 'omex-manifest', 'omex-metadata'];
     var title_text = document.createTextNode(get_title(data.location));
     title_entry.appendChild(title_text);
 
-
-    if (typeof base_format(data.format) !== 'undefined' && format_list.indexOf(base_format(data.format))>=0){
-            title_entry.insertBefore(get_format_icon(data),title_entry.childNodes[0]);
-
+    if (typeof base_format(data.format) !== 'undefined'){
+        title_entry.insertBefore(get_format_icon(data.format),title_entry.childNodes[0]);
     }
 
     if (data.master){
@@ -18,7 +15,6 @@ function create_entry_title(data){
 
     return title_entry;
 }
-
 
 
 function get_master_icon(master){
@@ -30,35 +26,22 @@ function get_master_icon(master){
 }
 
 
-
 function get_title(location){
     "use strict";
     var splited_fn = location.split("/");
     return " " + splited_fn[splited_fn.length-1];
 }
 
-function get_format_icon(data){
+function get_format_icon(format){
     "use strict";
-    var src=url_mediatype+base_format(data.format)+".png";
+    var src=url_mediatype + base_format(format)+".png";
     var format_icon = document.createElement("img");
     format_icon.setAttribute("src", src);
     format_icon.setAttribute("height","20");
-    format_icon.setAttribute("title",data.format);
+    format_icon.setAttribute("title",format);
     return format_icon;
-}
 
-function get_format_code(data){
-    "use strict";
-    var format_div = document.createElement("div");
-    var format_code = document.createElement("code");
-    var format_label = document.createElement("label");
-    format_code.setAttribute("title",data.format);
-    format_label.innerHTML = "Format";
-    format_code.innerHTML = base_format(data.format);
-    format_div.appendChild(format_label);
-    format_div.appendChild(format_code);
 
-    return format_div;
 }
 function base_format(format){
     "use strict";
@@ -67,33 +50,9 @@ function base_format(format){
  return short.replace("+xml",'');
 }
 
-function add_master_checkbox(master,edit){
-    "use strict";
-    var checkbox_div = document.createElement("div");
-    var checkbox_label = document.createElement("label");
-    var checkbox = document.createElement("INPUT");
-    checkbox_label.innerHTML = "Master";
-    checkbox.type = "checkbox";
-    checkbox.id = "checkbox1";
-    checkbox.setAttribute("data-toggle", "toggle");
-    checkbox.checked= master;
-    checkbox.disabled = !edit;
-    checkbox_div.appendChild(checkbox_label);
-    checkbox_div.appendChild(checkbox);
-    return checkbox_div;
-}
 
-function add_location(location){
-    "use strict";
-    var dl = document.createElement("dl");
-    var dt = document.createElement("dt");
-    var dd = document.createElement("dd");
-    dt.innerHTML = "Location";
-    dd.innerHTML = location;
-    dl.appendChild(dt);
-    dl.appendChild(dd);
-    return dl;
-}
+
+
 
 function modified_content( modified){
     "use strict";
@@ -159,28 +118,22 @@ function addContact(creators,creator,edit){
 
 
         var deleteButton = document.createElement("input");
-        deleteButton.setAttribute("class" , "btn btn-default btn-space");
-        deleteButton.setAttribute("value","delete");
+        deleteButton.setAttribute("class" , "btn btn-xs btn-danger");
+        deleteButton.setAttribute("value","Delete");
         deleteButton.setAttribute("id","delete");
         deleteButton.setAttribute("type","button");
 
 
         delete_button = deleteButton.outerHTML;
 
-        contact_div.innerHTML =delete_button+id+creators[creator].html_edit+delete_creator;
+        contact_div.innerHTML ="<dl class = 'inline-flex'> <dt>" +delete_button+"</dt>"+creators[creator].html_edit+"</dl>"+id+delete_creator;
 
     }
     else {
-            contact_div.innerHTML = creators[creator].html;
+            contact_div.innerHTML ="<dl class = 'inline-flex'>" + creators[creator].html+ "</dl>";
     }
-
-
     return contact_div;
 }
-
-
-
-
 
 
 function create_delete_contact(creator_id){
@@ -194,74 +147,79 @@ function create_delete_contact(creator_id){
 
 function delete_contact(creator_id, contact_div){
     "use strict";
+    //contact_div.parentNode.innerHTML += "<input value='" + creator_id + "' type='hidden' name='creators[][delete]'/>";
     contact_div.parentNode.appendChild(create_delete_contact(creator_id));
 
 }
 
-function create_edit_button(){
-    "use strict";
-    var myButton = document.createElement("span");
-    var icon = document.createElement("i");
-    myButton.className="btn btn-default btn-space";
-    myButton.setAttribute("id","editButton");
-    icon.className="fa fa-pencil fa-fw";
-    icon.title="create new rdf entry";
-    myButton.appendChild(icon);
-    myButton.append("edit");
-    return myButton;
-}
-
-function create_add_annotation_button(){
-    "use strict";
-    var creatorButton = document.createElement("input");
-    creatorButton.setAttribute("class","btn btn-default");
-    creatorButton.setAttribute("id","addAnnotation");
-    creatorButton.setAttribute("type","button");
-    creatorButton.setAttribute("value","add Annotation");
-    return creatorButton;
-}
-function create_add_creator_button(){
-    "use strict";
-    var creatorButton = document.createElement("input");
-    creatorButton.setAttribute("class","btn btn-default");
-    creatorButton.setAttribute("id","addCreator");
-    creatorButton.setAttribute("type","button");
-    creatorButton.setAttribute("value","add Creator");
-    return creatorButton;
-}
-
-function create_save_button(){
-    "use strict";
-    var saveButton = document.createElement("input");
-    saveButton.setAttribute("class","btn btn-default");
-    saveButton.setAttribute("id","saveButton");
-    saveButton.setAttribute("type","submit");
-    saveButton.setAttribute("value","save");
-    saveButton.setAttribute("name","save_entry_details");
-
-    return saveButton;
-}
-
-
 function create_buttons_div(edit){
+    /** Button HTML */
     "use strict";
     var buttons_div = document.createElement("div");
-    buttons_div.appendChild(create_edit_button());
+
     if ( edit ){
-        buttons_div.appendChild(create_add_creator_button());
-        buttons_div.appendChild(create_add_annotation_button());
-        buttons_div.appendChild(create_save_button());
+         buttons_div.innerHTML += '<span class="btn btn-success entry_buttons " id="saveButton"><i class="far fa-save"></i> Save </span>';
+         buttons_div.innerHTML += '<span class="btn btn-default entry_buttons " id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';
     }
+    else {
+        buttons_div.innerHTML += '<span class="btn btn-default  entry_buttons" id="editButton"> <i class="fas fa-edit fa-fw"></i> edit </span>';
+    }
+
     return buttons_div;
 }
 
 
+function add_master_checkbox(master,edit){
+    "use strict";
+    var checkbox_div = document.createElement("div");
+    var dl = document.createElement("dl");
+    dl.setAttribute("class","inline-flex");
+    var dt = document.createElement("dt");
+    dt.innerHTML = "Master ";
+    var dd = document.createElement("dd");
+    checkbox_div.appendChild(dl);
+    dl.appendChild(dt);
+
+    dl.appendChild(dd);
+
+    var checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = "checkbox1";
+    //checkbox.setAttribute("data-toggle", "toggle");
+    checkbox.defaultChecked = master;
+    checkbox.checked = master;
+    checkbox.disabled = !edit;
+    dd.appendChild(checkbox);
+    return checkbox_div;
+}
+
+function add_location(location){
+    "use strict";
+    var dl = document.createElement("dl");
+    dl.setAttribute("class","inline-flex");
+    var dt = document.createElement("dt");
+    var dd = document.createElement("dd");
+    dt.innerHTML = "Location";
+    dd.innerHTML = location;
+    dl.appendChild(dt);
+    dl.appendChild(dd);
+    return dl;
+}
+
 function create_manfifest_detail(entry_pk,data,edit){
     "use strict";
     var detailManifest = document.createElement("div");
-    detailManifest.appendChild(get_format_code(data));
+    detailManifest.innerHTML += "<div><dl class = inline-flex><dt> Format </dt><dd><code title='"+data.format +"'>" + base_format(data.format) +" </code></dd></dl> </div>"
     detailManifest.appendChild(add_master_checkbox(data.master,edit));
-    detailManifest.appendChild(add_location(data.location));
+    if (data.file !== null && typeof data.file !== 'undefined'){
+        detailManifest.innerHTML += "<div><dl class = inline-flex><dt> Location </dt> <dd><a  target='_blank' href='"+data.file+"'>"+ data.location + "</a> </dd></div>";
+    }
+    else{
+         detailManifest.innerHTML += "<div><dl class = inline-flex><dt> Location </dt><dd>"+ data.location + "</dd></div>";
+    }
+
+    //detailManifest.appendChild(add_location(data.location));
+
     detailManifest.appendChild(hidden_input_entry_pk(entry_pk));
     return detailManifest;
 }
@@ -285,34 +243,71 @@ function create_master_input(){
     return master_output;
 }
 
+function show_modified(dd_modified, modified){
+    "use strict";
+    dd_modified.innerHTML = modified_content(modified.slice(0, 3));
+    if (modified.length > 3){
+        var show_modifed_button = document.createElement("button");
+        show_modifed_button.setAttribute("class", "btn btn-default");
+        show_modifed_button.innerHTML = '<i class="fas fa-arrow-down"></i> All Dates';
+        show_modifed_button.onclick = function(){
+            dd_modified.innerHTML = modified_content(modified);
+            var close_modifed_button = document.createElement("button");
+            close_modifed_button.setAttribute("class", "btn btn-default");
+            close_modifed_button.innerHTML = '<i class="fas fa-arrow-up"></i> Last dates';
+            close_modifed_button.onclick = function(){
+                show_modified(dd_modified, modified);
+            };
+            dd_modified.appendChild(close_modifed_button);
+        };
+        dd_modified.appendChild(show_modifed_button);
+    }
+}
+
 
 function create_meta(metadata, edit){
     "use strict";
     var meta_div = document.createElement("div");
+    var creators_div = document.createElement("div");
+    creators_div.setAttribute("id","creators_div");
+
+
+    creators_div.innerHTML += '<dl class="inline-flex"> <dt>Creators</dt><dd></dd></dl>';
+
     var dl_desc = document.createElement("dl");
+    dl_desc.setAttribute("class", "inline-flex");
+
     var dt_desc = document.createElement("dt");
     var dd_desc = document.createElement("dd");
 
     var dl_created = document.createElement("dl");
+    dl_created.setAttribute("class", "inline-flex");
+
     var dt_created = document.createElement("dt");
     var dd_created = document.createElement("dd");
 
     var dl_modified = document.createElement("dl");
+    dl_modified.setAttribute("class", "inline-flex");
+
     var dt_modified = document.createElement("dt");
     var dd_modified = document.createElement("dd");
+    show_modified(dd_modified,metadata.modified);
+
+
+
 
     dt_desc.appendChild(document.createTextNode("Description"));
     dt_created.appendChild(document.createTextNode("Created"));
     dt_modified.appendChild(document.createTextNode("Modified"));
 
     dd_created.appendChild(document.createTextNode(metadata.created));
-    dd_modified.innerHTML = modified_content(metadata.modified);
+
+
 
     if (edit===true) {
 
         var textArea = document.createElement("textarea");
-        textArea.cols = "50";
-        textArea.rows = "5";
+        textArea.setAttribute("class", "textArea");
         textArea.setAttribute("name", "description");
         textArea.append(metadata.description);
         dd_desc.appendChild(textArea);
@@ -324,6 +319,9 @@ function create_meta(metadata, edit){
     dl_desc.appendChild(dt_desc);
     dl_desc.appendChild(dd_desc);
 
+
+
+
     dl_created.appendChild(dt_created);
     dl_created.appendChild(dd_created);
 
@@ -331,20 +329,19 @@ function create_meta(metadata, edit){
     dl_modified.appendChild(dd_modified);
 
     meta_div.appendChild(dl_desc);
+
+     for (var creator in metadata.creators){
+         if(metadata.creators.hasOwnProperty(creator)){
+        var contact_div = addContact(metadata.creators,creator,edit);
+        creators_div.appendChild(contact_div);
+    }}
+
+    meta_div.appendChild(creators_div);
+    meta_div.innerHTML += "<br>";
+
     meta_div.appendChild(dl_created);
     meta_div.appendChild(dl_modified);
 
-    for (var creator in metadata.creators){
-         if(metadata.creators.hasOwnProperty(creator)){
-        var contact_div = addContact(metadata.creators,creator,edit);
-        meta_div.appendChild(contact_div);
-    }}
-
-    for (var triple in metadata.triples){
-         if(metadata.triples.hasOwnProperty(triple)){
-             var triple_div = addTriple(metadata.triples,triple,edit);
-        meta_div.appendChild(triple_div);
-    }}
 
     return meta_div;
 
@@ -358,21 +355,3 @@ function addTriple(triples,triple,edit){
     return triple_div;
 }
 
-function addTriple_old(triples,triple,edit){
- "use strict";
-    var triple_div , subject,predicate,object, id, delete_button;
-    triple_div = document.createElement("div");
-    triple_div.setAttribute("id", triple);
-
-
-        subject = triples[triple].subject;
-        predicate = triples[triple].predicate;
-        object = triples[triple].object;
-        id = "";
-        delete_button= "";
-
-
-    triple_div.innerHTML =delete_button+' '+subject+' '+predicate+' <a href="'+object+'" target="_blank">'+object+"</a><br />"+id;
-
-    return triple_div;
-}

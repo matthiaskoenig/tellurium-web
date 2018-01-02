@@ -30,11 +30,12 @@ from combine.fixtures.users import user_defs
 # directories with OMEX archives
 ARCHIVE_DIRS = [
     os.path.join(FILE_DIR, "../archives"),
+    # os.path.join(FILE_DIR, "../archives/showcase"),
     # os.path.join(FILE_DIR, "../archives/annotation"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/biomodels"),
     # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/jws"),
-    # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/specification/"),
+    # os.path.join(FILE_DIR, "../../sedml-test-suite/archives/sedml-L1V3/"),
     # os.path.join(FILE_DIR, "../../sed-ml/specification/level-1-version-3/examples/__omex__"),
 ]
 

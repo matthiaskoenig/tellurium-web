@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2006/vcard/ns#">
+	<rdf:Description rdf:about=".">
+		<dcterms:description>Test description.</dcterms:description>
+		<dcterms:creator rdf:parseType="Resource">
+            <vCard:n rdf:parseType="Resource">
+                <vCard:family-name>König</vCard:family-name>
+                <vCard:given-name>Matthias</vCard:given-name>
+            </vCard:n>
+            <vCard:email>konigmatt@googlemail.de</vCard:email>
+            <vCard:org rdf:parseType="Resource">
+                <vCard:organization-name>Humboldt University Berlin</vCard:organization-name>
+            </vCard:org>
+		</dcterms:creator>
+		<dcterms:created rdf:parseType="Resource">
+			<dcterms:W3CDTF>2015-05-27T16:09:10Z</dcterms:W3CDTF>
+		</dcterms:created>
+		<dcterms:modified rdf:parseType="Resource">
+			<dcterms:W3CDTF>2015-05-27T16:09:10Z</dcterms:W3CDTF>
+		</dcterms:modified>
+		<dcterms:modified rdf:parseType="Resource">
+			<dcterms:W3CDTF>2015-05-27T16:09:28Z</dcterms:W3CDTF>
+		</dcterms:modified>
+	</rdf:Description>
+</rdf:RDF>

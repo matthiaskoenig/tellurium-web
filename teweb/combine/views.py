@@ -1,7 +1,5 @@
 """
-Tellurium SED-ML Tools Views
-
-Creates the HTML views of the web-interface.
+Views definition.
 """
 import logging
 
@@ -11,6 +9,11 @@ import json
 import os
 import tempfile
 import shutil
+import zipfile
+import io
+
+import datetime
+from django.utils.timezone import utc
 
 from django.utils import timezone
 from django.core.files.base import ContentFile
@@ -20,26 +23,13 @@ from django.http import HttpResponse, FileResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django_celery_results.models import TaskResult
-from django_filters import rest_framework as filters
 from celery.result import AsyncResult
-
-from rest_framework import viewsets, status
-from rest_framework.reverse import reverse
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
-import rest_framework.filters as filters_rest
 
 from .tasks import execute_omex
 from .models import Archive, Tag, ArchiveEntry, Creator, Date
 from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer, DateSerializer, \
     CreatorSerializer, MetaDataSerializer
 from .forms import UploadArchiveForm
-from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, \
-    IsOwnerOrGlobalOrAdminReadOnly
-
 from .utils import comex, git
 
 try:
@@ -53,13 +43,6 @@ logger = logging.getLogger(__name__)
 ######################
 # ABOUT
 ######################
-@login_required
-def test_view(request):
-    """ Test page. """
-    context = {}
-    return render(request, 'combine/test.html', context)
-
-
 def about(request):
     """ About page. """
     context = {
@@ -97,16 +80,19 @@ def archive_view(request, archive_id):
     :param archive_id:
     :return:
     """
-
     archive = get_object_or_404(Archive, pk=archive_id)
     context = archive_context(archive)
 
-    if request.method == 'POST':
+    # Check if a POST via the UI, i.e., changes to the archive, not new upload
+    if request.method == 'POST' and "data" in request.POST:
 
-        modified = False
+        # keep track of modifications
+        modified_metadata = False  # something changed in metadata
+        modified_entry = False     # something changed in entry, i.e., format, master, location
+
         data = request.POST["data"]
         entrydata_dict = json.loads(data)
-        print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
+        # print(json.dumps(entrydata_dict, indent=4, sort_keys=True))
 
         archive_entry = ArchiveEntry.objects.get(id=entrydata_dict["id"])
 
@@ -115,138 +101,80 @@ def archive_view(request, archive_id):
         elif entrydata_dict["master"] == "false":
             entrydata_dict["master"] = False
 
-        # todo: valdidation
+        # TODO: validation
         archive_entry_serializer = ArchiveEntrySerializer()
         archive_entry_serializer.update(instance=archive_entry, validated_data=entrydata_dict)
         if bool(archive_entry.changes()):
-            modified = True
+            modified_entry = True
         archive_entry.save()
 
         data = {"description": entrydata_dict["description"]}
         meta_data_serializer = MetaDataSerializer()
         meta_data_serializer.update(instance=archive_entry.metadata, validated_data=data)
+
         if bool(archive_entry.metadata.changes()):
-            modified = True
+            # Checks if description changed
+            modified_metadata = True
+
+        print(archive_entry.metadata.changes())
+
+
         archive_entry.metadata.save()
+        if "creators" in entrydata_dict:
+            for creator in entrydata_dict["creators"]:
 
-        for creator in entrydata_dict["creators"]:
-            if creator["delete"] not in ["false", ""]:
-                creator = Creator.objects.get(id=creator["delete"])
-                creator.delete()
+                # Delete creator
+                if creator["delete"] not in ["false", ""]:
+                    creator = Creator.objects.get(id=creator["delete"])
+                    creator.delete()
+                    modified_metadata = True
 
-            elif creator["delete"] == "":
-                # tries to delete a cerator, which was not even created
-                pass
+                elif creator["delete"] == "":
+                    # tries to delete a creator, which was not even created
+                    pass
 
-            elif creator["id"] == "new":
-                del creator["id"]
-                serializer_creator = CreatorSerializer(data=creator)
-                if serializer_creator.is_valid():
-                    creator = serializer_creator.create(validated_data=serializer_creator.validated_data)
-                    archive_entry.metadata.creators.add(creator)
-                    modified = True
+                # Create new creator
+                elif creator["id"] == "new":
+                    del creator["id"]
+                    serializer_creator = CreatorSerializer(data=creator)
+                    if serializer_creator.is_valid():
+                        creator = serializer_creator.create(validated_data=serializer_creator.validated_data)
+                        archive_entry.metadata.creators.add(creator)
+                        modified_metadata = True
+                    else:
+                        response = {"errors": serializer_creator.errors, "is_error": True}
+                        return JsonResponse(response)
+                # Update creator
                 else:
-                    response = {"errors": serializer_creator.errors, "is_error": True}
-                    return JsonResponse(response)
-            else:
-                serializer_creator = CreatorSerializer(data=creator)
-                if serializer_creator.is_valid():
-                    creator = Creator.objects.get(id=creator["id"])
-                    serializer_creator.save()
-                    serializer_creator.update(instance=creator, validated_data=serializer_creator.validated_data)
-                    if bool(creator.changes()):
-                        modified = True
-                    creator.save()
-                else:
-                    response = {"errors": serializer_creator.errors, "is_error": True}
-                    return JsonResponse(response)
+                    serializer_creator = CreatorSerializer(data=creator)
+                    if serializer_creator.is_valid():
+                        creator = Creator.objects.get(id=creator["id"])
+                        serializer_creator.save()
+                        serializer_creator.update(instance=creator, validated_data=serializer_creator.validated_data)
+                        if bool(creator.changes()):
+                            # checks what changed on creator
+                            print(creator.changes())
+                            modified_metadata = True
+                        creator.save()
+                    else:
+                        response = {"errors": serializer_creator.errors, "is_error": True}
+                        return JsonResponse(response)
 
-        if modified:
-            date = Date.objects.create(date=timezone.now())
-            archive_entry.metadata.modified.add(date)
+        # add modified timestamp
+        if modified_metadata or modified_entry:
+            archive_entry.add_modified()
+
+        # update manifest if entry information changed
+        if modified_entry:
+            archive.update_manifest_entry()
+
+        # update metadata file if metadata changed
+        if modified_metadata:
+            archive.update_metadata_entry()
 
         return JsonResponse({"is_error": False})
 
     return render(request, 'combine/archive.html', context)
-
-
-def archive_context(archive):
-    """ Context required to render archive_content"""
-    # omex entries
-    entries = archive.omex_entries()
-
-    # task and taskresult
-    task = None
-    task_result = None
-    if archive.task_id:
-        task = AsyncResult(archive.task_id)
-        task_result = TaskResult.objects.filter(task_id=archive.task_id)
-        if task_result and len(task_result) > 0:
-            task_result = task_result[0]
-
-    context = {
-        'Creator': Creator,
-        'archive': archive,
-        'task': task,
-        'task_result': task_result,
-    }
-    return context
-
-
-def download_archive(request, archive_id):
-    """ Download archive.
-
-    :param request:
-    :param archive_id:
-    :return:
-    """
-    archive = get_object_or_404(Archive, pk=archive_id)
-    filename = archive.file.name.split('/')[-1]
-
-    response = HttpResponse(archive.file, content_type='application/zip')
-    response['Content-Disposition'] = 'attachment; filename=%s' % filename
-
-    # no redirecting, but breaks on archives
-    # url = reverse('combine:archive', args=(archive_id,))
-    # response['Refresh'] = "0;url={}".format(url)
-
-    return response
-
-
-@login_required
-def delete_archive(request, archive_id):
-    """ Delete archive.
-
-    :param request:
-    :param archive_id:
-    :return:
-    """
-    archive = get_object_or_404(Archive, pk=archive_id)
-    archive.delete()
-
-    return redirect('combine:index')
-
-
-def archive_entry(request, entry_id):
-    """ Display an Archive Entry.
-
-    :param request:
-    :param archive_id:
-    :param entry_id:
-    :return:
-    """
-    entry = get_object_or_404(ArchiveEntry, pk=entry_id)
-    context = {
-        'entry': entry
-    }
-    return render(request, 'combine/entry.html', context)
-
-
-def upload_view(request, form):
-    context = {
-        'form': form,
-    }
-    return render(request, 'combine/archive_upload.html', context)
 
 
 def upload(request):
@@ -275,7 +203,10 @@ def upload(request):
                 new_archive, _ = Archive.objects.get_or_create(archive_path=file_path, **create_dic)
             shutil.rmtree(dirpath)
 
-            return archive_view(request, new_archive.id)
+            # Everything uploaded, now display the entry
+            return redirect('combine:archive', archive_id=new_archive.id)
+            # return archive_view(request, new_archive.id)
+
         else:
             logging.warning('Form is invalid')
     else:
@@ -284,51 +215,140 @@ def upload(request):
     return upload_view(request, form)
 
 
-def archive_next(request, archive_id):
-    """ Returns single archive view of next archive.
-    Displays the content of the archive.
+def upload_view(request, form):
+    context = {
+        'form': form,
+    }
+    return render(request, 'combine/archive_upload.html', context)
+
+
+def archive_context(archive):
+    """ Context required to render archive_content. """
+
+    task = None
+    task_result = None
+    if archive.task_id:
+        task = AsyncResult(archive.task_id)
+        task_result = TaskResult.objects.filter(task_id=archive.task_id)
+        if task_result and len(task_result) > 0:
+            task_result = task_result[0]
+
+    context = {
+        'Creator': Creator,
+        'archive': archive,
+        'task': task,
+        'task_result': task_result,
+    }
+    return context
+
+
+def download_archive_initial(request, archive_id):
+    """ Download the originally uploaded archive.
 
     :param request:
     :param archive_id:
     :return:
     """
-    return archive_adjacent(request, archive_id, order='pk')
+    archive = get_object_or_404(Archive, pk=archive_id)
+    filename = archive.file.name.split('/')[-1]
+
+    response = HttpResponse(archive.file, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+
+    return response
 
 
-def archive_previous(request, archive_id):
-    """ Returns single archive view of previous archive.
-    Displays the content of the archive.
+def download_archive(request, archive_id):
+    """ Download the latest archive.
+
+    The archive is created dynamically, i.e., everything is packed in a zip archive.
+    Manifest and metadata files are created from database content.
 
     :param request:
     :param archive_id:
     :return:
     """
-    return archive_adjacent(request, archive_id, order='-pk')
+    archive = get_object_or_404(Archive, pk=archive_id)
+    filename = archive.file.name.split('/')[-1]
+
+    # All entries are written including the updated manifest.xml and metadata.rdf
+    content = {}
+    for entry in archive.entries.all():
+        location = entry.location
+        if location in ["."]:
+            continue
+
+        content[location] = entry
+
+    # Open StringIO to grab in-memory ZIP contents
+    s = io.BytesIO()
+
+    # The zip compressor
+    zf = zipfile.ZipFile(s, "w")
+
+    # write all entries
+    for location, entry in content.items():
+        file_path = entry.path
+
+        # fix paths for writing in zip file
+        zip_path = location.replace("./", "")
+        
+        # Add file, at correct path, with last_modified time
+        modified_date = entry.metadata.last_modified
+        if modified_date:
+            date_time = modified_date.date
+        else:
+            # get current date time with server timezone
+            date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
+
+        zip_info = zipfile.ZipInfo(filename=zip_path)
+        zip_info.date_time = date_time.timetuple()  # set modification date
+        zip_info.external_attr = 0o777 << 16  # give full access to included file
+
+        with open(file_path, "rb") as f:
+            zf.writestr(zip_info, f.read())
+
+        # zf.write(fpath, zip_path)
+
+    # Must close zip for all contents to be written
+    zf.close()
+
+    # Grab ZIP file from in-memory, make response with correct content type
+    response = HttpResponse(s.getvalue(), content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+
+    return response
 
 
-def archive_adjacent(request, archive_id, order):
-    """ Returns adjacent archive view.
+@login_required
+def delete_archive(request, archive_id):
+    """ Delete archive.
 
     :param request:
     :param archive_id:
-    :param order: order parameter to decide adjacent
     :return:
     """
-    if order.startswith("-"):
-        adj_archive = Archive.objects.filter(pk__lt=archive_id).order_by(order)[0:1]
-    else:
-        adj_archive = Archive.objects.filter(pk__gt=archive_id).order_by(order)[0:1]
-    if len(adj_archive) == 1:
-        pk = adj_archive[0].pk
-    else:
-        pk = archive_id
+    archive = get_object_or_404(Archive, pk=archive_id)
+    archive.delete()
 
-    referer = request.META.get('HTTP_REFERER')
-    if referer.endswith('results'):
-        return redirect('combine:results', pk)
-    else:
-        return redirect('combine:archive', pk)
+    return redirect('combine:index')
 
+######################
+# ARCHIVE ENTRY
+######################
+def archive_entry(request, entry_id):
+    """ Display an Archive Entry.
+
+    :param request:
+    :param archive_id:
+    :param entry_id:
+    :return:
+    """
+    entry = get_object_or_404(ArchiveEntry, pk=entry_id)
+    context = {
+        'entry': entry
+    }
+    return render(request, 'combine/entry.html', context)
 
 ######################
 # TASK RESULTS
@@ -476,7 +496,7 @@ def results(request, archive_id):
     dgs_json = task.result["dgs"]
 
     for sedml_path, dgs_dict in dgs_json.items():
-        sedml_location = comex._normalize_location(sedml_path)
+        sedml_location = comex.EntryParser._normalize_location(sedml_path)
 
         print("SEDML location:", sedml_location)
         archive_entries = ArchiveEntry.objects.filter(archive=archive.pk, location=sedml_location)
@@ -738,105 +758,3 @@ def check_state(request, archive_id):
     return JsonResponse(data)
 
 
-###################################
-# REST API
-###################################
-# TODO: authentication, get queries allowed for everyone, all other queries for authenticated
-# TODO: provide url for download of archives
-# TODO: use tag names in REST API
-# TODO: API versioning
-# TODO: improved swagger documentation
-# TODO: fixed ids
-
-
-def webservices(request):
-    """ Web services page. """
-    context = {
-
-    }
-    return render(request, 'combine/webservices.html', context)
-
-
-class ArchiveViewSet(viewsets.ModelViewSet):
-    """ REST archives.
-
-    lookup_field defines the url of the detailed view.
-    permission_classes define which users is allowed to do what.
-    """
-
-    queryset = Archive.objects.all()
-    permission_classes = (IsOwnerOrReadOnly,)
-    serializer_class = ArchiveSerializer
-    lookup_field = 'uuid'
-    filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
-    filter_fields = ('name', 'task_id', 'tags', 'created')
-    search_fields = ('name', 'tags__name', 'created')
-
-    def perform_create(self, serializer):
-        # automatically set the user on create
-        serializer.save(user=self.request.user)
-
-    def list(self, request):
-        global_user = User.objects.get(username="global")
-
-        if request.user.is_authenticated:
-            queryset = Archive.objects.filter(user__in=[global_user, request.user])
-        else:
-            queryset = Archive.objects.filter(user=global_user)
-        context = {
-            'request': request,
-        }
-        serializer = ArchiveSerializer(queryset, many=True, context=context)
-        return Response(serializer.data)
-
-
-class ArchiveEntryViewSet(viewsets.ModelViewSet):
-    """ REST archive entries.
-
-        lookup_field defines the url of the detailed view.
-        permission_classes define which users is allowed to do what.
-        """
-    queryset = ArchiveEntry.objects.all()
-    permission_classes = (IsOwnerOfArchiveEntryOrReadOnly,)
-    serializer_class = ArchiveEntrySerializer
-
-
-class TagViewSet(viewsets.ModelViewSet):
-    """ REST tags. """
-    queryset = Tag.objects.all()
-    permission_classes = (IsAdminUserOrReadOnly,)
-    serializer_class = TagSerializer
-    lookup_field = 'uuid'
-    filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
-    filter_fields = ('category', 'name')
-    search_fields = ('category', 'name')
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """ REST users.
-    A viewset for viewing and editing user instances.
-    """
-    serializer_class = UserSerializer
-    permission_classes = (IsAdminUser,)
-    queryset = User.objects.all()
-    filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
-    filter_fields = ('is_staff', 'username')
-    search_fields = ('is_staff', 'username', "email")
-
-
-class ZipTreeView(APIView):
-    queryset = Archive.objects.all()
-    permission_classes = (IsOwnerOrGlobalOrAdminReadOnly,)
-
-    def get(self, request, *args, **kwargs):
-        archive_id = kwargs.get('archive_id')
-        archive = self.get_object(request)
-        parsed = archive.tree_json()
-        parsed = json.loads(parsed)
-        return Response(parsed)
-
-    def get_object(self, request):
-        archive = self.queryset.get(pk=self.kwargs.get('archive_id'))
-        self.user = archive.user
-        self.check_object_permissions(request, obj=archive)
-        return archive

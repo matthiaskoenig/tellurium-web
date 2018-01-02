@@ -4,6 +4,8 @@ Models definitions.
 import uuid as uuid_lib
 import logging
 import os
+import datetime
+import tempfile
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,12 +13,17 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from djchoices import DjangoChoices, ChoiceItem
 from django_model_changes import ChangesMixin
+from django.utils.timezone import utc
+from django.core.files import File
+
 from celery.result import AsyncResult
+
 
 from . import validators, managers
 from .metadata.rdf import read_metadata
 from .utils import comex
-from .utils.html import input_template, html_creator
+from .metadata import rdf
+from .utils.html import input_template, html_creator, html_creator_edit
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +31,12 @@ logger = logging.getLogger(__name__)
 # Settings
 # ===============================================================================
 MAX_TEXT_LENGTH = 500
+MANIFEST_LOCATION = "./manifest.xml"
+MANIFEST_FORMAT = "http://identifiers.org/combine.specifications/omex-manifest"
+METADATA_LOCATION = "./metadata.rdf"
+METADATA_FORMAT = "http://identifiers.org/combine.specifications/omex-metadata"
+METADATA_LOCATION_TURTLE = "./metadata.ttl"
+METADATA_FORMAT_TURTLE = "http://purl.org/NET/mediatypes/text/turtle"
 
 
 # ===============================================================================
@@ -38,8 +51,11 @@ class Date(models.Model):
     def __str__(self):
         return str(self.date)
 
+    class Meta:
+        ordering = ['-date']
 
-class Creator(ChangesMixin,models.Model):
+
+class Creator(ChangesMixin, models.Model):
     """ RDF creator of archive entry. """
     first_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
     last_name = models.CharField(max_length=MAX_TEXT_LENGTH, blank=True, null=True)
@@ -51,33 +67,34 @@ class Creator(ChangesMixin,models.Model):
 
     @property
     def html(self):
-        """
+        """ HTML representation.
 
-        :return: HTML representation for rendering of triple
+        :return: html string
         """
         return html_creator(self.first_name, self.last_name, self.organisation, self.email)
 
     @staticmethod
     def html_empty():
-        """
+        """ HTML representation empty.
 
-        :return: HTML representation for rendering of triple
+        :return: html string
         """
         first_name_input = input_template(name="creators[][first_name]", placeholder="First Name",
-                                          value="")
-        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value="")
+                                          value="", size="10")
+        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value="",size="10")
         organisation_input = input_template(name="creators[][organisation]", placeholder="Organisation",
-                                            value="")
-        email_input = input_template(name="creators[][email]", placeholder="Email", value="")
+                                            value="", size="10")
+        email_input = input_template(name="creators[][email]", placeholder="Email", value="", size="10")
 
-        #id_dict = {"class":"Id","value":"delete","id":"delete","type":"button"}
+        # id_dict = {"class":"Id","value":"delete","id":"delete","type":"button"}
         id_input = input_template(name="creators[][id]", value="new", type="hidden")
-        delete_dict = {"class":"btn btn-default btn-space","value":"delete","id":"delete","type":"button"}
+
+        delete_dict = {"class": "btn btn-xs btn-danger", "value": "Delete", "id": "delete", "type": "button"}
         delete_input = input_template(name="creators[][delete]", value="false", type="hidden")
         delete_button = input_template(**delete_dict)
 
-
-        return delete_button + html_creator(first_name_input, last_name_input, organisation_input, email_input)+id_input+ delete_input
+        return "<dl class = 'inline-flex'> <dt>"+delete_button +"</dt>"+html_creator_edit(first_name_input, last_name_input, organisation_input, email_input)\
+                +"</dl>"+ id_input + delete_input
 
     @property
     def html_edit(self):
@@ -85,25 +102,33 @@ class Creator(ChangesMixin,models.Model):
 
         :return: HTML representation for rendering of editable triple
         """
-        first_name_input = input_template(name="creators[][first_name]",placeholder="First Name", value=self.first_name)
-        last_name_input = input_template(name="creators[][last_name]",placeholder="Family Name", value=self.last_name)
-        organisation_input = input_template(name="creators[][organisation]",placeholder="Organisation", value=self.organisation)
-        email_input = input_template(name="creators[][email]",placeholder="Email", value=self.email)
+        first_name_input = input_template(name="creators[][first_name]", placeholder="First Name", value=self.first_name,size="10")
+        last_name_input = input_template(name="creators[][last_name]", placeholder="Family Name", value=self.last_name,size="10")
+        organisation_input = input_template(name="creators[][organisation]", placeholder="Organisation", value=self.organisation, size="10")
+        email_input = input_template(name="creators[][email]", placeholder="Email", value=self.email, size="10")
+
+        return html_creator_edit(first_name_input, last_name_input, organisation_input, email_input)
 
 
-
-
-        return html_creator(first_name_input, last_name_input, organisation_input, email_input)
+class TripleElementType(DjangoChoices):
+    """ Categories for the element types. """
+    uri = ChoiceItem("<class 'rdflib.term.URIRef'>")
+    literal = ChoiceItem("<class 'rdflib.term.Literal'>")
+    bnode = ChoiceItem("<class 'rdflib.term.BNode'>")
 
 
 class Triple(models.Model):
     """ RDF triple store."""
     subject = models.TextField()
+    subject_type = models.TextField(choices=TripleElementType.choices)
     predicate = models.TextField()
+    predicate_type = models.TextField(choices=TripleElementType.choices)
     object = models.TextField()
+    object_type = models.TextField(choices=TripleElementType.choices)
 
     def __str__(self):
         return "({}, {}, {})".format(self.subject, self.predicate, self.object)
+
 
     @property
     def html(self):
@@ -111,21 +136,10 @@ class Triple(models.Model):
 
         :return: HTML representation for rendering of triple
         """
-        html = '{} {} <a href="{}" target="_blank">{}</a>'.format(self.subject, self.predicate,
-                                                                  self.object, self.object)
-        return html
+        from .metadata import annotation
+        a = annotation.Annotation(subject=self.subject, qualifier=self.predicate, uri=self.object)
+        return a.html()
 
-    def get_ols_data(self):
-        """ Looks up the ontology lookup service data for triples.
-
-        :return:
-        """
-        if not self.is_bq:
-            return None
-        else:
-            from combine.rdf import ols
-
-            raise NotImplementedError
 
     def is_bq(self):
         """ Triple with biomodels qualifer predictate.
@@ -146,7 +160,7 @@ class MetaData(ChangesMixin,models.Model):
      """
     description = models.TextField(null=True, blank=True)
     creators = models.ManyToManyField(Creator)
-    created = models.DateTimeField(editable=False,null=True, blank=True)
+    created = models.DateTimeField(editable=False, null=True, blank=True)
     modified = models.ManyToManyField(Date)
     triples = models.ManyToManyField(Triple)
 
@@ -166,7 +180,32 @@ class MetaData(ChangesMixin,models.Model):
 
     @property
     def triple_count(self):
+        """ Returns number of triples
+        :return:
+        """
+
         return self.triples.count()
+
+    @property
+    def last_modified(self):
+        """ Gets the last modified Date.
+
+        :return: date instance or None if no modified dates.
+        """
+        try:
+            return self.modified.filter(date__isnull=False).latest('date')
+        except ObjectDoesNotExist:
+            return None
+
+    def _add_modified(self):
+        """ Adds a modified timestamp to the metadata.
+
+        ! This should never be called directly, but only via
+            entry.add_modified()
+        """
+        date = Date.objects.create(date=timezone.now())
+        self.modified.add(date)
+
 
 # ===============================================================================
 # COMBINE Archives
@@ -287,6 +326,11 @@ class Archive(models.Model):
             pass
         return metadata
 
+    def has_sedml(self):
+        """ Check if any SED-ML file in the archive."""
+        sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/sed-ml")
+        return len(sedml_entries) > 0
+
     def has_entries(self):
         """ Check if ArchiveEntries exist for archive. """
         return self.entries.count() > 0
@@ -296,7 +340,7 @@ class Archive(models.Model):
 
         :return: dictionary {location: entry} for all entries in the manifest.xml
         """
-        return comex.read_manifest_entries(self.path)
+        return comex.EntryParser.read_manifest_entries(self.path)
 
     def omex_metadata(self):
         """ Get metadata information from archive.
@@ -305,13 +349,113 @@ class Archive(models.Model):
         """
         return read_metadata(self.path)
 
-    def tree_json(self):
-        """ Gets the zip tree as JSON for the archive.
+    def update_manifest_entry(self):
+        """ Updates the manifest entry of this archive based on the latest information.
+        This function must be called if any content of the archive entries change, i.e,
+        - adding entries
+        - removing entries
+        - changing formats
 
-        The entry information is added to the tree.
+        ! This functions only should be called if something changed in any of the entries.
+          This adds new modified timestamps without checking for changes !
+
+        :return: None
         """
-        entries = self.entries.all()
-        return comex.zip_tree_content(self.path, entries)
+        manifest_entry = self.entries.filter(location=MANIFEST_LOCATION).first()
+        if manifest_entry:
+            # update modified timestamp
+            manifest_entry.add_modified()
+        else:
+            # create new entry
+            manifest_entry = ArchiveEntry.objects.create(archive=self,
+                                                         source=EntrySource.zip,
+                                                         master=False,
+                                                         location=MANIFEST_LOCATION,
+                                                         format=MANIFEST_FORMAT)
+            manifest_entry.set_new_metadata(description="Manifest file describing COMBINE archive content", save=True)
+
+        # create latest manifest.xml
+        manifest = comex.create_manifest(archive=self)
+        suffix = MANIFEST_LOCATION.split('/')[-1]
+        tmp = tempfile.NamedTemporaryFile("w", suffix=suffix)
+        tmp.write(manifest)
+        tmp.seek(0)  # rewind file for reading !
+
+        # add/update file to manifest entry
+        name = MANIFEST_LOCATION.replace("./", "")
+        with open(tmp.name, 'rb') as f:
+            manifest_entry.file.save(name, File(f))
+        tmp.close()
+
+        manifest_entry.save()
+        self.save()
+
+    def update_metadata_entry(self):
+        """ Updates the metadata files in the archive.
+
+        Must be called after changes to the metadata.
+        """
+        # ------------------
+        # XML serialization
+        # ------------------
+        metadata_entry = self.entries.filter(location=METADATA_LOCATION).first()
+        if metadata_entry:
+            # update modified timestamp
+            metadata_entry.add_modified()
+        else:
+            # create new entry
+            metadata_entry = ArchiveEntry.objects.create(archive=self,
+                                                         source=EntrySource.zip,
+                                                         master=False,
+                                                         location=METADATA_LOCATION,
+                                                         format=METADATA_FORMAT)
+            metadata_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
+
+        # create metadata
+        metadata = rdf.create_metadata(archive=self, rdf_format="pretty-xml")
+        tmp = tempfile.NamedTemporaryFile("w")
+        tmp.write(metadata)
+        tmp.seek(0)  # rewind file for reading !
+
+        # add/update file to manifest entry
+        name = METADATA_LOCATION.replace("./", "")
+        with open(tmp.name, 'rb') as f:
+            metadata_entry.file.save(name, File(f))
+        tmp.close()
+
+        metadata_entry.save()
+        self.save()
+
+        # -----------------------
+        # TURTLE serialization
+        # -----------------------
+        turtle_entry = self.entries.filter(location=METADATA_LOCATION_TURTLE).first()
+        if turtle_entry:
+            turtle_entry.add_modified()
+        else:
+            # create new entry
+            turtle_entry = ArchiveEntry.objects.create(archive=self,
+                                                         source=EntrySource.zip,
+                                                         master=False,
+                                                         location=METADATA_LOCATION_TURTLE,
+                                                         format=METADATA_FORMAT_TURTLE)
+            turtle_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
+
+        # create metadata
+        metadata = rdf.create_metadata(archive=self, rdf_format="turtle")
+
+        tmp = tempfile.NamedTemporaryFile("w")
+        tmp.write(metadata)
+        tmp.seek(0)  # rewind file for reading !
+
+        # add/update file to manifest entry
+        name = METADATA_LOCATION_TURTLE.replace("./", "")
+        with open(tmp.name, 'rb') as f:
+            turtle_entry.file.save(name, File(f))
+        tmp.close()
+
+        turtle_entry.save()
+        self.save()
 
 
 class EntrySource(DjangoChoices):
@@ -320,13 +464,23 @@ class EntrySource(DjangoChoices):
     zip = ChoiceItem("zip")
 
 
+def get_entry_upload_path(instance, filename):
+    """ Path for upload of file for ArchiveEntry.
+
+    :param instance:
+    :param filename:
+    :return:
+    """
+    return os.path.join("entries", instance.archive.name, filename)
+
+
 class ArchiveEntry(ChangesMixin, models.Model):
 
     """ Entry information.
     This corresponds to the content of the manifest file.
     """
     archive = models.ForeignKey(Archive, on_delete=models.CASCADE, related_name="entries")
-    file = models.FileField(upload_to='files', null=True)
+    file = models.FileField(upload_to=get_entry_upload_path, null=True)
     location = models.CharField(max_length=MAX_TEXT_LENGTH)
     format = models.CharField(max_length=MAX_TEXT_LENGTH)
     source = models.CharField(max_length=MAX_TEXT_LENGTH, choices=EntrySource.choices)
@@ -335,7 +489,7 @@ class ArchiveEntry(ChangesMixin, models.Model):
 
     objects = managers.ArchiveEntryManager()
 
-    def __str__(self):
+    def __unicode__(self):
         return "{}:{}".format(self.archive, self.location)
 
     class Meta:
@@ -356,3 +510,45 @@ class ArchiveEntry(ChangesMixin, models.Model):
     @property
     def path(self):
         return str(self.file.path)
+
+    def add_modified(self):
+        self.metadata._add_modified()
+
+    def set_new_metadata(self, description=None, save=True):
+        """ Sets new minimal metadata on entry.
+
+        Used for all entries which do not have metadata associated.
+        """
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        meta_dict = {
+            'about': None,
+            'description': description,
+            'created': now,
+            'modified': (now,),
+            'creators': [],
+            'triples': [],
+        }
+        metadata_dict = {
+            "metadata": meta_dict,
+        }
+        metadata = MetaData.objects.create(**metadata_dict)
+
+        # FIXME: update triples
+
+        self.metadata = metadata
+        if save:
+            self.save()
+
+
+class Job(models.Model):
+    name = models.CharField(max_length=255)
+    status = models.CharField(max_length=255, null=True, blank=True)
+    created = models.DateTimeField(default=timezone.now)
+    completed = models.DateTimeField(null=True, blank=True)
+    celery_id = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        ordering = ('created',)
+
+    def __unicode__(self):
+        return self.name

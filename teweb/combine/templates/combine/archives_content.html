@@ -14,6 +14,7 @@
                     <th>name</th>
                     <th>user</th>
                     <th>tags</th>
+                    <th>sedml</th>
                     <th>action</th>
                     <th>status</th>
                     <th>results</th>
@@ -25,12 +26,15 @@
                     <tr>
                         <td>{{ macros.archive_download(archive) }}</td>
                         <td>{{ macros.archive_html(archive) }}</td>
-
                         <td>{{ macros.user(archive.user) }}</td>
                         <td>
                             {% for tag in archive.tags.all() %}
                                 {{ macros.tag_html(tag) }}
                             {% endfor %}
+                        </td>
+                        <td>{% if archive.has_sedml() %}
+                            <img src="{{ static('combine/images/mediatype/sed-ml.png') }}" height="20"/>
+                            {% endif %}
                         </td>
                         <td>{{ macros.archive_action(archive) }}</td>
                         <td>{{ macros.archive_status(archive) }}</td>

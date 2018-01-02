@@ -35,9 +35,9 @@ class DateAdmin(admin.ModelAdmin):
 
 @admin.register(Triple)
 class TripleAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'is_bq', 'subject', 'predicate', 'object')
+    list_display = ('pk', 'is_bq', 'subject', 'predicate', 'object', 'subject_type', 'predicate_type', 'object_type')
     list_filter = ('predicate',)
-    fields = ('subject', 'predicate', 'object')
+    fields = ('subject', 'predicate', 'object', 'subject_type', 'predicate_type', 'object_type')
 
 
 @admin.register(Creator)
