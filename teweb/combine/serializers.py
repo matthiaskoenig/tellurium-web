@@ -99,15 +99,24 @@ class MetaDataSerializer(serializers.HyperlinkedModelSerializer):
 
 class ArchiveSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializing Archives. """
-    tags = serializers.HyperlinkedRelatedField(many=True, view_name='api:tag-detail', queryset=Tag.objects.all(), lookup_field='uuid')
+    tags = serializers.HyperlinkedRelatedField(many=True, view_name='api:tag-detail', queryset=Tag.objects.all(), lookup_field='uuid', required=False)
     user = serializers.HyperlinkedRelatedField(view_name='api:user-detail', read_only=True)
-    entries = serializers.HyperlinkedRelatedField(many=True, view_name='api:archive-entry-detail', queryset=ArchiveEntry.objects.all())
-    created = serializers.DateTimeField(format=DATEFORMAT)
+    entries = serializers.HyperlinkedRelatedField(many=True, view_name='api:archive-entry-detail', queryset=ArchiveEntry.objects.all(), required=False)
+    created = serializers.DateTimeField(format=DATEFORMAT, required=False)
+    name = serializers.CharField(required=False)
+
 
     class Meta:
         model = Archive
         fields = ['name', 'file', 'created', 'md5', 'task_id', 'uuid', 'entries', 'user', 'tags']
 
+    def create(self, validated_data):
+        validated_data["user"]= self.context['request'].user
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            validated_data["user"] = request.user
+
+        return Archive.objects.create(**validated_data)
 
 class ArchiveEntrySerializer(serializers.HyperlinkedModelSerializer):
     """ Serializing ArchiveEntries. """

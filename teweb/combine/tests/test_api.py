@@ -4,10 +4,11 @@ Testing the API.
 
 import os
 import datetime
+from pprint import pprint
 
 # setup of django
 from ..utils import django_setup
-
+from rest_framework.test import CoreAPIClient
 from django.test import TestCase
 from django.urls import reverse
 from django.core.files import File
@@ -20,6 +21,9 @@ from ..utils.data import create_users, add_archives_to_database
 # testdata
 from .utils import ARCHIVE_DIRS
 from ..fixtures.users import user_defs
+
+import coreapi
+
 
 # environment variables for tests
 os.environ["DJANGO_ADMIN_PASSWORD"] = "test"
@@ -38,6 +42,18 @@ class ViewAPILoggedInSuperUser(TestCase):
 
     def setUp(self):
         self.client.login(username='mkoenig', password=os.environ['DJANGO_ADMIN_PASSWORD'])
+
+        # so far the api is restricted and only accasible with authentication
+        auth = coreapi.auth.BasicAuthentication(
+            username='mkoenig',
+            password=os.environ['DJANGO_ADMIN_PASSWORD']
+        )
+        #self.client_coreapi = coreapi.Client(auth=auth)
+        self.client_coreapi = CoreAPIClient()
+        self.client_coreapi.session.auth = auth
+
+
+
 
     def test_list_users(self):
         """
@@ -90,18 +106,29 @@ class ViewAPILoggedInSuperUser(TestCase):
         omex_files = get_archive_paths(ARCHIVE_DIRS)
         f = omex_files[0]
         name = os.path.basename(f)
-        md5 = hash_for_file(f, hash_type='MD5')
-        django_file = File(open(f, 'rb'))
-        archive_data = {'name': name+"test", 'file': django_file, 'tags': [], 'md5': md5, 'created': datetime.datetime.now()}
+        file = open(f, 'rb')
+        archive_data = {'file': file}
         response = self.client.post(url, archive_data)
+
         # print(response.content)
         self.assertEquals(response.status_code, 201)
         response = self.client.get(url)
-        self.assertContains(response, name+"test")
+        self.assertContains(response, name)
         # should not be seen after logout
         self.client.logout()
         response = self.client.get(url)
-        self.assertNotContains(response, name+"test")
+        self.assertNotContains(response, name)
+
+    def test_create_archive_coreapi(self):
+
+        omex_files = get_archive_paths(ARCHIVE_DIRS)
+        f = omex_files[0]
+        file = open(f, 'rb')
+        document = self.client_coreapi.get('https://testserver/api/')
+        data = self.client_coreapi.action(document["api"],["archives","create"],params={"file":file}, encoding="multipart/form-data")
+        url = reverse('api:archive-detail', kwargs={"uuid": data["uuid"]})
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
 
     def test_list_tags(self):
         """
@@ -261,10 +288,8 @@ class ViewAPILoggedIn(TestCase):
         omex_files = get_archive_paths(ARCHIVE_DIRS)
         f = omex_files[0]
         name = os.path.basename(f)
-        md5 = hash_for_file(f, hash_type='MD5')
-        django_file = File(open(f, 'rb'))
-        archive_data = {'name': name+"test", 'file': django_file, 'tags': [], 'md5': md5,
-                        'created': datetime.datetime.now()}
+        file = open(f, 'rb')
+        archive_data = { 'file': file}
         response = self.client.post(url, archive_data)
         self.assertEquals(response.status_code, 201)
 
@@ -286,9 +311,9 @@ class ViewAPILoggedIn(TestCase):
         self.assertEquals(response_tree.status_code, 200)
 
         response = self.client.get(url)
-        self.assertContains(response, name+"test")
+        self.assertContains(response, name)
         for archive in response.json():
-            if archive["name"] == name+"test":
+            if archive["name"] == name:
                 new_archive = archive
 
         # should not be seen after logout testuser zip tree
