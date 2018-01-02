@@ -331,6 +331,17 @@ class Archive(models.Model):
         sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/sed-ml")
         return len(sedml_entries) > 0
 
+    def has_sbml(self):
+        """ Check if any SBML file in the archive."""
+        sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/sbml")
+        return len(sedml_entries) > 0
+
+    def has_cellml(self):
+        """ Check if any CellML file in the archive."""
+        sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/cellml")
+        return len(sedml_entries) > 0
+
+
     def has_entries(self):
         """ Check if ArchiveEntries exist for archive. """
         return self.entries.count() > 0
