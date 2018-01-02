@@ -12,27 +12,11 @@
        console.log("Got message: " + message.data);
        var data = JSON.parse(message.data);
        archive_id = data.archive_id
-       // if action is started, add new item to table
+       // if action is started
        if (data.action == "started") {
 
-
-           var task_status = $("#task_status");
-           var ele = $('<tr></tr>');
-           ele.attr("id", data.job_id);
-           var item_id = $("<td></td>").text(data.job_id);
-           ele.append(item_id);
-           var item_name = $("<td></td>").text(data.job_name);
-           ele.append(item_name);
-           var item_status = $("<td></td>");
-           item_status.attr("id", "item-status-"+data.job_id);
-           var span = $('<span class="label label-primary"></span>').text(data.job_status);
-           item_status.append(span);
-           ele.append(item_status);
-           task_status.append(ele);
-           var content = "Job started: " + data.action + " " + data.task_id + " " + data.task_status
-           $("#task-status-"+archive_id).append(content);
        }
-       // if action is completed, just update the status
+       // if action completed
        else if (data.action == "completed"){
            var item = $('#item-status-' + data.job_id + ' span');
            item.attr("class", "label label-success");
