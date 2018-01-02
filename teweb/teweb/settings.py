@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_filters',
     'django_model_changes',
     # 'debug_toolbar',
+    'channels'
 
 ]
 
