@@ -65,17 +65,30 @@
            var item = $('#item-status-' + data.job_id + ' span');
            item.attr("class", "label label-success");
            item.text(data.job_status);
+
+           // update icon
+           var content = '<i class="fas fa-fw fa-check fa-5x"></i> Finished';
+           $("#task-status").html(content);
        }
    };
-   $("#taskform").on("submit", function(event) {
+
+   // archive action
+   $(".archive-action").on("click", function(event) {
        var message = {
            action: "start_sec3",
-           job_name: $('#task_name').val()
+           job_name: {{ archive.id }}
        };
        socket.send(JSON.stringify(message));
        $("#task_name").val('').focus();
+
+       // update icon
+       var content = '<i class="fas fa-fw fa-cog fa-5x fa-spin"></i> Executing Task';
+       $("#task-status").html(content);
+
        return false;
    });
+
+
 });
 
 </script>
