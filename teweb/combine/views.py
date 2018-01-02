@@ -433,13 +433,25 @@ def runall(request, status=None):
     :param request:
     :return:
     """
-    # TODO: implement allow filtering by status
-
     all_archives = Archive.objects.all().order_by('-created')
     for archive in all_archives:
-        result = execute_omex.delay(archive_id=archive.id)
+        result = execute_omex.delay(archive_id=archive.id, reply_channel=None)
         archive.task_id = result.task_id
         archive.save()
+    return redirect('combine:index')
+
+@login_required
+def resetall(request):
+    """ Resets all archives, i.e., removing task results.
+
+    :param request:
+    :return:
+    """
+    all_archives = Archive.objects.all().order_by('-created')
+    for archive in all_archives:
+        # remove old TaskResult and reset task_id
+       archive.reset_task()
+
     return redirect('combine:index')
 
 
@@ -458,7 +470,8 @@ def run_archive(request, archive_id):
         # Create new task and run again.
         if result.status in ["FAILURE", "SUCCESS"]:
             create_task = True
-
+            # reset task (and remove old task result)
+            archive.reset_task()
     else:
         # no execution yet
         create_task = True

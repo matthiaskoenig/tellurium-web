@@ -83,13 +83,15 @@ def execute_omex(archive_id, reply_channel, debug=False):
 
     print("*** FINISHED RUNNING OMEX ***")
 
+
+
     # Send status update back to browser client
     if reply_channel is not None:
         Channel(reply_channel).send({
             "text": json.dumps({
                 "action": "completed",
-                "task_id": "?id",
-                "task_status": "FINISHED",
+                "task_id": archive.task_id,
+                "archive_id": archive_id,
             })
         })
 

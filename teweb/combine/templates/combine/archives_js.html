@@ -20,48 +20,35 @@
        console.log("Got message: " + message.data);
        var data = JSON.parse(message.data);
        // if action is started, add new item to table
+
+       var archive_id = data.archive_id;
        if (data.action == "started") {
 
-
-           var task_status = $("#task_status");
-           var ele = $('<tr></tr>');
-           ele.attr("id", data.job_id);
-           var item_id = $("<td></td>").text(data.job_id);
-           ele.append(item_id);
-           var item_name = $("<td></td>").text(data.job_name);
-           ele.append(item_name);
-           var item_status = $("<td></td>");
-           item_status.attr("id", "item-status-"+data.job_id);
-           var span = $('<span class="label label-primary"></span>').text(data.job_status);
-           item_status.append(span);
-           ele.append(item_status);
-           task_status.append(ele);
-           var content = "Job started: " + data.action + " " + data.task_id + " " + data.task_status
-           $("#task-status").append(content);
        }
        // if action is completed, just update the status
        else if (data.action == "completed"){
-           var item = $('#item-status-' + data.job_id + ' span');
-           item.attr("class", "label label-success");
-           item.text(data.job_status);
 
            // update icon
-           var content = '<i class="fas fa-fw fa-check fa-5x"></i> Finished';
-           $("#task-status").html(content);
+           var content = '<i class="fas fa-fw fa-check"></i> Finished';
+           $("#task-status-"+archive_id).html(content);
        }
    };
 
    // archive action
    $(".archive-action").on("click", function(event) {
+       var archive_id = $(this).attr("archive");
+       console.log("Archive id: " + archive_id)
+
        var message = {
            action: "run_archive",
-           archive_id: {{ archive.id }}
+           archive_id: archive_id
        };
        socket.send(JSON.stringify(message));
+       $("#task_name").val('').focus();
 
        // update icon
-       var content = '<i class="fas fa-fw fa-cog fa-5x fa-spin"></i> Executing Task';
-       $("#task-status").html(content);
+       var content = '<i class="fas fa-fw fa-cog fa-spin"></i> Executing Task';
+       $("#task-status-"+archive_id).html(content);
 
        return false;
    });

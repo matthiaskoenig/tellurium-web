@@ -67,7 +67,7 @@ Definition of reusable macro function in templates
 
 
 {%  macro archive_action(archive) %}
-    <span class="archive-action">
+    <span class="archive-action" archive="{{ archive.id }}">
 {% if archive.task_id %}
 
     {% with task = archive.task %}

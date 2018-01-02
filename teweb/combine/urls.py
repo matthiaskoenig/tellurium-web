@@ -20,6 +20,7 @@ urlpatterns = [
 
     url(r'^upload$', views.upload, name='upload'),
     url(r'^runall$', views.runall, name='runall'),
+    url(r'^resetall$', views.resetall, name='resetall'),
     url(r'^runall/(?P<status>[.]+)/$', views.runall, name='runall'),
 
     url(r'^tags/$', views.tags, name='tags'),

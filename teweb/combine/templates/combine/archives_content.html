@@ -44,7 +44,7 @@
                             <img src="{{ static('combine/images/mediatype/sed-ml.png') }}" height="16"/>
                             {% endif %}
                         </td>
-                        <td><span id="task-status" archive_id="{{ archive_id }}"></span> {{ macros.archive_action(archive) }}</td>
+                        <td><span id="task-status-{{ archive.id }}"></span> {{ macros.archive_action(archive) }}</td>
                         <td>{{ macros.archive_status(archive) }}</td>
                         <td>{{ macros.archive_results(archive) }}</td>
                         <td>{{ archive.description }}</td>

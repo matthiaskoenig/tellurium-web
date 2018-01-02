@@ -125,6 +125,7 @@ def run_archive(data, reply_channel):
             "action": "started",
             "task_id": archive.task_id,
             "task_status": result.status,
+            "archive_id": archive_id,
         })
     })
 
