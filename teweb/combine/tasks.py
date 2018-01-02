@@ -40,7 +40,7 @@ from channels import Channel
 log = logging.getLogger(__name__)
 
 @task(name="execute omex")
-def execute_omex(archive_id, debug=False):
+def execute_omex(archive_id, reply_channel, debug=False):
     """
     Execute omex.
     """
@@ -82,6 +82,17 @@ def execute_omex(archive_id, debug=False):
         shutil.rmtree(tmp_dir)
 
     print("*** FINISHED RUNNING OMEX ***")
+
+    # Send status update back to browser client
+    if reply_channel is not None:
+        Channel(reply_channel).send({
+            "text": json.dumps({
+                "action": "completed",
+                "task_id": "?id",
+                "task_status": "FINISHED",
+            })
+        })
+
     return results
 
 

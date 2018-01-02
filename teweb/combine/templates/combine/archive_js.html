@@ -46,6 +46,8 @@
        var data = JSON.parse(message.data);
        // if action is started, add new item to table
        if (data.action == "started") {
+
+
            var task_status = $("#task_status");
            var ele = $('<tr></tr>');
            ele.attr("id", data.job_id);
@@ -59,6 +61,8 @@
            item_status.append(span);
            ele.append(item_status);
            task_status.append(ele);
+           var content = "Job started: " + data.action + " " + data.task_id + " " + data.task_status
+           $("#task-status").append(content);
        }
        // if action is completed, just update the status
        else if (data.action == "completed"){
@@ -75,8 +79,8 @@
    // archive action
    $(".archive-action").on("click", function(event) {
        var message = {
-           action: "start_sec3",
-           job_name: {{ archive.id }}
+           action: "run_archive",
+           archive_id: {{ archive.id }}
        };
        socket.send(JSON.stringify(message));
        $("#task_name").val('').focus();
