@@ -1,25 +1,21 @@
 {% extends "combine/base.html" %}
 
-{% block head %}
-    {% include "combine/archive_content_head.html" %}
-{% endblock %}
-
 {% block content %}
 <div class="row">
     <div class="col-xs-12">
     {% include "combine/archive_content.html" %}
     </div>
 </div>
+
 <div class="row">
     {% if archive.has_sedml() %}
     <div class="col-xs-12">
-        {% include "combine/task_content.html" %}
+    {% include "combine/task_content.html" %}
     </div>
     {% endif %}
 </div>
 {% endblock %}
 
 {% block javascript %}
-    {%  include "combine/archive_js.html" %}
-    {%  include "combine/task_js.html" %}
+{% include "combine/archive_js.html" %}
 {% endblock %}

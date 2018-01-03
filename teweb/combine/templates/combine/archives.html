@@ -13,5 +13,17 @@
 
 
 {% block javascript %}
-    {%  include "combine/archives_js.html" %}
+    <!-- Datatable -->
+    <script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+        $('#archives').DataTable({
+            "order": [[6, "desc"]],
+            "pageLength": 15
+        });
+    });
+    </script>
+
+    <!-- Websockets, channels & archive actions -->
+    <script src="{{ static('combine/js/channels.js') }}"></script>
+
 {% endblock %}
