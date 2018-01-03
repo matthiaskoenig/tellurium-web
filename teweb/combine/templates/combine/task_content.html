@@ -31,7 +31,7 @@
                 <!-- results -->
                 {% if task.status == 'SUCCESS' %}
                     <a href="{{ url('combine:results', args=[archive.id]) }}" title="View the outputs (plots & reports)">
-                        <span class="btn btn-primary btn-xs"><i class="fas fa-chart-line fa-fw"></i> RESULTS</span></a>
+                        <button class="btn-xs btn-primary"><i class="fas fa-chart-line fa-fw"></i> RESULTS</button></a>
                 {% endif %}
 
                 <!-- traceback -->

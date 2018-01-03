@@ -15,7 +15,7 @@ import logging
 from django.shortcuts import get_object_or_404
 
 from .models import Job, Archive
-from .tasks import sec3, execute_omex
+from .tasks import execute_omex
 from urllib.parse import parse_qs
 from celery.result import AsyncResult
 
@@ -66,9 +66,6 @@ def ws_receive(message):
 
     if data:
         reply_channel = message.reply_channel.name
-
-        if data['action'] == "start_sec3":
-            start_sec3(data, reply_channel)
 
         if data['action'] == "run_archive":
             run_archive(data, reply_channel)
@@ -122,38 +119,8 @@ def run_archive(data, reply_channel):
     # Tell client task has been started
     Channel(reply_channel).send({
         "text": json.dumps({
-            "action": "started",
             "task_id": archive.task_id,
             "task_status": result.status,
             "archive_id": archive_id,
-        })
-    })
-
-
-
-def start_sec3(data, reply_channel):
-    log.debug("job Name=%s", data['job_name'])
-    # Save model to our database
-    job = Job(
-        name=data['job_name'],
-        status="started",
-    )
-    job.save()
-
-    # Start long running task here (using Celery)
-    sec3_task = sec3.delay(job.id, reply_channel)
-
-    # Store the celery task id into the database if we wanted to
-    # do things like cancel the task in the future
-    job.celery_id = sec3_task.id
-    job.save()
-
-    # Tell client task has been started
-    Channel(reply_channel).send({
-        "text": json.dumps({
-            "action": "started",
-            "job_id": job.id,
-            "job_name": job.name,
-            "job_status": job.status,
         })
     })

@@ -26,6 +26,7 @@ import matplotlib
 from tellurium.sedml import tesedml
 
 from .models import Archive
+from django_celery_results.models import TaskResult
 from celery import shared_task, task
 
 import time
@@ -45,8 +46,6 @@ def execute_omex(archive_id, reply_channel, debug=False):
     Execute omex.
     """
     matplotlib.pyplot.switch_backend("Agg")
-
-    print("*** START RUNNING OMEX ***")
     results = {}
 
     # get archive, raises ObjectDoesNotExist
@@ -77,45 +76,29 @@ def execute_omex(archive_id, reply_channel, debug=False):
         results['dgs'] = dgs_json
         # results['code'] = te_result['code']
 
+
+        # Send status update back to browser client
+        if reply_channel is not None:
+            Channel(reply_channel).send({
+                "text": json.dumps({
+                    "task_id": archive.task_id,
+                    "task_status": "SUCCESS",
+                    "archive_id": archive_id,
+                })
+            })
+    except:
+        # Send status update back to browser client
+        if reply_channel is not None:
+            Channel(reply_channel).send({
+                "text": json.dumps({
+                    "task_id": archive.task_id,
+                    "task_status": "FAILURE",
+                    "archive_id": archive_id,
+                })
+            })
+
     finally:
         # cleanup
         shutil.rmtree(tmp_dir)
 
-    print("*** FINISHED RUNNING OMEX ***")
-
-
-
-    # Send status update back to browser client
-    if reply_channel is not None:
-        Channel(reply_channel).send({
-            "text": json.dumps({
-                "action": "completed",
-                "task_id": archive.task_id,
-                "archive_id": archive_id,
-            })
-        })
-
     return results
-
-
-@app.task
-def sec3(job_id, reply_channel):
-    # time sleep represent some long running process
-    time.sleep(3)
-    # Change task status to completed
-    job = Job.objects.get(pk=job_id)
-    log.debug("Running job_name=%s", job.name)
-
-    job.status = "completed"
-    job.save()
-
-    # Send status update back to browser client
-    if reply_channel is not None:
-        Channel(reply_channel).send({
-            "text": json.dumps({
-                "action": "completed",
-                "job_id": job.id,
-                "job_name": job.name,
-                "job_status": job.status,
-            })
-})

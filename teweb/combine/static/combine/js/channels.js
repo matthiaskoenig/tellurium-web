@@ -15,16 +15,24 @@ $(function() {
        // if action is started, add new item to table
 
        var archive_id = data.archive_id;
-       if (data.action == "started") {
-
-       }
-       // if action is completed, just update the status
-       else if (data.action == "completed"){
-
+       if (data.task_status == "PENDING") {
            // update icon
-           var content = '<i class="fas fa-fw fa-check"></i> Finished';
+           var content = '<i class="fas fa-fw fa-cog fa-spin"></i> PENDING';
            $("#task-status-"+archive_id).html(content);
        }
+       // if action is completed, just update the status
+       else if (data.task_status == "SUCCESS"){
+
+           // update icon
+           var content = '<i class="fas fa-fw fa-check"></i> SUCCESS';
+           $("#task-status-"+archive_id).html(content);
+       }
+       else if (data.task_status == "FAILURE") {
+           // update icon
+           var content = '<i class="fas fa-fw fa-minus"></i> FAILURE';
+           $("#task-status-" + archive_id).html(content);
+       };
+
    };
 
    /*
@@ -44,6 +52,12 @@ $(function() {
        // update icon
        var content = '<i class="fas fa-fw fa-cog fa-spin"></i> Executing Task';
        $("#task-status-"+archive_id).html(content);
+
+       // update action icon
+       var button = $(this).find("button");
+       button.attr("class", "btn-xs btn-info");
+       var icon = button.find("i");
+       icon.attr("class", "fas fa-cog fa-spin fa-fw");
 
        return false;
    });
