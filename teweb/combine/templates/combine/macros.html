@@ -74,7 +74,7 @@ Definition of reusable macro function in templates
         <!--<a href="{{ url('combine:run_archive', args=[archive.id]) }}">-->
             {% if task %}
                 {% if task.status == 'SUCCESS' %}
-                    <span id="action_{{ archive.id }}" class="btn-xs btn-warning">
+                    <span id="action_{{ archive.id }}" class="btn-xs btn-default">
                     <i class="fas fa-sync-alt fa-fw" title="RERUN"></i> RERUN
                 {% elif task.status == 'FAILURE' %}
                     <span id="action_{{ archive.id }}" class="btn-xs btn-danger">
@@ -102,7 +102,11 @@ Definition of reusable macro function in templates
 <!-- User -->
 {% macro user(user) %}
 {% if user %}
-<i class="fas fa-fw fa-user"></i> {{ user }}
+    {% if user.username == "global" %}
+        <i class="fas fa-fw fa-globe" title="global"></i>
+    {% else %}
+        <i class="fas fa-fw fa-user"></i> {{ user }}
+    {%  endif %}
 {% else %}
 <i class="fas fa-fw fa-ban"></i>
 {% endif %}
