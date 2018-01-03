@@ -479,6 +479,8 @@ class Archive(models.Model):
         self.save()
 
 
+
+
 class EntrySource(DjangoChoices):
     """ Source of the entry information. """
     manifest = ChoiceItem("manifest")
