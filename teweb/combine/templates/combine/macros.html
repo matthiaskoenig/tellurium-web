@@ -84,20 +84,19 @@ Definition of reusable macro function in templates
 
 <!-- Status -->
 {%  macro archive_status(archive) %}
+    <span id="status_{{ archive.id }}">
 {% if archive.task_id %}
     {{ task_status(archive.task) }}
 {% endif %}
+    </span>
 {% endmacro %}
 
 {% macro task_status(task) %}
     {% if task.status == "SUCCESS" %}
-        <span class="label label-success"><i
-                class="fas fa-check-square fa-fw"></i> {{ task.status }}</span>
+        <span class="label label-success"><i class="fas fa-check-square fa-fw"></i> SUCCESS</span>
     {% elif task.status == "FAILURE" %}
-        <span class="label label-danger"><i
-                class="fas fa-minus-square fa-fw"></i> {{ task.status }}</span>
+        <span class="label label-danger"><i class="fas fa-minus-square fa-fw"></i> FAILURE</span>
     {% else %}
-        <span class="label label-info"
-              title="{{ task }}">{{ task.status }}</span>
+        <span class="label label-warning">{{ task.status }}</span>
     {% endif %}
 {% endmacro %}
