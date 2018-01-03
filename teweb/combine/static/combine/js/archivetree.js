@@ -17,7 +17,7 @@ $.ajax({
                 'multiple': false,
                 'data': data
             },
-            'plugins':['types']
+            'plugins':['types','dnd']
         });
     },
     error: function (error_data) {
@@ -42,12 +42,15 @@ $.ajax({
     });
 
 
+
+
     /**
       * Trigger on_select for selected node when tree loads
       */
     $("#json_tree").on("ready.jstree", function(e, data) {
       var tree = data.instance;
       var obj = tree.get_selected(true)[0];
+
 
       // trigger the on_select handler for the tree node that is currently selected
         // and ensure that it is opened
@@ -69,13 +72,22 @@ $.ajax({
                 });
           });
         }
+
+
+
       }
     });
+
+
+
 
     $(document).on('click','#editButton',function(){
         var selected = $('#json_tree').jstree(true).get_selected(true);
         var entry_pk = selected[0].original.pk;
         display_entry_detail(entry_pk, true);
+
+        //image.setAttribute("src", picture_url);
+        //icon_image.innerHTML =image;
     });
 
     $(document).on('click','#addCreator',function(){
@@ -88,6 +100,7 @@ $.ajax({
          delete_contact(creatorId,this.parentNode.parentNode.parentNode.parentNode);
          this.parentNode.parentNode.parentNode = this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)
     });
+
     $(document).on('click','#saveButton',function(){
         var frm = $('#form_detail');
         frm.submit(submit_form());
@@ -104,7 +117,6 @@ $.ajax({
         /** Main function for displaying archive entry detail after selection. */
         var endpoint_path = "/api/archive-entries/" + entry_pk + "/";
         var endpoint = window.location.origin + endpoint_path;
-
         var manifest_detail_div = document.getElementById("manifest_detail");
         var button_div = document.getElementById("button-div");
         var entry_detail_div = document.getElementById("item_detail");
