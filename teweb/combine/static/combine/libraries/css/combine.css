@@ -1,0 +1,337 @@
+
+body {
+}
+
+.pk{
+    background-color: rgba(125, 125, 125, 0.7);
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.subject{
+    background-color: darkblue;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.ontology{
+    background-color: #5FBDCE;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.collection{
+    background-color: #000000;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.identifier{
+    background-color: #ffac1b;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.purl{
+    color: grey;
+}
+
+
+/* Colors */
+.icon-invisible {
+    visibility: hidden;
+}
+.black {
+    color: black;
+}
+.grey {
+    color: grey;
+}
+.green {
+    color: darkgreen;
+}
+.white {
+    color: white;
+}
+
+/* Progress bar */
+  .progress {
+   width:50%;
+   background: rgba(200, 200, 200, 0.69);
+  }
+  .bar {
+   height:15px;
+   width:0%;
+   background:green;
+   text-align:right;
+  }
+
+
+/* References */
+.ref-item {
+    list-style-type: none;
+}
+.ref-item a{
+    font-size: 10px;
+}
+.ref-title{
+    font-size: 10px;
+    font-weight: bold;
+}
+.ref-authors{
+    font-size: 10px;
+}
+.ref-journal{
+    font-size: 10px;
+}
+
+.term{
+    background-color: #ffac1b;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+.item{
+    background-color: gray;
+    padding:2px;
+    padding-right:4px;
+    color: black;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.comment{
+    background-color: gray;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.cvterm{
+    border-radius: 15px;
+    background: #f9f9f9;
+    padding: 5px;
+}
+
+.history{
+    border-radius: 15px;
+    background: #ffffff;
+    padding: 5px;
+}
+
+.qualifier{
+    background-color: #13721c;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.unit{
+    background-color: rgba(200, 200, 200, 0.51);
+    padding:2px;
+    padding-right:4px;
+    color: black;
+    font-family: monospace;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.math{
+    color: black;
+    font-family: monospace;
+}
+
+/********************************
+SBML validation
+*********************************/
+
+h3.valid, h3.invalid, h3.valid-warning {
+    font-size-adjust: 0.4;
+    font-style: normal;
+    letter-spacing: normal;
+    margin: 0;
+    padding-bottom: 0.2em;
+    padding-top: 0.2em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: none;
+    word-spacing: normal;
+}
+.valid {
+    background: #55b05a none repeat scroll 0 0;
+    color: white;
+}
+.invalid {
+    background: #d23d24 none repeat scroll 0 0;
+    color: white;
+}
+
+.errorFatal{
+    background-color: #ff081b;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.errorError{
+    background-color: #ff5327;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.errorWarning{
+    background-color: #ffcb13;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.errorInfo{
+    background-color: #3c7bff;
+    padding:2px;
+    padding-right:4px;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+
+.errorLine{
+    background-color: rgba(200, 200, 200, 0.51);
+    padding:2px;
+    padding-right:4px;
+    color: black;
+    font-family: monospace;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+.errorLine{
+    background-color: rgba(200, 200, 200, 0.51);
+    padding:2px;
+    padding-right:4px;
+    color: black;
+    font-family: monospace;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+dl.inline-flex {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  width: 100%;      /* set the container width*/
+  overflow: visible;
+}
+dl.inline-flex dt {
+  flex: 0 0 20%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+dl.inline-flex dd {
+  flex:0 0 80%;
+  margin-left: auto;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.entry_buttons{
+    float:right;
+    display:block;
+    margin-right:20px;
+    margin-top:20px;
+    margin-bottom:20px;
+    clear:left;
+}
+
+.add_contact_button{
+    float:right;
+    display:block;
+    clear:left;
+}
+
+.textArea {
+    width:100%;
+    min-height: 150px;
+}
+
+.flex-container {
+  display: flex;
+
+}
+
+.flex-container>div {
+  margin: 20px;
+  flex-grow: 1;
+
+}
+
+.btn-compact{
+    height: 25px;
+    text-align: center;
+    padding-top:3px;
+}
+
+div:empty {
+   display: none;
+}

@@ -9,18 +9,11 @@
     <title>Tellurium Web</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="{{ static('combine/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ static('combine/js/datatables.min.css') }}"/>
-    <link rel="stylesheet" type="text/css" href="{{ static('combine/css/combine.css') }}"/>
-
-    <!-- scripts -->
-    <script defer src="{{ static('combine/fontawesome-5.0.2/fontawesome-all.js') }}"></script>
-    <script src="{{ static('combine/js/jquery-3.2.1.min.js') }}"></script>
-    <script src="{{ static('combine/js/tether-1.4.0.min.js') }}"></script>
-    <script src="{{ static('combine/js/bootstrap-3.3.7.min.js') }}"></script>
-    <script src="{{ static('combine/js/datatables-1.10.16.min.js') }}"></script>
-    <script src="{{ static("combine/js/reconnecting-websocket.min.js") }}" type="text/javascript"></script>
-
+    <link rel="stylesheet" href="{{ static('combine/libraries/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('combine/libraries/js/datatables.min.css') }}"/>
+    <link rel="stylesheet" href="{{ static('combine/libraries/js/bootstrap-table-1.10.1.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static('combine/libraries/css/combine.css') }}"/>
+    <link rel="stylesheet" href="{{ static('combine/libraries/js/jstree-3.3.4/themes/default/style.min.css') }}" />
 
     {% block head %}{% endblock %}
 </head>
@@ -100,7 +93,7 @@
                     <i class="fab fa-github fa-fw"></i> Github</a></li>
 
             </ul>
-        </div><!--/.nav-collapse -->
+        </div>
     </div>
 </nav>
 
@@ -114,8 +107,17 @@
 </div>
 
 
-<!-- CRFS TOKEN -->
+<!-- scripts -->
+<script defer src="{{ static('combine/libraries/js/fontawesome-5.0.2-all.js') }}"></script>
+<script src="{{ static('combine/libraries/js/jquery-3.2.1.min.js') }}"></script>
+<script src="{{ static('combine/libraries/js/tether-1.4.0.min.js') }}"></script>
+<script src="{{ static('combine/libraries/js/bootstrap-3.3.7.min.js') }}"></script>
+<script src="{{ static('combine/libraries/js/datatables-1.10.16.min.js') }}"></script>
+<script src="{{ static('combine/libraries/js/bootstrap-table-1.10.1.min.js') }}"></script>
+<script src="{{ static("combine/js/reconnecting-websocket.min.js") }}" type="text/javascript"></script>
 
+
+<!-- CRFS TOKEN -->
 <script>
     var csrftoken = Cookies.get('csrftoken');
     function csrfSafeMethod(method) {
