@@ -7,7 +7,14 @@
 
     <div class="panel-body">
         {% if archives %}
-            <table id="archives" class="table table-striped table-condensed table-hover">
+            <table id="archives"
+                   class="table table-striped table-condensed table-hover"
+                   data-toggle="table"
+                   data-search="true"
+                   data-pagination="true"
+                   data-page-size="15"
+                   data-show-toggle="true"
+                   data-show-columns="true">
                 <thead>
                 <tr>
                     <th></th>
