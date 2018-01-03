@@ -11,89 +11,45 @@ function such as a Celery task so that they can also send a message back.
 
 import json
 import logging
-from channels import Channel
-from .models import Job
-from .tasks import sec3
+
+from django.shortcuts import get_object_or_404
+
+from .models import Job, Archive
+from .tasks import execute_omex
+from urllib.parse import parse_qs
+from celery.result import AsyncResult
 
 from django.http import HttpResponse
+
+from channels import Channel, Group
 from channels.handler import AsgiHandler
-from channels import Group
 from channels.sessions import channel_session
-from urllib.parse import parse_qs
+from channels.auth import channel_session_user, channel_session_user_from_http
+from channels.security.websockets import allowed_hosts_only
+
 log = logging.getLogger(__name__)
 
 
+@allowed_hosts_only
+@channel_session_user_from_http
+def ws_connect(message):
+    """ Connection to websocket. """
 
-# Connected to websocket.connect
-@channel_session
-def ws_connect(message, room_name):
     # Accept connection
-    message.reply_channel.send({"accept": True})
-    # Parse the query string
-    params = parse_qs(message.content["query_string"])
-    if b"username" in params:
-        # Set the username in the session
-        message.channel_session["username"] = params[b"username"][0].decode("utf8")
-        # Add the user to the room_name group
-        Group("chat-%s" % room_name).add(message.reply_channel)
-    else:
-        # Close the connection.
-        message.reply_channel.send({"close": True})
-
-# Connected to websocket.receive
-@channel_session
-def ws_message(message, room_name):
-    Group("chat-%s" % room_name).send({
-        "text": json.dumps({
-            "text": message["text"],
-            "username": message.channel_session["username"],
-        }),
-    })
-
-# Connected to websocket.disconnect
-@channel_session
-def ws_disconnect(message, room_name):
-    Group("chat-%s" % room_name).discard(message.reply_channel)
-
-'''
-def ws_message(message):
-    # ASGI WebSocket packet-received and send-packet message types
-    # both have a "text" key for their textual data.
     message.reply_channel.send({
-        "text": message.content['text'],
+        "text": json.dumps({
+            "accept": True,
+            "action": "reply_channel",
+            "reply_channel": message.reply_channel.name,
+        })
     })
-'''
 
-def http_consumer(message):
-    """ Example http consumer.
 
-    :param message:
-    :return:
-    """
-    # Make standard HTTP response - access ASGI path attribute directly
-    response = HttpResponse("Hello world! You asked for %s" % message.content['path'])
-    # Encode that response into message format (ASGI)
-    for chunk in AsgiHandler.encode_response(response):
-        message.reply_channel.send(chunk)
-
-def my_consumer(message):
-    """ Example function to consume a channel.
-    For every message on the channel, Django will call the consumer function with
-    a message object (message objects have a “content” attribute which is
-    always a dict of data, and a “channel” attribute which is the channel
-    it came from, as well as some others).
-
-    :param message:
-    :return:
-    """
-
-    pass
-
-'''
 @channel_session
 def ws_connect(message):
     message.reply_channel.send({
         "text": json.dumps({
+            "accept": True,
             "action": "reply_channel",
             "reply_channel": message.reply_channel.name,
         })
@@ -111,34 +67,60 @@ def ws_receive(message):
     if data:
         reply_channel = message.reply_channel.name
 
-        if data['action'] == "start_sec3":
-            start_sec3(data, reply_channel)
+        if data['action'] == "run_archive":
+            run_archive(data, reply_channel)
 
 
-def start_sec3(data, reply_channel):
-    log.debug("job Name=%s", data['job_name'])
-    # Save model to our database
-    job = Job(
-        name=data['job_name'],
-        status="started",
-    )
-    job.save()
 
-    # Start long running task here (using Celery)
-    sec3_task = sec3.delay(job.id, reply_channel)
+@channel_session_user
+def ws_disconnect(message):
+    pass
+    # Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
 
-    # Store the celery task id into the database if we wanted to
-    # do things like cancel the task in the future
-    job.celery_id = sec3_task.id
-    job.save()
+
+def http_consumer(message):
+    """ Example http consumer.
+
+    :param message:
+    :return:
+    """
+    # Make standard HTTP response - access ASGI path attribute directly
+    response = HttpResponse("Hello world! You asked for %s" % message.content['path'])
+    # Encode that response into message format (ASGI)
+    for chunk in AsgiHandler.encode_response(response):
+        message.reply_channel.send(chunk)
+
+
+def run_archive(data, reply_channel):
+    log.debug("job Name=%s", data['archive_id'])
+
+    create_task = False
+
+    # get archive
+    archive_id = data['archive_id']
+    archive = get_object_or_404(Archive, pk=archive_id)
+
+    if archive.task_id:
+        result = AsyncResult(archive.task_id)
+        # Create new task and run again.
+        if result.status in ["FAILURE", "SUCCESS"]:
+            create_task = True
+
+    else:
+        # no execution yet
+        create_task = True
+
+    if create_task:
+        # task will send message when finished
+        result = execute_omex.delay(archive_id=archive_id, reply_channel=reply_channel)
+        archive.task_id = result.task_id
+        archive.save()
 
     # Tell client task has been started
     Channel(reply_channel).send({
         "text": json.dumps({
-            "action": "started",
-            "job_id": job.id,
-            "job_name": job.name,
-            "job_status": job.status,
+            "task_id": archive.task_id,
+            "task_status": result.status,
+            "archive_id": archive_id,
         })
     })
-'''

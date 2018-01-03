@@ -61,7 +61,17 @@ def archives(request, form=None):
     :param form:
     :return:
     """
-    archives = Archive.objects.all().order_by('-created')
+    if request.user.is_superuser:
+        archives = Archive.objects.all().order_by('-created')
+    else:
+        accepted_user = [request.user]
+        try:
+            global_user = User.objects.get(username="global")
+            accepted_user.append(global_user)
+        except User.DoesNotExist:
+            pass
+
+        archives = [archive  for archive  in Archive.objects.all().order_by('-created') if archive.user in accepted_user]
 
     if form is None:
         form = UploadArchiveForm()
@@ -200,7 +210,7 @@ def upload(request):
             with open(file_path, 'wb+') as destination:
                 destination.write(file_obj2.read())
 
-                new_archive, _ = Archive.objects.get_or_create(archive_path=file_path, **create_dic)
+                new_archive = Archive.objects.create(file=file_obj, **create_dic)
             shutil.rmtree(dirpath)
 
             # Everything uploaded, now display the entry
@@ -328,6 +338,8 @@ def delete_archive(request, archive_id):
     :param archive_id:
     :return:
     """
+
+    # FIXME: make sure only the own archives can be deleted
     archive = get_object_or_404(Archive, pk=archive_id)
     archive.delete()
 
@@ -433,13 +445,25 @@ def runall(request, status=None):
     :param request:
     :return:
     """
-    # TODO: implement allow filtering by status
-
     all_archives = Archive.objects.all().order_by('-created')
     for archive in all_archives:
-        result = execute_omex.delay(archive_id=archive.id)
+        result = execute_omex.delay(archive_id=archive.id, reply_channel=None)
         archive.task_id = result.task_id
         archive.save()
+    return redirect('combine:index')
+
+@login_required
+def resetall(request):
+    """ Resets all archives, i.e., removing task results.
+
+    :param request:
+    :return:
+    """
+    all_archives = Archive.objects.all().order_by('-created')
+    for archive in all_archives:
+        # remove old TaskResult and reset task_id
+       archive.reset_task()
+
     return redirect('combine:index')
 
 
@@ -458,7 +482,8 @@ def run_archive(request, archive_id):
         # Create new task and run again.
         if result.status in ["FAILURE", "SUCCESS"]:
             create_task = True
-
+            # reset task (and remove old task result)
+            archive.reset_task()
     else:
         # no execution yet
         create_task = True

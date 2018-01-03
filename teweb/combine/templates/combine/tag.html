@@ -13,5 +13,6 @@
 
 
 {% block javascript %}
-    {%  include "combine/archives_js.html" %}
+<!-- Websockets, channels & archive actions -->
+<script src="{{ static('combine/js/channels.js') }}"></script>
 {% endblock %}

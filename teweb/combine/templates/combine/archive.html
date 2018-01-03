@@ -1,72 +1,23 @@
 {% extends "combine/base.html" %}
 
-{% block head %}
-    {% include "combine/archive_content_head.html" %}
-    <script src="{{ static("combine/js/reconnecting-websocket.min.js") }}" type="text/javascript"></script>
-{% endblock %}
-
 {% block content %}
 <div class="row">
     <div class="col-xs-12">
-    {% include "combine/archive_content.html" %}
+
+        {% include "combine/archive_content.html" %}
+
     </div>
 </div>
+
 <div class="row">
     {% if archive.has_sedml() %}
     <div class="col-xs-12">
-        {% include "combine/task_content.html" %}
+    {% include "combine/task_content.html" %}
     </div>
     {% endif %}
 </div>
 {% endblock %}
 
 {% block javascript %}
-    {%  include "combine/archive_js.html" %}
-    <script>
-        $(function() {
-       // When we're using HTTPS, use WSS too.
-       var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-       var ws_path = ws_scheme + '://' + window.location.host + '/dashboard/';
-       console.log("Connecting to " + ws_path)
-       var socket = new ReconnectingWebSocket(ws_path);
-       socket.onmessage = function(message) {
-           console.log("Got message: " + message.data);
-           var data = JSON.parse(message.data);
-           // if action is started, add new item to table
-           if (data.action == "started") {
-               var task_status = $("#task_status");
-               var ele = $('<tr></tr>');
-               ele.attr("id", data.job_id);
-               var item_id = $("<td></td>").text(data.job_id);
-               ele.append(item_id);
-               var item_name = $("<td></td>").text(data.job_name);
-               ele.append(item_name);
-               var item_status = $("<td></td>");
-               item_status.attr("id", "item-status-"+data.job_id);
-               var span = $('<span class="label label-primary"></span>').text(data.job_status);
-               item_status.append(span);
-               ele.append(item_status);
-               task_status.append(ele);
-           }
-           // if action is completed, just update the status
-           else if (data.action == "completed"){
-               var item = $('#item-status-' + data.job_id + ' span');
-               item.attr("class", "label label-success");
-               item.text(data.job_status);
-           }
-       };
-       $("#taskform").on("submit", function(event) {
-           var message = {
-               action: "start_sec3",
-               job_name: $('#task_name').val()
-           };
-           socket.send(JSON.stringify(message));
-           $("#task_name").val('').focus();
-           return false;
-       });
-    });
-
-    </script>
-
-
+{% include "combine/archive_js.html" %}
 {% endblock %}

@@ -17,6 +17,7 @@ from django.utils.timezone import utc
 from django.core.files import File
 
 from celery.result import AsyncResult
+from django_celery_results.models import TaskResult
 
 
 from . import validators, managers
@@ -331,6 +332,17 @@ class Archive(models.Model):
         sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/sed-ml")
         return len(sedml_entries) > 0
 
+    def has_sbml(self):
+        """ Check if any SBML file in the archive."""
+        sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/sbml")
+        return len(sedml_entries) > 0
+
+    def has_cellml(self):
+        """ Check if any CellML file in the archive."""
+        sedml_entries = self.entries.filter(format__startswith="http://identifiers.org/combine.specifications/cellml")
+        return len(sedml_entries) > 0
+
+
     def has_entries(self):
         """ Check if ArchiveEntries exist for archive. """
         return self.entries.count() > 0
@@ -348,6 +360,15 @@ class Archive(models.Model):
         :return: dictionary {location: metadata}
         """
         return read_metadata(self.path)
+
+    def reset_task(self):
+        """ Resets the task, and removes corresponding task results. """
+        if self.task_id:
+            task_result = TaskResult.objects.get(task_id=self.task_id)
+            task_result.delete()
+            self.task_id = ''  # set blank
+            self.save()
+
 
     def update_manifest_entry(self):
         """ Updates the manifest entry of this archive based on the latest information.
@@ -458,6 +479,8 @@ class Archive(models.Model):
         self.save()
 
 
+
+
 class EntrySource(DjangoChoices):
     """ Source of the entry information. """
     manifest = ChoiceItem("manifest")
@@ -539,6 +562,11 @@ class ArchiveEntry(ChangesMixin, models.Model):
         if save:
             self.save()
 
+
+############################
+# Channels
+############################
+# Testing channels
 
 class Job(models.Model):
     name = models.CharField(max_length=255)

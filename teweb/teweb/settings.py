@@ -14,7 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "0.2.0a1"
+VERSION = "0.2.0a2"
 INTERNAL_IPS = ['127.0.0.1']
 
 # Quick-start development settings - unsuitable for production
@@ -45,8 +45,7 @@ INSTALLED_APPS = [
     'django_filters',
     'django_model_changes',
     # 'debug_toolbar',
-    'channels'
-
+    'channels',
 ]
 
 MIDDLEWARE = [

@@ -53,6 +53,122 @@ def hash_for_file(file, hash_type='MD5', blocksize=65536):
 class ArchiveManager(models.Manager):
     """ Manager for Archive. """
 
+    def create(self, *args, **kwargs):
+        Tag = apps.get_model("combine", model_name="Tag")
+        ArchiveEntry = apps.get_model("combine", model_name="ArchiveEntry")
+        MetaData = apps.get_model("combine", model_name="MetaData")
+
+
+        kwargs["created"] = datetime.datetime.now()
+        file= kwargs["file"]
+        #kwargs["file"] = File(kwargs["file"])
+        del kwargs["file"]
+        hasher = hashlib.md5()
+        buf = file.read(65536)
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = file.read(65536)
+        kwargs["md5"] = hasher.hexdigest()
+        kwargs["name"] =  os.path.basename(file.name)
+        archive = super(ArchiveManager, self).create(*args, **kwargs)
+
+        archive.file.save(kwargs["name"],File(file))
+
+        try:
+            if isinstance(kwargs['user'], string_types):
+                archive.user = User.objects.get(username=kwargs["user"])
+            elif isinstance(kwargs['user'], User):
+                archive.user = kwargs["user"]
+        except KeyError:
+            archive.user = User.objects.get(username="global")
+
+        archive.save()
+
+        with zipfile.ZipFile(file) as z:
+
+            tags = []
+
+            for location, entry in archive.omex_entries().items():
+                entry_dict = {
+                    "entry": entry,
+                    "archive": archive,
+                }
+                archive_entry, _ = ArchiveEntry.objects.get_or_create(**entry_dict)
+
+                # add file to archive entry
+                if location != ".":
+                    zip_name = location.replace("./", "")
+
+                    # extract to temporary file
+                    suffix = location.split('/')[-1]
+                    tmp = tempfile.NamedTemporaryFile("wb", suffix=suffix)
+                    tmp.write(z.read(zip_name))
+                    tmp.seek(0)  # rewind file for reading !
+
+                    with open(tmp.name, 'rb') as f:
+                        name = zip_name
+                        # name = name.replace("/", '__')
+                        archive_entry.file.save(name, File(f))
+                    tmp.close()
+
+                # create metadata for entry
+                meta_dict = archive.omex_metadata().get(location)
+                if meta_dict.get("created") is None:
+                    # dummy created timestamp
+                    now = datetime.datetime.utcnow().replace(tzinfo=utc)
+                    meta_dict['created'] = now
+                    meta_dict['modified'].append(now)
+
+                metadata_dict = {
+                    "metadata": meta_dict,
+                }
+                metadata = MetaData.objects.create(**metadata_dict)
+
+                archive_entry.metadata = metadata
+                archive_entry.save()
+
+                # add some standard descriptions
+                if (metadata.description is None) or (len(metadata.description) == 0):
+                    base_format = archive_entry.base_format
+                    if base_format in ["sed-ml", 'sedml']:
+                        metadata.description = "SED-ML simulation experiment"
+                        metadata.save()
+                    elif base_format == "sbml":
+                        metadata.description = "SBML model"
+                        metadata.save()
+                    elif base_format == "cellml":
+                        metadata.description = "CellML model"
+                        metadata.save()
+                    location = archive_entry.location
+                    if location == "./manifest.xml":
+                        metadata.description = "COMBINE archive manifest"
+                        metadata.save()
+                    if location == "./metadata.rdf":
+                        metadata.description = "COMBINE archive metadata"
+                        metadata.save()
+
+                # Tags from given entry
+                # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
+                tags_info = create_tags_for_entry(archive_entry)
+                # pprint(tags_info)
+                for tag_info in tags_info:
+                    tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
+                    tags.append(tag)
+
+            # add all tags at once
+            archive.tags.add(*tags)
+            archive.save()
+
+            # update the manifest
+            archive.update_manifest_entry()
+
+            # update the metadata
+            archive.update_metadata_entry()
+
+
+        return archive
+
+
     def get_or_create(self, *args, **kwargs):
         """ Create archive information from given archive file.
         This is the main entry point for the import of archives in the database.
@@ -88,13 +204,12 @@ class ArchiveManager(models.Manager):
             # add User to Archive, User format can be string, or User object
             try:
                 if isinstance(kwargs['user'], string_types):
-                    user = User.objects.get(username=kwargs["user"])
+                    archive.user = User.objects.get(username=kwargs["user"])
                 elif isinstance(kwargs['user'], User):
-                    user = kwargs["user"]
+                    archive.user = kwargs["user"]
             except KeyError:
-                user = User.objects.get(username="global")
+                archive.user = User.objects.get(username="global")
 
-            archive.user = user
             archive.save()
 
             # ----------------------------
@@ -191,6 +306,7 @@ class ArchiveManager(models.Manager):
 
         else:
             return super(ArchiveManager, self).get_or_create(*args, **kwargs)
+
 
 
 class ArchiveEntryManager(models.Manager):

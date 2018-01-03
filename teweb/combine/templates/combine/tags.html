@@ -12,15 +12,20 @@
 
             <div class="panel-body">
                 {% if tags %}
-                <table id="tags" class="table table-striped table-condensed table-hover">
+                <table id="tags"
+                   class="table table-striped table-condensed table-hover"
+                   data-toggle="table"
+                   data-search="true"
+                   data-pagination="true"
+                   data-page-size="25">
                     <thead>
                     <tr>
-                        <th>id</th>
-                        <th>tag</th>
-                        <th>type</th>
-                        <th>name</th>
-                        <th>count</th>
-                        <th>archives</th>
+                        <th data-sortable="true">id</th>
+                        <th data-sortable="true">tag</th>
+                        <th data-sortable="true">type</th>
+                        <th data-sortable="true">name</th>
+                        <th data-sortable="true">count</th>
+                        <th data-sortable="true">archives</th>
                     </tr>
                     </thead>
 
@@ -50,13 +55,3 @@
     </div>
 </div>
 {%  endblock %}
-
-{% block javascript %}
-<script type="text/javascript" charset="utf-8">
-    $(document).ready(function () {
-        $('#tags').DataTable({
-            "pageLength": 25
-        });
-    });
-</script>
-{% endblock %}
