@@ -25,78 +25,45 @@ Definition of reusable macro function in templates
 {% endmacro %}
 
 
-<!-- Tasks -->
-{% macro task_status(task) %}
-    {% if task.status == "SUCCESS" %}
-        <span class="label label-success"><i
-                class="fas fa-check-square fa-fw"></i> {{ task.status }}</span>
-    {% elif task.status == "FAILURE" %}
-        <span class="label label-danger"><i
-                class="fas fa-minus-square fa-fw"></i> {{ task.status }}</span>
-    {% else %}
-        <span class="label label-info"
-              title="{{ task }}">{{ task.status }}</span>
-    {% endif %}
-{% endmacro %}
-
-{%  macro archive_status(archive) %}
-{% if archive.task_id %}
-    {{ task_status(archive.task) }}
-{% else %}
-    <i class="fas fa-ban fa-fw fa-lg grey"></i>
-{% endif %}
-{% endmacro %}
-
-
-
-{% macro archive_results(archive) %}
-{% if archive.task_id %}
-    {% with task = archive.task %}
-        {% if task.status == "SUCCESS" %}
-            <a href="{{ url('combine:results', args=[archive.id])}}">
-                <i class="fas fa-chart-line fa-fw fa-lg"></i>
-            </a>
-        {% else %}
-            <i class="fas fa-ban fa-fw fa-lg grey"></i>
-        {% endif %}
-    {% endwith %}
-{% else %}
-    <i class="fas fa-ban fa-fw fa-lg grey"></i>
-{% endif %}
-{% endmacro %}
-
-
+<!-- Archive action -->
 {%  macro archive_action(archive) %}
     <span class="archive-action" archive="{{ archive.id }}">
 {% if archive.task_id %}
 
     {% with task = archive.task %}
-        <!--<a href="{{ url('combine:run_archive', args=[archive.id]) }}">-->
             {% if task %}
                 {% if task.status == 'SUCCESS' %}
-                    <span id="action_{{ archive.id }}" class="btn-xs btn-default">
-                    <i class="fas fa-sync-alt fa-fw" title="RERUN"></i> RERUN
+                    <button id="action_{{ archive.id }}" class="btn-xs btn-default" title="Rerun Archive">
+                        <i class="fas fa-sync-alt fa-fw"></i></button>
                 {% elif task.status == 'FAILURE' %}
-                    <span id="action_{{ archive.id }}" class="btn-xs btn-danger">
-                    <i id="action_{{ archive.id }}" class="fas fa-sync-alt fa-fw" title="RETRY"></i> RETRY
+                    <button id="action_{{ archive.id }}" class="btn-xs btn-danger" title="Retry Archive">
+                        <i class="fas fa-sync-alt fa-fw"></i></button>
                 {% else %}
-                    <span id="action_{{ archive.id }}" class="btn-xs btn-info">
-                    <i class="fas fa-cog fa-spin fa-fw" title="EXECUTING"></i> EXECUTING
+                    <button id="action_{{ archive.id }}" class="btn-xs btn-info" title="Executing Archive">
+                        <i class="fas fa-cog fa-spin fa-fw"></i></button>
                 {% endif %}
             {% endif %}
-            </span>
-        <!--</a>-->
     {% endwith %}
 {% else %}
     {% if archive.has_sedml() %}
-    <!--<a href="{{ url('combine:run_archive', args=[archive.id]) }}">-->
-    <span id="action_{{ archive.id }}" class="btn-xs btn-success btn-xs">
-    <i class="fas fa-play-circle fa-fw" title="RUN"></i> RUN</span></a>
-    <!--</a>-->
+    <button id="action_{{ archive.id }}" class="btn-xs btn-success" title="Run archive">
+        <i class="fas fa-play-circle fa-fw"></i></button>
     {% endif %}
 
 {% endif %}
-    </span>
+{% endmacro %}
+
+<!-- Archive results -->
+{% macro archive_results(archive) %}
+{% if archive.task_id %}
+    {% with task = archive.task %}
+        {% if task.status == "SUCCESS" %}
+            <button id="results_{{ archive.id }}" class="btn-xs btn-default" title="Show results">
+            <a href="{{ url('combine:results', args=[archive.id])}}"><i class="fas fa-chart-line fa-fw fa-lg"></i></a>
+            </button>
+        {% endif %}
+    {% endwith %}
+{% endif %}
 {% endmacro %}
 
 <!-- User -->
@@ -113,11 +80,21 @@ Definition of reusable macro function in templates
 {% endmacro %}
 
 <!-- Status -->
-{% macro status(status) %}
-{% if status == "finished" %}
-<i class="fas fa-fw fa-check-square-o text-success" title="{{ status }}"></i>
-{% elif status == "in progress" %}
-    <i class="fas fa-fw fa-cog" title="{{ status }}"></i>
+{%  macro archive_status(archive) %}
+{% if archive.task_id %}
+    {{ task_status(archive.task) }}
 {% endif %}
-{{ status }}</td>
+{% endmacro %}
+
+{% macro task_status(task) %}
+    {% if task.status == "SUCCESS" %}
+        <span class="label label-success"><i
+                class="fas fa-check-square fa-fw"></i> {{ task.status }}</span>
+    {% elif task.status == "FAILURE" %}
+        <span class="label label-danger"><i
+                class="fas fa-minus-square fa-fw"></i> {{ task.status }}</span>
+    {% else %}
+        <span class="label label-info"
+              title="{{ task }}">{{ task.status }}</span>
+    {% endif %}
 {% endmacro %}
