@@ -10,8 +10,14 @@ from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from ..forms import UploadArchiveForm
 from .utils import OMEX_SHOWCASE_PATH
+from ..utils.data import create_users, add_archives_to_database
+from ..fixtures.users import user_defs
+
 
 BASE_URL = '/'
+
+# environment variables for tests
+os.environ["DJANGO_ADMIN_PASSWORD"] = "test"
 
 class ArchiveMethodTests(TestCase):
     def test_view_index(self):
@@ -57,8 +63,28 @@ class ArchiveMethodTests(TestCase):
         # get_content(archive)
 class LoginInViews(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        create_users(user_defs=user_defs, delete_all=True)
+
     def setUp(self):
-        self.client.login(user="janekg89", password="test")
+
+        self.client.login(username="janekg89", password=os.environ['DJANGO_ADMIN_PASSWORD'])
+
+    def test_upload_archive(self):
+
+        path = OMEX_SHOWCASE_PATH
+
+        with open(path, 'rb') as fp:
+            file = SimpleUploadedFile("test", fp.read())
+            response = self.client.post("/upload",{'file':file })
+            self.assertEquals(response.status_code, 302)
+            self.assertEquals(response.url, "/archive/1/")
+
+
+
+
+
 
 
 
