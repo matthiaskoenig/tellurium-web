@@ -279,49 +279,8 @@ def download_archive(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
-    filename = archive.file.name.split('/')[-1]
-
-    # All entries are written including the updated manifest.xml and metadata.rdf
-    content = {}
-    for entry in archive.entries.all():
-        location = entry.location
-        if location in ["."]:
-            continue
-
-        content[location] = entry
-
-    # Open StringIO to grab in-memory ZIP contents
-    s = io.BytesIO()
-
-    # The zip compressor
-    zf = zipfile.ZipFile(s, "w")
-
-    # write all entries
-    for location, entry in content.items():
-        file_path = entry.path
-
-        # fix paths for writing in zip file
-        zip_path = location.replace("./", "")
-        
-        # Add file, at correct path, with last_modified time
-        modified_date = entry.metadata.last_modified
-        if modified_date:
-            date_time = modified_date.date
-        else:
-            # get current date time with server timezone
-            date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
-
-        zip_info = zipfile.ZipInfo(filename=zip_path)
-        zip_info.date_time = date_time.timetuple()  # set modification date
-        zip_info.external_attr = 0o777 << 16  # give full access to included file
-
-        with open(file_path, "rb") as f:
-            zf.writestr(zip_info, f.read())
-
-        # zf.write(fpath, zip_path)
-
-    # Must close zip for all contents to be written
-    zf.close()
+    filename = self.file.name.split('/')[-1]
+    s = archive.create_omex_bytes()
 
     # Grab ZIP file from in-memory, make response with correct content type
     response = HttpResponse(s.getvalue(), content_type='application/zip')
