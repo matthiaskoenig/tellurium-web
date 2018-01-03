@@ -16,19 +16,17 @@
                    data-toggle="table"
                    data-search="true"
                    data-pagination="true"
-                   data-page-size="15"
-                   data-show-toggle="true"
-                   data-show-columns="true">
+                   data-page-size="15">
                     <thead>
                     <tr>
-                        <th>id</th>
-                        <th>task_id</th>
-                        <th>status</th>
-                        <th>content_type</th>
-                        <th>content_encoding</th>
-                        <th>date_done</th>
-                        <th>hidden</th>
-                        <th>meta</th>
+                        <th data-sortable="true">id</th>
+                        <th data-sortable="true">task_id</th>
+                        <th data-sortable="true">status</th>
+                        <th data-sortable="true">content_type</th>
+                        <th data-sortable="true">content_encoding</th>
+                        <th data-sortable="true">date_done</th>
+                        <th data-sortable="true">hidden</th>
+                        <th data-sortable="true">meta</th>
                     </tr>
                     </thead>
                     {% for tr in taskresults %}
