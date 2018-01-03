@@ -35,20 +35,20 @@ Definition of reusable macro function in templates
             {% if task %}
                 {% if task.status == 'SUCCESS' %}
                     <button id="action_{{ archive.id }}" class="btn-xs btn-default" title="Rerun archive">
-                        <i class="fas fa-sync-alt fa-fw"></i></button>
+                        <i id="action_icon_{{ archive.id }}" class="fas fa-sync-alt fa-fw"></i></button>
                 {% elif task.status == 'FAILURE' %}
                     <button id="action_{{ archive.id }}" class="btn-xs btn-danger" title="Retry archive">
-                        <i class="fas fa-sync-alt fa-fw"></i></button>
+                        <i id="action_icon_{{ archive.id }}"class="fas fa-sync-alt fa-fw"></i></button>
                 {% else %}
                     <button id="action_{{ archive.id }}" class="btn-xs btn-info" title="Executing archive">
-                        <i class="fas fa-cog fa-spin fa-fw"></i></button>
+                        <i id="action_icon_{{ archive.id }}"class="fas fa-cog fa-spin fa-fw"></i></button>
                 {% endif %}
             {% endif %}
     {% endwith %}
 {% else %}
     {% if archive.has_sedml() %}
     <button id="action_{{ archive.id }}" class="btn-xs btn-success" title="Run archive">
-        <i class="fas fa-play-circle fa-fw"></i></button>
+        <i id="action_icon_{{ archive.id }}" class="fas fa-play-circle fa-fw"></i></button>
     {% endif %}
 
 {% endif %}
