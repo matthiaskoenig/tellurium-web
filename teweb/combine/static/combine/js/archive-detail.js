@@ -158,11 +158,11 @@ function create_buttons_div(edit){
     var buttons_div = document.createElement("div");
 
     if ( edit ){
-         buttons_div.innerHTML += '<span class="btn btn-success entry_buttons " id="saveButton"><i class="far fa-save"></i> Save </span>';
-         buttons_div.innerHTML += '<span class="btn btn-default entry_buttons " id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';
+         buttons_div.innerHTML += '<span class="btn btn-success entry_buttons" id="saveButton"><i class="far fa-save"></i> Save </span>';
+         buttons_div.innerHTML += '<span class="btn btn-default entry_buttons" id="cancelButton"><i class="fas fa-ban"></i> Cancel </span>';
     }
     else {
-        buttons_div.innerHTML += '<span class="btn btn-default  entry_buttons" id="editButton"> <i class="fas fa-edit fa-fw"></i> edit </span>';
+        buttons_div.innerHTML += '<span class="btn btn-default entry_buttons" id="editButton"> <i class="fas fa-edit fa-fw"></i> edit </span>';
     }
 
     return buttons_div;
