@@ -57,13 +57,12 @@ Definition of reusable macro function in templates
 
 <!-- Archive results -->
 {% macro archive_results(archive) %}
-    <span class="archive-results" archive="{{ archive.id }}">
+    <span id="results_{{ archive.id }}">
 {% if archive.task_id %}
     {% with task = archive.task %}
         {% if task.status == "SUCCESS" %}
             <a href="{{ url('combine:results', args=[archive.id])}}"><button id="results_{{ archive.id }}" class="btn-xs btn-default" title="Show results">
-            <i class="fas fa-chart-line fa-fw fa-lg"></i>
-            </button></a>
+            <i class="fas fa-chart-line fa-fw fa-lg"></i></button></a>
         {% endif %}
     {% endwith %}
 {% endif %}

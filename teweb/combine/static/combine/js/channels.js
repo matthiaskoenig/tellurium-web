@@ -34,6 +34,13 @@ $(function() {
            button.attr("class", "btn-xs btn-success");
            button.attr("title", "Rerun archive");
            button.html('<i class="fas fa-sync-alt fa-fw">');
+
+           // result icon
+           var result_url = "./archive/" + archive_id + "/results";
+           var content = '<a href="' + result_url +'"><button id="results_' + archive_id +'" class="btn-xs btn-default" title="Show results">\n' +
+               '<i class="fas fa-chart-line fa-fw fa-lg"></i></button></a>';
+           $("#results_"+archive_id).html(content);
+
        }
        else if (data.task_status == "FAILURE") {
            // update icon
@@ -46,12 +53,10 @@ $(function() {
 
    };
 
-   /*
-    * Action after clicking the archive action.
-    */
+   /* Action after clicking the archive action. */
    $(".archive-action").on("click", function(event) {
        var archive_id = $(this).attr("archive");
-       console.log("Archive id: " + archive_id)
+       console.log("Archive id: " + archive_id);
 
        var message = {
            action: "run_archive",
@@ -59,16 +64,15 @@ $(function() {
        };
        socket.send(JSON.stringify(message));
 
-       // update message
-       // var content = '<i class="fas fa-fw fa-cog fa-spin"></i> Executing Task';
-       // $("#task-status-"+archive_id).html(content);
-
        // update action icon
        var button = $("#action_"+archive_id);
        button.attr("class", "btn-xs btn-info");
        button.attr("title", "Executing archive");
-
        button.html('<i class="fas fa-cog fa-spin fa-fw">');
+
+       // update results icon
+       $("#results_"+archive_id).html();
+
 
        return false;
    });
