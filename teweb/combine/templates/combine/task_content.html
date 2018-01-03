@@ -8,31 +8,12 @@
             </div>
 
             <div class="panel-body">
-
-                <!-- status -->
-                {% if task %}
-                    {{ macros.task_status(task) }}
-                {% else %}
-                    <span class="label label-default">None</span> Archive has not been executed.
-                {% endif %}
+                {{ macros.archive_action(archive) }} {{ macros.archive_status(archive) }}
+                {{ macros.archive_results(archive) }}
 
                 <!-- task result -->
-                {% if task_result %}
-                    <a href="{{ url('combine:taskresult', args=[task_result.pk]) }}"><span class="btn btn-default btn-xs">TaskResult</span></a>
-                {% endif %}
+                {{ macros.task_result(task_result) }}
 
-                <!-- task id -->
-                {% if archive.task_id %}
-                    {{ archive.task_id }}
-                {% endif %}
-
-                <br/><br/>
-
-                <!-- results -->
-                {% if task.status == 'SUCCESS' %}
-                    <a href="{{ url('combine:results', args=[archive.id]) }}" title="View the outputs (plots & reports)">
-                        <button class="btn-xs btn-primary"><i class="fas fa-chart-line fa-fw"></i> RESULTS</button></a>
-                {% endif %}
 
                 <!-- traceback -->
                 {% if task_result %}
@@ -44,9 +25,9 @@
                 {% endif %}
 
                 <!-- run archive action -->
-                {{ macros.archive_action(archive) }}
 
-                <div id="task-status-{{ archive.id }}"></div>
+                <hr />
+
 
             </div>
         </div>

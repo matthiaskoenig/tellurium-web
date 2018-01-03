@@ -20,7 +20,7 @@
                 <th class="hidden-xs" data-sortable="true">sedml</th>
                 <th class="hidden-xs" data-sortable="true">tags</th>
                 {% if request.user.is_authenticated %}
-                <th></th>
+                <th><button id="btn-run-all" class="btn-xs btn-success" title="Run all archives"><i class="fas fa-fast-forward fa-fw"></i></button></th>
                 {% endif %}
             </tr>
             </thead>

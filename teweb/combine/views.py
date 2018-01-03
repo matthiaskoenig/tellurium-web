@@ -73,10 +73,6 @@ def archives(request, form=None):
 
         archives = [archive  for archive  in Archive.objects.all().order_by('-created') if archive.user in accepted_user]
 
-
-
-
-
     if form is None:
         form = UploadArchiveForm()
     context = {
@@ -342,6 +338,8 @@ def delete_archive(request, archive_id):
     :param archive_id:
     :return:
     """
+
+    # FIXME: make sure only the own archives can be deleted
     archive = get_object_or_404(Archive, pk=archive_id)
     archive.delete()
 
