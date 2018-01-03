@@ -1,41 +1,39 @@
 {% import 'combine/macros.html' as macros %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-
-        <h2 class="panel-title">{{ macros.archive_download(archive) }}&nbsp;{{ macros.archive_html(archive) }}
-
-            <span class="pull-right">
-                <!-- delete archive -->
-                {% if request.user.is_authenticated %}
-                            {{ macros.archive_delete(archive) }}
-                {% endif %}
-            </span>
-        </h2>
-    </div>
-
-    <div class="panel-body">
-        <!-- Archive tree -->
-        <div class="flex-container">
-            <div class="">
-                <div class="well">
-                    <div id="json_tree"></div>
-                </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">{{ macros.archive_download(archive) }} {{ macros.archive_html(archive) }}
+                    {% if request.user.is_authenticated %}
+                    <span class="pull-right">
+                    <!-- delete archive -->
+                    {{ macros.archive_delete(archive) }}
+                    </span>
+                    {% endif %}
+                </h2>
             </div>
 
-            <div class="">
-                <!-- Entry detail -->
-                <div id="entry_detail">
-                    <form id="form_detail" method="post">
-                        <div id="button-div"></div>
-                        <div class="well" id="manifest_detail"></div>
-                        <div id="button-meta-div"></div>
-                        <div class="well" id="item_detail"></div>
-                        <div class="well" id="tripples_detail"></div>
-                    </form>
+            <div class="panel-body">
+                <!-- Archive tree -->
+                <div class="flex-container">
+                    <div class="">
+                        <div class="well">
+                            <div id="json_tree"></div>
+                        </div>
+                    </div>
+
+                    <div class="">
+                        <!-- Entry detail -->
+                        <div id="entry_detail">
+                            <form id="form_detail" method="post">
+                                <div id="button-div"></div>
+                                <div class="well" id="manifest_detail"></div>
+                                <div id="button-meta-div"></div>
+                                <div class="well" id="item_detail"></div>
+                                <div class="well" id="tripples_detail"></div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
-
-    </div>
-</div>

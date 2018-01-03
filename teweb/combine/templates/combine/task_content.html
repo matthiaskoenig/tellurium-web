@@ -1,52 +1,52 @@
 {% import 'combine/macros.html' as macros %}
-<div class="panel panel-default">
+        <div class="panel panel-default">
 
-    <div class="panel-heading">
-        <h2 class="panel-title">
-            <i class="fas fa-industry fa-fw"></i> Task
-        </h2>
-    </div>
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    <i class="fas fa-industry fa-fw"></i> Task
+                </h2>
+            </div>
 
-    <div class="panel-body">
+            <div class="panel-body">
 
-        <!-- status -->
-        {% if task %}
-            {{ macros.task_status(task) }}
-        {% else %}
-            <span class="label label-default">None</span> Archive has not been executed.
-        {% endif %}
+                <!-- status -->
+                {% if task %}
+                    {{ macros.task_status(task) }}
+                {% else %}
+                    <span class="label label-default">None</span> Archive has not been executed.
+                {% endif %}
 
-        <!-- task result -->
-        {% if task_result %}
-            <a href="{{ url('combine:taskresult', args=[task_result.pk]) }}"><span class="btn btn-default btn-xs">TaskResult</span></a>
-        {% endif %}
+                <!-- task result -->
+                {% if task_result %}
+                    <a href="{{ url('combine:taskresult', args=[task_result.pk]) }}"><span class="btn btn-default btn-xs">TaskResult</span></a>
+                {% endif %}
 
-        <!-- task id -->
-        {% if archive.task_id %}
-            {{ archive.task_id }}
-        {% endif %}
+                <!-- task id -->
+                {% if archive.task_id %}
+                    {{ archive.task_id }}
+                {% endif %}
 
-        <br/><br/>
+                <br/><br/>
 
-        <!-- results -->
-        {% if task.status == 'SUCCESS' %}
-            <a href="{{ url('combine:results', args=[archive.id]) }}" title="View the outputs (plots & reports)">
-                <span class="btn btn-primary btn-xs"><i class="fas fa-chart-line fa-fw"></i> RESULTS</span></a>
-        {% endif %}
+                <!-- results -->
+                {% if task.status == 'SUCCESS' %}
+                    <a href="{{ url('combine:results', args=[archive.id]) }}" title="View the outputs (plots & reports)">
+                        <span class="btn btn-primary btn-xs"><i class="fas fa-chart-line fa-fw"></i> RESULTS</span></a>
+                {% endif %}
 
-        <!-- traceback -->
-        {% if task_result %}
-            {% if task_result.traceback %}
-                <pre>
-                    <code>{{ task_result.traceback|safe }}</code>
-                    </pre>
-            {% endif %}
-        {% endif %}
+                <!-- traceback -->
+                {% if task_result %}
+                    {% if task_result.traceback %}
+                        <pre>
+                            <code>{{ task_result.traceback|safe }}</code>
+                            </pre>
+                    {% endif %}
+                {% endif %}
 
-        <!-- run archive action -->
-        {{ macros.archive_action(archive) }}
+                <!-- run archive action -->
+                {{ macros.archive_action(archive) }}
 
-        <div id="task-status-{{ archive.id }}"></div>
+                <div id="task-status-{{ archive.id }}"></div>
 
-    </div>
-</div>
+            </div>
+        </div>
