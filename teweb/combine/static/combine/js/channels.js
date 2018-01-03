@@ -15,10 +15,16 @@ $(function() {
        // if action is started, add new item to table
 
        var archive_id = data.archive_id;
+       var button = $("#action_"+archive_id);
+
+
+
        if (data.task_status == "PENDING") {
            // update icon
            var content = '<i class="fas fa-fw fa-cog fa-spin"></i> PENDING';
            $("#task-status-"+archive_id).html(content);
+           button.attr("class", "btn-xs btn-info");
+           button.attr("title", "Executing archive");
        }
        // if action is completed, just update the status
        else if (data.task_status == "SUCCESS"){
@@ -26,11 +32,15 @@ $(function() {
            // update icon
            var content = '<i class="fas fa-fw fa-check"></i> SUCCESS';
            $("#task-status-"+archive_id).html(content);
+           button.attr("class", "btn-xs btn-success");
+           button.attr("title", "Rerun archive");
        }
        else if (data.task_status == "FAILURE") {
            // update icon
            var content = '<i class="fas fa-fw fa-minus"></i> FAILURE';
            $("#task-status-" + archive_id).html(content);
+           button.attr("class", "btn-xs btn-danger");
+           button.attr("title", "Retry archive");
        };
 
    };
@@ -49,13 +59,14 @@ $(function() {
        socket.send(JSON.stringify(message));
        $("#task_name").val('').focus();
 
-       // update icon
+       // update message
        var content = '<i class="fas fa-fw fa-cog fa-spin"></i> Executing Task';
        $("#task-status-"+archive_id).html(content);
 
        // update action icon
-       var button = $(this).find("button");
+       var button = $("#action_"+archive_id);
        button.attr("class", "btn-xs btn-info");
+       button.attr("title", "Executing archive");
        var icon = button.find("i");
        icon.attr("class", "fas fa-cog fa-spin fa-fw");
 

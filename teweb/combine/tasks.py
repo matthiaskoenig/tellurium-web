@@ -96,6 +96,7 @@ def execute_omex(archive_id, reply_channel, debug=False):
                     "archive_id": archive_id,
                 })
             })
+        raise
 
     finally:
         # cleanup
