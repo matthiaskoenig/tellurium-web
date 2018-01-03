@@ -11,14 +11,14 @@
             <tr>
                 <th></th>
                 <th data-sortable="true">name</th>
-                <th class="hidden-xs" data-sortable="true">user</th>
-                <th class="hidden-xs" data-sortable="true">tags</th>
-                <th class="hidden-xs" data-sortable="true">model</th>
-                <th class="hidden-xs" data-sortable="true">sedml</th>
                 <th data-sortable="true">action</th>
                 <th data-sortable="true">status</th>
                 <th data-sortable="true">results</th>
                 <th data-sortable="true">description</th>
+                <th class="hidden-xs" data-sortable="true">user</th>
+                <th class="hidden-xs" data-sortable="true">model</th>
+                <th class="hidden-xs" data-sortable="true">sedml</th>
+                <th class="hidden-xs" data-sortable="true">tags</th>
                 {% if request.user.is_authenticated %}
                 <th></th>
                 {% endif %}
@@ -28,12 +28,11 @@
                 <tr>
                     <td>{{ macros.archive_download(archive) }}</td>
                     <td>{{ macros.archive_html(archive) }}</td>
+                    <td><span id="task-status-{{ archive.id }}"></span> {{ macros.archive_action(archive) }}</td>
+                    <td>{{ macros.archive_status(archive) }}</td>
+                    <td>{{ macros.archive_results(archive) }}</td>
+                    <td>{{ archive.description }}</td>
                     <td class="hidden-xs">{{ macros.user(archive.user) }}</td>
-                    <td class="hidden-xs">
-                        {% for tag in archive.tags.all() %}
-                            {{ macros.tag_html(tag) }}
-                        {% endfor %}
-                    </td>
                     <td class="hidden-xs">{% if archive.has_sbml() %}
                         <img src="{{ static('combine/images/mediatype/sbml.png') }}" height="16"/>
                         {% endif %}
@@ -45,10 +44,11 @@
                         <img src="{{ static('combine/images/mediatype/sed-ml.png') }}" height="16"/>
                         {% endif %}
                     </td>
-                    <td><span id="task-status-{{ archive.id }}"></span> {{ macros.archive_action(archive) }}</td>
-                    <td>{{ macros.archive_status(archive) }}</td>
-                    <td>{{ macros.archive_results(archive) }}</td>
-                    <td>{{ archive.description }}</td>
+                    <td class="hidden-xs">
+                        {% for tag in archive.tags.all() %}
+                            {{ macros.tag_html(tag) }}
+                        {% endfor %}
+                    </td>
                     {% if request.user.is_authenticated %}
                     <td>{{ macros.archive_delete(archive) }}</td>
                     {% endif %}
