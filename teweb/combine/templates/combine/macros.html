@@ -4,18 +4,19 @@ Definition of reusable macro function in templates
 
 <!-- Tags -->
 {% macro tag_html(tag) %}
-<a href="{{ url('combine:tag', args=[tag.id]) }}"><span class="btn btn-default btn-xs"><i class="fas fa-fw fa-tag"></i> {{ tag.category }}:<b>{{ tag.name }}</b></span></a>
+<a href="{{ url('combine:tag', args=[tag.id]) }}"><span class="btn btn-default btn-xs" title="Show tag details"><i class="fas fa-fw fa-tag"></i> {{ tag.category }}:<b>{{ tag.name }}</b></span></a>
 {% endmacro %}
 
 
 <!-- Archives -->
 {% macro archive_html(archive) %}
-    <a href="{{ url('combine:archive', args=[archive.id]) }}"><span class="btn btn-xs btn-primary"><i class="fas fa-archive fa-fw"></i> {{ archive.name }}</span></a>
+    <a href="{{ url('combine:archive', args=[archive.id]) }}"><span class="btn btn-xs btn-primary" title="Show archive details">
+        <i class="fas fa-archive fa-fw"></i> {{ archive.name }}</span></a>
 {% endmacro %}
 
 {% macro archive_download(archive) %}
-<a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download: '{{ archive.name }}.omex'">
-                <span class="btn-xs btn-default"><i class="fas fa-download fa-fw"></i></span></a>
+<a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
+                <button class="btn-xs btn-default"><i class="fas fa-download fa-fw"></i></button></a>
 {% endmacro %}
 
 {% macro archive_delete(archive) %}
@@ -33,13 +34,13 @@ Definition of reusable macro function in templates
     {% with task = archive.task %}
             {% if task %}
                 {% if task.status == 'SUCCESS' %}
-                    <button id="action_{{ archive.id }}" class="btn-xs btn-default" title="Rerun Archive">
+                    <button id="action_{{ archive.id }}" class="btn-xs btn-default" title="Rerun archive">
                         <i class="fas fa-sync-alt fa-fw"></i></button>
                 {% elif task.status == 'FAILURE' %}
-                    <button id="action_{{ archive.id }}" class="btn-xs btn-danger" title="Retry Archive">
+                    <button id="action_{{ archive.id }}" class="btn-xs btn-danger" title="Retry archive">
                         <i class="fas fa-sync-alt fa-fw"></i></button>
                 {% else %}
-                    <button id="action_{{ archive.id }}" class="btn-xs btn-info" title="Executing Archive">
+                    <button id="action_{{ archive.id }}" class="btn-xs btn-info" title="Executing archive">
                         <i class="fas fa-cog fa-spin fa-fw"></i></button>
                 {% endif %}
             {% endif %}
@@ -58,9 +59,9 @@ Definition of reusable macro function in templates
 {% if archive.task_id %}
     {% with task = archive.task %}
         {% if task.status == "SUCCESS" %}
-            <button id="results_{{ archive.id }}" class="btn-xs btn-default" title="Show results">
-            <a href="{{ url('combine:results', args=[archive.id])}}"><i class="fas fa-chart-line fa-fw fa-lg"></i></a>
-            </button>
+            <a href="{{ url('combine:results', args=[archive.id])}}"><button id="results_{{ archive.id }}" class="btn-xs btn-default" title="Show results">
+            <i class="fas fa-chart-line fa-fw fa-lg"></i>
+            </button></a>
         {% endif %}
     {% endwith %}
 {% endif %}
