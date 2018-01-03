@@ -279,7 +279,7 @@ def download_archive(request, archive_id):
     :return:
     """
     archive = get_object_or_404(Archive, pk=archive_id)
-    filename = self.file.name.split('/')[-1]
+    filename = archive.file.name.split('/')[-1]
     s = archive.create_omex_bytes()
 
     # Grab ZIP file from in-memory, make response with correct content type
