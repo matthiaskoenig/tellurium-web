@@ -39,7 +39,6 @@ $(function() {
            var content_results = '<a href="' + result_url +'"><button id="results_' + archive_id +'" class="btn-xs btn-default" title="Show results">\n' +
                '<i class="fas fa-chart-line fa-fw fa-lg"></i></button></a>';
            $("#results_"+archive_id).html(content_results);
-
        }
        else if (data.task_status == "FAILURE") {
            // action
