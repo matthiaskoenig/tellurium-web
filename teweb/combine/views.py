@@ -61,7 +61,13 @@ def archives(request, form=None):
     :param form:
     :return:
     """
-    archives = Archive.objects.all().order_by('-created')
+    if request.user.is_superuser:
+        archives = Archive.objects.all().order_by('-created')
+    else:
+        global_user = User.objects.get(username="global")
+        archives = [archive  for archive  in Archive.objects.all().order_by('-created') if archive.user in [request.user,global_user ]]
+
+
 
     if form is None:
         form = UploadArchiveForm()
