@@ -47,6 +47,7 @@ class ArchiveMethodTests(TestCase):
         form = UploadArchiveForm(post_dict, file_dict)
         self.assertTrue(form.is_valid())
 
+
     # OMEX Tests
     def test_omex(self):
         # TODO: implement & upload archive & fill database tests for the test database
@@ -54,5 +55,11 @@ class ArchiveMethodTests(TestCase):
         # archive = Archive.objects.get(pk=1)
         # print(archive)
         # get_content(archive)
+class LoginInViews(TestCase):
+
+    def setUp(self):
+        self.client.login(user="janekg89", password="test")
+
+
 
 

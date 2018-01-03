@@ -12,15 +12,15 @@
             <thead>
             <tr>
                 <th></th>
-                <th>name</th>
-                <th class="hidden-xs">user</th>
-                <th class="hidden-xs">tags</th>
-                <th class="hidden-xs">model</th>
-                <th class="hidden-xs">sedml</th>
-                <th>action</th>
-                <th>status</th>
-                <th>results</th>
-                <th>description</th>
+                <th data-sortable="true">name</th>
+                <th class="hidden-xs" data-sortable="true">user</th>
+                <th class="hidden-xs" data-sortable="true">tags</th>
+                <th class="hidden-xs" data-sortable="true">model</th>
+                <th class="hidden-xs" data-sortable="true">sedml</th>
+                <th data-sortable="true">action</th>
+                <th data-sortable="true">status</th>
+                <th data-sortable="true">results</th>
+                <th data-sortable="true">description</th>
                 {% if request.user.is_authenticated %}
                 <th></th>
                 {% endif %}
