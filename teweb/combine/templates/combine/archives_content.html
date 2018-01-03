@@ -1,9 +1,9 @@
 {% import 'combine/macros.html' as macros %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
+
+
         <h2 class="panel-title"><i class="fa fa-archive fa-fw"></i> COMBINE Archives</h2>
-    </div>
+
 
     <div class="panel-body">
         {% if archives %}
@@ -12,35 +12,37 @@
                 <tr>
                     <th></th>
                     <th>name</th>
-                    <th>user</th>
-                    <th>tags</th>
-                    <th>model</th>
-                    <th>sedml</th>
+                    <th class="hidden-xs">user</th>
+                    <th class="hidden-xs">tags</th>
+                    <th class="hidden-xs">model</th>
+                    <th class="hidden-xs">sedml</th>
                     <th>action</th>
                     <th>status</th>
                     <th>results</th>
                     <th>description</th>
+                    {% if request.user.is_authenticated %}
                     <th></th>
+                    {% endif %}
                 </tr>
                 </thead>
                 {% for archive in archives %}
                     <tr>
                         <td>{{ macros.archive_download(archive) }}</td>
                         <td>{{ macros.archive_html(archive) }}</td>
-                        <td>{{ macros.user(archive.user) }}</td>
-                        <td>
+                        <td class="hidden-xs">{{ macros.user(archive.user) }}</td>
+                        <td class="hidden-xs">
                             {% for tag in archive.tags.all() %}
                                 {{ macros.tag_html(tag) }}
                             {% endfor %}
                         </td>
-                        <td>{% if archive.has_sbml() %}
+                        <td class="hidden-xs">{% if archive.has_sbml() %}
                             <img src="{{ static('combine/images/mediatype/sbml.png') }}" height="16"/>
                             {% endif %}
                             {% if archive.has_cellml() %}
                             <img src="{{ static('combine/images/mediatype/cellml.png') }}" height="16"/>
                             {% endif %}
                         </td>
-                        <td>{% if archive.has_sedml() %}
+                        <td class="hidden-xs">{% if archive.has_sedml() %}
                             <img src="{{ static('combine/images/mediatype/sed-ml.png') }}" height="16"/>
                             {% endif %}
                         </td>
@@ -48,10 +50,9 @@
                         <td>{{ macros.archive_status(archive) }}</td>
                         <td>{{ macros.archive_results(archive) }}</td>
                         <td>{{ archive.description }}</td>
-                        <td>{% if request.user.is_authenticated %}
-                            {{ macros.archive_delete(archive) }}
-                            {% endif %}
-                        </td>
+                        {% if request.user.is_authenticated %}
+                        <td>{{ macros.archive_delete(archive) }}</td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
 
