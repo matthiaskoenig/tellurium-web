@@ -313,9 +313,9 @@ def read_metadata_from_graph(location, g):
     metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created, multiple=False)
     metadata['modified'] = read_predicate(g, location, predicate=DCTERMS.modified, multiple=True)
     metadata['creators'] = read_creators(g, location)
+    metadata['biomodels_triples'] biomodels_triples_from_graph(g, location)
     metadata['triples'] = django_triples_from_graph(g)
     return metadata
-
 
 
 def read_creators(g, location, delete=True):
@@ -410,6 +410,33 @@ def read_predicate(g, location, predicate, multiple=True, delete=True):
             return None
 
 
+def biomodels_triples_from_graph(g, location):
+    # consumes the biomodels triples from the rdf graph
+    triples = []
+
+    # handle the bags for the triples
+    deleted_triples = []
+    for triple in g.triples((URIRef(location), None, None)):
+        (s_root, p_root, o_root) = triple
+
+        # this is a biomodel qualifier
+        if str(p_root).startswith("http://biomodels.net/"):
+
+            deleted_triples.append(triple)
+            # get the object in the bag (if not in bag triple is returned)
+            for (s, p, o) in _objects_in_bag(g, triple, deleted_triples=deleted_triples):
+                triples.append(
+                    _django_triple((s, p, o))
+                )
+
+    # delete triples
+    for triple in deleted_triples:
+        g.remove(triple)
+
+    return triples
+
+
+
 def django_triples_from_graph(g):
     """ Reads the django triples from the given graph.
 
@@ -417,11 +444,16 @@ def django_triples_from_graph(g):
     :return:
     """
     triples = []
-    for (s, p, o) in g.triples((None, None, None)):
-        triple_info = [str(el) for el in (s, type(s), p, type(p), o, type(o)) ]
-        triples.append(triple_info)
+    for triple in g:
+        triples.append(_django_triple(triple))
 
     return triples
+
+
+def _django_triple(triple):
+    """ Creates the django triple from RDF triple. """
+    s, p, o = triple
+    return [str(el) for el in (s, type(s), p, type(p), o, type(o))]
 
 
 def _objects_in_bag(g, triple, deleted_triples=None):
@@ -439,10 +471,14 @@ def _objects_in_bag(g, triple, deleted_triples=None):
     is_bag = len([(s, p, o) for (s, p, o) in triples if p == RDF.type]) > 0
 
     if is_bag:
-        # return list entries
-        return [(s, p, o) for (s, p, o) in triples if p != RDF.type]
+        # return list entries with fixed subject and predicate
+        objects = [(subj, pred, o) for (s, p, o) in triples if p != RDF.type]
     else:
         return [(subj, pred, obj)]
+
+    # fix the subjects
+
+    return objects
 
 
 def read_rdf_graphs(archive_path, debug=False):
