@@ -159,15 +159,21 @@ if __name__ == "__main__":
     from combine.metadata.rdf import MetaDataRDFSerializer
     g = None
     for location, metadata in metadata_dict.items():
-        print(location)
+
         # add the triples for current entry
         serializer = MetaDataRDFSerializer(location=location, metadata=metadata, g=g)
         g = serializer.get_rdf_triples()
-        print(g)
 
     # serialize the full graph
     ttl = g.serialize(format='turtle').decode("utf-8")
     print("-" * 80)
     print(ttl)
     print("-" * 80)
+    ttl_path = "./BIOMD0000000012.ttl"
+    with open(ttl_path, "w") as f_ttl:
+        f_ttl.write(ttl)
 
+    rdf = g.serialize(format='pretty-xml').decode("utf-8")
+    rdf_path = "./BIOMD0000000012.rdf"
+    with open(rdf_path, "w") as f_rdf:
+        f_rdf.write(rdf)
