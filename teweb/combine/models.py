@@ -4,8 +4,10 @@ Models definitions.
 import uuid as uuid_lib
 import logging
 import os
+import io
 import datetime
 import tempfile
+import zipfile
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
@@ -369,6 +371,54 @@ class Archive(models.Model):
             self.task_id = ''  # set blank
             self.save()
 
+    def create_omex_bytes(self):
+        """Writes current omex zip to io.BytesIO.
+        This can than be served as response are stored in file.
+
+        :return:
+        """
+        # All entries are written including the updated manifest.xml and metadata.rdf
+        content = {}
+        for entry in self.entries.all():
+            location = entry.location
+            if location in ["."]:
+                continue
+
+            content[location] = entry
+
+        # Open StringIO to grab in-memory ZIP contents
+        s = io.BytesIO()
+
+        # The zip compressor
+        zf = zipfile.ZipFile(s, "w")
+
+        # write all entries
+        for location, entry in content.items():
+            file_path = entry.path
+
+            # fix paths for writing in zip file
+            zip_path = location.replace("./", "")
+
+            # Add file, at correct path, with last_modified time
+            modified_date = entry.metadata.last_modified
+            if modified_date:
+                date_time = modified_date.date
+            else:
+                # get current date time with server timezone
+                date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
+
+            zip_info = zipfile.ZipInfo(filename=zip_path)
+            zip_info.date_time = date_time.timetuple()  # set modification date
+            zip_info.external_attr = 0o777 << 16  # give full access to included file
+
+            with open(file_path, "rb") as f:
+                zf.writestr(zip_info, f.read())
+
+                # zf.write(fpath, zip_path)
+
+        # Must close zip for all contents to be written
+        zf.close()
+        return s
 
     def update_manifest_entry(self):
         """ Updates the manifest entry of this archive based on the latest information.
@@ -544,11 +594,12 @@ class ArchiveEntry(ChangesMixin, models.Model):
         """
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         meta_dict = {
-            'about': None,
+            'about': self.location,
             'description': description,
             'created': now,
             'modified': (now,),
             'creators': [],
+            'bm_triples': [],
             'triples': [],
         }
         metadata_dict = {

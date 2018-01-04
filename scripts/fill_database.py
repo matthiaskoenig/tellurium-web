@@ -29,10 +29,10 @@ from combine.fixtures.users import user_defs
 
 # directories with OMEX archives
 ARCHIVE_DIRS = [
-    # os.path.join(FILE_DIR, "../archives"),
+    os.path.join(FILE_DIR, "../archives"),
     # os.path.join(FILE_DIR, "../archives/showcase"),
     # os.path.join(FILE_DIR, "../archives/annotation"),
-    os.path.join(FILE_DIR, "../archives/sedml-L1V3"),
+    # os.path.join(FILE_DIR, "../archives/sedml-L1V3"),
 ]
 
 if __name__ == "__main__":

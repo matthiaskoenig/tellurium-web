@@ -50,7 +50,16 @@ def execute_omex(archive_id, reply_channel, debug=False):
 
     # get archive, raises ObjectDoesNotExist
     archive = Archive.objects.get(pk=archive_id)
-    omex_path = str(archive.file.path)
+
+    # uploaded archive
+    # omex_path = str(archive.file.path)
+
+    # latest archive
+    s = archive.create_omex_bytes()
+    tmp_omex = tempfile.NamedTemporaryFile("wb", suffix=".omex")
+    tmp_omex.write(s.getvalue())
+    omex_path = tmp_omex.name
+
 
     # execute archive
     try:
@@ -101,5 +110,6 @@ def execute_omex(archive_id, reply_channel, debug=False):
     finally:
         # cleanup
         shutil.rmtree(tmp_dir)
+        tmp_omex.close()
 
     return results

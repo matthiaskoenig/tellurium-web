@@ -1,0 +1,160 @@
+@prefix bqbiol: <http://biomodels.net/biology-qualifiers/> .
+@prefix bqmodel: <http://biomodels.net/model-qualifiers/> .
+@prefix dcelements: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vCard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix vCardOld: <http://www.w3.org/2001/vcard-rdf/3.0#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<./BIOMD0000000012.xml#PX> bqbiol:is <http://identifiers.org/uniprot/P03023> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000252> .
+
+<./BIOMD0000000012.xml#PY> bqbiol:is <http://identifiers.org/uniprot/P04483> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000252> .
+
+<./BIOMD0000000012.xml#PZ> bqbiol:is <http://identifiers.org/uniprot/P03034> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000252> .
+
+<./BIOMD0000000012.xml#_000001> bqbiol:hasTaxon <http://identifiers.org/taxonomy/562> ;
+    bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0040029> ;
+    bqmodel:is <http://identifiers.org/biomodels.db/BIOMD0000000012>,
+        <http://identifiers.org/biomodels.db/MODEL6615351360> ;
+    bqmodel:isDescribedBy <http://identifiers.org/pubmed/10659856> ;
+    dcterms:created [ dcterms:W3CDTF "2009-01-20T14:03:56Z" ] ;
+    dcterms:creator [ dcterms:hasEmail "juty@ebi.ac.uk" ;
+            dcterms:hasName [ dcterms:family-name "Nick" ;
+                    dcterms:given-name "Juty" ] ;
+            dcterms:organization-name "EMBL-EBI" ],
+        [ dcterms:hasEmail "lukas@ebi.ac.uk" ;
+            dcterms:hasName [ dcterms:family-name "Lukas" ;
+                    dcterms:given-name "Endler" ] ;
+            dcterms:organization-name "EMBL-EBI" ],
+        [ dcterms:hasEmail "bshapiro@caltech.edu" ;
+            dcterms:hasName [ dcterms:family-name "Bruce" ;
+                    dcterms:given-name "Shapiro" ] ;
+            dcterms:organization-name "Jet Propulsion Laboratory" ],
+        [ dcterms:hasEmail "viji@ebi.ac.uk" ;
+            dcterms:hasName [ dcterms:family-name "Vijayalakshmi" ;
+                    dcterms:given-name "Chelliah" ] ;
+            dcterms:organization-name "EMBL-EBI" ],
+        [ dcterms:hasEmail "lenov@ebi.ac.uk" ;
+            dcterms:hasName [ dcterms:family-name "Nicolas" ;
+                    dcterms:given-name "Le Novère" ] ;
+            dcterms:organization-name "EMBL-EBI" ] ;
+    dcterms:modified [ dcterms:W3CDTF "2013-07-10T10:59:30Z" ] .
+
+<./BIOMD0000000012.xml#_000002> bqbiol:is <http://identifiers.org/obo.go/GO:0005623> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000290> .
+
+<./BIOMD0000000012.xml#_420986> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421012> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421038> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421064> bqmodel:is <http://identifiers.org/sbo/SBO:0000461> .
+
+<./BIOMD0000000012.xml#_421076> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421100> bqmodel:is <http://identifiers.org/sbo/SBO:0000461> .
+
+<./BIOMD0000000012.xml#_421112> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421136> bqmodel:is <http://identifiers.org/sbo/SBO:0000461> .
+
+<./BIOMD0000000012.xml#_421148> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421172> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421196> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421220> bqmodel:is <http://identifiers.org/sbo/SBO:0000049> .
+
+<./BIOMD0000000012.xml#_421244> bqmodel:is <http://identifiers.org/sbo/SBO:0000536> .
+
+<./BIOMD0000000012.xml#_421280> bqmodel:is <http://identifiers.org/sbo/SBO:0000536> .
+
+<./BIOMD0000000012.xml#_421317> bqmodel:is <http://identifiers.org/sbo/SBO:0000536> .
+
+<./BIOMD0000000012.xml#_905769> bqbiol:encodes <http://identifiers.org/uniprot/P03023> ;
+    bqbiol:isVersionOf <http://identifiers.org/chebi/CHEBI:33699>,
+        <http://identifiers.org/kegg.compound/C00046> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000250> .
+
+<./BIOMD0000000012.xml#_905781> bqbiol:encodes <http://identifiers.org/uniprot/P04483> ;
+    bqbiol:isVersionOf <http://identifiers.org/chebi/CHEBI:33699>,
+        <http://identifiers.org/kegg.compound/C00046> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000250> .
+
+<./BIOMD0000000012.xml#_905802> bqbiol:encodes <http://identifiers.org/uniprot/P03034> ;
+    bqbiol:isVersionOf <http://identifiers.org/chebi/CHEBI:33699>,
+        <http://identifiers.org/kegg.compound/C00046> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000250> .
+
+<./BIOMD0000000012.xml#_905823> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006402> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000179> .
+
+<./BIOMD0000000012.xml#_905842> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006402> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000179> .
+
+<./BIOMD0000000012.xml#_905862> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006402> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000179> .
+
+<./BIOMD0000000012.xml#_905882> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006412> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000184> .
+
+<./BIOMD0000000012.xml#_905903> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006412> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000184> .
+
+<./BIOMD0000000012.xml#_905923> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006412> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000184> .
+
+<./BIOMD0000000012.xml#_905943> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0030163> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000179> .
+
+<./BIOMD0000000012.xml#_905962> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0030163> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000179> .
+
+<./BIOMD0000000012.xml#_905982> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0030163> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000179> .
+
+<./BIOMD0000000012.xml#_906002> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006351> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000183> .
+
+<./BIOMD0000000012.xml#_906022> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006351> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000183> .
+
+<./BIOMD0000000012.xml#_906042> bqbiol:isVersionOf <http://identifiers.org/obo.go/GO:0006351> ;
+    bqmodel:is <http://identifiers.org/sbo/SBO:0000183> .
+
+<./BIOMD0000000012.xml#metaid_0000023> bqmodel:is <http://identifiers.org/sbo/SBO:0000485> .
+
+<./BIOMD0000000012.xml#metaid_0000024> bqmodel:is <http://identifiers.org/sbo/SBO:0000186> .
+
+<./BIOMD0000000012.xml#metaid_0000026> bqmodel:is <http://identifiers.org/sbo/SBO:0000190> .
+
+<./BIOMD0000000012.xml#metaid_0000027> bqmodel:is <http://identifiers.org/sbo/SBO:0000288> .
+
+<./BIOMD0000000012.xml#metaid_0000028> bqmodel:is <http://identifiers.org/sbo/SBO:0000332> .
+
+<./BIOMD0000000012.xml#metaid_0000032> bqmodel:is <http://identifiers.org/sbo/SBO:0000348> .
+
+<./BIOMD0000000012.xml#metaid_0000128> bqmodel:is <http://identifiers.org/sbo/SBO:0000332> .
+
+<./BIOMD0000000012.xml#metaid_0000132> bqmodel:is <http://identifiers.org/sbo/SBO:0000356> .
+
+<./BIOMD0000000012.xml#metaid_0000133> bqmodel:is <http://identifiers.org/sbo/SBO:0000356> .
+
+<./BIOMD0000000012.xml#metaid_0000233> bqmodel:is <http://identifiers.org/sbo/SBO:0000016> .
+
+<./BIOMD0000000012.xml#metaid_0000234> bqmodel:is <http://identifiers.org/sbo/SBO:0000485> .
+
+<./BIOMD0000000012.xml#metaid_0500235> bqmodel:is <http://identifiers.org/sbo/SBO:0000485> .
+
+<./BIOMD0000000012.xml#metaid_0800235> bqmodel:is <http://identifiers.org/sbo/SBO:0000186> .
+
+<./BIOMD0000000012.xml#metaid_0900235> bqmodel:is <http://identifiers.org/sbo/SBO:0000186> .
+
