@@ -7,7 +7,7 @@ import logging
 
 import rdflib
 import uuid
-from combine.metadata.rdf import bind_default_namespaces
+from combine.metadata.rdf import bind_default_namespaces, read_metadata_from_graph
 
 
 try:
@@ -17,18 +17,17 @@ except:
 
 logger = logging.getLogger(__name__)
 
-# TODO: promote SBO terms
-
 
 def promote_sbo_to_rdf(doc: libsbml.SBMLDocument) -> libsbml.SBMLDocument:
     """
     Add the SBOTerms to the RDF.
     Autogenerates metaids if necessary.
 
+    This is a helper function to convert SBOTerms to RDF.
+
     :param doc:
     :return: SBMLDocument with SBOTerms in annotations.
     """
-
     for element in doc.getListOfAllElements():
 
         element = element  # type: libsbml.SBase
@@ -60,7 +59,6 @@ def promote_sbo_to_rdf(doc: libsbml.SBMLDocument) -> libsbml.SBMLDocument:
 
                 for k_res in range(cvterm.getNumResources()):
                     uri = cvterm.getResourceURI(k_res)
-                    print(qualifier, uri)
                     if uri.endswith(sbo):
                         contains_sbo = True
                         break
@@ -70,12 +68,13 @@ def promote_sbo_to_rdf(doc: libsbml.SBMLDocument) -> libsbml.SBMLDocument:
                 # set meta id
                 if not element.isSetMetaId():
                     # FIXME: this is not reproducible
-                    metaid = uuid.uuid4()
+                    metaid = "meta_" + uuid.uuid4()
                     element.setMetaId(metaid)
 
                 # add cvterm
                 uri = "http://identifiers.org/sbo/" + sbo
                 cvterm = libsbml.CVTerm()
+                cvterm.setQualifierType(libsbml.MODEL_QUALIFIER)
                 cvterm.setModelQualifierType(libsbml.BQM_IS)
                 cvterm.addResource(uri)
                 code = element.addCVTerm(cvterm)
@@ -84,13 +83,10 @@ def promote_sbo_to_rdf(doc: libsbml.SBMLDocument) -> libsbml.SBMLDocument:
                     logger.error("Setting SBO CVTerm '{}' on {} failed with {}".format(sbo, element, code))
                     logger.error(libsbml.OperationReturnValue_toString(code))
 
-
     return doc
 
 
-
-
-def parse_annotations(doc: libsbml.SBMLDocument) -> rdflib.Graph:
+def parse_metadata(doc: libsbml.SBMLDocument, about_prefix=None) -> dict:
     """ Parses the annotations from a given SBML file.
 
     Return RDF graph of triples.
@@ -98,22 +94,23 @@ def parse_annotations(doc: libsbml.SBMLDocument) -> rdflib.Graph:
     :param doc:
     :return:
     """
-    g = rdflib.Graph()
-    bind_default_namespaces(g)
+    metadata_dict = {}
 
     # iterate over all SBases
     for element in doc.getListOfAllElements():
 
         element = element  # type: libsbml.SBase
 
-        # libsbml
-        if element.isSetSBOTerm():
-            sbo = print('SBO:', element.getSBOTermID())
-
         annotation = element.getAnnotation()  # type: libsbml.XMLNode
         if annotation:
-            print()
-            print(element)
+            # individual metadata graph for every element
+            g = rdflib.Graph()
+            bind_default_namespaces(g)
+
+            # location of this element
+            location = about_prefix + "#" + element.getMetaId()
+
+            # parse rdf of element
             rdf_node = annotation.getChild("RDF")  # type: libsbml.XMLNode
             rdf_node.toString()
             rdf_str = rdf_node.toXMLString()  # type: str
@@ -124,23 +121,35 @@ def parse_annotations(doc: libsbml.SBMLDocument) -> rdflib.Graph:
             g_element.parse(data=rdf_str, format="xml")
 
             # add triples to graph
-            for triple in g_element:
-                g.add(triple)
+            for (s, p, o) in g_element:
 
-    ttl = g.serialize(format='turtle').decode("utf-8")
-    print("-" * 80)
-    print(ttl)
-    print("-" * 80)
+                # add prefixes
+                if about_prefix:
+                    if isinstance(s, rdflib.URIRef) and (str(s).startswith('#')):
+                        s = rdflib.URIRef(prefix + str(s))
+                g.add((s, p, o))
 
-    return g
+            # parse metadata from graph
+            ttl = g.serialize(format='turtle').decode("utf-8")
+            print("-" * 80)
+            print(ttl)
+            print("-" * 80)
+            metadata = read_metadata_from_graph(location, g)
+            pprint(metadata)
+
+            metadata_dict[location] = metadata
+
+    return metadata_dict
 
 
 if __name__ == "__main__":
     print(libsbml.getLibSBMLDottedVersion())
     path = "./BIOMD0000000012.xml"
+    prefix = path
     assert os.path.exists(path)
 
     doc = libsbml.readSBMLFromFile(path)  # libsbml.SBMLDocument
     doc = promote_sbo_to_rdf(doc)
-    g = parse_annotations(doc)
+    metadata_dict = parse_metadata(doc, about_prefix=prefix)
+    # pprint(metadata_dict)
 

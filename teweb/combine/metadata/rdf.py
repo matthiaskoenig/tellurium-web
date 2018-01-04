@@ -295,17 +295,27 @@ def read_metadata(archive_path):
     graph_dict = read_rdf_graphs(archive_path=archive_path)
 
     for location, g in graph_dict.items():
-        metadata = {}
-        metadata['about'] = location
-        metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description, multiple=False)
-        metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created, multiple=False)
-        metadata['modified'] = read_predicate(g, location, predicate=DCTERMS.modified, multiple=True)
-        metadata['creators'] = read_creators(g, location)
-        metadata['triples'] = django_triples_from_graph(g)
-
-        metadata_dict[location] = metadata
+        metadata_dict[location] = read_metadata_from_graph(location, g)
 
     return metadata_dict
+
+
+def read_metadata_from_graph(location, g):
+    """ Reads the metadata from given graph
+
+    :param location:
+    :param g:
+    :return:
+    """
+    metadata = {}
+    metadata['about'] = location
+    metadata['description'] = read_predicate(g, location, predicate=DCTERMS.description, multiple=False)
+    metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created, multiple=False)
+    metadata['modified'] = read_predicate(g, location, predicate=DCTERMS.modified, multiple=True)
+    metadata['creators'] = read_creators(g, location)
+    metadata['triples'] = django_triples_from_graph(g)
+    return metadata
+
 
 
 def read_creators(g, location, delete=True):
