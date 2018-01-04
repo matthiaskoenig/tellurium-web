@@ -86,7 +86,7 @@ def promote_sbo_to_rdf(doc: libsbml.SBMLDocument) -> libsbml.SBMLDocument:
     return doc
 
 
-def parse_metadata(doc: libsbml.SBMLDocument, about_prefix=None) -> dict:
+def parse_metadata(doc: libsbml.SBMLDocument, about_prefix=None, debug=False) -> dict:
     """ Parses the annotations from a given SBML file.
 
     Return RDF graph of triples.
@@ -130,12 +130,14 @@ def parse_metadata(doc: libsbml.SBMLDocument, about_prefix=None) -> dict:
                 g.add((s, p, o))
 
             # parse metadata from graph
-            ttl = g.serialize(format='turtle').decode("utf-8")
-            print("-" * 80)
-            print(ttl)
-            print("-" * 80)
             metadata = read_metadata_from_graph(location, g)
-            pprint(metadata)
+
+            if debug:
+                ttl = g.serialize(format='turtle').decode("utf-8")
+                print("-" * 80)
+                print(ttl)
+                print("-" * 80)
+                pprint(metadata)
 
             metadata_dict[location] = metadata
 
@@ -152,4 +154,20 @@ if __name__ == "__main__":
     doc = promote_sbo_to_rdf(doc)
     metadata_dict = parse_metadata(doc, about_prefix=prefix)
     # pprint(metadata_dict)
+
+
+    from combine.metadata.rdf import MetaDataRDFSerializer
+    g = None
+    for location, metadata in metadata_dict.items():
+        print(location)
+        # add the triples for current entry
+        serializer = MetaDataRDFSerializer(location=location, metadata=metadata, g=g)
+        g = serializer.get_rdf_triples()
+        print(g)
+
+    # serialize the full graph
+    ttl = g.serialize(format='turtle').decode("utf-8")
+    print("-" * 80)
+    print(ttl)
+    print("-" * 80)
 

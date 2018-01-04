@@ -171,25 +171,7 @@ def create_metadata(archive, rdf_format, debug=False):
     g = Graph()
     bind_default_namespaces(g)
 
-    def get_element(info_str, type_str):
-        if type_str == "<class 'rdflib.term.URIRef'>":
-            return URIRef(info_str)
-        elif type_str == "<class 'rdflib.term.BNode'>":
-            return BNode(info_str)
-        elif type_str == "<class 'rdflib.term.Literal'>":
-            return Literal(info_str)
-        else:
-            raise ValueError
-
     for entry in archive.entries.order_by('location'):
-        metadata = entry.metadata
-
-        # Write all annotation triples
-        for triple in metadata.triples.all():
-            s = get_element(triple.subject, triple.subject_type)
-            p = get_element(triple.predicate, triple.predicate_type)
-            o = get_element(triple.object, triple.object_type)
-            g.add((s, p, o))
 
         # Add the metadata triples
         md_serializer = MetaDataRDFSerializer(location=entry.location, metadata=entry.metadata)
@@ -205,25 +187,38 @@ def create_metadata(archive, rdf_format, debug=False):
     return g.serialize(format=rdf_format).decode("utf-8")
 
 
+def get_element(info_str, type_str):
+    """ Helper function for casting. """
+    if type_str == "<class 'rdflib.term.URIRef'>":
+        return URIRef(info_str)
+    elif type_str == "<class 'rdflib.term.BNode'>":
+        return BNode(info_str)
+    elif type_str == "<class 'rdflib.term.Literal'>":
+        return Literal(info_str)
+    else:
+        raise ValueError
+
 class MetaDataRDFSerializer(object):
     """
     RDF serialization of the metadata information.
     This creates the triples and adds them to graph.
     """
 
-    def __init__(self, location, metadata):
+    def __init__(self, location, metadata, g=None):
         self.location = location
         self.metadata = metadata
-        self.g = None
+        self.g = g
+        if self.g is None:
+            self.g = Graph()
+            bind_default_namespaces(self.g)
 
     def get_rdf_triples(self):
         """ Get all the triples for the metadata information. """
-        self.g = Graph()
-        bind_default_namespaces(self.g)
         self._add_created_rdf_triples()
         self._add_modified_rdf_triples()
         self._add_description_rdf_triples()
         self._add_creators_rdf_triples()
+        self._add_triples()
 
         return self.g
 
@@ -234,7 +229,10 @@ class MetaDataRDFSerializer(object):
             <dcterms:W3CDTF>2017-12-28T16:23:43Z</dcterms:W3CDTF>
         </dcterms:created>
         """
-        created = self.metadata.created
+        if isinstance(self.metadata, dict):
+            created = self.metadata.get("created")
+        else:
+            created = self.metadata.created
         if created:
             bnode = BNode()
             self.g.add((URIRef(self.location), DCTERMS.created, bnode))
@@ -247,10 +245,16 @@ class MetaDataRDFSerializer(object):
             <dcterms:W3CDTF>2017-12-28T16:23:43Z</dcterms:W3CDTF>
         </dcterms:modified>
         """
-        for modified in self.metadata.modified.all():
-            bnode = BNode()
-            self.g.add((URIRef(self.location), DCTERMS.modified, bnode))
-            self.g.add((bnode, DCTERMS.W3CDTF, Literal(modified)))
+        if isinstance(self.metadata, dict):
+            for modified in self.metadata.get("modified"):
+                bnode = BNode()
+                self.g.add((URIRef(self.location), DCTERMS.modified, bnode))
+                self.g.add((bnode, DCTERMS.W3CDTF, Literal(modified)))
+        else:
+            for modified in self.metadata.modified.all():
+                bnode = BNode()
+                self.g.add((URIRef(self.location), DCTERMS.modified, bnode))
+                self.g.add((bnode, DCTERMS.W3CDTF, Literal(modified)))
 
 
     def _add_description_rdf_triples(self):
@@ -258,7 +262,10 @@ class MetaDataRDFSerializer(object):
 
         <dcterms:description>Information to create archive metadata</dcterms:description>
         """
-        description = self.metadata.description
+        if isinstance(self.metadata, dict):
+            description = self.metadata.get("description")
+        else:
+            description = self.metadata.description
         if description:
             self.g.add((URIRef(self.location), DCTERMS.description, Literal(description)))
 
@@ -273,16 +280,46 @@ class MetaDataRDFSerializer(object):
             <vCard:organization-name>Caltech</vCard:organization-name>
         </dcterms:creator>
         """
-        for creator in self.metadata.creators.all():
-            bnode1 = BNode()
+        if isinstance(self.metadata, dict):
+            for creator in self.metadata.get('creators'):
+                bnode1 = BNode()
 
-            self.g.add( (URIRef(self.location), DCTERMS.creator, bnode1) )
-            self.g.add( (bnode1, DCTERMS['organization-name'], Literal(creator.organisation)) )
-            self.g.add( (bnode1, DCTERMS.hasEmail, Literal(creator.email)) )
-            bnode2 = BNode()
-            self.g.add( (bnode1, DCTERMS.hasName, bnode2) )
-            self.g.add( (bnode2, DCTERMS['family-name'], Literal(creator.last_name)))
-            self.g.add((bnode2, DCTERMS['given-name'], Literal(creator.first_name)))
+                self.g.add((URIRef(self.location), DCTERMS.creator, bnode1))
+                self.g.add((bnode1, DCTERMS['organization-name'], Literal(creator.get("organisation"))))
+                self.g.add((bnode1, DCTERMS.hasEmail, Literal(creator.get("email"))))
+                bnode2 = BNode()
+                self.g.add((bnode1, DCTERMS.hasName, bnode2))
+                self.g.add((bnode2, DCTERMS['family-name'], Literal(creator.get("givenName"))))
+                self.g.add((bnode2, DCTERMS['given-name'], Literal(creator.get("familyName"))))
+        else:
+            for creator in self.metadata.creators.all():
+                bnode1 = BNode()
+
+                self.g.add((URIRef(self.location), DCTERMS.creator, bnode1))
+                self.g.add((bnode1, DCTERMS['organization-name'], Literal(creator.organisation)))
+                self.g.add((bnode1, DCTERMS.hasEmail, Literal(creator.email)))
+                bnode2 = BNode()
+                self.g.add((bnode1, DCTERMS.hasName, bnode2))
+                self.g.add((bnode2, DCTERMS['family-name'], Literal(creator.last_name)))
+                self.g.add((bnode2, DCTERMS['given-name'], Literal(creator.first_name)))
+
+    def _add_triples(self):
+        """ Adds the remaining triples. """
+        if isinstance(self.metadata, dict):
+            # Write all annotation triples
+            for triples in [self.metadata.get("triples"), self.metadata.get("bm_triples")]:
+                for triple in triples:
+                    s = get_element(triple[0], triple[1])
+                    p = get_element(triple[2], triple[3])
+                    o = get_element(triple[4], triple[5])
+                    self.g.add((s, p, o))
+        else:
+            # Write all annotation triples
+            for triple in self.metadata.triples.all():
+                s = get_element(triple.subject, triple.subject_type)
+                p = get_element(triple.predicate, triple.predicate_type)
+                o = get_element(triple.object, triple.object_type)
+                self.g.add((s, p, o))
 
 
 ##############################################################
