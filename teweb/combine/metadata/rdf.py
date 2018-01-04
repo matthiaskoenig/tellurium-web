@@ -313,7 +313,7 @@ def read_metadata_from_graph(location, g):
     metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created, multiple=False)
     metadata['modified'] = read_predicate(g, location, predicate=DCTERMS.modified, multiple=True)
     metadata['creators'] = read_creators(g, location)
-    metadata['biomodels_triples'] biomodels_triples_from_graph(g, location)
+    metadata['biomodels_triples'] = biomodels_triples_from_graph(g, location)
     metadata['triples'] = django_triples_from_graph(g)
     return metadata
 
