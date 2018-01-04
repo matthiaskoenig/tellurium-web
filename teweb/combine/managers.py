@@ -69,7 +69,7 @@ class ArchiveManager(models.Manager):
             hasher.update(buf)
             buf = file.read(65536)
         kwargs["md5"] = hasher.hexdigest()
-        kwargs["name"] =  os.path.basename(file.name)
+        kwargs["name"] = os.path.basename(file.name)
         archive = super(ArchiveManager, self).create(*args, **kwargs)
 
         archive.file.save(kwargs["name"],File(file))
@@ -83,6 +83,9 @@ class ArchiveManager(models.Manager):
             archive.user = User.objects.get(username="global")
 
         archive.save()
+
+        # only parse this once !
+        metadata_dict = archive.omex_metadata()
 
         with zipfile.ZipFile(file) as z:
 
@@ -112,7 +115,7 @@ class ArchiveManager(models.Manager):
                     tmp.close()
 
                 # create metadata for entry
-                meta_dict = archive.omex_metadata().get(location)
+                meta_dict = metadata_dict.get(location)
                 if meta_dict.get("created") is None:
                     # dummy created timestamp
                     now = datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -369,11 +372,21 @@ class MetaDataManager(models.Manager):
 
             # add triples
             triples = []
+            # add remaining triples, everything which could not be parsed
+            for (s, s_type, p, p_type, o, o_type) in metadata["bm_triples"]:
+                triple = Triple.objects.create(subject=s, subject_type=s_type,
+                                               predicate=p, predicate_type=p_type,
+                                               object=o, object_type=o_type)
+                triples.append(triple)
+
+            # add remaining triples, everything which could not be parsed
             for (s, s_type, p, p_type, o, o_type) in metadata["triples"]:
                 triple = Triple.objects.create(subject=s, subject_type=s_type,
                                                predicate=p, predicate_type=p_type,
                                                object=o, object_type=o_type)
                 triples.append(triple)
+
+
             entry_meta.triples.add(*triples)
 
             # save the entry

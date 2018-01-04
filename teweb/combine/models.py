@@ -594,11 +594,12 @@ class ArchiveEntry(ChangesMixin, models.Model):
         """
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         meta_dict = {
-            'about': None,
+            'about': self.location,
             'description': description,
             'created': now,
             'modified': (now,),
             'creators': [],
+            'bm_triples': [],
             'triples': [],
         }
         metadata_dict = {

@@ -44,7 +44,9 @@ from combine.utils import comex
 
 ##########################################################################
 VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
+VCARD_OLD = Namespace('http://www.w3.org/2001/vcard-rdf/3.0#')
 DCTERMS = Namespace('http://purl.org/dc/terms/')
+DCELEMENTS = Namespace('http://purl.org/dc/elements/1.1/')
 BQMODEL = Namespace('http://biomodels.net/model-qualifiers/')
 BQBIOL = Namespace('http://biomodels.net/biology-qualifiers/')
 ##########################################################################
@@ -57,7 +59,9 @@ def bind_default_namespaces(g):
     :return:
     """
     g.bind(prefix="vCard", namespace=URIRef("http://www.w3.org/2006/vcard/ns#"))
+    g.bind(prefix="vCardOld", namespace=URIRef('http://www.w3.org/2001/vcard-rdf/3.0#'))
     g.bind(prefix="dcterms", namespace=URIRef("http://purl.org/dc/terms/"))
+    g.bind(prefix="dcelements", namespace=URIRef("http://purl.org/dc/elements/1.1/"))
     g.bind(prefix="bqmodel", namespace=URIRef("http://biomodels.net/model-qualifiers/"))
     g.bind(prefix="bqbiol", namespace=URIRef("http://biomodels.net/biology-qualifiers/"))
 
@@ -313,7 +317,7 @@ def read_metadata_from_graph(location, g):
     metadata['created'] = read_predicate(g, location, predicate=DCTERMS.created, multiple=False)
     metadata['modified'] = read_predicate(g, location, predicate=DCTERMS.modified, multiple=True)
     metadata['creators'] = read_creators(g, location)
-    metadata['biomodels_triples'] = biomodels_triples_from_graph(g, location)
+    metadata['bm_triples'] = biomodels_triples_from_graph(g, location)
     metadata['triples'] = django_triples_from_graph(g)
     return metadata
 
@@ -326,7 +330,7 @@ def read_creators(g, location, delete=True):
     """
     creators = []
     deleted_triples = []
-    for triple in g.triples((URIRef(location), DCTERMS.creator, None)):
+    for triple in list(g.triples((URIRef(location), DCTERMS.creator, None))) + list(g.triples((URIRef(location), DCELEMENTS.creator, None))):
         deleted_triples.append(triple)
         # get the object in the bag (if not in bag triple is returned)
         for (subj, pred, obj) in _objects_in_bag(g, triple, deleted_triples=deleted_triples):
@@ -334,7 +338,7 @@ def read_creators(g, location, delete=True):
             info = {}
 
             # email
-            for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))):
+            for (s, p, o) in list(g.triples((obj, VCARD.hasEmail, None))) + list(g.triples((obj, VCARD.email, None))) + list(g.triples((obj, VCARD_OLD.EMAIL, None))):
                 info["email"] = str(o)
                 deleted_triples.append((s, p, o))
 
@@ -343,19 +347,19 @@ def read_creators(g, location, delete=True):
                 info["organisation"] = str(o)
                 deleted_triples.append((s, p, o))
 
-            for (s, p, o) in list(g.triples((obj, VCARD.org, None))):
+            for (s, p, o) in list(g.triples((obj, VCARD.org, None))) + list(g.triples((obj, VCARD_OLD.ORG, None))):
                 deleted_triples.append((s, p, o))
-                for (s2, p2, o2) in g.triples((o, VCARD["organization-name"], None)):
-                    info["organization"] = str(o2)
+                for (s2, p2, o2) in list(g.triples((o, VCARD["organization-name"], None))) + list(g.triples((o, VCARD_OLD["Orgname"], None))):
+                    info["organisation"] = str(o2)
                     deleted_triples.append((s2, p2, o2))
 
             # names
-            for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))):
+            for (s, p, o) in list(g.triples((obj, VCARD.hasName, None))) + list(g.triples((obj, VCARD.n, None))) + list(g.triples((obj, VCARD_OLD.N, None))):
                 deleted_triples.append((s, p, o))
-                for (s2, p2, o2) in g.triples((o, VCARD["family-name"], None)):
+                for (s2, p2, o2) in list(g.triples((o, VCARD["family-name"], None))) + list(g.triples((o, VCARD_OLD["Family"], None))):
                     info["familyName"] = str(o2)
                     deleted_triples.append((s2, p2, o2))
-                for (s2, p2, o2) in g.triples((o, VCARD["given-name"], None)):
+                for (s2, p2, o2) in list(g.triples((o, VCARD["given-name"], None))) + list(g.triples((o, VCARD_OLD["Given"], None))):
                     info["givenName"] = str(o2)
                     deleted_triples.append((s2, p2, o2))
 
