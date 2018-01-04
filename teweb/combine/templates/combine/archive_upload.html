@@ -7,3 +7,13 @@
     </div>
     </div>
 {% endblock %}
+
+{% block javascript %}
+    <script>
+    $(document).ready(function(){
+        var upload_button = document.getElementsByName("file");
+        //console.log(upload_button);
+        //upload_button[0].setAttribute("class", "btn btn-primary")
+    })
+    </script>
+{% endblock %}

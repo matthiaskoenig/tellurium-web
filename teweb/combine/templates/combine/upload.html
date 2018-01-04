@@ -12,10 +12,21 @@
             <p>{{ form.non_field_errors() }}</p>
             <p>{{ form.file.label_tag() }} {{ form.file.help_text }}</p>
             <p>
-                {{ form.file.errors }}
-                {{ form.file }}
-                <input class="btn btn-primary" type="submit" value="Upload"/>
-            </p>
+                <dl>
+                    <dt>{{ form.file }}</dt>
+                    <dt>{{ form.file.errors }}</dt>
+                </dl>
+
+                or upload file by url
+                <dl>
+                    <dt>{{ form.url }}</dt>
+                    <dt>{{ form.url.errors }}</dt>
+
+                    <dd><input class="btn btn-primary pull-right" type="submit" value="Upload"/></dd>
+                </dl>
+
+
+
         </form>
         </div>
     </div>

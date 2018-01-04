@@ -129,6 +129,9 @@ class ViewAPILoggedInSuperUser(TestCase):
         url = reverse('api:archive-detail', kwargs={"uuid": data["uuid"]})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
+        data = self.client_coreapi.action(document["api"],["archives","create"],params={"file":"http://127.0.0.1:8000/archive/16/download"} )
+        print(data)
+
 
     def test_list_tags(self):
         """

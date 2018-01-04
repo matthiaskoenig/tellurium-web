@@ -196,9 +196,9 @@ def upload(request):
     if request.method == 'POST':
         form = UploadArchiveForm(request.POST, request.FILES)
         if form.is_valid():
-
-            file_name = request.FILES['file'].name
-            file_obj = request.FILES['file']
+            cleaned_data = form.cleaned_data
+            file_name =  cleaned_data['file'].name
+            file_obj = cleaned_data['file']
             file_obj2 = ContentFile(file_obj.read())
             dirpath = tempfile.mkdtemp()
             file_path = os.path.join(dirpath, file_name)
