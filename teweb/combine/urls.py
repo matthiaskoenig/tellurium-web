@@ -30,6 +30,5 @@ urlpatterns = [
     url(r'^taskresults/(?P<taskresult_id>[0-9]+)/$', views.taskresult, name='taskresult'),
 
     url(r'^about$', views.about, name='about'),
-    url(r'^sticky-uploads/', include('stickyuploads.urls')),
 
 ]
