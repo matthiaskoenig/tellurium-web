@@ -78,7 +78,7 @@ def archives(request, form=None):
     return render(request, 'combine/archives.html', context)
 
 
-@permission_required('archive.view_archive', fn=objectgetter(Archive, 'archive_id'))
+#@permission_required('archive.view_archive', fn=objectgetter(Archive, 'archive_id'))
 def archive_view(request, archive_id):
     """ Single archive view.
     Displays the content of the archive.

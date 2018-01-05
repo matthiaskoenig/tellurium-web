@@ -53,8 +53,6 @@ class ViewAPILoggedInSuperUser(TestCase):
         self.client_coreapi.session.auth = auth
 
 
-
-
     def test_list_users(self):
         """
         Ensure we can create a new account object.
@@ -129,6 +127,14 @@ class ViewAPILoggedInSuperUser(TestCase):
         url = reverse('api:archive-detail', kwargs={"uuid": data["uuid"]})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
+
+        #data = self.client_coreapi.action(document["api"],["archives","update"],params={"file":file, "uuid": data["uuid"],"name":"test"}, encoding="multipart/form-data")
+        print(document["api"]["archives"])
+        data2 = self.client_coreapi.action(document["api"],["archives","read"],params={"uuid": data["uuid"]})
+        self.assertEquals(data2 , data)
+        data3 = self.client_coreapi.action(document["api"],["archives","partial_update"],params={"uuid": data["uuid"]})
+
+        print(data3)
 
 
     def test_list_tags(self):
@@ -290,7 +296,7 @@ class ViewAPILoggedIn(TestCase):
         f = omex_files[0]
         name = os.path.basename(f)
         file = open(f, 'rb')
-        archive_data = { 'file': file}
+        archive_data = {'file': file}
         response = self.client.post(url, archive_data)
         self.assertEquals(response.status_code, 201)
 

@@ -164,7 +164,7 @@ class ArchiveManager(models.Manager):
                             description = "COMBINE archive manifest"
                         if location == "./metadata.rdf":
                             description = "COMBINE archive metadata"
-                    meta_dict["description"] = "description"
+                    meta_dict["description"] = description
 
                 metadata_dict = {"metadata": meta_dict}
                 metadata = MetaData.objects.create(**metadata_dict)
