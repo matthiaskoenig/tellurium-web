@@ -291,7 +291,7 @@ class ArchiveManager(models.Manager):
                             metadata.description = "COMBINE archive metadata"
                             metadata.save()
 
-                # Tags from given entry
+                    # Tags from given entry
                     # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
                     tags_info = create_tags_for_entry(archive_entry)
                     # pprint(tags_info)
@@ -313,7 +313,6 @@ class ArchiveManager(models.Manager):
 
         else:
             return super(ArchiveManager, self).get_or_create(*args, **kwargs)
-
 
 
 class ArchiveEntryManager(models.Manager):
