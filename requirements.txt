@@ -10,10 +10,14 @@ django-filter>=1.1.0
 djangorestframework>=3.7.3
 django-rest-swagger>=2.1.2
 django-model-changes-py3>=0.14.1
+django-jinja>=2.4.1
 
 channels>=1.1.8
 daphne>=1.4.1
 asgi_redis
+
+django-sticky-uploads>=0.6.1
+django-crispy-forms>=1.7.0
 
 coreapi>=2.3.3
 markdown>=2.6.9
@@ -24,6 +28,5 @@ gunicorn>=19.7.1
 rdflib>=4.2.2
 tellurium>=2.0.13
 
-watchdog
 
 # -e git+https://github.com/sys-bio/tellurium.git@master#egg=tellurium

@@ -2,13 +2,13 @@
 Module for working with SBML annotations.
 """
 import os
-from pprint import pprint
-import logging
-
 import rdflib
 import uuid
-from combine.metadata.rdf import bind_default_namespaces, read_metadata_from_graph
+import logging
+from pprint import pprint
 
+from combine.metadata.rdf import bind_default_namespaces, read_metadata_from_graph
+from combine.metadata.rdf import MetaDataRDFSerializer
 
 try:
     import libsbml
@@ -86,7 +86,7 @@ def promote_sbo_to_rdf(doc: libsbml.SBMLDocument) -> libsbml.SBMLDocument:
     return doc
 
 
-def parse_metadata(doc: libsbml.SBMLDocument, about_prefix=None, debug=False) -> dict:
+def parse_metadata(doc: libsbml.SBMLDocument, prefix=None, debug=False) -> dict:
     """ Parses the annotations from a given SBML file.
 
     Return RDF graph of triples.
@@ -108,7 +108,7 @@ def parse_metadata(doc: libsbml.SBMLDocument, about_prefix=None, debug=False) ->
             bind_default_namespaces(g)
 
             # location of this element
-            location = about_prefix + "#" + element.getMetaId()
+            location = prefix + "#" + element.getMetaId()
 
             # parse rdf of element
             rdf_node = annotation.getChild("RDF")  # type: libsbml.XMLNode
@@ -122,9 +122,8 @@ def parse_metadata(doc: libsbml.SBMLDocument, about_prefix=None, debug=False) ->
 
             # add triples to graph
             for (s, p, o) in g_element:
-
                 # add prefixes
-                if about_prefix:
+                if prefix:
                     if isinstance(s, rdflib.URIRef) and (str(s).startswith('#')):
                         s = rdflib.URIRef(prefix + str(s))
                 g.add((s, p, o))
@@ -144,36 +143,51 @@ def parse_metadata(doc: libsbml.SBMLDocument, about_prefix=None, debug=False) ->
     return metadata_dict
 
 
-if __name__ == "__main__":
-    print(libsbml.getLibSBMLDottedVersion())
-    path = "./BIOMD0000000012.xml"
-    prefix = path
-    assert os.path.exists(path)
+def externalize_annotations(path_in, path_out, prefix=None, format="turtle", debug=False):
+    """
 
-    doc = libsbml.readSBMLFromFile(path)  # libsbml.SBMLDocument
+    :param path_in:
+    :param path_out:
+    :param prefix:
+    :param format: one of the serializer formats, i.e., "turtle", "pretty-xml", ...
+    :return:
+    """
+    doc = libsbml.readSBMLFromFile(path_in)  # libsbml.SBMLDocument
     doc = promote_sbo_to_rdf(doc)
-    metadata_dict = parse_metadata(doc, about_prefix=prefix)
+    metadata_dict = parse_metadata(doc, prefix=prefix)
     # pprint(metadata_dict)
 
-
-    from combine.metadata.rdf import MetaDataRDFSerializer
+    # Create full RDF graph from individual graphs
     g = None
     for location, metadata in metadata_dict.items():
-
         # add the triples for current entry
         serializer = MetaDataRDFSerializer(location=location, metadata=metadata, g=g)
         g = serializer.get_rdf_triples()
 
     # serialize the full graph
-    ttl = g.serialize(format='turtle').decode("utf-8")
-    print("-" * 80)
-    print(ttl)
-    print("-" * 80)
-    ttl_path = "./BIOMD0000000012.ttl"
-    with open(ttl_path, "w") as f_ttl:
-        f_ttl.write(ttl)
+    rdf_byte = g.serialize(format=format)
+    if debug:
+        print("-" * 80)
+        print(rdf_byte.decode("utf-8"))
+        print("-" * 80)
 
-    rdf = g.serialize(format='pretty-xml').decode("utf-8")
-    rdf_path = "./BIOMD0000000012.rdf"
-    with open(rdf_path, "w") as f_rdf:
-        f_rdf.write(rdf)
+    with open(path_out, "wb") as f_out:
+        f_out.write(rdf_byte)
+
+    return rdf_byte.decode("utf-8")
+
+
+#########################################################
+if __name__ == "__main__":
+    print(libsbml.getLibSBMLDottedVersion())
+
+    # TODO: fix old obos
+
+    base_path = "./BIOMD0000000012"
+    base_path = "./BIOMD0000000176"
+
+    path_in, path_ttl, path_rdf = (base_path + ".xml", base_path + ".ttl", base_path + ".rdf")
+    rdf_ttl = externalize_annotations(path_in=path_in, path_out=path_ttl, prefix=path_in, format="turtle")
+    rdf_xml = externalize_annotations(path_in=path_in, path_out=path_rdf, prefix=path_in, format="pretty-xml")
+
+    print(rdf_ttl)

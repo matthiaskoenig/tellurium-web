@@ -485,7 +485,8 @@ class Archive(models.Model):
                                                          master=False,
                                                          location=METADATA_LOCATION,
                                                          format=METADATA_FORMAT)
-            metadata_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
+            metadata_entry.set_new_metadata(description="Metadata file describing COMBINE archive content as XML serialization.", save=True)
+            self.update_manifest_entry()
 
         # create metadata
         metadata = rdf.create_metadata(archive=self, rdf_format="pretty-xml")
@@ -515,7 +516,8 @@ class Archive(models.Model):
                                                          master=False,
                                                          location=METADATA_LOCATION_TURTLE,
                                                          format=METADATA_FORMAT_TURTLE)
-            turtle_entry.set_new_metadata(description="Metadata file describing COMBINE archive content", save=True)
+            turtle_entry.set_new_metadata(description="Metadata file describing COMBINE archive content as Turtle serialization.", save=True)
+            self.update_manifest_entry()
 
         # create metadata
         metadata = rdf.create_metadata(archive=self, rdf_format="turtle")

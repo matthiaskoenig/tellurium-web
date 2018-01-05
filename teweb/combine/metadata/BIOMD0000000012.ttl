@@ -24,25 +24,25 @@
         <http://identifiers.org/biomodels.db/MODEL6615351360> ;
     bqmodel:isDescribedBy <http://identifiers.org/pubmed/10659856> ;
     dcterms:created [ dcterms:W3CDTF "2009-01-20T14:03:56Z" ] ;
-    dcterms:creator [ dcterms:hasEmail "juty@ebi.ac.uk" ;
-            dcterms:hasName [ dcterms:family-name "Nick" ;
-                    dcterms:given-name "Juty" ] ;
-            dcterms:organization-name "EMBL-EBI" ],
-        [ dcterms:hasEmail "lukas@ebi.ac.uk" ;
-            dcterms:hasName [ dcterms:family-name "Lukas" ;
-                    dcterms:given-name "Endler" ] ;
-            dcterms:organization-name "EMBL-EBI" ],
-        [ dcterms:hasEmail "bshapiro@caltech.edu" ;
-            dcterms:hasName [ dcterms:family-name "Bruce" ;
-                    dcterms:given-name "Shapiro" ] ;
-            dcterms:organization-name "Jet Propulsion Laboratory" ],
-        [ dcterms:hasEmail "viji@ebi.ac.uk" ;
+    dcterms:creator [ dcterms:hasEmail "viji@ebi.ac.uk" ;
             dcterms:hasName [ dcterms:family-name "Vijayalakshmi" ;
                     dcterms:given-name "Chelliah" ] ;
             dcterms:organization-name "EMBL-EBI" ],
         [ dcterms:hasEmail "lenov@ebi.ac.uk" ;
             dcterms:hasName [ dcterms:family-name "Nicolas" ;
                     dcterms:given-name "Le Novère" ] ;
+            dcterms:organization-name "EMBL-EBI" ],
+        [ dcterms:hasEmail "bshapiro@caltech.edu" ;
+            dcterms:hasName [ dcterms:family-name "Bruce" ;
+                    dcterms:given-name "Shapiro" ] ;
+            dcterms:organization-name "Jet Propulsion Laboratory" ],
+        [ dcterms:hasEmail "lukas@ebi.ac.uk" ;
+            dcterms:hasName [ dcterms:family-name "Lukas" ;
+                    dcterms:given-name "Endler" ] ;
+            dcterms:organization-name "EMBL-EBI" ],
+        [ dcterms:hasEmail "juty@ebi.ac.uk" ;
+            dcterms:hasName [ dcterms:family-name "Nick" ;
+                    dcterms:given-name "Juty" ] ;
             dcterms:organization-name "EMBL-EBI" ] ;
     dcterms:modified [ dcterms:W3CDTF "2013-07-10T10:59:30Z" ] .
 
