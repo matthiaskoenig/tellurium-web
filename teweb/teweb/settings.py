@@ -42,13 +42,10 @@ INSTALLED_APPS = [
     'django_celery_results',
     'rest_framework',
     'rest_framework_swagger',
-    'django_jinja',
     'django_filters',
     'django_model_changes',
     # 'debug_toolbar',
     'channels',
-    'stickyuploads',
-    'crispy_forms',
 
 ]
 
