@@ -6,10 +6,12 @@ import os
 from collections import namedtuple
 import time
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 
 from combine.models import Archive, Tag
 from . import comex
+
 
 UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
 

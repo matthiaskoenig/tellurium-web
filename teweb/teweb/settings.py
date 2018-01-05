@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'django_model_changes',
     # 'debug_toolbar',
     'channels',
+    'rules.apps.AutodiscoverRulesConfig',
+
 
 ]
 
@@ -87,6 +89,11 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend', # this is default
+)
 
 WSGI_APPLICATION = 'teweb.wsgi.application'
 

@@ -25,6 +25,7 @@ from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, Archi
     CreatorSerializer, MetaDataSerializer
 from .forms import UploadArchiveForm
 from .utils import comex, git
+from rules.contrib.views import permission_required, objectgetter
 
 try:
     import libsedml
@@ -48,6 +49,7 @@ def about(request):
 ######################
 # ARCHIVES
 ######################
+
 def archives(request, form=None):
     """ Overview of archives.
 
@@ -76,6 +78,7 @@ def archives(request, form=None):
     return render(request, 'combine/archives.html', context)
 
 
+@permission_required('archive.view_archive', fn=objectgetter(Archive, 'archive_id'))
 def archive_view(request, archive_id):
     """ Single archive view.
     Displays the content of the archive.

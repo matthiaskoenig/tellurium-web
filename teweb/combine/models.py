@@ -265,6 +265,11 @@ class Archive(models.Model):
 
     objects = managers.ArchiveManager()
 
+    class Meta:
+        permissions = (
+            ('view_archive', 'View archive'),
+        )
+
     def __str__(self):
         return "{}".format(self.name)
 
