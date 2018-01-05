@@ -253,31 +253,19 @@ class MetaDataManager(models.Manager):
             # add modified time stamps
             modified = []
             for modified_date in metadata.get("modified", []):
-                modified.append(
-                    Date.objects.create(date=modified_date)
-                )
+                modified.append(Date.objects.create(date=modified_date))
             entry_meta.modified.add(*modified)
 
             # add triples
             triples = []
-            # add remaining triples, everything which could not be parsed
-            for (s, s_type, p, p_type, o, o_type) in metadata["bm_triples"]:
-                triple = Triple.objects.create(subject=s, subject_type=s_type,
-                                               predicate=p, predicate_type=p_type,
-                                               object=o, object_type=o_type)
-                triples.append(triple)
-
-            # add remaining triples, everything which could not be parsed
-            for (s, s_type, p, p_type, o, o_type) in metadata["triples"]:
-                triple = Triple.objects.create(subject=s, subject_type=s_type,
-                                               predicate=p, predicate_type=p_type,
-                                               object=o, object_type=o_type)
-                triples.append(triple)
-
+            for metadata_triples in [metadata["bm_triples"], metadata["triples"]]:
+                for (s, s_type, p, p_type, o, o_type) in metadata_triples:
+                    triple = Triple.objects.create(subject=s, subject_type=s_type,
+                                                   predicate=p, predicate_type=p_type,
+                                                   object=o, object_type=o_type)
+                    triples.append(triple)
 
             entry_meta.triples.add(*triples)
-
-            # save the entry
             entry_meta.save()
 
             return entry_meta
