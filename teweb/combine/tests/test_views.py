@@ -61,25 +61,7 @@ class ArchiveMethodTests(TestCase):
         # archive = Archive.objects.get(pk=1)
         # print(archive)
         # get_content(archive)
-class LoginInViews(TestCase):
 
-    @classmethod
-    def setUpTestData(cls):
-        create_users(user_defs=user_defs, delete_all=True)
-
-    def setUp(self):
-
-        self.client.login(username="janekg89", password=os.environ['DJANGO_ADMIN_PASSWORD'])
-
-    def test_upload_archive(self):
-
-        path = OMEX_SHOWCASE_PATH
-
-        with open(path, 'rb') as fp:
-            file = SimpleUploadedFile("test", fp.read())
-            response = self.client.post("/upload",{'file':file })
-            self.assertEquals(response.status_code, 302)
-            self.assertEquals(response.url, "/archive/1/")
 
 
 

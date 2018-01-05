@@ -135,7 +135,7 @@ $.ajax({
             type:'Get',
             success: function (data) {
 
-                if ('{{request.user.is_superuser}}'=='True' && data.file){
+                if (super_user=='True' && data.file){
                     var archive_entry_button = document.createElement("input");
                     archive_entry_button.setAttribute("type","button");
                     archive_entry_button.setAttribute("value","Archive Entry");

@@ -18,6 +18,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import utc
 
 from .utils.tags import create_tags_for_entry
+import dateutil.parser
 
 
 # ===============================================================================
@@ -117,57 +118,69 @@ class ArchiveManager(models.Manager):
                 # create metadata for entry
                 meta_dict = meta_data_dict.get(location)
 
-                if  meta_dict.get("created") is None:
-                    # dummy created timestamp
-                    now = datetime.datetime.utcnow().replace(tzinfo=utc)
-                    meta_dict['created'] = now
-                    meta_dict['modified'].append(now)
+                if meta_dict:
+                    #if entry has metadata
+                    if  meta_dict.get("created") is None:
+                        # dummy created timestamp
+                        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+                        meta_dict['created'] = now
+                        meta_dict['modified'].append(now)
 
-                metadata_dict = {
-                    "metadata": meta_dict,
-                }
-                metadata = MetaData.objects.create(**metadata_dict)
 
-                archive_entry.metadata = metadata
-                archive_entry.save()
+                    metadata_dict = {
+                        "metadata": meta_dict,
+                    }
+                    metadata = MetaData.objects.create(**metadata_dict)
 
-                # add some standard descriptions
-                if (metadata.description is None) or (len(metadata.description) == 0):
-                    base_format = archive_entry.base_format
-                    if base_format in ["sed-ml", 'sedml']:
-                        metadata.description = "SED-ML simulation experiment"
-                        metadata.save()
-                    elif base_format == "sbml":
-                        metadata.description = "SBML model"
-                        metadata.save()
-                    elif base_format == "cellml":
-                        metadata.description = "CellML model"
-                        metadata.save()
-                    location = archive_entry.location
-                    if location == "./manifest.xml":
-                        metadata.description = "COMBINE archive manifest"
-                        metadata.save()
-                    if location == "./metadata.rdf":
-                        metadata.description = "COMBINE archive metadata"
-                        metadata.save()
+                    archive_entry.metadata = metadata
+                    archive_entry.save()
 
-                # Tags from given entry
-                # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
-                tags_info = create_tags_for_entry(archive_entry)
-                # pprint(tags_info)
-                for tag_info in tags_info:
-                    tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
-                    tags.append(tag)
+                    # add some standard descriptions
+                    if (metadata.description is None) or (len(metadata.description) == 0):
+                        base_format = archive_entry.base_format
+                        if base_format in ["sed-ml", 'sedml']:
+                            metadata.description = "SED-ML simulation experiment"
+                            metadata.save()
+                        elif base_format == "sbml":
+                            metadata.description = "SBML model"
+                            metadata.save()
+                        elif base_format == "cellml":
+                            metadata.description = "CellML model"
+                            metadata.save()
+                        location = archive_entry.location
+                        if location == "./manifest.xml":
+                            metadata.description = "COMBINE archive manifest"
+                            metadata.save()
+                        if location == "./metadata.rdf":
+                            metadata.description = "COMBINE archive metadata"
+                            metadata.save()
 
-            # add all tags at once
-            archive.tags.add(*tags)
-            archive.save()
+                    # Tags from given entry
+                    # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
+                    tags_info = create_tags_for_entry(archive_entry)
+                    # pprint(tags_info)
+                    for tag_info in tags_info:
+                        tag, created_tag = Tag.objects.get_or_create(name=tag_info.name, category=tag_info.category)
+                        tags.append(tag)
 
-            # update the manifest
-            archive.update_manifest_entry()
+                    # add all tags at once
+                    archive.tags.add(*tags)
+                    archive.save()
 
-            # update the metadata
-            archive.update_metadata_entry()
+                    # update the manifest
+                    archive.update_manifest_entry()
+
+                    # update the metadata
+                    archive.update_metadata_entry()
+                else:
+                    #if entry has no meta data
+                    metadata = MetaData.objects.create(created=datetime.datetime.utcnow().replace(tzinfo=utc))
+                    archive_entry.metadata = metadata
+                    archive_entry.save()
+                    archive.save()
+
+
+
 
 
         return archive

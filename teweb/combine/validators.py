@@ -6,6 +6,7 @@ from django.template.defaultfilters import filesizeformat
 from django.utils.deconstruct import deconstructible
 from django.core.exceptions import ValidationError
 import requests
+from pprint import pprint
 
 
 def validate_omex(data):
@@ -29,7 +30,7 @@ def validate_omex(data):
 
 def validate_url_omex(url):
     response = requests.head(url)
-    if response.headers['Content-Type'] != 'application/zip':
+    if not 'application/zip' in response.headers['Content-Type']:
         raise ValidationError("Url does not point to a file with content type: application/zip")
     if int(response.headers['Content-Length']) > 100000000:
         raise ValidationError("File is too large")
