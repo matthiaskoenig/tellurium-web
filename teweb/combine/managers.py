@@ -114,10 +114,18 @@ class ArchiveManager(models.Manager):
                         archive_entry.file.save(name, File(f))
                     tmp.close()
 
-                # create metadata for entry
-                meta_dict = metadata_dict.get(location)
+                # get metadata for entry
+                meta_dict = metadata_dict.get(location,
+                                              {
+                                                  'description': None,
+                                                  'creators': [],
+                                                  'created': None,
+                                                  'modified': [],
+                                                  'bm_triples': [],
+                                                  'triples': []
+                                              })
+                # set created date
                 if meta_dict.get("created") is None:
-                    # dummy created timestamp
                     now = datetime.datetime.utcnow().replace(tzinfo=utc)
                     meta_dict['created'] = now
                     meta_dict['modified'].append(now)

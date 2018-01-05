@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<omexManifest xmlns="http://identifiers.org/combine.specifications/omex-manifest">
+  <content format="http://identifiers.org/combine.specifications/omex" location="."/>
+  <content format="http://identifiers.org/combine.specifications/omex-metadata" location="./BIOMD0000000176.rdf"/>
+  <content format="http://purl.org/NET/mediatypes/text/turtle" location="./BIOMD0000000176.ttl"/>
+  <content format="http://identifiers.org/combine.specifications/sbml" location="./BIOMD0000000176.xml"/>
+  <content format="http://identifiers.org/combine.specifications/omex-manifest" location="./manifest.xml"/>
+  <content format="http://identifiers.org/combine.specifications/sed-ml" location="./simulation.xml"/>
+</omexManifest>
