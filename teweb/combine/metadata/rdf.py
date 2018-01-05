@@ -637,7 +637,7 @@ def _transitive_subgraph(g, start, gloc=None):
 ########################################################################
 if __name__ == "__main__":
 
-    metadata = read_metadata("../tests/testdata/metadata/metadata_minimal.omex")
+    metadata = read_metadata("../tests/testdata/archives/adlung2017_fig2g.sedx")
     # metadata = read_metadata("../tests/testdata/archives/smith_chase_nokes_shaw_wake_2004.omex")
     pprint(metadata['.'])
 
@@ -653,6 +653,7 @@ if __name__ == "__main__":
     f1 = "../tests/testdata/metadata/metadata1.rdf"
     f2 = "../tests/testdata/metadata/metadata2.rdf"
     f3 = "../tests/testdata/metadata/metadata_minimal.rdf"
+    f4 = "../tests/testdata/metadata/jws_metadata.rdf"
 
-    # parse_rdf(location=f3, debug=True)
+    # parse_rdf(location=f4, debug=True)
 

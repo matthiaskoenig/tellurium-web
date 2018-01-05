@@ -7,7 +7,9 @@ import hashlib
 import zipfile
 import tempfile
 import datetime
+import logging
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.files import File
 from django.apps import apps
@@ -16,6 +18,7 @@ from django.utils.timezone import utc
 
 from .utils.tags import create_tags_for_entry
 
+logger = logging.getLogger(__name__)
 
 # ===============================================================================
 # Utility functions for models
@@ -142,12 +145,6 @@ class ArchiveManager(models.Manager):
                                   'triples': []
                               })
 
-                # set default created date
-                if meta_dict.get("created") is None:
-                    now = datetime.datetime.utcnow().replace(tzinfo=utc)
-                    meta_dict['created'] = now
-                    meta_dict['modified'].append(now)
-
                 # set default descriptions
                 description = meta_dict["description"]
                 if not description:  # this handles None case and empty string
@@ -164,7 +161,7 @@ class ArchiveManager(models.Manager):
                             description = "COMBINE archive manifest"
                         if location == "./metadata.rdf":
                             description = "COMBINE archive metadata"
-                    meta_dict["description"] = "description"
+                    meta_dict["description"] = description
 
                 metadata_dict = {"metadata": meta_dict}
                 metadata = MetaData.objects.create(**metadata_dict)
@@ -231,7 +228,23 @@ class MetaDataManager(models.Manager):
             del kwargs["metadata"]
             if "description" in metadata:
                 kwargs["description"] = metadata.get("description")
-            kwargs["created"] = metadata.get("created")
+
+            # make sure the date string is parsable
+            created = metadata.get("created")
+            if created:
+                # check that parsable
+                try:
+                    date = Date.objects.create(date=created)
+                except ValidationError:
+                    logger.error("Created date is not valid '{}', probably incorrect RDF.".format(created))
+                    created = None
+
+            # set default created date
+            if created is None:
+                now = datetime.datetime.utcnow().replace(tzinfo=utc)
+                created = now
+                metadata.get('modified').append(now)
+            kwargs["created"] = created
 
             # create initial meta entry
             entry_meta = super(MetaDataManager, self).create(*args, **kwargs)
@@ -253,7 +266,12 @@ class MetaDataManager(models.Manager):
             # add modified time stamps
             modified = []
             for modified_date in metadata.get("modified", []):
-                modified.append(Date.objects.create(date=modified_date))
+                try:
+                    date = Date.objects.create(date=modified_date)
+                    modified.append(date)
+                except ValidationError:
+                    logger.error("Modifed date is not valid '{}', probably incorrect RDF.".format(modified_date))
+
             entry_meta.modified.add(*modified)
 
             # add triples
