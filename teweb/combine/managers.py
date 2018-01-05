@@ -85,7 +85,7 @@ class ArchiveManager(models.Manager):
         archive.save()
 
         # only parse this once !
-        metadata_dict = archive.omex_metadata()
+        meta_data_dict = archive.omex_metadata()
 
         with zipfile.ZipFile(file) as z:
 
@@ -115,8 +115,9 @@ class ArchiveManager(models.Manager):
                     tmp.close()
 
                 # create metadata for entry
-                meta_dict = metadata_dict.get(location)
-                if meta_dict.get("created") is None:
+                meta_dict = meta_data_dict.get(location)
+
+                if  meta_dict.get("created") is None:
                     # dummy created timestamp
                     now = datetime.datetime.utcnow().replace(tzinfo=utc)
                     meta_dict['created'] = now
