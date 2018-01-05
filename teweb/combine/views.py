@@ -25,6 +25,7 @@ from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, Archi
     CreatorSerializer, MetaDataSerializer
 from .forms import UploadArchiveForm
 from .utils import comex, git
+from teweb.settings import VERSION
 
 try:
     import libsedml
@@ -40,7 +41,8 @@ logger = logging.getLogger(__name__)
 def about(request):
     """ About page. """
     context = {
-        'commit': git.get_commit()
+        'commit': git.get_commit(),
+        'version': VERSION
     }
     return render(request, 'combine/about.html', context)
 

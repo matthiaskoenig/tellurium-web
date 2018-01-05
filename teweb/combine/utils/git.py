@@ -16,7 +16,7 @@ def get_commit():
     try:
         commit = subprocess.check_output(["git", "describe", "--always"])
         commit = commit.strip()
-        return commit
+        return commit.decode("utf8")
     except Exception:
         return None
 
