@@ -9,8 +9,6 @@ import zipfile
 import tempfile
 import datetime
 
-from pprint import pprint
-
 from django.db import models
 from django.core.files import File
 from django.apps import apps
@@ -18,7 +16,6 @@ from django.contrib.auth.models import User
 from django.utils.timezone import utc
 
 from .utils.tags import create_tags_for_entry
-import dateutil.parser
 
 
 # ===============================================================================

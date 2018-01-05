@@ -5,7 +5,6 @@ from django import forms
 from . import validators
 import requests
 from django.core.files import File
-import tempfile
 import io
 
 class UploadArchiveForm(forms.Form):
