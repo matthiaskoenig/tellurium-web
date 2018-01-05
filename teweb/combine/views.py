@@ -168,13 +168,13 @@ def archive_view(request, archive_id):
         if modified_metadata or modified_entry:
             archive_entry.add_modified()
 
-        # update manifest if entry information changed
-        if modified_entry:
-            archive.update_manifest_entry()
-
         # update metadata file if metadata changed
         if modified_metadata:
             archive.update_metadata_entry()
+
+        # update manifest if entry information changed
+        if modified_entry:
+            archive.update_manifest_entry()
 
         return JsonResponse({"is_error": False})
 

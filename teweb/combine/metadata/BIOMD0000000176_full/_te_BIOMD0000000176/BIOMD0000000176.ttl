@@ -1,0 +1,177 @@
+@prefix bqbiol: <http://biomodels.net/biology-qualifiers/> .
+@prefix bqmodel: <http://biomodels.net/model-qualifiers/> .
+@prefix dcelements: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vCard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix vCardOld: <http://www.w3.org/2001/vcard-rdf/3.0#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<./BIOMD0000000176.xml#_525523> bqbiol:is <http://identifiers.org/go/GO:0005829> .
+
+<./BIOMD0000000176.xml#_525530> bqbiol:is <http://identifiers.org/chebi/CHEBI:4167>,
+        <http://identifiers.org/kegg.compound/C00031> .
+
+<./BIOMD0000000176.xml#_525533> bqbiol:is <http://identifiers.org/chebi/CHEBI:15422>,
+        <http://identifiers.org/kegg.compound/C00002> .
+
+<./BIOMD0000000176.xml#_525536> bqbiol:is <http://identifiers.org/chebi/CHEBI:17665>,
+        <http://identifiers.org/kegg.compound/C00668> .
+
+<./BIOMD0000000176.xml#_525539> bqbiol:is <http://identifiers.org/chebi/CHEBI:16761>,
+        <http://identifiers.org/kegg.compound/C00008> .
+
+<./BIOMD0000000176.xml#_525542> bqbiol:is <http://identifiers.org/chebi/CHEBI:16084>,
+        <http://identifiers.org/kegg.compound/C05345> .
+
+<./BIOMD0000000176.xml#_525545> bqbiol:is <http://identifiers.org/chebi/CHEBI:28013>,
+        <http://identifiers.org/kegg.compound/C05378> .
+
+<./BIOMD0000000176.xml#_525548> bqbiol:is <http://identifiers.org/chebi/CHEBI:16027>,
+        <http://identifiers.org/kegg.compound/C00020> .
+
+<./BIOMD0000000176.xml#_525558> bqbiol:is <http://identifiers.org/chebi/CHEBI:16108>,
+        <http://identifiers.org/kegg.compound/C00111> .
+
+<./BIOMD0000000176.xml#_525561> bqbiol:is <http://identifiers.org/chebi/CHEBI:29052>,
+        <http://identifiers.org/kegg.compound/C00118> .
+
+<./BIOMD0000000176.xml#_525564> bqbiol:is <http://identifiers.org/chebi/CHEBI:15846>,
+        <http://identifiers.org/kegg.compound/C00003> .
+
+<./BIOMD0000000176.xml#_525567> bqbiol:is <http://identifiers.org/chebi/CHEBI:16001>,
+        <http://identifiers.org/kegg.compound/C00236> .
+
+<./BIOMD0000000176.xml#_525573> bqbiol:is <http://identifiers.org/chebi/CHEBI:16908>,
+        <http://identifiers.org/kegg.compound/C00004> .
+
+<./BIOMD0000000176.xml#_525578> bqbiol:is <http://identifiers.org/chebi/CHEBI:17794>,
+        <http://identifiers.org/kegg.compound/C00197> .
+
+<./BIOMD0000000176.xml#_525582> bqbiol:is <http://identifiers.org/chebi/CHEBI:17835>,
+        <http://identifiers.org/kegg.compound/C00631> .
+
+<./BIOMD0000000176.xml#_525585> bqbiol:is <http://identifiers.org/chebi/CHEBI:18021>,
+        <http://identifiers.org/kegg.compound/C00074> .
+
+<./BIOMD0000000176.xml#_525588> bqbiol:is <http://identifiers.org/chebi/CHEBI:15361>,
+        <http://identifiers.org/kegg.compound/C00022> .
+
+<./BIOMD0000000176.xml#_525591> bqbiol:is <http://identifiers.org/chebi/CHEBI:15343>,
+        <http://identifiers.org/kegg.compound/C00084> .
+
+<./BIOMD0000000176.xml#_525599> bqbiol:is <http://identifiers.org/chebi/CHEBI:4167>,
+        <http://identifiers.org/kegg.compound/C00031> .
+
+<./BIOMD0000000176.xml#_525602> bqbiol:is <http://identifiers.org/chebi/CHEBI:16526>,
+        <http://identifiers.org/kegg.compound/C00011> .
+
+<./BIOMD0000000176.xml#_525609> bqbiol:is <http://identifiers.org/chebi/CHEBI:16236>,
+        <http://identifiers.org/kegg.compound/C00469> .
+
+<./BIOMD0000000176.xml#_525612> bqbiol:is <http://identifiers.org/chebi/CHEBI:17754>,
+        <http://identifiers.org/kegg.compound/C00116> .
+
+<./BIOMD0000000176.xml#_525616> bqbiol:is <http://identifiers.org/chebi/CHEBI:28087>,
+        <http://identifiers.org/kegg.compound/C00182> .
+
+<./BIOMD0000000176.xml#_525619> bqbiol:is <http://identifiers.org/chebi/CHEBI:16551>,
+        <http://identifiers.org/kegg.compound/C01083> .
+
+<./BIOMD0000000176.xml#_525622> bqbiol:is <http://identifiers.org/chebi/CHEBI:30031>,
+        <http://identifiers.org/kegg.compound/C00042> .
+
+<./BIOMD0000000176.xml#_525635> bqbiol:isVersionOf <http://identifiers.org/go/GO:0015758> .
+
+<./BIOMD0000000176.xml#_525638> bqbiol:is <http://identifiers.org/kegg.reaction/R02848> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/2.7.1.1>,
+        <http://identifiers.org/go/GO:0004396> .
+
+<./BIOMD0000000176.xml#_525641> bqbiol:is <http://identifiers.org/kegg.reaction/R00771> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/5.3.1.9>,
+        <http://identifiers.org/go/GO:0004347> .
+
+<./BIOMD0000000176.xml#_525644> bqbiol:is <http://identifiers.org/kegg.reaction/R00756> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/2.7.1.11>,
+        <http://identifiers.org/go/GO:0003872> .
+
+<./BIOMD0000000176.xml#_525650> bqbiol:is <http://identifiers.org/kegg.reaction/R01068> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/4.1.2.13>,
+        <http://identifiers.org/go/GO:0004332> .
+
+<./BIOMD0000000176.xml#_525657> bqbiol:is <http://identifiers.org/kegg.reaction/R01015> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/5.3.1.1>,
+        <http://identifiers.org/go/GO:0004807> .
+
+<./BIOMD0000000176.xml#_525661> bqbiol:is <http://identifiers.org/kegg.reaction/R01061> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/1.2.1.12>,
+        <http://identifiers.org/go/GO:0004365> .
+
+<./BIOMD0000000176.xml#_525664> bqbiol:is <http://identifiers.org/kegg.reaction/R01512> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/2.7.2.3>,
+        <http://identifiers.org/go/GO:0004618> .
+
+<./BIOMD0000000176.xml#_525668> bqbiol:is <http://identifiers.org/kegg.reaction/R01518> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/5.4.2.1>,
+        <http://identifiers.org/go/GO:0004619> .
+
+<./BIOMD0000000176.xml#_525672> bqbiol:is <http://identifiers.org/kegg.reaction/R00658> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/4.2.1.11>,
+        <http://identifiers.org/go/GO:0004634> .
+
+<./BIOMD0000000176.xml#_525675> bqbiol:is <http://identifiers.org/kegg.reaction/R00200> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/2.7.1.40>,
+        <http://identifiers.org/go/GO:0004743> .
+
+<./BIOMD0000000176.xml#_525678> bqbiol:is <http://identifiers.org/kegg.reaction/R00636> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/4.1.1.1>,
+        <http://identifiers.org/go/GO:0004737> .
+
+<./BIOMD0000000176.xml#_525681> bqbiol:is <http://identifiers.org/kegg.reaction/R00754> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/1.1.1.1>,
+        <http://identifiers.org/go/GO:0004022> .
+
+<./BIOMD0000000176.xml#_525685> bqbiol:isVersionOf <http://identifiers.org/go/GO:0016887> .
+
+<./BIOMD0000000176.xml#_525693> bqbiol:is <http://identifiers.org/kegg.reaction/R00127> ;
+    bqbiol:isVersionOf <http://identifiers.org/ec-code/2.7.4.3>,
+        <http://identifiers.org/go/GO:0004017> .
+
+<./BIOMD0000000176.xml#_525696> bqbiol:hasPart <http://identifiers.org/kegg.reaction/R00842>,
+        <http://identifiers.org/kegg.reaction/R07298> ;
+    bqbiol:hasVersion <http://identifiers.org/ec-code/1.1.1.8>,
+        <http://identifiers.org/ec-code/3.1.3.21> ;
+    bqbiol:isVersionOf <http://identifiers.org/go/GO:0006114> .
+
+<./BIOMD0000000176.xml#_525700> bqbiol:isVersionOf <http://identifiers.org/go/GO:0005978> .
+
+<./BIOMD0000000176.xml#_525704> bqbiol:isVersionOf <http://identifiers.org/go/GO:0005992> .
+
+<./BIOMD0000000176.xml#_525711> bqbiol:isVersionOf <http://identifiers.org/go/GO:0006105> .
+
+<./BIOMD0000000176.xml#_551383> bqbiol:hasPart <http://identifiers.org/go/GO:0006096>,
+        <http://identifiers.org/kegg.pathway/sce00010> ;
+    bqbiol:hasTaxon <http://identifiers.org/taxonomy/4932> ;
+    bqmodel:is <http://identifiers.org/biomodels.db/BIOMD0000000176>,
+        <http://identifiers.org/biomodels.db/MODEL2427095802> ;
+    bqmodel:isDescribedBy <http://identifiers.org/pubmed/17667951> ;
+    dcterms:created [ dcterms:W3CDTF "2008-08-06T10:23:52Z" ] ;
+    dcterms:creator [ dcterms:hasEmail "lukas@ebi.ac.uk" ;
+            dcterms:hasName [ dcterms:family-name "Lukas" ;
+                    dcterms:given-name "Endler" ] ;
+            dcterms:organization-name "EMBL-EBI" ],
+        [ dcterms:hasEmail "khwolfe@tcd.ie" ;
+            dcterms:hasName [ dcterms:family-name "Kenneth" ;
+                    dcterms:given-name "Wolfe" ] ;
+            dcterms:organization-name "Smurfit Institute of Genetics, University of Dublin, Trinity College" ],
+        [ dcterms:hasEmail "conantg@tcd.ie" ;
+            dcterms:hasName [ dcterms:family-name "Gavin" ;
+                    dcterms:given-name "Conant" ] ;
+            dcterms:organization-name "Smurfit Institute of Genetics, University of Dublin, Trinity College, Dublin 2, Ireland" ] ;
+    dcterms:modified [ dcterms:W3CDTF "2012-05-16T14:25:08Z" ] .
+
+<./BIOMD0000000176.xml#metaid_00100001> bqbiol:is <http://identifiers.org/chebi/CHEBI:28602>,
+        <http://identifiers.org/kegg.compound/C00665> .
+

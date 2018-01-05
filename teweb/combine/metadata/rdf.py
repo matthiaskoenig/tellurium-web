@@ -466,6 +466,12 @@ def biomodels_triples_from_graph(g, location):
             deleted_triples.append(triple)
             # get the object in the bag (if not in bag triple is returned)
             for (s, p, o) in _objects_in_bag(g, triple, deleted_triples=deleted_triples):
+
+                # fix old go in object: 'obo.go' -> 'go', 'obo.chebi', ...
+                if isinstance(o, rdflib.URIRef):
+                    if str(o).startswith('http://identifiers.org/obo.'):
+                        o = rdflib.URIRef(str(o).replace('http://identifiers.org/obo.', 'http://identifiers.org/'))
+
                 triples.append(
                     _django_triple((s, p, o))
                 )

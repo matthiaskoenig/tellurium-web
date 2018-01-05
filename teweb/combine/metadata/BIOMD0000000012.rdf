@@ -1,254 +1,254 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
-  xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"
-  xmlns:bqmodel="http://biomodels.net/model-qualifiers/"
   xmlns:dcterms="http://purl.org/dc/terms/"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"
+  xmlns:bqmodel="http://biomodels.net/model-qualifiers/"
 >
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0500235">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000485"/>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905823">
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006402"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905769">
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905862">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006402"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_000001">
+    <bqbiol:hasTaxon rdf:resource="http://identifiers.org/taxonomy/562"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/biomodels.db/MODEL6615351360"/>
+    <dcterms:modified>
+      <rdf:Description rdf:nodeID="N12ef66f95dfc4f13a00cff414b10693f">
+        <dcterms:W3CDTF>2013-07-10T10:59:30Z</dcterms:W3CDTF>
+      </rdf:Description>
+    </dcterms:modified>
+    <bqmodel:isDescribedBy rdf:resource="http://identifiers.org/pubmed/10659856"/>
+    <dcterms:created>
+      <rdf:Description rdf:nodeID="N8d112a40a9a34a18bfc4b636c25ba7c8">
+        <dcterms:W3CDTF>2009-01-20T14:03:56Z</dcterms:W3CDTF>
+      </rdf:Description>
+    </dcterms:created>
+    <dcterms:creator>
+      <rdf:Description rdf:nodeID="N2ea3b9bfd3a7450696988be94ea7594b">
+        <dcterms:hasEmail>lenov@ebi.ac.uk</dcterms:hasEmail>
+        <dcterms:hasName>
+          <rdf:Description rdf:nodeID="Nb0f7449279074a75a4fcbe7bad2d3328">
+            <dcterms:family-name>Nicolas</dcterms:family-name>
+            <dcterms:given-name>Le Novère</dcterms:given-name>
+          </rdf:Description>
+        </dcterms:hasName>
+        <dcterms:organization-name>EMBL-EBI</dcterms:organization-name>
+      </rdf:Description>
+    </dcterms:creator>
+    <dcterms:creator>
+      <rdf:Description rdf:nodeID="Nbeb9822331a44666a4ba8303490a5876">
+        <dcterms:organization-name>EMBL-EBI</dcterms:organization-name>
+        <dcterms:hasEmail>lukas@ebi.ac.uk</dcterms:hasEmail>
+        <dcterms:hasName>
+          <rdf:Description rdf:nodeID="Nc4e56d91ce124ad8840e1ef002c13349">
+            <dcterms:given-name>Endler</dcterms:given-name>
+            <dcterms:family-name>Lukas</dcterms:family-name>
+          </rdf:Description>
+        </dcterms:hasName>
+      </rdf:Description>
+    </dcterms:creator>
+    <dcterms:creator>
+      <rdf:Description rdf:nodeID="Nc109dffabc4f46ea8d5fe9c9f8c95035">
+        <dcterms:organization-name>EMBL-EBI</dcterms:organization-name>
+        <dcterms:hasEmail>viji@ebi.ac.uk</dcterms:hasEmail>
+        <dcterms:hasName>
+          <rdf:Description rdf:nodeID="N42f1690cad2a4f79b6248328a4bb7c82">
+            <dcterms:given-name>Chelliah</dcterms:given-name>
+            <dcterms:family-name>Vijayalakshmi</dcterms:family-name>
+          </rdf:Description>
+        </dcterms:hasName>
+      </rdf:Description>
+    </dcterms:creator>
+    <dcterms:creator>
+      <rdf:Description rdf:nodeID="N0cff229b491c4efc9e15b9d014f716e1">
+        <dcterms:organization-name>EMBL-EBI</dcterms:organization-name>
+        <dcterms:hasName>
+          <rdf:Description rdf:nodeID="Nd636bbaef4504f638dcc8743fd150201">
+            <dcterms:given-name>Juty</dcterms:given-name>
+            <dcterms:family-name>Nick</dcterms:family-name>
+          </rdf:Description>
+        </dcterms:hasName>
+        <dcterms:hasEmail>juty@ebi.ac.uk</dcterms:hasEmail>
+      </rdf:Description>
+    </dcterms:creator>
+    <bqmodel:is rdf:resource="http://identifiers.org/biomodels.db/BIOMD0000000012"/>
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0040029"/>
+    <dcterms:creator>
+      <rdf:Description rdf:nodeID="N65b6f648d76f49e682879fdcfad81275">
+        <dcterms:hasName>
+          <rdf:Description rdf:nodeID="N4ed18fe6a44f4839b289a1aca52eb1d9">
+            <dcterms:given-name>Shapiro</dcterms:given-name>
+            <dcterms:family-name>Bruce</dcterms:family-name>
+          </rdf:Description>
+        </dcterms:hasName>
+        <dcterms:organization-name>Jet Propulsion Laboratory</dcterms:organization-name>
+        <dcterms:hasEmail>bshapiro@caltech.edu</dcterms:hasEmail>
+      </rdf:Description>
+    </dcterms:creator>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905781">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000250"/>
-    <bqbiol:encodes rdf:resource="http://identifiers.org/uniprot/P03023"/>
     <bqbiol:isVersionOf rdf:resource="http://identifiers.org/chebi/CHEBI:33699"/>
+    <bqbiol:encodes rdf:resource="http://identifiers.org/uniprot/P04483"/>
     <bqbiol:isVersionOf rdf:resource="http://identifiers.org/kegg.compound/C00046"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905903">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000184"/>
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006412"/>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_906042">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000183"/>
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006351"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421244">
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905769">
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/kegg.compound/C00046"/>
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/chebi/CHEBI:33699"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000250"/>
+    <bqbiol:encodes rdf:resource="http://identifiers.org/uniprot/P03023"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905842">
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006402"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421317">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000536"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0800235">
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000028">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000332"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#PX">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000252"/>
+    <bqbiol:is rdf:resource="http://identifiers.org/uniprot/P03023"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905802">
+    <bqbiol:encodes rdf:resource="http://identifiers.org/uniprot/P03034"/>
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/kegg.compound/C00046"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000250"/>
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/chebi/CHEBI:33699"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000024">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000186"/>
   </rdf:Description>
   <rdf:Description rdf:about="./BIOMD0000000012.xml#_905923">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000184"/>
     <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006412"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905802">
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/kegg.compound/C00046"/>
-    <bqbiol:encodes rdf:resource="http://identifiers.org/uniprot/P03034"/>
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/chebi/CHEBI:33699"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000250"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_000001">
-    <dcterms:creator>
-      <rdf:Description rdf:nodeID="Nd3716cbee20b4975871dc098856214dc">
-        <dcterms:organization-name>Jet Propulsion Laboratory</dcterms:organization-name>
-        <dcterms:hasEmail>bshapiro@caltech.edu</dcterms:hasEmail>
-        <dcterms:hasName>
-          <rdf:Description rdf:nodeID="N05dc093d4de1462ca128a487f033a325">
-            <dcterms:given-name>Shapiro</dcterms:given-name>
-            <dcterms:family-name>Bruce</dcterms:family-name>
-          </rdf:Description>
-        </dcterms:hasName>
-      </rdf:Description>
-    </dcterms:creator>
-    <bqmodel:isDescribedBy rdf:resource="http://identifiers.org/pubmed/10659856"/>
-    <dcterms:creator>
-      <rdf:Description rdf:nodeID="N9d82ed707faa4e4c9311480818042f52">
-        <dcterms:hasName>
-          <rdf:Description rdf:nodeID="Nc9b408e6cf1748bcbe67705a6c685e74">
-            <dcterms:family-name>Nick</dcterms:family-name>
-            <dcterms:given-name>Juty</dcterms:given-name>
-          </rdf:Description>
-        </dcterms:hasName>
-        <dcterms:hasEmail>juty@ebi.ac.uk</dcterms:hasEmail>
-        <dcterms:organization-name>EMBL-EBI</dcterms:organization-name>
-      </rdf:Description>
-    </dcterms:creator>
-    <bqmodel:is rdf:resource="http://identifiers.org/biomodels.db/MODEL6615351360"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/biomodels.db/BIOMD0000000012"/>
-    <dcterms:creator>
-      <rdf:Description rdf:nodeID="Na2e457c69ef341e49e4146cf126df9ac">
-        <dcterms:organization-name>EMBL-EBI</dcterms:organization-name>
-        <dcterms:hasName>
-          <rdf:Description rdf:nodeID="N487b418520594bbab4f8d68d272c7fc1">
-            <dcterms:family-name>Lukas</dcterms:family-name>
-            <dcterms:given-name>Endler</dcterms:given-name>
-          </rdf:Description>
-        </dcterms:hasName>
-        <dcterms:hasEmail>lukas@ebi.ac.uk</dcterms:hasEmail>
-      </rdf:Description>
-    </dcterms:creator>
-    <dcterms:creator>
-      <rdf:Description rdf:nodeID="Nd688f6f49cca4486b634b58adcb1a5ae">
-        <dcterms:hasEmail>viji@ebi.ac.uk</dcterms:hasEmail>
-        <dcterms:organization-name>EMBL-EBI</dcterms:organization-name>
-        <dcterms:hasName>
-          <rdf:Description rdf:nodeID="N2513718c2c63466bbc4b3a162ffc5582">
-            <dcterms:family-name>Vijayalakshmi</dcterms:family-name>
-            <dcterms:given-name>Chelliah</dcterms:given-name>
-          </rdf:Description>
-        </dcterms:hasName>
-      </rdf:Description>
-    </dcterms:creator>
-    <dcterms:modified>
-      <rdf:Description rdf:nodeID="Nf181b2dc75b14cc6b458270c764c1751">
-        <dcterms:W3CDTF>2013-07-10T10:59:30Z</dcterms:W3CDTF>
-      </rdf:Description>
-    </dcterms:modified>
-    <dcterms:created>
-      <rdf:Description rdf:nodeID="N7414298e2a16446fa37ab451abe3ed06">
-        <dcterms:W3CDTF>2009-01-20T14:03:56Z</dcterms:W3CDTF>
-      </rdf:Description>
-    </dcterms:created>
-    <dcterms:creator>
-      <rdf:Description rdf:nodeID="Ndb160d6ef7e648ec88cb89cdd5e42d56">
-        <dcterms:hasName>
-          <rdf:Description rdf:nodeID="N3defe05f206c468d9d665d4042cc10f2">
-            <dcterms:family-name>Nicolas</dcterms:family-name>
-            <dcterms:given-name>Le Novère</dcterms:given-name>
-          </rdf:Description>
-        </dcterms:hasName>
-        <dcterms:hasEmail>lenov@ebi.ac.uk</dcterms:hasEmail>
-        <dcterms:organization-name>EMBL-EBI</dcterms:organization-name>
-      </rdf:Description>
-    </dcterms:creator>
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0040029"/>
-    <bqbiol:hasTaxon rdf:resource="http://identifiers.org/taxonomy/562"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905962">
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0030163"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421148">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000026">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000190"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#PX">
-    <bqbiol:is rdf:resource="http://identifiers.org/uniprot/P03023"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000252"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000128">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000332"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905982">
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0030163"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905781">
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/kegg.compound/C00046"/>
-    <bqbiol:encodes rdf:resource="http://identifiers.org/uniprot/P04483"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000250"/>
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/chebi/CHEBI:33699"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000027">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000288"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421196">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_906022">
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006351"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000183"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421076">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
-  </rdf:Description>
   <rdf:Description rdf:about="./BIOMD0000000012.xml#_906002">
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006351"/>
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000183"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0900235">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000186"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000024">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000186"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421112">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905823">
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006402"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000133">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000356"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_000002">
-    <bqbiol:is rdf:resource="http://identifiers.org/obo.go/GO:0005623"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000290"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_906042">
     <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006351"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000183"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_420986">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421317">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000536"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905862">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006402"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000234">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000485"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000023">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000485"/>
   </rdf:Description>
   <rdf:Description rdf:about="./BIOMD0000000012.xml#PZ">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000252"/>
     <bqbiol:is rdf:resource="http://identifiers.org/uniprot/P03034"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#PY">
-    <bqbiol:is rdf:resource="http://identifiers.org/uniprot/P04483"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000252"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421172">
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421038">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905842">
-    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006402"/>
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000032">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000348"/>
   </rdf:Description>
   <rdf:Description rdf:about="./BIOMD0000000012.xml#_421220">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421280">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000536"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000132">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000356"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421136">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000461"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421038">
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421112">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000028">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000332"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000233">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000016"/>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905962">
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0030163"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
   </rdf:Description>
   <rdf:Description rdf:about="./BIOMD0000000012.xml#_421100">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000461"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421064">
-    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000461"/>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905903">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000184"/>
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006412"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000133">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000356"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421148">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000132">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000356"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_906022">
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006351"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000183"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000128">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000332"/>
   </rdf:Description>
   <rdf:Description rdf:about="./BIOMD0000000012.xml#_905882">
     <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0006412"/>
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000184"/>
   </rdf:Description>
-  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905943">
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0500235">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000485"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000027">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000288"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000023">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000485"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905982">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
     <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0030163"/>
   </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#PY">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000252"/>
+    <bqbiol:is rdf:resource="http://identifiers.org/uniprot/P04483"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421244">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000536"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421280">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000536"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0900235">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000186"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421076">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0800235">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000186"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421196">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
+  </rdf:Description>
   <rdf:Description rdf:about="./BIOMD0000000012.xml#_421012">
     <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_420986">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_000002">
+    <bqbiol:is rdf:resource="http://identifiers.org/obo.go/GO:0005623"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000290"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421136">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000461"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421172">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000049"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000026">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000190"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_421064">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000461"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#_905943">
+    <bqbiol:isVersionOf rdf:resource="http://identifiers.org/obo.go/GO:0030163"/>
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000179"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000234">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000485"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000233">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000016"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="./BIOMD0000000012.xml#metaid_0000032">
+    <bqmodel:is rdf:resource="http://identifiers.org/sbo/SBO:0000348"/>
   </rdf:Description>
 </rdf:RDF>
