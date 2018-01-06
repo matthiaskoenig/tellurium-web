@@ -13,8 +13,19 @@ http://identifiers.org/restws
 """
 
 import warnings
-import requests
 from pprint import pprint
+
+import requests
+
+# caching of webservice requests
+import requests_cache
+requests_cache.install_cache(backend="redis", cache_name="annotations", expire_after=86400)
+# requests_cache.install_cache(backend="re", cache_name="annotations", expire_after=86400)
+
+# expired only removed on next access, so make sure the cache is cleared
+# requests_cache.remove_expired_responses()
+# from functools import lru_cache
+# @lru_cache(maxsize=500)
 
 OLS_BASE_URL = "http://www.ebi.ac.uk/ols/api/"
 MIRIAM_BASE_URL = "http://www.ebi.ac.uk/miriamws/main/rest/"

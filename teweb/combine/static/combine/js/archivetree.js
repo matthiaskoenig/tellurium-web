@@ -2,11 +2,9 @@
  * Javascript for working with the archive navigation tree.
  */
 
-
 /**
  * Load zip tree
  */
-
 var endpoint = './zip_tree';
 $.ajax({
     method: "GET",
@@ -15,7 +13,13 @@ $.ajax({
         $('#json_tree').jstree({
             'core': {
                 'multiple': false,
-                'data': data
+                'data': data,
+                 "themes": {
+                    "name": 'default',
+                    "dots" : true,
+                    "responsive" : true,
+                    "stripes": false
+                  },
             },
             'plugins':['types','dnd']
         });
@@ -24,7 +28,7 @@ $.ajax({
         console.log("error");
         console.log(error_data);
     }
-})
+});
 
 
 /**
@@ -40,8 +44,6 @@ $.ajax({
       entry_pk = selected[0].original.pk;
       display_entry_detail(entry_pk, false);
     });
-
-
 
 
     /**
@@ -72,9 +74,6 @@ $.ajax({
                 });
           });
         }
-
-
-
       }
     });
 
@@ -121,21 +120,21 @@ $.ajax({
         var button_div = document.getElementById("button-div");
         var entry_detail_div = document.getElementById("item_detail");
         var button_div_meta = document.getElementById("button-meta-div");
-        var div_tripples = document.getElementById("tripples_detail");
+        var div_triples = document.getElementById("triples_detail");
 
         // empty content
-        manifest_detail_div.innerHTML = "";
+        manifest_detail_div.innerHTML = '';
         button_div.innerHTML = "";
-        entry_detail_div.innerHTML = "";
+        entry_detail_div.innerHTML = '<b><i class="fa fa-fw fa-4x fa-cog fa-spin"></i>Waiting for response ... </b>';
         button_div_meta.innerHTML = "";
-        div_tripples.innerHTML = "";
+        div_triples.innerHTML = "";
 
         $.ajax({
             url: endpoint,
             type:'Get',
             success: function (data) {
-
-                if ('{{request.user.is_superuser}}'=='True' && data.file){
+                entry_detail_div.innerHTML = '';
+                if (super_user=='True' && data.file){
                     var archive_entry_button = document.createElement("input");
                     archive_entry_button.setAttribute("type","button");
                     archive_entry_button.setAttribute("value","Archive Entry");
@@ -152,7 +151,6 @@ $.ajax({
                 }
 
                 var metadata = data.metadata;
-
                 button_div.appendChild(create_buttons_div(edit));
                 manifest_detail_div.appendChild(create_entry_title(data));
                 manifest_detail_div.appendChild(create_manfifest_detail(entry_pk, data, edit));
@@ -165,7 +163,7 @@ $.ajax({
                     for (var triple in metadata.triples){
                      if(metadata.triples.hasOwnProperty(triple)){
                          var triple_div = addTriple(metadata.triples,triple,edit);
-                         div_tripples.appendChild(triple_div);
+                         div_triples.appendChild(triple_div);
                          }
                      }
                 }

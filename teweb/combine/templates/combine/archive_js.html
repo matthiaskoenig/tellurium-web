@@ -7,6 +7,7 @@
 <script>
     const url_mediatype = '{{ static("combine/images/mediatype/")| safe }}';
     var empty_creator = "{{ Creator.html_empty()| safe }}";
+    var super_user = '{{request.user.is_superuser}}';
 </script>
 <script src="{{ static('combine/js/archivetree.js') }}"></script>
 

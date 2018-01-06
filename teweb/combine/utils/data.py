@@ -6,10 +6,12 @@ import os
 from collections import namedtuple
 import time
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 
 from combine.models import Archive, Tag
 from . import comex
+
 
 UserDef = namedtuple('UserDef', ['username', 'first_name', 'last_name', 'email', 'superuser'])
 
@@ -29,14 +31,7 @@ def add_archives_to_database(archive_dirs, debug=False):
 
         start_time = time.time()
 
-        # default user is "global" but can be changed by adding user= < User Object >, user = User.username( string)
-
-        #Archive.objects.create(file=open(path, 'rb'))
-
-        _, created = Archive.objects.get_or_create(archive_path=path)
-
-        if not created:
-            print("Archive already exists, not recreated: {}".format(path))
+        archive = Archive.objects.create(archive_path=path, user="global")
 
         if debug:
             print("\t{:2.2f} [s]".format(time.time() - start_time))

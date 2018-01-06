@@ -26,8 +26,8 @@
             </thead>
             {% for archive in archives %}
                 <tr>
-                    <td>{{ macros.archive_download(archive) }}</td>
-                    <td>{{ macros.archive_html(archive) }}</td>
+                    <td>{{ macros.archive_download_xs(archive) }}</td>
+                    <td>{{ macros.archive_html_xs(archive) }}</td>
                     <td><span id="task-status-{{ archive.id }}"></span> {{ macros.archive_action(archive) }}</td>
                     <td>{{ macros.archive_status(archive) }}</td>
                     <td>{{ macros.archive_results(archive) }}</td>
@@ -50,7 +50,7 @@
                         {% endfor %}
                     </td>
                     {% if request.user.is_authenticated %}
-                    <td>{{ macros.archive_delete(archive) }}</td>
+                    <td>{{ macros.archive_delete_xs(archive) }}</td>
                     {% endif %}
                 </tr>
             {% endfor %}

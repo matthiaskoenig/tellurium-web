@@ -9,13 +9,7 @@ import json
 import os
 import tempfile
 import shutil
-import zipfile
-import io
 
-import datetime
-from django.utils.timezone import utc
-
-from django.utils import timezone
 from django.core.files.base import ContentFile
 
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
@@ -32,6 +26,10 @@ from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, Archi
 from .forms import UploadArchiveForm
 from .utils import comex, git
 
+
+from teweb.settings import VERSION
+
+
 try:
     import libsedml
 except ImportError:
@@ -46,7 +44,8 @@ logger = logging.getLogger(__name__)
 def about(request):
     """ About page. """
     context = {
-        'commit': git.get_commit()
+        'commit': git.get_commit(),
+        'version': VERSION
     }
     return render(request, 'combine/about.html', context)
 
@@ -54,6 +53,7 @@ def about(request):
 ######################
 # ARCHIVES
 ######################
+
 def archives(request, form=None):
     """ Overview of archives.
 
@@ -82,6 +82,7 @@ def archives(request, form=None):
     return render(request, 'combine/archives.html', context)
 
 
+#@permission_required('archive.view_archive', fn=objectgetter(Archive, 'archive_id'))
 def archive_view(request, archive_id):
     """ Single archive view.
     Displays the content of the archive.
@@ -174,13 +175,13 @@ def archive_view(request, archive_id):
         if modified_metadata or modified_entry:
             archive_entry.add_modified()
 
-        # update manifest if entry information changed
-        if modified_entry:
-            archive.update_manifest_entry()
-
         # update metadata file if metadata changed
         if modified_metadata:
             archive.update_metadata_entry()
+
+        # update manifest if entry information changed
+        if modified_entry:
+            archive.update_manifest_entry()
 
         return JsonResponse({"is_error": False})
 
@@ -196,9 +197,9 @@ def upload(request):
     if request.method == 'POST':
         form = UploadArchiveForm(request.POST, request.FILES)
         if form.is_valid():
-
-            file_name = request.FILES['file'].name
-            file_obj = request.FILES['file']
+            cleaned_data = form.cleaned_data
+            file_name =  cleaned_data['file'].name
+            file_obj = cleaned_data['file']
             file_obj2 = ContentFile(file_obj.read())
             dirpath = tempfile.mkdtemp()
             file_path = os.path.join(dirpath, file_name)
@@ -280,48 +281,7 @@ def download_archive(request, archive_id):
     """
     archive = get_object_or_404(Archive, pk=archive_id)
     filename = archive.file.name.split('/')[-1]
-
-    # All entries are written including the updated manifest.xml and metadata.rdf
-    content = {}
-    for entry in archive.entries.all():
-        location = entry.location
-        if location in ["."]:
-            continue
-
-        content[location] = entry
-
-    # Open StringIO to grab in-memory ZIP contents
-    s = io.BytesIO()
-
-    # The zip compressor
-    zf = zipfile.ZipFile(s, "w")
-
-    # write all entries
-    for location, entry in content.items():
-        file_path = entry.path
-
-        # fix paths for writing in zip file
-        zip_path = location.replace("./", "")
-        
-        # Add file, at correct path, with last_modified time
-        modified_date = entry.metadata.last_modified
-        if modified_date:
-            date_time = modified_date.date
-        else:
-            # get current date time with server timezone
-            date_time = datetime.datetime.utcnow().replace(tzinfo=utc)
-
-        zip_info = zipfile.ZipInfo(filename=zip_path)
-        zip_info.date_time = date_time.timetuple()  # set modification date
-        zip_info.external_attr = 0o777 << 16  # give full access to included file
-
-        with open(file_path, "rb") as f:
-            zf.writestr(zip_info, f.read())
-
-        # zf.write(fpath, zip_path)
-
-    # Must close zip for all contents to be written
-    zf.close()
+    s = archive.create_omex_bytes()
 
     # Grab ZIP file from in-memory, make response with correct content type
     response = HttpResponse(s.getvalue(), content_type='application/zip')

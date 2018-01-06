@@ -23,7 +23,7 @@ from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, Archi
     CreatorSerializer, MetaDataSerializer
 
 from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, \
-    IsOwnerOrGlobalOrAdminReadOnly
+    IsOwnerOrGlobalOrAdminReadOnly, CompleteArchivePermissions
 
 from .utils import tree
 
@@ -46,7 +46,7 @@ class ArchiveViewSet(viewsets.ModelViewSet):
     """
 
     queryset = Archive.objects.all()
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (CompleteArchivePermissions,)
     serializer_class = ArchiveSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
@@ -78,14 +78,14 @@ class ArchiveEntryViewSet(viewsets.ModelViewSet):
         permission_classes define which users is allowed to do what.
         """
     queryset = ArchiveEntry.objects.all()
-    permission_classes = (IsOwnerOfArchiveEntryOrReadOnly,)
+    #permission_classes = (IsOwnerOfArchiveEntryOrReadOnly,)
     serializer_class = ArchiveEntrySerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
     """ REST tags. """
     queryset = Tag.objects.all()
-    permission_classes = (IsAdminUserOrReadOnly,)
+    #permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = TagSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)

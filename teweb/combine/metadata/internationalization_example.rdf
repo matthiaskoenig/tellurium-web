@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/">
+  <rdf:Description rdf:about="." xml:lang="de">
+    <dcterms:description>Das ist ein Beispiel für ein COMBINE Archive.</dcterms:description>
+  </rdf:Description>
+    <rdf:Description rdf:about="." xml:lang="en">
+    <dcterms:description>This is an example for a COMBINE archive.</dcterms:description>
+  </rdf:Description>
+    <rdf:Description rdf:about="." xml:lang="es">
+    <dcterms:description>Esto es un ejemplo por un archivo de COMBINE.</dcterms:description>
+  </rdf:Description>
+</rdf:RDF>

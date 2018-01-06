@@ -1,36 +1,33 @@
 {% import 'combine/macros.html' as macros %}
+        <span>{{ macros.archive_html(archive) }} {{ macros.archive_download(archive) }}
+            {% if request.user.is_authenticated %}
+            <span class="pull-right">
 
+            {{ macros.archive_delete(archive) }}
+            </span>
+            {% endif %}
+        </span>
         <div class="panel panel-default">
-            <div class="panel-heading">
-                <h2 class="panel-title">{{ macros.archive_download(archive) }} {{ macros.archive_html(archive) }}
-                    {% if request.user.is_authenticated %}
-                    <span class="pull-right">
-                    <!-- delete archive -->
-                    {{ macros.archive_delete(archive) }}
-                    </span>
-                    {% endif %}
-                </h2>
-            </div>
+            <!-- <div class="panel-heading"></div> -->
 
             <div class="panel-body">
-                <!-- Archive tree -->
-                <div class="flex-container">
-                    <div class="">
-                        <div id="json_tree"></div>
-                    </div>
+                <div class="row">
 
-                    <div class="">
-                        <!-- Entry detail -->
-                        <div id="entry_detail">
-                            <form id="form_detail" method="post">
-                                <div id="button-div"></div>
-                                <div class="well" id="manifest_detail"></div>
-                                <div id="button-meta-div"></div>
-                                <div class="well" id="item_detail"></div>
-                                <div class="well" id="tripples_detail"></div>
-                            </form>
-                        </div>
+                    <!-- Archive tree -->
+                    <div id="json_tree" class="col-lg-4" style="max-height: 500px; overflow-y:auto;"></div>
+
+                    <!-- Entry detail -->
+                    <div id="entry_detail" class="col-lg-8 well" style="min-height: 500px; max-height: 500px; overflow-y:auto;">
+                        <form id="form_detail" method="post">
+                            <div id="button-div"></div>
+                            <div id="manifest_detail"></div>
+                            <div id="button-meta-div"></div>
+                            <div id="item_detail"></div>
+                        </form>
                     </div>
+                </div>
+                <div class="row">
+                <div id="triples_detail" class="col-lg-12" style="max-height: 500px; overflow-y:auto;"></div>
                 </div>
 
             </div>
