@@ -22,16 +22,13 @@ import requests_cache
 requests_cache.install_cache(backend="redis", cache_name="annotations", expire_after=86400)
 
 # expired only removed on next access, so make sure the cache is cleared
-requests_cache.remove_expired_responses()
-
-
+# requests_cache.remove_expired_responses()
 # from functools import lru_cache
 # @lru_cache(maxsize=500)
 
 OLS_BASE_URL = "http://www.ebi.ac.uk/ols/api/"
 MIRIAM_BASE_URL = "http://www.ebi.ac.uk/miriamws/main/rest/"
 IDENTIFIERS_BASE_URL = "http://identifiers.org/rest/"
-
 
 
 def json_providers_for_uri(uri):

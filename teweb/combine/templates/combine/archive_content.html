@@ -13,24 +13,23 @@
             </div>
 
             <div class="panel-body">
-                <!-- Archive tree -->
-                <div class="flex-container">
-                    <div class="">
-                        <div id="json_tree"></div>
-                    </div>
+                <div class="row">
 
-                    <div class="">
-                        <!-- Entry detail -->
-                        <div id="entry_detail">
-                            <form id="form_detail" method="post">
-                                <div id="button-div"></div>
-                                <div class="well" id="manifest_detail"></div>
-                                <div id="button-meta-div"></div>
-                                <div class="well" id="item_detail"></div>
-                                <div class="well" id="tripples_detail"></div>
-                            </form>
-                        </div>
+                    <!-- Archive tree -->
+                    <div id="json_tree" class="col-lg-4" style="max-height: 500px; overflow-y:auto;"></div>
+
+                    <!-- Entry detail -->
+                    <div id="entry_detail" class="col-lg-8 well" style="min-height: 500px; max-height: 500px; overflow-y:auto;">
+                        <form id="form_detail" method="post">
+                            <div id="button-div"></div>
+                            <div id="manifest_detail"></div>
+                            <div id="button-meta-div"></div>
+                            <div id="item_detail"></div>
+                        </form>
                     </div>
+                </div>
+                <div class="row">
+                <div id="tripples_detail" class="col-lg-12" style="max-height: 500px; overflow-y:auto;"></div>
                 </div>
 
             </div>
