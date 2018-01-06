@@ -66,6 +66,7 @@ initative
 ## Funding
 <b><a href="https://orcid.org/0000-0003-1725-179X" title="0000-0003-1725-179X"><img src="./docs/images/logos/orcid.png" height="15"/></a> Matthias König</b> is supported by the Federal Ministry of Education and Research (BMBF, Germany) 
 within the research network Systems Medicine of the Liver (LiSyM, grant number 031L0054).
+
 <a href="http://www.lisym.org/" alt="LiSyM" target="_blank"><img src="./docs/images/logos/lisym.png" height="35"></a> &nbsp;&nbsp;
 <a href="http://www.bmbf.de/" alt="BMBF" target="_blank"><img src="./docs/images/logos/bmbf.png" height="35"></a> &nbsp;&nbsp;
 
@@ -78,7 +79,7 @@ The following technology is used in `Tellurium Web`
 * Interactive plots: [plotly.js](https://github.com/plotly/plotly.js)
 * Websockets: Django channels
 
-# Changelog
+## Changelog
 *v0.2.0* [2018-01-06]
 - complete rewrite of the user interface and core functionality
 - combine archive viewer/editor (metadata)
