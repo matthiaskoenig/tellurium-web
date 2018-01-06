@@ -53,23 +53,14 @@ initative, e.g.,
 <a href="http://antimony.sourceforge.net//" alt="Antimony" target="_blank"><img src="./docs/images/logos/antimony.png" height="25"></a> &nbsp;&nbsp;
 
 ## Screenshots
-Screenshot of COMBINE archive browser:
+COMBINE archive browser
 <img title="Screenshot Tellurium Web Tools Browser" src="./docs/images/screenshot-v0.2.0_archives.png" width="800" />
 
-Screenshot of COMBINE archive viewer:
-<img title="Screenshot Tellurium Web Tools Viewer" src="./docs/images/screenshot-v0.2.0_archives.png" width="800" />
+COMBINE archive viewer with access to manifest, metadata and annotations
+<img title="Screenshot Tellurium Web Tools Viewer" src="./docs/images/screenshot-v0.2.0_archiveview.png" width="800" />
 
-Screenshot of simulation results:
-<img title="Screenshot Tellurium Web Tools Results" src="./docs/images/screenshot-v0.2.0_archives.png" width="800" />
-
-## Technology
-The following technology is used in `Tellurium Web`
-* Web framework: [django](https://www.djangoproject.com/)
-* Database layer: [sqlite](https://www.sqlite.org/) (develop) & [postgres](https://www.postgresql.org/) (deploy)
-* Task queue: [celery](http://www.celeryproject.org/) Distributed task queue
-* Message broker: [redis](https://redis.io/) Redis is an open source in-memory data structure store, used as a database, cache and message broker.
-* Interactive plots: [plotly.js](https://github.com/plotly/plotly.js)
-* Websockets: Django channels
+Simulation results of SED-ML experiment
+<img title="Screenshot Tellurium Web Tools Results" src="./docs/images/screenshot-v0.2.0_results.png" width="800" />
 
 ## License
 * Source Code: [LGPLv3](http://opensource.org/licenses/LGPL-3.0)
@@ -81,7 +72,33 @@ within the research network Systems Medicine of the Liver (LiSyM, grant number 0
 <a href="http://www.lisym.org/" alt="LiSyM" target="_blank"><img src="./docs/images/logos/lisym.png" height="35"></a> &nbsp;&nbsp;
 <a href="http://www.bmbf.de/" alt="BMBF" target="_blank"><img src="./docs/images/logos/bmbf.png" height="35"></a> &nbsp;&nbsp;
 
-# Installation
+## Technology
+The following technology is used in `Tellurium Web`
+* Web framework: [django](https://www.djangoproject.com/)
+* Database layer: [postgres](https://www.postgresql.org/) & [sqlite](https://www.sqlite.org/) (develop) 
+* Task queue: [celery](http://www.celeryproject.org/) Distributed task queue
+* Message broker: [redis](https://redis.io/) Redis is an open source in-memory data structure store, used as a database, cache and message broker.
+* Interactive plots: [plotly.js](https://github.com/plotly/plotly.js)
+* Websockets: Django channels
+
+# Changelog
+*v0.2.0* [2018-01-06]
+- complete rewrite of the user interface and core functionality
+- combine archive viewer/editor (metadata)
+- manifest.xml and metadata.rdf handling
+- dynamic generation of archives
+- archive upload via url
+- user management (global and user archives)
+- annotation support (external annotation files and SBML annotations)
+- django channels for task notifications
+- REST API (with swagger documentation)
+
+*v0.1.0* [2017-10-19]
+- initial release
+- core functionality implemented
+
+
+# Installation & Setup
 `tellurium-web` supports `python 3.5` or `python 3.6`.
 
 ## Basic setup
@@ -127,21 +144,4 @@ The test server is run via
 (tellurium-web) python manage.py runserver 8001
 ```
 
-# Changelog
-*v0.2.0* [2018-01-06]
-- complete rewrite of the user interface and core functionality
-- combine archive viewer/editor (metadata)
-- manifest.xml and metadata.rdf handling
-- dynamic generation of archives
-- archive upload via url
-- user management (global and user archives)
-- annotation support (external annotation files and SBML annotations)
-- django channels for task notifications
-- REST API (with swagger documentation)
-
-*v0.1.0* [2017-10-19]
-- initial release
-- core functionality implemented
-
-
-&copy; 2017 Matthias König
+&copy; 2018 Matthias König
