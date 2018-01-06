@@ -1,12 +1,12 @@
 {% import 'combine/macros.html' as macros %}
-        <h2>{{ macros.archive_html(archive) }} {{ macros.archive_download(archive) }}
-                    {% if request.user.is_authenticated %}
-                    <span class="pull-right">
-                    <!-- delete archive -->
-                    {{ macros.archive_delete(archive) }}
-                    </span>
-                    {% endif %}
-                </h2>
+        <span>{{ macros.archive_html(archive) }} {{ macros.archive_download(archive) }}
+            {% if request.user.is_authenticated %}
+            <span class="pull-right">
+
+            {{ macros.archive_delete(archive) }}
+            </span>
+            {% endif %}
+        </span>
         <div class="panel panel-default">
             <!-- <div class="panel-heading"></div> -->
 

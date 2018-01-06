@@ -15,7 +15,13 @@ $.ajax({
         $('#json_tree').jstree({
             'core': {
                 'multiple': false,
-                'data': data
+                'data': data,
+                 "themes": {
+                    "name": 'default',
+                    "dots" : true,
+                    "responsive" : true,
+                    "stripes": false
+                  },
             },
             'plugins':['types','dnd']
         });
@@ -24,7 +30,7 @@ $.ajax({
         console.log("error");
         console.log(error_data);
     }
-})
+});
 
 
 /**
