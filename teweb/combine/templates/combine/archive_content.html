@@ -1,8 +1,5 @@
 {% import 'combine/macros.html' as macros %}
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h2 class="panel-title">{{ macros.archive_download(archive) }} {{ macros.archive_html(archive) }}
+        <h2>{{ macros.archive_html(archive) }} {{ macros.archive_download(archive) }}
                     {% if request.user.is_authenticated %}
                     <span class="pull-right">
                     <!-- delete archive -->
@@ -10,7 +7,8 @@
                     </span>
                     {% endif %}
                 </h2>
-            </div>
+        <div class="panel panel-default">
+            <!-- <div class="panel-heading"></div> -->
 
             <div class="panel-body">
                 <div class="row">
