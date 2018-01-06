@@ -108,8 +108,6 @@ To start a `celery` test worker change in the `teweb` folder start a worker via
 ```
 (tellurium-web) cd teweb
 (tellurium-web) celery -A teweb worker -l info
-# autoreload
-(tellurium-web) watchmedo auto-restart -d . -p '*.py' -- celery -A teweb worker -l info
 ```
 
 # Run the test server

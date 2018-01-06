@@ -47,8 +47,6 @@ INSTALLED_APPS = [
     # 'debug_toolbar',
     'channels',
     'rules.apps.AutodiscoverRulesConfig',
-
-
 ]
 
 MIDDLEWARE = [
