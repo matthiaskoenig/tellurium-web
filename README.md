@@ -6,43 +6,40 @@
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 [![Coverage Status](https://coveralls.io/repos/github/matthiaskoenig/tellurium-web/badge.svg?branch=master)](https://coveralls.io/github/matthiaskoenig/tellurium-web?branch=master)
 
-<b><a href="https://orcid.org/0000-0002-4588-4925" title="0000-0002-4588-4925"><img src="./docs/images/logos/orcid.png" height="15"/></a> Janek Grzegorzewski</b>
-and 
 <b><a href="https://orcid.org/0000-0003-1725-179X" title="0000-0003-1725-179X"><img src="./docs/images/logos/orcid.png" height="15"/></a> Matthias König</b>
+and
+<b><a href="https://orcid.org/0000-0002-4588-4925" title="0000-0002-4588-4925"><img src="./docs/images/logos/orcid.png" height="15"/></a> Janek Grzegorzewski</b>
  
 `Tellurium Web` provides an online database and simulation tools for running reproducible simulation experiments in computational biology. 
  
 The `Tellurium Web` workflow is based around [COMBINE Archives](http://co.mbine.org/documents/archive) (`*.omex`)
-as an exchange format. [Tellurium](http://tellurium.analogmachine.org/), a python environment for reproducible dynamical modeling 
-of biological networks, is used as simulation backend with [libroadrunner](http://libroadrunner.org/) as high performance simulation engine. 
-
-A [COMBINE Archive](http://co.mbine.org/documents/archive) is a single zip file containing the various documents 
+as an exchange format. A [COMBINE Archive](http://co.mbine.org/documents/archive) is a single zip file containing the various documents 
 necessary for the description of a model and all associated data and procedures. 
 This includes for instance, but not limited to, simulation experiment descriptions, 
 all models needed to run the simulations and associated data files. 
-The archive is encoded using the Open Modeling EXchange format (OMEX).
+The archive is encoded using the Open Modeling EXchange format (OMEX). 
 
-The current version of `Tellurium Web` supports model descriptions in the Systems Biology Markup Language ([SBML](http://sbml.org)), 
-the de facto standard for encoding mathematical models in computational biology, and simulation descriptions in 
-the Simulation Experiment Description Markup Language ([SED-ML](http://sed-ml.org)), the standard for describing
-simulation experiments. 
+[Tellurium](http://tellurium.analogmachine.org/), a python environment for reproducible dynamical modeling 
+of biological networks, is used as simulation backend with [libroadrunner](http://libroadrunner.org/) as high performance simulation engine. 
 
 ## Features
-- COMBINE archive database (upload & managing of archives)
-- COMBINE archive viewer
-- COMBINE archive based simulation experiments
-- supports [SBML](http://sbml.org) models (all level and versions, i.e. `L2V*` and `L3V*`)
-- supports [SED-ML](http://sed-ml.org) simulations (all level and versions, i.e., `L1V1`, `L1V2` & `L1V3`)
+The current version of `Tellurium Web` supports the execution of simulation experiments with model descriptions in the Systems Biology Markup Language ([SBML](http://sbml.org)), 
+the de facto standard for encoding mathematical models in computational biology, and simulation descriptions in 
+the Simulation Experiment Description Markup Language ([SED-ML](http://sed-ml.org)), the standard for describing
+simulation experiments.
+
+- COMBINE archive browser (upload & managing of archives)
+- COMBINE archive viewer (managing metadata, manifest & annotations)
+- Execution of COMBINE archive based simulation experiments
+- supports [SBML](http://sbml.org) models (all level and versions, i.e., `L2V*` and `L3V*`)
+- supports [SED-ML](http://sed-ml.org) simulations (all level and versions, i.e., `L1V1`, `L1V2` and `L1V3`)
 
 `Tellurium Web` has been tested with a wide range of archives, among others 
 - [COMBINE Archive Showcase](https://github.com/SemsProject/CombineArchiveShowCase)
 - [JWS online](https://jjj.bio.vu.nl/) archives
 
 `Tellurium Web` is based existing technology and standards in the "Coordinating standards for modeling in biology" ([COMBINE](http://co.mbine.org/))  
-initative, e.g., 
-* [SBML](http://sbml.org) for computational models
-* [SED-ML](http://sed-ml.org) for simulation experiments
-* [COMBINE Archives](http://co.mbine.org/documents/archive) for the exchange of data
+initative
 
 <a href="http://co.mbine.org/" alt="COMBINE" target="_blank"><img src="./docs/images/logos/combine.png" height="25"></a> &nbsp;&nbsp;
 <a href="http://co.mbine.org/documents/archive" alt="COMBINE archive format" target="_blank"><img src="./docs/images/logos/omex.png" height="25"></a> &nbsp;&nbsp;
@@ -53,13 +50,13 @@ initative, e.g.,
 <a href="http://antimony.sourceforge.net//" alt="Antimony" target="_blank"><img src="./docs/images/logos/antimony.png" height="25"></a> &nbsp;&nbsp;
 
 ## Screenshots
-COMBINE archive browser
+**COMBINE archive browser**
 <img title="Screenshot Tellurium Web Tools Browser" src="./docs/images/screenshot-v0.2.0_archives.png" width="800" />
 
-COMBINE archive viewer with access to manifest, metadata and annotations
+**COMBINE archive viewer with access to manifest, metadata and annotations**
 <img title="Screenshot Tellurium Web Tools Viewer" src="./docs/images/screenshot-v0.2.0_archiveview.png" width="800" />
 
-Simulation results of SED-ML experiment
+**Simulation results of SED-ML experiment**
 <img title="Screenshot Tellurium Web Tools Results" src="./docs/images/screenshot-v0.2.0_results.png" width="800" />
 
 ## License
@@ -67,7 +64,7 @@ Simulation results of SED-ML experiment
 * Documentation: [CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/)
 
 ## Funding
-Matthias König is supported by the Federal Ministry of Education and Research (BMBF, Germany) 
+<b><a href="https://orcid.org/0000-0003-1725-179X" title="0000-0003-1725-179X"><img src="./docs/images/logos/orcid.png" height="15"/></a> Matthias König</b> is supported by the Federal Ministry of Education and Research (BMBF, Germany) 
 within the research network Systems Medicine of the Liver (LiSyM, grant number 031L0054).
 <a href="http://www.lisym.org/" alt="LiSyM" target="_blank"><img src="./docs/images/logos/lisym.png" height="35"></a> &nbsp;&nbsp;
 <a href="http://www.bmbf.de/" alt="BMBF" target="_blank"><img src="./docs/images/logos/bmbf.png" height="35"></a> &nbsp;&nbsp;
