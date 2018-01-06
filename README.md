@@ -53,8 +53,14 @@ initative, e.g.,
 <a href="http://antimony.sourceforge.net//" alt="Antimony" target="_blank"><img src="./docs/images/logos/antimony.png" height="25"></a> &nbsp;&nbsp;
 
 ## Screenshots
-Screenshot of the COMBINE archive upload functionality and COMBINE archive browser:
-<img title="Screenshot Tellurium Web Tools" src="./docs/images/screenshot-0.1.png" width="800" />
+Screenshot of COMBINE archive browser:
+<img title="Screenshot Tellurium Web Tools Browser" src="./docs/images/screenshot-v0.2.0_archives.png" width="800" />
+
+Screenshot of COMBINE archive viewer:
+<img title="Screenshot Tellurium Web Tools Viewer" src="./docs/images/screenshot-v0.2.0_archives.png" width="800" />
+
+Screenshot of simulation results:
+<img title="Screenshot Tellurium Web Tools Results" src="./docs/images/screenshot-v0.2.0_archives.png" width="800" />
 
 ## Technology
 The following technology is used in `Tellurium Web`
@@ -63,6 +69,7 @@ The following technology is used in `Tellurium Web`
 * Task queue: [celery](http://www.celeryproject.org/) Distributed task queue
 * Message broker: [redis](https://redis.io/) Redis is an open source in-memory data structure store, used as a database, cache and message broker.
 * Interactive plots: [plotly.js](https://github.com/plotly/plotly.js)
+* Websockets: Django channels
 
 ## License
 * Source Code: [LGPLv3](http://opensource.org/licenses/LGPL-3.0)
