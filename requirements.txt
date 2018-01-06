@@ -17,6 +17,9 @@ channels>=1.1.8
 daphne>=1.4.1
 asgi_redis
 
+requests
+requests-cache>=0.4.13
+
 django-sticky-uploads>=0.6.1
 django-crispy-forms>=1.7.0
 
