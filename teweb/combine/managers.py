@@ -60,6 +60,7 @@ class ArchiveManager(models.Manager):
         Tag = apps.get_model("combine", model_name="Tag")
         ArchiveEntry = apps.get_model("combine", model_name="ArchiveEntry")
         MetaData = apps.get_model("combine", model_name="MetaData")
+        Triple = apps.get_model("combine", model_name="Triple")
 
         kwargs["created"] = datetime.datetime.now()
 
@@ -166,11 +167,38 @@ class ArchiveManager(models.Manager):
                 metadata_dict = {"metadata": meta_dict}
                 metadata = MetaData.objects.create(**metadata_dict)
                 archive_entry.metadata = metadata
-
                 # don't forget to save the entry
                 archive_entry.save()
 
+                # ----------------------------
+                # additional metadata entries
+                # ----------------------------
+                if archive_entry.base_format == "sbml":
+                    logger.info("Adding SBML external annotations")
+
+                    # externalize annotations
+                    from combine.metadata import sbml as mdsbml
+                    mdsbml_dict = mdsbml.parse_metadata(path_sbml=archive_entry.path, prefix=location)
+
+                    # add triples
+                    entry_meta = archive_entry.metadata
+                    triples = []
+                    for sbml_location, sbml_dict in mdsbml_dict.items():
+                        metadata_triples = sbml_dict.get('bm_triples')
+                        for (s, s_type, p, p_type, o, o_type) in metadata_triples:
+                            triple = Triple.objects.create(subject=s, subject_type=s_type,
+                                                           predicate=p, predicate_type=p_type,
+                                                           object=o, object_type=o_type)
+                            triples.append(triple)
+
+                        entry_meta.triples.add(*triples)
+                        entry_meta.save()
+                    archive_entry.save()
+
+                # ----------------------
                 # Tags from given entry
+                # ----------------------
+
                 # FIXME: this must be done on save method of entry (dynamic update of tags if entries change)
                 tags_info = create_tags_for_entry(archive_entry)
                 # pprint(tags_info)
