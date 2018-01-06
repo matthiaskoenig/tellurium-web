@@ -6,6 +6,9 @@
 [![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=flat-square)](http://opensource.org/licenses/LGPL-3.0)
 [![Coverage Status](https://coveralls.io/repos/github/matthiaskoenig/tellurium-web/badge.svg?branch=master)](https://coveralls.io/github/matthiaskoenig/tellurium-web?branch=master)
 
+<b><a href="https://orcid.org/0000-0002-4588-4925" title="0000-0002-4588-4925"><img src="./docs/images/logos/orcid.png" height="15"/></a> Janek Grzegorzewski</b>
+and 
+<b><a href="https://orcid.org/0000-0003-1725-179X" title="0000-0003-1725-179X"><img src="./docs/images/logos/orcid.png" height="15"/></a> Matthias König</b>
  
 `Tellurium Web` provides an online database and simulation tools for running reproducible simulation experiments in computational biology. 
  
@@ -118,8 +121,16 @@ The test server is run via
 ```
 
 # Changelog
-*v0.2.0* [?]
-
+*v0.2.0* [2018-01-06]
+- complete rewrite of the user interface and core functionality
+- combine archive viewer/editor (metadata)
+- manifest.xml and metadata.rdf handling
+- dynamic generation of archives
+- archive upload via url
+- user management (global and user archives)
+- annotation support (external annotation files and SBML annotations)
+- django channels for task notifications
+- REST API (with swagger documentation)
 
 *v0.1.0* [2017-10-19]
 - initial release

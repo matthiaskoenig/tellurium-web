@@ -30,6 +30,11 @@ Definition of reusable macro function in templates
 
 {% macro archive_delete(archive) %}
     <a href="{{ url('combine:delete_archive', args=[archive.id]) }}" title="Delete archive {{ archive.id }}: {{ archive.name }}">
+    <button class="btn btn-danger" onclick="return confirm('Are you sure you want to delete: {{ archive }}?')">
+    <i class="fas fa-trash fa-fw"></i></button></a>
+{% endmacro %}
+{% macro archive_delete_xs(archive) %}
+    <a href="{{ url('combine:delete_archive', args=[archive.id]) }}" title="Delete archive {{ archive.id }}: {{ archive.name }}">
     <button class="btn-xs btn-danger" onclick="return confirm('Are you sure you want to delete: {{ archive }}?')">
     <i class="fas fa-trash fa-fw"></i></button></a>
 {% endmacro %}
