@@ -20,6 +20,7 @@ import requests
 # caching of webservice requests
 import requests_cache
 requests_cache.install_cache(backend="redis", cache_name="annotations", expire_after=86400)
+# requests_cache.install_cache(backend="re", cache_name="annotations", expire_after=86400)
 
 # expired only removed on next access, so make sure the cache is cleared
 # requests_cache.remove_expired_responses()
