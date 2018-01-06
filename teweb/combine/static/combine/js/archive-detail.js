@@ -51,9 +51,6 @@ function base_format(format){
 }
 
 
-
-
-
 function modified_content( modified){
     "use strict";
     var content="";
@@ -72,8 +69,6 @@ function add_empty_contact(){
     contact_div.setAttribute("id", "new");
     contact_div.innerHTML = "<div>"+empty_creator+"</div>";
     return contact_div
-
-
 }
 
 function add_empty_creator(){
@@ -115,14 +110,11 @@ function addContact(creators,creator,edit){
 
         delete_creator =  deleteInput.outerHTML;
 
-
-
         var deleteButton = document.createElement("input");
         deleteButton.setAttribute("class" , "btn btn-xs btn-danger");
         deleteButton.setAttribute("value","Delete");
         deleteButton.setAttribute("id","delete");
         deleteButton.setAttribute("type","button");
-
 
         delete_button = deleteButton.outerHTML;
 
@@ -294,18 +286,13 @@ function create_meta(metadata, edit){
     show_modified(dd_modified,metadata.modified);
 
 
-
-
     dt_desc.appendChild(document.createTextNode("Description"));
     dt_created.appendChild(document.createTextNode("Created"));
     dt_modified.appendChild(document.createTextNode("Modified"));
 
     dd_created.appendChild(document.createTextNode(metadata.created));
 
-
-
     if (edit===true) {
-
         var textArea = document.createElement("textarea");
         textArea.setAttribute("class", "textArea");
         textArea.setAttribute("name", "description");
@@ -318,9 +305,6 @@ function create_meta(metadata, edit){
 
     dl_desc.appendChild(dt_desc);
     dl_desc.appendChild(dd_desc);
-
-
-
 
     dl_created.appendChild(dt_created);
     dl_created.appendChild(dd_created);
@@ -341,7 +325,6 @@ function create_meta(metadata, edit){
 
     meta_div.appendChild(dl_created);
     meta_div.appendChild(dl_modified);
-
 
     return meta_div;
 
