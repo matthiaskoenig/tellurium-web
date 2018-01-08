@@ -9,22 +9,15 @@ import json
 from django.contrib.auth.models import User
 from django_filters import rest_framework as filters
 
-from rest_framework import viewsets, status
-from rest_framework.reverse import reverse
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAdminUser
 import rest_framework.filters as filters_rest
 
 from .models import Archive, Tag, ArchiveEntry, Creator, Date
-from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer, DateSerializer, \
-    CreatorSerializer, MetaDataSerializer
-
-from .permissions import IsOwnerOrReadOnly, IsAdminUserOrReadOnly, IsOwnerOfArchiveEntryOrReadOnly, \
-    IsOwnerOrGlobalOrAdminReadOnly, CompleteArchivePermissions
-
+from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, ArchiveEntrySerializer
+from .permissions import  ZipTreePermissions, CompleteArchivePermissions, CompleteArchiveEntryPermissions, IsAdminUserOrReadOnly
 from .utils import tree
 
 
@@ -78,14 +71,14 @@ class ArchiveEntryViewSet(viewsets.ModelViewSet):
         permission_classes define which users is allowed to do what.
         """
     queryset = ArchiveEntry.objects.all()
-    #permission_classes = (IsOwnerOfArchiveEntryOrReadOnly,)
+    permission_classes = (CompleteArchiveEntryPermissions,)
     serializer_class = ArchiveEntrySerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
     """ REST tags. """
     queryset = Tag.objects.all()
-    #permission_classes = (IsAdminUserOrReadOnly,)
+    permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = TagSerializer
     lookup_field = 'uuid'
     filter_backends = (filters.DjangoFilterBackend, filters_rest.SearchFilter)
@@ -107,7 +100,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ZipTreeView(APIView):
     queryset = Archive.objects.all()
-    permission_classes = (IsOwnerOrGlobalOrAdminReadOnly,)
+    permission_classes = (ZipTreePermissions,)
 
     def get(self, request, *args, **kwargs):
         archive = self.get_object(request)

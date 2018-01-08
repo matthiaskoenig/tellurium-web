@@ -19,7 +19,12 @@
                     <!-- Entry detail -->
                     <div id="entry_detail" class="col-lg-8 well" style="min-height: 500px; max-height: 500px; overflow-y:auto;">
                         <form id="form_detail" method="post">
+                            {% if request.user.has_perm('combine.change_archive', archive) %}
                             <div id="button-div"></div>
+                             {% else %}
+                             <div style="display: none;" id="button-div"></div>
+                            {% endif %}
+
                             <div id="manifest_detail"></div>
                             <div id="button-meta-div"></div>
                             <div id="item_detail"></div>

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'guardian',
 ]
 
+
 MIDDLEWARE = [
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -90,8 +91,9 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'rules.permissions.ObjectPermissionBackend',
+    #'rules.permissions.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
 )
 
 WSGI_APPLICATION = 'teweb.wsgi.application'
@@ -179,6 +181,8 @@ CHANNEL_LAYERS = {
    },
 }
 
+ANONYMOUS_USER_NAME = "Anonymous"
+GUARDIAN_GET_INIT_ANONYMOUS_USER = 'combine.models.get_anonymous_user_instance'
 
 LOGIN_URL = 'rest_framework:login'
 LOGOUT_URL = 'rest_framework:logout'

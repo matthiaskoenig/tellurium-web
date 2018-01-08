@@ -40,8 +40,11 @@ METADATA_LOCATION = "./metadata.rdf"
 METADATA_FORMAT = "http://identifiers.org/combine.specifications/omex-metadata"
 METADATA_LOCATION_TURTLE = "./metadata.ttl"
 METADATA_FORMAT_TURTLE = "http://purl.org/NET/mediatypes/text/turtle"
-
-
+# ===============================================================================
+# Used in Settings
+# ===============================================================================
+def get_anonymous_user_instance(User):
+    return User(real_username='Anonymous')
 # ===============================================================================
 # MetaData
 # ===============================================================================
@@ -282,6 +285,9 @@ class Archive(models.Model):
             self.md5 = managers.hash_for_file(self.file, hash_type='MD5')
 
         return super(Archive, self).save(*args, **kwargs)
+
+    def post_save(self):
+        pass
 
     @property
     def md5_short(self):

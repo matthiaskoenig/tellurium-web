@@ -15,8 +15,10 @@ from django.core.files.base import ContentFile
 from django.shortcuts import render, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, FileResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django_celery_results.models import TaskResult
+from django.contrib.auth.models import  Group, User
+
+
 from celery.result import AsyncResult
 
 from .tasks import execute_omex
@@ -26,6 +28,9 @@ from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, Archi
 from .forms import UploadArchiveForm
 from .utils import comex, git
 
+from guardian.shortcuts import get_objects_for_user
+from guardian.compat import get_user_model
+from guardian.utils import get_anonymous_user, get_identity
 
 from teweb.settings import VERSION
 
@@ -61,7 +66,8 @@ def archives(request, form=None):
     :param form:
     :return:
     """
-    if request.user.is_superuser:
+    """
+        if request.user.is_superuser:
         archives = Archive.objects.all().order_by('-created')
     else:
         accepted_user = [request.user]
@@ -70,8 +76,21 @@ def archives(request, form=None):
             accepted_user.append(global_user)
         except User.DoesNotExist:
             pass
+    """
 
-        archives = [archive  for archive  in Archive.objects.all().order_by('-created') if archive.user in accepted_user]
+
+
+
+    if not request.user.is_authenticated:
+        #User = get_user_model()
+        #user = User.get_anonymous()
+        #user = get_anonymous_user()
+        user = get_anonymous_user()
+    else:
+        user = request.user
+    archives = get_objects_for_user(user, 'combine.view_archive',use_groups=True).order_by('-created')
+
+    #archives = [archive  for archive  in Archive.objects.all().order_by('-created') if archive.user in accepted_user]
 
     if form is None:
         form = UploadArchiveForm()

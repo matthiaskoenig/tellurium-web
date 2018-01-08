@@ -13,8 +13,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.files import File
 from django.apps import apps
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.utils.timezone import utc
+from guardian.shortcuts import assign_perm
+from guardian.utils import get_anonymous_user
+
 
 from .utils.tags import create_tags_for_entry
 
@@ -64,10 +67,18 @@ class ArchiveManager(models.Manager):
 
         kwargs["created"] = datetime.datetime.now()
 
+
+        # if anonymous user get the user
+        kwargs['user'] = kwargs.get("user",get_anonymous_user())
+
         # if string user get the user
-        username = kwargs['user']
-        if isinstance(username, str):
-            kwargs['user'] = User.objects.get(username=username)
+        if isinstance(kwargs['user'], str):
+            kwargs['user'] = User.objects.get(username=kwargs['user'])
+
+        # mark archive as global
+        is_global_archive = kwargs.get("global_archive", False)
+        if "global_archive" in kwargs:
+            del kwargs["global_archive"]
 
         # archive from path
         if "archive_path" in kwargs:
@@ -80,6 +91,7 @@ class ArchiveManager(models.Manager):
 
             # Create archive and store file
             archive = super(ArchiveManager, self).create(*args, **kwargs)
+
             with open(path, 'rb') as f:
                 archive.file.save(name, File(f))
 
@@ -96,6 +108,15 @@ class ArchiveManager(models.Manager):
             kwargs["name"] = os.path.basename(file.name)
             archive = super(ArchiveManager, self).create(*args, **kwargs)
             archive.file.save(kwargs["name"], File(file))
+
+        #add permissions
+        if is_global_archive:
+            normal_group = Group.objects.get(name="normal_group")
+            assign_perm('combine.view_archive', normal_group, archive)
+
+        assign_perm('combine.view_archive', kwargs['user'], archive)
+        assign_perm('combine.change_archive', kwargs['user'], archive)
+        assign_perm('combine.delete_archive', kwargs['user'], archive)
 
         archive.save()
 

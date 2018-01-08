@@ -1,17 +1,14 @@
 from rest_framework import permissions
 
-class IsOwnerOrReadOnly(permissions.BasePermission):
-    """
-    Custom permission to only allow owners of an object to edit it.
-    """
-    def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS:
-            return True
+class IsAdminUserOrReadOnly(permissions.IsAdminUser):
 
-        # Write permissions are only allowed to the owner of the snippet.
-        return obj.user == request.user
+    def has_permission(self, request, view):
+        is_admin = super(
+            IsAdminUserOrReadOnly,
+            self).has_permission(request, view)
+        # Python3: is_admin = super().has_permission(request, view)
+        return request.method in permissions.SAFE_METHODS or request.user.is_staff
+
 
 
 class CompleteArchivePermissions(permissions.BasePermission):
@@ -22,7 +19,7 @@ class CompleteArchivePermissions(permissions.BasePermission):
     """
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
-            return obj.user == request.user or obj.user.username == "global" or request.user.is_staff
+            return obj.user == request.user or obj.user.username in ["global","Anonymous"] or request.user.is_staff
         elif request.method == 'POST':
                 return True
         return obj.user == request.user or request.user.is_staff
@@ -35,9 +32,19 @@ class CompleteArchiveEntryPermissions(permissions.BasePermission):
     """
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
-            return obj.archive.user == request.user or obj.archive.user.username == "global" or request.user.is_staff
+            return obj.archive.user == request.user or request.user.is_staff or obj.archive.user.username  in ["global","Anonymous"]
         else:
             return obj.archive.user == request.user  or request.user.is_staff
+
+class ZipTreePermissions(permissions.IsAdminUser):
+    """
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return obj.user == request.user or obj.user.username in ["global","Anonymous"]
+
+    def has_permission(self, request, view):
+        return True
 
 ########################################################################################################################
 
@@ -46,41 +53,6 @@ class CompleteArchiveEntryPermissions(permissions.BasePermission):
 
 
 
-
-
-class IsOwnerOfArchiveEntryOrReadOnly(permissions.BasePermission):
-    """
-    Custom permission to only allow owners of an object to edit it.
-    """
-    def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # Write permissions are only allowed to the owner of the snippet.
-        return obj.archive.user == request.user
-
-class IsAdminUserOrReadOnly(permissions.IsAdminUser):
-
-    def has_permission(self, request, view):
-        is_admin = super(
-            IsAdminUserOrReadOnly,
-            self).has_permission(request, view)
-        # Python3: is_admin = super().has_permission(request, view)
-        return request.method in permissions.SAFE_METHODS or request.user.is_staff
-
-
-class IsOwnerOrGlobalOrAdminReadOnly(permissions.IsAdminUser):
-    """
-    """
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return obj.user == request.user or obj.user.username == "global"
-
-    def has_permission(self, request, view):
-
-        return True
 
 
 

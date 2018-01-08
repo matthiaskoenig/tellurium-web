@@ -6,8 +6,11 @@ import os
 from collections import namedtuple
 import time
 
-from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import  Group
+from guardian.compat import get_user_model
+
+from guardian.shortcuts import get_anonymous_user
+
 
 from combine.models import Archive, Tag
 from . import comex
@@ -31,7 +34,7 @@ def add_archives_to_database(archive_dirs, debug=False):
 
         start_time = time.time()
 
-        archive = Archive.objects.create(archive_path=path, user="global")
+        archive = Archive.objects.create(archive_path=path, user="global", global_archive=True)
 
         if debug:
             print("\t{:2.2f} [s]".format(time.time() - start_time))
@@ -43,6 +46,13 @@ def create_users(user_defs, delete_all=True, debug=False):
     :param delete_all: deletes all existing users
     :return:
     """
+    # adds user to database
+    normal_group = Group.objects.create(name='normal_group')
+    # anon = get_anonymous_user()
+    User = get_user_model()
+    anon = User.get_anonymous()
+    anon.groups.add(normal_group)
+
     if not user_defs:
         user_defs = []
 
@@ -50,7 +60,7 @@ def create_users(user_defs, delete_all=True, debug=False):
     if delete_all:
         User.objects.all().delete()
 
-    # adds user to database
+
     for user_def in user_defs:
         if user_def.superuser:
             user = User.objects.create_superuser(username=user_def.username, email=user_def.email,
@@ -58,6 +68,7 @@ def create_users(user_defs, delete_all=True, debug=False):
         else:
             user = User.objects.create_user(username=user_def.username, email=user_def.email,
                                             password=os.environ['DJANGO_ADMIN_PASSWORD'])
+            user.groups.add(normal_group)
         user.last_name = user_def.last_name
         user.first_name = user_def.first_name
         user.save()

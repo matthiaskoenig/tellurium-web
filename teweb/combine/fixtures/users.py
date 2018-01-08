@@ -6,6 +6,7 @@ Used for filling database and in tests.
 from ..utils.data import UserDef
 
 user_defs = [
+    UserDef('Anonymous',  False, False, False, False),
     UserDef("janekg89", "Jan", "Grzegorzewski", "janekg89@hotmail.de", True),
     UserDef("mkoenig", "Matthias", "König", "konigmatt@googlemail.com", True),
     UserDef("testuser", False, False, False, False),
