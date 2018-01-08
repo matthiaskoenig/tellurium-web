@@ -322,7 +322,7 @@ def copy_archive(request, archive_id):
     archive = get_object_or_404(Archive, pk=archive_id)
     new_archive = Archive.objects.create(file=archive.file, user=request.user)
 
-    return redirect('combine:archive',archive_id=new_archive.id)
+    return redirect('combine:archive', archive_id=new_archive.id)
 
 
 @login_required

@@ -16,9 +16,11 @@ rules>=1.3
 channels>=1.1.8
 daphne>=1.4.1
 asgi_redis
+msgpack-python==0.4.8 # problem with 0.5
 
 requests
 requests-cache>=0.4.13
+django-guardian>=1.4.9
 
 django-sticky-uploads>=0.6.1
 django-crispy-forms>=1.7.0
