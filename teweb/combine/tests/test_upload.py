@@ -31,8 +31,8 @@ class UploadinView(TestCase):
         with open(OMEX_SHOWCASE_PATH, 'rb') as fp:
             file = SimpleUploadedFile("test", fp.read())
             response = self.client.post("/upload",{'file':file })
-            self.assertEquals(response.status_code, 302)
-            self.assertEquals(response.url, "/archive/1/")
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, "/archive/1/")
 
     def test_upload_archive_via_url(self):
         archive_url = "https://wwwdev.ebi.ac.uk/biomodels/model/download/BIOMD0000000012"
@@ -40,9 +40,11 @@ class UploadinView(TestCase):
         self.assertEquals(response.status_code, 302)
         self.assertEquals(response.url, "/archive/1/")
 
-    #def test_upload_archive_via_url(self):
-    #    archive_url = "https://jjj.bio.vu.nl//models/eperiments/adlung2017_fig2g/export/combinearchive?download=1"
-    #    response = self.client.post("/upload", {'url': archive_url})
-    #    self.assertEquals(response.status_code, 302)
-    #    self.assertEquals(response.url, "/archive/1/")
+    def test_upload_archive_via_url_2(self):
+        archive_url = "https://jjj.bio.vu.nl//models/eperiments/adlung2017_fig2g/export/combinearchive?download=1"
+        response = self.client.post("/upload", {'url': archive_url})
+        from pprint import pprint
+        pprint(response)
+        #self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, "/archive/1/")
 

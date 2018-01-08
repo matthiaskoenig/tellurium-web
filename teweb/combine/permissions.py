@@ -36,7 +36,15 @@ class CompleteArchiveEntryPermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return obj.archive.user == request.user or obj.archive.user.username == "global" or request.user.is_staff
-        return False
+        else:
+            return obj.archive.user == request.user  or request.user.is_staff
+
+########################################################################################################################
+
+
+
+
+
 
 
 

@@ -30,12 +30,11 @@ def validate_omex(data):
 
 def validate_url_omex(url):
     response = requests.head(url)
+    print(response.headers)
     if not 'application/zip' in response.headers['Content-Type']:
         raise ValidationError("Url does not point to a file with content type: application/zip")
     if int(response.headers['Content-Length']) > 100000000:
         raise ValidationError("File is too large")
-
-
 
 @deconstructible
 class FileValidator(object):
