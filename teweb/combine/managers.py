@@ -70,12 +70,14 @@ class ArchiveManager(models.Manager):
 
         # if anonymous user get the user
         kwargs['user'] = kwargs.get("user",get_anonymous_user())
-        if not kwargs['user'].is_authenticated:
-            kwargs['user'] = get_anonymous_user()
+
 
         # if string user get the user
         if isinstance(kwargs['user'], str):
             kwargs['user'] = User.objects.get(username=kwargs['user'])
+
+        if not kwargs['user'].is_authenticated:
+            kwargs['user'] = get_anonymous_user()
 
         # mark archive as global
         is_global_archive = kwargs.get("global_archive", False)

@@ -6,7 +6,7 @@ import os
 from collections import namedtuple
 import time
 
-from django.contrib.auth.models import  Group
+from django.contrib.auth.models import  Group, User
 from guardian.compat import get_user_model
 
 from guardian.shortcuts import get_anonymous_user
@@ -48,10 +48,7 @@ def create_users(user_defs, delete_all=True, debug=False):
     """
     # adds user to database
     normal_group = Group.objects.create(name='normal_group')
-    # anon = get_anonymous_user()
-    User = get_user_model()
-    anon = User.get_anonymous()
-    anon.groups.add(normal_group)
+
 
     if not user_defs:
         user_defs = []
