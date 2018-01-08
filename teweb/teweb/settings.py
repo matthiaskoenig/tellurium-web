@@ -182,7 +182,9 @@ CHANNEL_LAYERS = {
 }
 
 ANONYMOUS_USER_NAME = "Anonymous"
-GUARDIAN_GET_INIT_ANONYMOUS_USER = 'combine.models.get_anonymous_user_instance'
+GUARDIAN_RENDER_403 = False
+GUARDIAN_RAISE_403 = True
+
 
 LOGIN_URL = 'rest_framework:login'
 LOGOUT_URL = 'rest_framework:logout'

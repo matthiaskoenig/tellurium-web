@@ -9,6 +9,7 @@
             {% if archive.user.username == "global" %}
                 {{ macros.archive_copy(archive) }}
             {% endif %}
+            {{ macros.user_archives(archive.user) }}
         </span>
         <div class="panel panel-default">
             <!-- <div class="panel-heading"></div> -->

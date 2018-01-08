@@ -24,6 +24,11 @@ Definition of reusable macro function in templates
                 <button class="btn btn-default"><i class="fas fa-copy fa-fw"></i></button></a>
 {% endmacro %}
 
+{% macro user_archives(user) %}
+<a href="{{ url('combine:user_archives', args=[user.id])}}" title="Show archives with similar owner">
+                <button class="btn btn-default"><i class="fas fa-archive fa-fw"></i> <i class="fas fa-user fa-fw"></i></button></a>
+{% endmacro %}
+
 {% macro archive_download(archive) %}
 <a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
                 <button class="btn btn-default"><i class="fas fa-download fa-fw"></i></button></a>
