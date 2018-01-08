@@ -66,6 +66,16 @@ def archives(request, form=None):
     :param form:
     :return:
     """
+
+    return user_archives(request, None, form=None)
+
+def user_archives(request,user_id, form=None):
+    """ Overview of archives of a user.
+
+    :param request:
+    :param form:
+    :return:
+    """
     """
         if request.user.is_superuser:
         archives = Archive.objects.all().order_by('-created')
@@ -89,6 +99,8 @@ def archives(request, form=None):
     else:
         user = request.user
     archives = get_objects_for_user(user, 'combine.view_archive',use_groups=True).order_by('-created')
+    if bool(user_id):
+        archives = archives.filter(user__id=user_id)
 
     #archives = [archive  for archive  in Archive.objects.all().order_by('-created') if archive.user in accepted_user]
 
@@ -99,7 +111,6 @@ def archives(request, form=None):
         'form': form
     }
     return render(request, 'combine/archives.html', context)
-
 
 @permission_required_or_403('combine.view_archive',(Archive, 'id', 'archive_id'))
 def archive_view(request, archive_id):

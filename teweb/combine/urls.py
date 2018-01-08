@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^archive/(?P<archive_id>[0-9]+)/download_initial$', views.download_archive_initial, name='download_archive_initial'),
     url(r'^archive/(?P<archive_id>[0-9]+)/download$', views.download_archive, name='download_archive'),
     url(r'^archive/(?P<archive_id>[0-9]+)/copy$', views.copy_archive, name='copy_archive'),
+    url(r'^archives/(?P<user_id>[0-9]+)/$', views.user_archives, name='user_archives'),
 
     url(r'^archive/(?P<archive_id>[0-9]+)/zip_tree$', views_api.ZipTreeView.as_view(), name='zip_data'),
 
