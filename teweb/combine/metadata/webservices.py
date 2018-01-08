@@ -16,21 +16,25 @@ import warnings
 from pprint import pprint
 
 import requests
+import logging
 
 # caching of webservice requests
 import requests_cache
-requests_cache.install_cache(backend="redis", cache_name="annotations", expire_after=86400)
+# requests_cache.install_cache(backend="redis", cache_name="annotations", expire_after=86400)
+# CACHE_SESSION = requests_cache.CachedSession(backend="redis", cache_name="annotations", expire_after=86400)
+
 # requests_cache.install_cache(backend="re", cache_name="annotations", expire_after=86400)
 
 # expired only removed on next access, so make sure the cache is cleared
 # requests_cache.remove_expired_responses()
-# from functools import lru_cache
+from functools import lru_cache
 # @lru_cache(maxsize=500)
 
 OLS_BASE_URL = "http://www.ebi.ac.uk/ols/api/"
 MIRIAM_BASE_URL = "http://www.ebi.ac.uk/miriamws/main/rest/"
 IDENTIFIERS_BASE_URL = "http://identifiers.org/rest/"
 
+logger = logging.getLogger(__name__)
 
 def json_providers_for_uri(uri):
     json = {}
@@ -60,7 +64,7 @@ def _json_providers_for_prefix(prefix):
     """
 
     url = IDENTIFIERS_BASE_URL + 'collections/provider/{}'.format(prefix)
-    response = requests.get(url)
+    response = _make_request(url)
     return response.json()
 
 
@@ -84,13 +88,29 @@ def json_term_for_uri(uri):
         iri = "{}_{}".format(ontology.upper(), iri)
 
         # encode URL
-        url = OLS_BASE_URL + 'ontologies/{}/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252F{}'.format(ontology, iri)
-        response = requests.get(url)
+        OLS_PATTERN = 'ontologies/{}/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252F{}'
+        url = OLS_BASE_URL + OLS_PATTERN.format(ontology, iri)
+        response = _make_request(url)
         json = response.json()
 
     return json
 
 
+@lru_cache(maxsize=2000)
+def _make_request(url):
+    """ Performs request, returns response.
+
+    :param url:
+    :return:
+    """
+    # response = requests.get(url)
+    logging.info("web service request: {}".format(url))
+    # response = CACHE_SESSION.get(url)
+    # logger.warning("cached {}: ".format(url, response.is_cached))
+    response = requests.get(url)
+    print("request:", url)
+
+    return response
 
 
 if __name__ == "__main__":
