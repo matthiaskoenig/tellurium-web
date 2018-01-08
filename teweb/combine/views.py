@@ -27,7 +27,7 @@ from .serializers import ArchiveSerializer, TagSerializer, UserSerializer, Archi
     CreatorSerializer, MetaDataSerializer
 from .forms import UploadArchiveForm
 from .utils import comex, git
-
+from guardian.decorators import permission_required_or_403
 from guardian.shortcuts import get_objects_for_user
 from guardian.compat import get_user_model
 from guardian.utils import get_anonymous_user, get_identity
@@ -101,7 +101,7 @@ def archives(request, form=None):
     return render(request, 'combine/archives.html', context)
 
 
-#@permission_required('archive.view_archive', fn=objectgetter(Archive, 'archive_id'))
+@permission_required_or_403('combine.view_archive',(Archive, 'id', 'archive_id'))
 def archive_view(request, archive_id):
     """ Single archive view.
     Displays the content of the archive.
