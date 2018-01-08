@@ -21,7 +21,7 @@ class CompleteArchivePermissions(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return obj.user == request.user or obj.user.username in ["global","Anonymous"] or request.user.is_staff
         elif request.method == 'POST':
-                return True
+                return request.user.is_authenticated
         return obj.user == request.user or request.user.is_staff
 
 

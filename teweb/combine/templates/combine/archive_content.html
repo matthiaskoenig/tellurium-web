@@ -3,8 +3,11 @@
             {% if request.user.is_authenticated %}
             <span class="pull-right">
 
-            {{ macros.archive_delete(archive) }}
+            {{ macros.archive_delete(archive)}}
             </span>
+            {% endif %}
+            {% if archive.user.username == "global" %}
+                {{ macros.archive_copy(archive) }}
             {% endif %}
         </span>
         <div class="panel panel-default">

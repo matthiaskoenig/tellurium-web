@@ -309,6 +309,22 @@ def download_archive(request, archive_id):
     return response
 
 
+def copy_archive(request, archive_id):
+    """ Download the latest archive.
+
+    The archive is created dynamically, i.e., everything is packed in a zip archive.
+    Manifest and metadata files are created from database content.
+
+    :param request:
+    :param archive_id:
+    :return:
+    """
+    archive = get_object_or_404(Archive, pk=archive_id)
+    new_archive = Archive.objects.create(file=archive.file, user=request.user)
+
+    return redirect('combine:archive',archive_id=new_archive.id)
+
+
 @login_required
 def delete_archive(request, archive_id):
     """ Delete archive.

@@ -19,10 +19,16 @@ Definition of reusable macro function in templates
         <i class="fas fa-archive fa-fw"></i> {{ archive.name }}</span></a>
 {% endmacro %}
 
+{% macro archive_copy(archive) %}
+<a href="{{ url('combine:copy_archive', args=[archive.id]) }}" title="Copy archive to your archives">
+                <button class="btn btn-default"><i class="fas fa-copy fa-fw"></i></button></a>
+{% endmacro %}
+
 {% macro archive_download(archive) %}
 <a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
                 <button class="btn btn-default"><i class="fas fa-download fa-fw"></i></button></a>
 {% endmacro %}
+
 {% macro archive_download_xs(archive) %}
 <a href="{{ url('combine:download_archive', args=[archive.id]) }}" title="Download archive">
                 <button class="btn-xs btn-default"><i class="fas fa-download fa-fw"></i></button></a>

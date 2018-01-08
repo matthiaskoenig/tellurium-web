@@ -70,6 +70,8 @@ class ArchiveManager(models.Manager):
 
         # if anonymous user get the user
         kwargs['user'] = kwargs.get("user",get_anonymous_user())
+        if not kwargs['user'].is_authenticated:
+            kwargs['user'] = get_anonymous_user()
 
         # if string user get the user
         if isinstance(kwargs['user'], str):
