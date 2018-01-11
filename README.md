@@ -8,7 +8,7 @@
 
 <b><a href="https://orcid.org/0000-0003-1725-179X" title="0000-0003-1725-179X"><img src="./docs/images/logos/orcid.png" height="15"/></a> Matthias König</b>
 and
-<b><a href="https://orcid.org/0000-0002-4588-4925" title="0000-0002-4588-4925"><img src="./docs/images/logos/orcid.png" height="15"/></a> Janek Grzegorzewski</b>
+<b><a href="https://orcid.org/0000-0002-4588-4925" title="0000-0002-4588-4925"><img src="./docs/images/logos/orcid.png" height="15"/></a> Jan Grzegorzewski</b>
  
 `Tellurium Web` provides an online database and simulation tools for running reproducible simulation experiments in computational biology. 
  
